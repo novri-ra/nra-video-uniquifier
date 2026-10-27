@@ -2,26 +2,25 @@
 
 ## Timestamp
 - **Date**: 2026-10-28
-- **Session**: 13-full-engine-and-ux-stabilization
+- **Session**: 14-android-compatibility-api24-and-universal-abi
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Working Tree**: Stabilized engine, upgraded anti-fingerprint filters, real-time telemetry and settings.
+- **Working Tree**: Android API 24+, universal ABI, and tiered permissions configured.
 
 ## Hardware & Device Verification Status
-- **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699` (Disconnected during this session, automated tests active)
-- **Architecture**: `arm64-v8a` (Snapdragon 710)
-- **OS / API**: Android 15 (API 35)
+- **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699` (Offline / Headless automated verification active)
+- **Target Emulators / Secondary**: LDPlayer 9 / PC Emulators (`x86_64`, `x86`) & Physical ARM (`arm64-v8a`, `armeabi-v7a`)
+- **OS / API Support**: Android 7.0 (API 24) through Android 15 (API 35+)
 - **Runtime Verdict**: **PASSED (33/33 automated tests passed, 0 analyze issues)**
 - **Native Components**:
+  - `minSdk = 24`, universal `ndk.abiFilters` (`arm64-v8a`, `armeabi-v7a`, `x86_64`, `x86`).
+  - Tiered permissions: Media permissions (`READ_MEDIA_VIDEO/IMAGES/AUDIO`) for API 33+, bounded external storage (`maxSdkVersion="32"` / `"29"`), and `requestLegacyExternalStorage="true"`.
   - `ffmpeg-kit-flutter-new` 3.2.0 executing synchronously via native thread pool with sandbox staging.
-  - Upgraded Anti-Fingerprint Evasion: PTS shift (`setpts=0.9852*PTS`), tempo (`atempo=1.015`), micro-crop, color matrix EQ (`contrast=1.02,saturation=1.03`), grain noise (`noise=alls=2:allf=t+u`), audio resample (`asetrate=48000*1.01,aresample=48000,equalizer`), container scrubbing (`-map_metadata -1 -map_chapters -1 -bitexact -g 60 -keyint_min 30`).
-  - Real-time statistics: `FFmpegKitConfig.enableStatisticsCallback` tracking progress %, rendering speed, and dynamic ETA.
-  - Real disk capacity telemetry via `storage_space`.
-  - Persistent settings via `shared_preferences` and `SettingsService`.
+  - Upgraded Anti-Fingerprint Evasion pipeline & real-time telemetry.
 
 ## Roadmap & Maintenance Status
 - [x] **P1 Hygiene**: Remove unreferenced `mockSelectFile()` in `UniquifierProvider` (Completed in report 03).
@@ -36,16 +35,17 @@
 - [x] **P10 Hardware Verification**: Built, installed, and launched on Android 15 physical device (`RMX1851`, API 35). Verified all tabs visually via live screenshots.
 - [x] **P11 Video Processing E2E Verification**: Verified end-to-end transcoding on device (`FFprobeKit` probe -> `FFmpegKit` transcode -> `SuccessScreen` -> `RecentHistoryScreen`).
 - [x] **P12 Engine Stabilization & Anti-Fingerprint**: Sandbox staging, real thumbnail extraction, anti-fingerprint filters, real-time telemetry, real device storage, and persistent settings.
+- [x] **P13 Android Compatibility Expansion**: Configured minSdk 24 (Android 7.0+), universal ABI (ARM + x86/x86_64 for LDPlayer 9), and tiered storage permissions.
 - [ ] **Next Maintenance (Active on `development`)**:
-  - Reconnect physical device for final on-hardware confirmation when ready.
-  - Implement batch processing pipeline.
+  - Deploy and test on LDPlayer 9 via adb when emulator is booted.
+  - Batch video processing queue.
 
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
 - **Project**: `C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier`
-- **Indexed At**: 2026-10-28T01:30:00Z
-- **Nodes**: 967 (Classes: 184, Methods: 212, Files: 114, Modules: 108)
-- **Edges**: 2,116 (Defines: 772, Calls: 298, Usage: 284, Imports: 35)
+- **Indexed At**: 2026-10-28T02:00:00Z
+- **Nodes**: 974 (Classes: 184, Methods: 212, Files: 114, Modules: 108)
+- **Edges**: 2,158 (Defines: 772, Calls: 298, Usage: 284, Imports: 35)
 - **Tools Verified**: `index_status`, `search_graph`, `index_repository`, `query_graph`, `get_graph_schema`
 
 ## Module Health & Line Budget Status (All 25 Files Passed)
