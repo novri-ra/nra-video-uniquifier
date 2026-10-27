@@ -2,14 +2,14 @@
 
 ## Timestamp
 - **Date**: 2026-10-27
-- **Session**: 08-final-wrapup-and-consolidation
+- **Session**: 09-git-init-and-ci-pipeline
 
 ## Git Status
-- **Repository**: Standalone directory (Git not initialized).
-- **Branch**: N/A
-- **HEAD**: N/A
-- **Working Tree**: Clean (all 27 tests pass, 0 analyze issues).
-- **Recent Commits**: None (local unversioned folder).
+- **Repository**: Initialized & active.
+- **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
+- **Branch**: `main` (tracking `origin/main`).
+- **Latest Commit**: `f8f3f47` (`feat: initial commit - modular architecture, 27 tests, CI pipeline & 0ai_context baseline`).
+- **Working Tree**: Clean (`git status` reports 0 untracked or modified files).
 
 ## Roadmap & Maintenance Status
 - [x] **P1 Hygiene**: Remove unreferenced `mockSelectFile()` in `UniquifierProvider` (Completed in report 03).
@@ -19,10 +19,10 @@
 - [x] **P5 Line Budget Refactoring (Processing Screen)**: Decompose `processing_screen.dart` (471 -> 272 lines, completed in report 06).
 - [x] **P6 Line Budget Refactoring (Settings Bottom Sheet)**: Decompose `advanced_settings_bottom_sheet.dart` (438 -> 158 lines, completed in report 07).
 - [x] **P7 Milestone**: **Zero files exceeding 400 LOC across entire codebase**.
-- [ ] **Next Maintenance (Recommended)**:
-  - Initialize Git version tracking (`git init`, create initial commit).
-  - Add GitHub Actions CI/CD pipeline (`flutter analyze`, `flutter test`).
+- [x] **P8 VCS & CI**: Initialized Git, resolved rebase with GitHub remote origin, pushed commit `f8f3f47`, and configured `.github/workflows/flutter-ci.yml`.
+- [ ] **Next Maintenance**:
   - Add widget interaction tests for `source_file_section.dart` and `upscale_resolution_card.dart`.
+  - Add release build workflow (Android APK / Windows executable release artifacts).
 
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
@@ -62,7 +62,8 @@
 | 25 | `lib/features/history/widgets/history_empty_state.dart` | 28 | **PASSED** | Empty state placeholder |
 
 ## Hygiene Status
-- `.gitignore`: Junk patterns locked (`Thumbs.db`, `*.tmp`, `__pycache__/`, `*.bak`, `*.swp`).
+- `.gitignore`: Configured and tracking cleanly.
 - **Dead Code Audit**: Clean. 0 unreferenced files or methods in `lib/`.
 - **Test Suite**: 27 unit & smoke tests passing (0 analyzer warnings/errors).
 - **Line Budget Target**: 100% compliant (0 files > 400 LOC).
+- **CI Automation**: GitHub Actions configured via `.github/workflows/flutter-ci.yml`.
