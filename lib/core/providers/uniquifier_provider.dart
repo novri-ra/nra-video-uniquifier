@@ -1,7 +1,25 @@
+import 'dart:io';
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 
 class UniquifierProvider extends ChangeNotifier {
+  UniquifierProvider() {
+    _initDefaultVideo();
+  }
+
+  void _initDefaultVideo() {
+    try {
+      final defaultFile = File('/sdcard/Download/test_sample.mp4');
+      if (defaultFile.existsSync() && defaultFile.lengthSync() > 0) {
+        setVideoFile(
+          path: defaultFile.path,
+          name: 'test_sample.mp4',
+          sizeBytes: defaultFile.lengthSync(),
+        );
+      }
+    } catch (_) {}
+  }
+
   // Source Video State
   String? _selectedFileName = 'video_01.mp4';
   String? _selectedFilePath;

@@ -2,24 +2,25 @@
 
 ## Timestamp
 - **Date**: 2026-10-28
-- **Session**: 11-device-run-test
+- **Session**: 12-video-processing-e2e-test
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Working Tree**: Modified `android/build.gradle.kts`, `android/settings.gradle.kts`, added report 11 & screenshots.
+- **Working Tree**: Committed and verified E2E transcoding run.
 
 ## Hardware & Device Verification Status
 - **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699`
 - **Architecture**: `arm64-v8a` (Snapdragon 710)
 - **OS / API**: Android 15 (API 35)
-- **Runtime Verdict**: **PASSED (100% Functional)**
+- **Runtime Verdict**: **PASSED (100% Functional E2E Transcoding)**
 - **Native Components**:
-  - `ffmpeg-kit-full-gpl-arm64-v8a-6.0-20250810` loaded cleanly.
+  - `ffmpeg-kit-full-gpl-arm64-v8a-6.0-20250810` executing synchronously via native thread pool.
   - Impeller rendering engine active (Vulkan + GLES).
-  - UI navigation tested across Process, Presets, and Inspect screens.
+  - Transcoding Pipeline Verified: 40s video (6.4 MB -> 13.8 MB) transcoded in ~35s on physical hardware.
+  - UI Navigation & File Browser: Verified Process, Processing, Success, and Recent Exports screens with ADB screenshots.
 
 ## Roadmap & Maintenance Status
 - [x] **P1 Hygiene**: Remove unreferenced `mockSelectFile()` in `UniquifierProvider` (Completed in report 03).
@@ -32,9 +33,10 @@
 - [x] **P8 VCS & CI**: Initialized Git, resolved rebase with GitHub remote origin, pushed commit `f8f3f47`, and configured `.github/workflows/flutter-ci.yml`.
 - [x] **P9 Branch Strategy**: Synced `main` with commit `deb15e2`, created branch `development`, and set upstream tracking to `origin/development`.
 - [x] **P10 Hardware Verification**: Built, installed, and launched on Android 15 physical device (`RMX1851`, API 35). Verified all tabs visually via live screenshots.
+- [x] **P11 Video Processing E2E Verification**: Verified end-to-end transcoding on device (`FFprobeKit` probe -> `FFmpegKit` transcode -> `SuccessScreen` -> `RecentHistoryScreen`).
 - [ ] **Next Maintenance (Active on `development`)**:
-  - Commit and push Android AGP 9 / subproject `compileSdk 36` fix to `development`.
   - Add widget interaction tests for UI screens.
+  - Test custom preset profiles and batch video processing.
 
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`

@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:isolate';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FfmpegService {
@@ -105,13 +103,6 @@ class FfmpegService {
       upscale1080p: upscale1080p,
     );
 
-    final token = RootIsolateToken.instance;
-    if (token != null) {
-      return await Isolate.run(() async {
-        BackgroundIsolateBinaryMessenger.ensureInitialized(token);
-        return await _executeFFmpeg(command, outputPath);
-      });
-    }
     return await _executeFFmpeg(command, outputPath);
   }
 
