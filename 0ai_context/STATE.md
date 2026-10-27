@@ -1,16 +1,25 @@
 # Project State
 
 ## Timestamp
-- **Date**: 2026-10-27
-- **Session**: 10-branch-development-setup
+- **Date**: 2026-10-28
+- **Session**: 11-device-run-test
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Latest Commit**: `deb15e2` (`docs: sync 0ai_context state, reports, and baseline documentation`).
-- **Working Tree**: Clean (`git status` reports 0 untracked or modified files after commit).
+- **Working Tree**: Modified `android/build.gradle.kts`, `android/settings.gradle.kts`, added report 11 & screenshots.
+
+## Hardware & Device Verification Status
+- **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699`
+- **Architecture**: `arm64-v8a` (Snapdragon 710)
+- **OS / API**: Android 15 (API 35)
+- **Runtime Verdict**: **PASSED (100% Functional)**
+- **Native Components**:
+  - `ffmpeg-kit-full-gpl-arm64-v8a-6.0-20250810` loaded cleanly.
+  - Impeller rendering engine active (Vulkan + GLES).
+  - UI navigation tested across Process, Presets, and Inspect screens.
 
 ## Roadmap & Maintenance Status
 - [x] **P1 Hygiene**: Remove unreferenced `mockSelectFile()` in `UniquifierProvider` (Completed in report 03).
@@ -22,9 +31,10 @@
 - [x] **P7 Milestone**: **Zero files exceeding 400 LOC across entire codebase**.
 - [x] **P8 VCS & CI**: Initialized Git, resolved rebase with GitHub remote origin, pushed commit `f8f3f47`, and configured `.github/workflows/flutter-ci.yml`.
 - [x] **P9 Branch Strategy**: Synced `main` with commit `deb15e2`, created branch `development`, and set upstream tracking to `origin/development`.
+- [x] **P10 Hardware Verification**: Built, installed, and launched on Android 15 physical device (`RMX1851`, API 35). Verified all tabs visually via live screenshots.
 - [ ] **Next Maintenance (Active on `development`)**:
-  - Add widget interaction tests for `source_file_section.dart` and `upscale_resolution_card.dart`.
-  - Add release build workflow (Android APK / Windows executable release artifacts).
+  - Commit and push Android AGP 9 / subproject `compileSdk 36` fix to `development`.
+  - Add widget interaction tests for UI screens.
 
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
