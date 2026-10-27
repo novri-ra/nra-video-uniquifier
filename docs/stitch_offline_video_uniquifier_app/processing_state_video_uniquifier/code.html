@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Uniquifier - Processing</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-highest": "#353437",
+            "on-primary-fixed-variant": "#005236",
+            "on-tertiary-fixed": "#1b1b21",
+            "secondary-fixed": "#4dffb2",
+            "inverse-primary": "#006c4a",
+            "on-secondary-container": "#005f3d",
+            "surface-tint": "#00e29e",
+            "secondary-container": "#00e296",
+            "on-surface": "#e5e1e4",
+            "surface-variant": "#353437",
+            "surface-bright": "#39393b",
+            "tertiary-fixed": "#e4e1ea",
+            "primary-container": "#00f0a8",
+            "inverse-on-surface": "#313032",
+            "on-tertiary": "#303036",
+            "on-primary": "#003824",
+            "tertiary-fixed-dim": "#c8c5cd",
+            "primary-fixed": "#46ffb8",
+            "primary": "#b7ffd9",
+            "surface-container-lowest": "#0e0e10",
+            "on-secondary-fixed-variant": "#005234",
+            "on-tertiary-fixed-variant": "#47464d",
+            "secondary": "#4dffb2",
+            "on-secondary": "#003822",
+            "surface": "#131315",
+            "surface-container-low": "#1c1b1d",
+            "error": "#ffb4ab",
+            "on-surface-variant": "#b9cbbf",
+            "tertiary": "#f1eef7",
+            "on-background": "#e5e1e4",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#002112",
+            "on-tertiary-container": "#5b5a61",
+            "background": "#131315",
+            "surface-container-high": "#2a2a2c",
+            "outline": "#84958a",
+            "surface-dim": "#131315",
+            "secondary-fixed-dim": "#00e296",
+            "on-error": "#690005",
+            "on-primary-fixed": "#002114",
+            "outline-variant": "#3b4a41",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#d4d2da",
+            "primary-fixed-dim": "#00e29e",
+            "inverse-surface": "#e5e1e4",
+            "on-primary-container": "#006847",
+            "surface-container": "#201f21"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["JetBrains Mono"],
+            "body-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "label-md": ["JetBrains Mono"],
+            "headline-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-xs": ["JetBrains Mono"],
+            "headline-lg-mobile": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #0e0e10;
+      color: #e5e1e4;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-surface-container-lowest">
+<!-- Top Navigation Anchor (Shared Component: TopAppBar) -->
+<header class="flex justify-between items-center w-full px-space-md py-space-sm h-14 bg-surface dark:bg-surface border-b border-surface-container-highest dark:border-surface-container-highest shrink-0 z-20">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary-container text-[20px]" data-icon="terminal">terminal</span>
+<h1 class="text-headline-sm font-headline-sm tracking-tight text-on-surface dark:text-on-surface uppercase">Video Uniquifier</h1>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-1 rounded border border-surface-container-highest">
+<span class="material-symbols-outlined text-primary-container text-[14px]" data-icon="lock">lock</span>
+<span class="text-label-xs font-label-xs text-on-surface tracking-wider uppercase">OFFLINE</span>
+</div>
+</header>
+<!-- Main Viewport Canvas (Active Processing Engine) -->
+<main class="flex-1 w-full max-w-md mx-auto px-space-md py-space-md flex flex-col justify-center items-center gap-space-lg">
+<!-- Central Processing Module -->
+<div class="w-full bg-surface border border-surface-container-highest rounded-lg p-space-md flex flex-col items-center">
+<!-- Sub-header Tag -->
+<div class="w-full flex items-center justify-between border-b border-surface-container-highest pb-space-sm mb-space-lg">
+<span class="text-label-xs font-label-xs text-outline tracking-wider uppercase">ENGINE: SANDBOX_V2</span>
+<span class="inline-flex items-center gap-1.5 text-label-xs font-label-xs text-primary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+          ACTIVE
+        </span>
+</div>
+<!-- Circular Radial Indicator -->
+<div class="relative w-44 h-44 flex items-center justify-center my-space-xs">
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 120 120">
+<!-- Background Inactive Track -->
+<circle class="stroke-surface-container-highest fill-none" cx="60" cy="60" r="50" stroke-width="6"></circle>
+<!-- Foreground Active Mint Stroke (45% = 314.15 * 0.55 remaining offset) -->
+<circle class="stroke-primary-container fill-none transition-all duration-300 ease-out" cx="60" cy="60" r="50" stroke-dasharray="314.15" stroke-dashoffset="172.78" stroke-linecap="square" stroke-width="6"></circle>
+</svg>
+<!-- Percentage Readout Inset -->
+<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none">
+<span class="text-headline-lg font-headline-lg text-on-surface tracking-tight">45%</span>
+<span class="text-label-xs font-label-xs text-outline tracking-widest mt-0.5">COMPLETED</span>
+</div>
+</div>
+<!-- Processing State Indicators -->
+<div class="text-center mt-space-md w-full">
+<h2 class="text-headline-md font-headline-md text-on-surface tracking-tight mb-1">Processing video...</h2>
+<p class="text-body-sm font-body-sm text-outline px-space-xs">
+          Applying micro-crop &amp; shifting audio pitch
+          <span class="block text-label-xs font-label-xs text-primary-container mt-1">(Step 2 of 4)</span>
+</p>
+</div>
+<!-- Micro Pipeline Stage Tracker -->
+<div class="grid grid-cols-4 gap-1.5 w-full mt-space-lg pt-space-md border-t border-surface-container-highest">
+<div class="flex flex-col gap-1 items-center">
+<div class="h-1 w-full bg-primary-container rounded"></div>
+<span class="text-label-xs font-label-xs text-on-surface">METADATA</span>
+</div>
+<div class="flex flex-col gap-1 items-center">
+<div class="h-1 w-full bg-primary-container rounded"></div>
+<span class="text-label-xs font-label-xs text-primary-container">AUDIO/CROP</span>
+</div>
+<div class="flex flex-col gap-1 items-center">
+<div class="h-1 w-full bg-surface-container-highest rounded"></div>
+<span class="text-label-xs font-label-xs text-outline">HASH_GEN</span>
+</div>
+<div class="flex flex-col gap-1 items-center">
+<div class="h-1 w-full bg-surface-container-highest rounded"></div>
+<span class="text-label-xs font-label-xs text-outline">RENDER</span>
+</div>
+</div>
+</div>
+<!-- Technical Hardware & Stream Inspect Container -->
+<div class="w-full bg-surface border border-surface-container-highest rounded-lg p-space-md flex flex-col gap-space-sm">
+<!-- Source Record -->
+<div class="flex items-center justify-between text-body-sm font-body-sm border-b border-surface-container-highest pb-space-xs">
+<span class="text-outline text-label-xs font-label-xs">SOURCE</span>
+<span class="text-label-sm font-label-sm text-on-surface">video_01.mp4 (0:15)</span>
+</div>
+<!-- Execution Clock Specs -->
+<div class="flex items-center justify-between text-body-sm font-body-sm border-b border-surface-container-highest py-space-xs">
+<span class="text-outline text-label-xs font-label-xs">EXECUTION TIME</span>
+<div class="flex items-center gap-space-xs text-label-sm font-label-sm">
+<span class="text-on-surface">00:04s</span>
+<span class="text-outline">/</span>
+<span class="text-outline">Est. 00:05s rem</span>
+</div>
+</div>
+<!-- Hardware Execution Context -->
+<div class="flex items-center justify-between text-body-sm font-body-sm pt-space-xs">
+<span class="text-outline text-label-xs font-label-xs">SANDBOX STATE</span>
+<div class="flex items-center gap-1.5 text-label-xs font-label-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-primary-container" data-icon="memory">memory</span>
+<span>CPU Core Efficiency • On-Device</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Primary Interactive Actions / Safe Exit Shell -->
+<footer class="w-full max-w-md mx-auto px-space-md pb-space-lg pt-space-sm shrink-0 flex flex-col items-center">
+<button class="w-full py-2.5 px-space-md bg-transparent border border-error-container text-error hover:bg-error-container hover:text-on-error transition-colors rounded text-body-md font-body-md flex items-center justify-center gap-space-xs active:scale-95 duration-100 cursor-pointer" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="close">close</span>
+<span>Cancel Operation</span>
+</button>
+<p class="text-label-xs font-label-xs text-outline mt-space-sm text-center">
+      Zero outbound network packets transmitted
+    </p>
+</footer>
+</body></html>

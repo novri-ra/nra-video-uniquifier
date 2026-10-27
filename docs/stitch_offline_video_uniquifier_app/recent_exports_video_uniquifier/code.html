@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recent Exports - Video Uniquifier</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#e5e1e4",
+            "surface-dim": "#131315",
+            "secondary-container": "#00e296",
+            "tertiary-container": "#d4d2da",
+            "inverse-primary": "#006c4a",
+            "on-surface": "#e5e1e4",
+            "on-primary-fixed-variant": "#005236",
+            "outline": "#84958a",
+            "inverse-on-surface": "#313032",
+            "on-tertiary-container": "#5b5a61",
+            "secondary-fixed": "#4dffb2",
+            "surface-bright": "#39393b",
+            "outline-variant": "#3b4a41",
+            "on-tertiary-fixed": "#1b1b21",
+            "background": "#131315",
+            "on-error": "#690005",
+            "secondary": "#4dffb2",
+            "on-secondary-container": "#005f3d",
+            "tertiary": "#f1eef7",
+            "on-primary": "#003824",
+            "surface-container-low": "#1c1b1d",
+            "surface-container-highest": "#353437",
+            "primary-fixed": "#46ffb8",
+            "surface-container": "#201f21",
+            "surface-container-high": "#2a2a2c",
+            "on-primary-fixed": "#002114",
+            "on-secondary-fixed": "#002112",
+            "error-container": "#93000a",
+            "on-tertiary": "#303036",
+            "on-secondary": "#003822",
+            "on-error-container": "#ffdad6",
+            "primary-container": "#00f0a8",
+            "secondary-fixed-dim": "#00e296",
+            "surface": "#131315",
+            "on-background": "#e5e1e4",
+            "on-surface-variant": "#b9cbbf",
+            "tertiary-fixed": "#e4e1ea",
+            "on-secondary-fixed-variant": "#005234",
+            "tertiary-fixed-dim": "#c8c5cd",
+            "surface-tint": "#00e29e",
+            "on-primary-container": "#006847",
+            "on-tertiary-fixed-variant": "#47464d",
+            "primary-fixed-dim": "#00e29e",
+            "error": "#ffb4ab",
+            "primary": "#b7ffd9",
+            "surface-variant": "#353437",
+            "surface-container-lowest": "#0e0e10"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "label-xs": ["JetBrains Mono"],
+            "headline-lg": ["Inter"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Inter"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .grid-pattern-overlay {
+      background-size: 12px 12px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-primary-container selection:text-surface-container-lowest">
+<!-- TopAppBar Anchor from Shared Components JSON -->
+<header class="flex justify-between items-center w-full px-space-md py-space-sm h-14 bg-surface dark:bg-surface border-b border-surface-container-highest dark:border-surface-container-highest sticky top-0 z-40">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary-container dark:text-primary-container" data-icon="terminal">terminal</span>
+<span class="text-headline-sm font-headline-sm tracking-tight text-on-surface dark:text-on-surface uppercase">Video Uniquifier</span>
+</div>
+<div class="flex items-center gap-space-xs px-2 py-0.5 border border-surface-container-highest bg-surface-container-low rounded">
+<span class="material-symbols-outlined text-outline text-body-sm" data-icon="lock">lock</span>
+<span class="text-label-xs font-label-xs text-on-surface-variant tracking-wider">OFFLINE</span>
+</div>
+</header>
+<!-- Main Viewport Canvas -->
+<main class="w-full max-w-3xl mx-auto px-space-md py-space-md flex-1 flex flex-col gap-space-md pb-24">
+<!-- Header Section with Action Metas -->
+<div class="flex items-center justify-between border-b border-surface-container-highest pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<h1 class="text-headline-sm font-headline-sm text-on-surface">Recent Exports</h1>
+<span class="text-label-xs font-label-xs px-1.5 py-0.5 bg-surface-container-high border border-surface-container-highest text-primary-container">QUEUE LOG</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="text-label-sm font-label-sm text-on-surface-variant font-medium">3 Files • 78.4 MB</span>
+<div class="flex items-center gap-1 border-l border-surface-container-highest pl-space-sm">
+<button class="text-on-surface-variant hover:text-primary-container active:opacity-80 transition-colors p-1" title="Filter Queue">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+<button class="text-on-surface-variant hover:text-error active:opacity-80 transition-colors p-1" title="Clear History">
+<span class="material-symbols-outlined" data-icon="delete_sweep">delete_sweep</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Storage Telemetry Bar -->
+<section class="p-space-md bg-surface-container-low border border-surface-container-highest rounded flex flex-col gap-space-sm">
+<div class="flex items-center justify-between text-label-sm font-label-sm">
+<div class="flex items-center gap-space-xs text-on-surface">
+<span class="material-symbols-outlined text-outline text-body-sm" data-icon="hard_drive">hard_drive</span>
+<span>Local Sandbox Storage:</span>
+<span class="text-primary-container font-semibold">2.1 GB / 32 GB available</span>
+</div>
+<span class="text-label-xs font-label-xs text-on-surface-variant">93.4% FREE</span>
+</div>
+<!-- Mini Progress Strip -->
+<div class="w-full h-1 bg-surface-container border border-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 6.6%;"></div>
+</div>
+<div class="flex justify-between items-center text-label-xs font-label-xs text-on-surface-variant pt-0.5">
+<span>V-SANDBOX ISOLATION: ACTIVE</span>
+<span>ZERO NETWORK LEAK</span>
+</div>
+</section>
+<!-- Exported Videos Queue / List -->
+<div class="flex flex-col gap-space-sm">
+<!-- Item 1 -->
+<article class="bg-surface-container-low border border-surface-container-highest hover:border-primary-container transition-colors rounded p-space-md flex flex-col sm:flex-row gap-space-md sm:items-center justify-between">
+<div class="flex items-start gap-space-md min-w-0">
+<!-- Thumbnail with duration and grid overlay -->
+<div class="relative w-24 h-16 sm:w-28 sm:h-18 flex-shrink-0 bg-surface-container-lowest border border-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover opacity-75" data-alt="Dark aesthetic video preview screen frame with high contrast technical lines and minimal neon mint indicators. High precision digital frame captured from cinematic drone footage over an empty brutalist concrete structure at twilight under crisp dark skies." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK74ugWwzmOMlJPIwu5wRpbwjQ4jzIZRUyDBySG6Yqe1W-Pcx5Kb0TTJQx09BvB1ooD4q0CHjWquv6TUriNOAi7y8Rxlb_n-cYKOzzK-50-CGI-5xWzfmUzCn05anAhNmw2w5h-Uti2Et7Vhm8UhcZoIR2pAxZU4rulwbmFXayjIseubRT6-9uj9-hfYcccniIODMNAFyg2p2J5D8XlGRNAxarBcBBVhuPsMh18O5i"/>
+<div class="absolute inset-0 grid-pattern-overlay pointer-events-none"></div>
+<div class="absolute bottom-1 right-1 bg-surface-container-lowest/90 px-1 py-0.5 border border-surface-container-highest text-label-xs font-label-xs text-on-surface">
+              0:15
+            </div>
+<div class="absolute top-1 left-1">
+<span class="material-symbols-outlined text-label-sm text-primary-container" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Technical Metadata -->
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="text-body-md font-body-md font-semibold text-on-surface truncate">video_01_unique.mp4</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate">
+              Today, 10:30 PM • 23.4 MB • 1080p
+            </p>
+<div class="flex items-center gap-space-xs mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 text-label-xs font-label-xs bg-primary-container/10 border border-primary-container text-primary-container">
+                READY
+              </span>
+<span class="text-label-xs font-label-xs text-on-surface-variant font-mono">H.264 • MD5 MODIFIED</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions Cluster -->
+<div class="flex items-center justify-end gap-space-xs border-t sm:border-t-0 border-surface-container-highest pt-space-xs sm:pt-0">
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Share Video">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Options">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</article>
+<!-- Item 2 -->
+<article class="bg-surface-container-low border border-surface-container-highest hover:border-primary-container transition-colors rounded p-space-md flex flex-col sm:flex-row gap-space-md sm:items-center justify-between">
+<div class="flex items-start gap-space-md min-w-0">
+<!-- Thumbnail with duration and grid overlay -->
+<div class="relative w-24 h-16 sm:w-28 sm:h-18 flex-shrink-0 bg-surface-container-lowest border border-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover opacity-75" data-alt="Monochromatic technical video frame showing high contrast sports car wheel spinning rapidly in slow motion on an asphalt testing track under moody dark architectural night floodlights, styled in pure black, deep graphite and precise electric mint line elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClgvie33WyDsrvSLkxRJ-wOaYg_CyIobYimH7I_cg-mr5JbYuIl7fp0OxLmTOJIC4rOYNDl1VjMz0oS_N281mRyc0XfgPH78bfACZQzsFuSrAA3HSb5zKuwRQBYSxN8RbDrMyhkBqucAHfLoczrQSjYTZp2fFmk-XS6cPDZypsSNjpmFm62COApO56wtY3iItCEQZOVGAcHX-PE2LZCs9IAyA36VvV4_NYe26vuntv"/>
+<div class="absolute inset-0 grid-pattern-overlay pointer-events-none"></div>
+<div class="absolute bottom-1 right-1 bg-surface-container-lowest/90 px-1 py-0.5 border border-surface-container-highest text-label-xs font-label-xs text-on-surface">
+              0:42
+            </div>
+<div class="absolute top-1 left-1">
+<span class="material-symbols-outlined text-label-sm text-primary-container" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Technical Metadata -->
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="text-body-md font-body-md font-semibold text-on-surface truncate">clip_broll_raw_unique.mp4</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate">
+              Today, 08:15 PM • 48.1 MB • 1080p
+            </p>
+<div class="flex items-center gap-space-xs mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 text-label-xs font-label-xs bg-primary-container/10 border border-primary-container text-primary-container">
+                SUCCESS
+              </span>
+<span class="text-label-xs font-label-xs text-on-surface-variant font-mono">BITRATE INJECTED</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions Cluster -->
+<div class="flex items-center justify-end gap-space-xs border-t sm:border-t-0 border-surface-container-highest pt-space-xs sm:pt-0">
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Share Video">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Options">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</article>
+<!-- Item 3 -->
+<article class="bg-surface-container-low border border-surface-container-highest hover:border-primary-container transition-colors rounded p-space-md flex flex-col sm:flex-row gap-space-md sm:items-center justify-between">
+<div class="flex items-start gap-space-md min-w-0">
+<!-- Thumbnail with duration and grid overlay -->
+<div class="relative w-24 h-16 sm:w-28 sm:h-18 flex-shrink-0 bg-surface-container-lowest border border-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover opacity-75" data-alt="Candid studio recording scene captured in raw silhouette profile against dark industrial wall with sharp mint edge glow. The video footage portrays technical vertical portrait orientation framing formatted for mobile display, pristine monochromatic shadows and clear technical sharpness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkqLf1qJZGqea-V5IkO21_i6FXJtQ5lMYAC399Gs5Zb6rSdcZ9HqXrHcTMaNjJqHTgp-IOBS7u7oHO4Dpn2JofnLS4pRdJW5SRhc9DDsOeGBSqaYcdknlguO4M6RJRkbD0r4zfopgdsacd7IjSzIXfPVUecArrhElyST8hjruNRGJhwJRp3vLIwjWeIDz42NYHSOFjke2lqdGue91F5KSkPwuSurgcicbLO5cH5JfU"/>
+<div class="absolute inset-0 grid-pattern-overlay pointer-events-none"></div>
+<div class="absolute bottom-1 right-1 bg-surface-container-lowest/90 px-1 py-0.5 border border-surface-container-highest text-label-xs font-label-xs text-on-surface">
+              1:04
+            </div>
+<div class="absolute top-1 left-1">
+<span class="material-symbols-outlined text-label-sm text-primary-container" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+<!-- Technical Metadata -->
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-sm">
+<span class="text-body-md font-body-md font-semibold text-on-surface truncate">reel_export_v2_unique.mp4</span>
+</div>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-0.5 truncate">
+              Yesterday, 11:45 PM • 6.9 MB • 720p
+            </p>
+<div class="flex items-center gap-space-xs mt-2">
+<span class="inline-flex items-center px-1.5 py-0.5 text-label-xs font-label-xs bg-primary-container/10 border border-primary-container text-primary-container">
+                PURGED AUDIO
+              </span>
+<span class="text-label-xs font-label-xs text-on-surface-variant font-mono">META STRIPPED</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions Cluster -->
+<div class="flex items-center justify-end gap-space-xs border-t sm:border-t-0 border-surface-container-highest pt-space-xs sm:pt-0">
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Share Video">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="p-2 bg-surface-container hover:bg-surface-container-high border border-surface-container-highest hover:border-primary-container text-on-surface transition-colors rounded flex items-center justify-center" title="Options">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Storage Location / Sandbox Hint Callout -->
+<footer class="mt-space-sm p-space-md bg-surface-container-lowest border border-surface-container-highest flex items-center justify-between rounded text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-outline text-body-sm" data-icon="folder_open">folder_open</span>
+<span class="font-mono">All exported files stored in /Movies/VideoUniquifier/</span>
+</div>
+<button class="text-primary-container hover:underline text-label-xs font-label-xs tracking-wider uppercase ml-2 flex-shrink-0">
+        OPEN DIR
+      </button>
+</footer>
+</main>
+<!-- Bottom Navigation Bar from Shared Components JSON -->
+<!-- Strictly renders the 3 defined destinations: Process, Presets, Inspect -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-space-md bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-surface-container-highest dark:border-surface-container-highest">
+<!-- Tab 1: Process (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 font-label-xs text-label-xs active:scale-95 transition-transform duration-100 hover:text-primary-container dark:hover:text-primary-container" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="video_settings">video_settings</span>
+<span>Process</span>
+</a>
+<!-- Tab 2: Presets (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant py-1 px-3 font-label-xs text-label-xs active:scale-95 transition-transform duration-100 hover:text-primary-container dark:hover:text-primary-container" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="tune">tune</span>
+<span>Presets</span>
+</a>
+<!-- Tab 3: Inspect / History Queue Destination (Active Match for Technical Inspection & Output Verification) -->
+<a class="flex flex-col items-center justify-center text-primary-container dark:text-primary-container py-1 px-3 border-b-2 border-primary-container dark:border-primary-container font-label-xs text-label-xs active:scale-95 transition-transform duration-100" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="data_object">data_object</span>
+<span>Inspect</span>
+</a>
+</nav>
+</body></html>
