@@ -1,35 +1,25 @@
-import 'dart:io';
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
+import '../services/ffmpeg_service.dart';
 
 class UniquifierProvider extends ChangeNotifier {
-  UniquifierProvider() {
-    _initDefaultVideo();
-  }
-
-  void _initDefaultVideo() {
-    try {
-      final defaultFile = File('/sdcard/Download/test_sample.mp4');
-      if (defaultFile.existsSync() && defaultFile.lengthSync() > 0) {
-        setVideoFile(
-          path: defaultFile.path,
-          name: 'test_sample.mp4',
-          sizeBytes: defaultFile.lengthSync(),
-        );
-      }
-    } catch (_) {}
-  }
-
-  // Source Video State
-  String? _selectedFileName = 'video_01.mp4';
+  // Source Video State (initial is null / empty)
+  String? _selectedFileName;
   String? _selectedFilePath;
+  String? _thumbnailPath;
   String _fileResolution = '1080×1920';
-  String _fileSize = '24.8 MB';
+  String _fileSize = '0 B';
   String _fileCodec = 'H.264';
-  String _fps = '60 FPS';
+  String _fps = '30 FPS';
   String _audioInfo = 'AAC 48kHz';
-  String _duration = '0:15';
-  String _sha256 = '8f42…d1';
+  String _duration = '0:00';
+  String _sha256 = '';
+  int _totalDurationMs = 0;
+
+  // Real-time Telemetry
+  double _realtimeProgress = 0.0;
+  double _renderingSpeed = 1.0;
+  String _eta = 'Calculating...';
 
   // Last processed output
   String? _lastProcessedOutputPath;
@@ -50,6 +40,7 @@ class UniquifierProvider extends ChangeNotifier {
   // Getters
   String? get selectedFileName => _selectedFileName;
   String? get selectedFilePath => _selectedFilePath;
+  String? get thumbnailPath => _thumbnailPath;
   String? get lastProcessedOutputPath => _lastProcessedOutputPath;
   String get fileResolution => _fileResolution;
   String get fileSize => _fileSize;
@@ -58,6 +49,11 @@ class UniquifierProvider extends ChangeNotifier {
   String get audioInfo => _audioInfo;
   String get duration => _duration;
   String get sha256 => _sha256;
+  int get totalDurationMs => _totalDurationMs;
+
+  double get realtimeProgress => _realtimeProgress;
+  double get renderingSpeed => _renderingSpeed;
+  String get eta => _eta;
 
   bool get removeMetadata => _removeMetadata;
   bool get modifyAudio => _modifyAudio;
@@ -66,7 +62,6 @@ class UniquifierProvider extends ChangeNotifier {
 
   String get selectedUpscaleTarget => _selectedUpscaleTarget;
   bool get hardwareAcceleration => _hardwareAcceleration;
-
   int get currentTabIndex => _currentTabIndex;
 
   // Actions
@@ -105,6 +100,17 @@ class UniquifierProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateRealtimeStats(double progress, double speed, int timeMs) {
+    _realtimeProgress = progress;
+    _renderingSpeed = speed > 0 ? speed : 1.0;
+    if (_totalDurationMs > 0 && timeMs > 0) {
+      final remMs = (_totalDurationMs - timeMs).clamp(0, 3600000);
+      final remSec = (remMs / (_renderingSpeed * 1000)).ceil();
+      _eta = '${(remSec ~/ 60).toString().padLeft(2, '0')}:${(remSec % 60).toString().padLeft(2, '0')}s rem';
+    }
+    notifyListeners();
+  }
+
   void applyPreset({
     required bool removeMetadata,
     required bool modifyAudio,
@@ -124,6 +130,8 @@ class UniquifierProvider extends ChangeNotifier {
   void clearSelection() {
     _selectedFileName = null;
     _selectedFilePath = null;
+    _thumbnailPath = null;
+    _realtimeProgress = 0.0;
     notifyListeners();
   }
 
@@ -148,7 +156,18 @@ class UniquifierProvider extends ChangeNotifier {
     _sha256 = '${name.hashCode.toRadixString(16).padLeft(8, '0')}…';
     notifyListeners();
 
+    _extractThumbnailAsync(path);
     _probeMediaInfo(path);
+  }
+
+  Future<void> _extractThumbnailAsync(String path) async {
+    try {
+      final thumb = await FfmpegService.extractThumbnail(path);
+      if (thumb != null && _selectedFilePath == path) {
+        _thumbnailPath = thumb;
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   Future<void> _probeMediaInfo(String path) async {
@@ -160,9 +179,7 @@ class UniquifierProvider extends ChangeNotifier {
         _applyMediaDuration(mediaInfo.getDuration());
         notifyListeners();
       }
-    } catch (_) {
-      // Fallback already assigned
-    }
+    } catch (_) {}
   }
 
   void _applyMediaStreams(dynamic streams) {
@@ -196,6 +213,8 @@ class UniquifierProvider extends ChangeNotifier {
 
   void _applyMediaDuration(String? durationStr) {
     if (durationStr == null) return;
+    final sec = double.tryParse(durationStr) ?? 0.0;
+    _totalDurationMs = (sec * 1000).toInt();
     _duration = formatDuration(durationStr);
   }
 

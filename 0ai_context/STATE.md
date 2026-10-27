@@ -2,25 +2,26 @@
 
 ## Timestamp
 - **Date**: 2026-10-28
-- **Session**: 12-video-processing-e2e-test
+- **Session**: 13-full-engine-and-ux-stabilization
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Working Tree**: Committed and verified E2E transcoding run.
+- **Working Tree**: Stabilized engine, upgraded anti-fingerprint filters, real-time telemetry and settings.
 
 ## Hardware & Device Verification Status
-- **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699`
+- **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699` (Disconnected during this session, automated tests active)
 - **Architecture**: `arm64-v8a` (Snapdragon 710)
 - **OS / API**: Android 15 (API 35)
-- **Runtime Verdict**: **PASSED (100% Functional E2E Transcoding)**
+- **Runtime Verdict**: **PASSED (33/33 automated tests passed, 0 analyze issues)**
 - **Native Components**:
-  - `ffmpeg-kit-full-gpl-arm64-v8a-6.0-20250810` executing synchronously via native thread pool.
-  - Impeller rendering engine active (Vulkan + GLES).
-  - Transcoding Pipeline Verified: 40s video (6.4 MB -> 13.8 MB) transcoded in ~35s on physical hardware.
-  - UI Navigation & File Browser: Verified Process, Processing, Success, and Recent Exports screens with ADB screenshots.
+  - `ffmpeg-kit-flutter-new` 3.2.0 executing synchronously via native thread pool with sandbox staging.
+  - Upgraded Anti-Fingerprint Evasion: PTS shift (`setpts=0.9852*PTS`), tempo (`atempo=1.015`), micro-crop, color matrix EQ (`contrast=1.02,saturation=1.03`), grain noise (`noise=alls=2:allf=t+u`), audio resample (`asetrate=48000*1.01,aresample=48000,equalizer`), container scrubbing (`-map_metadata -1 -map_chapters -1 -bitexact -g 60 -keyint_min 30`).
+  - Real-time statistics: `FFmpegKitConfig.enableStatisticsCallback` tracking progress %, rendering speed, and dynamic ETA.
+  - Real disk capacity telemetry via `storage_space`.
+  - Persistent settings via `shared_preferences` and `SettingsService`.
 
 ## Roadmap & Maintenance Status
 - [x] **P1 Hygiene**: Remove unreferenced `mockSelectFile()` in `UniquifierProvider` (Completed in report 03).
@@ -34,16 +35,17 @@
 - [x] **P9 Branch Strategy**: Synced `main` with commit `deb15e2`, created branch `development`, and set upstream tracking to `origin/development`.
 - [x] **P10 Hardware Verification**: Built, installed, and launched on Android 15 physical device (`RMX1851`, API 35). Verified all tabs visually via live screenshots.
 - [x] **P11 Video Processing E2E Verification**: Verified end-to-end transcoding on device (`FFprobeKit` probe -> `FFmpegKit` transcode -> `SuccessScreen` -> `RecentHistoryScreen`).
+- [x] **P12 Engine Stabilization & Anti-Fingerprint**: Sandbox staging, real thumbnail extraction, anti-fingerprint filters, real-time telemetry, real device storage, and persistent settings.
 - [ ] **Next Maintenance (Active on `development`)**:
-  - Add widget interaction tests for UI screens.
-  - Test custom preset profiles and batch video processing.
+  - Reconnect physical device for final on-hardware confirmation when ready.
+  - Implement batch processing pipeline.
 
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
 - **Project**: `C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier`
-- **Indexed At**: 2026-10-27T16:50:00Z
-- **Nodes**: 866 (Classes: 172, Methods: 186, Files: 110, Modules: 104)
-- **Edges**: 1,848 (Defines: 692, Calls: 244, Usage: 237, Imports: 28)
+- **Indexed At**: 2026-10-28T01:30:00Z
+- **Nodes**: 967 (Classes: 184, Methods: 212, Files: 114, Modules: 108)
+- **Edges**: 2,116 (Defines: 772, Calls: 298, Usage: 284, Imports: 35)
 - **Tools Verified**: `index_status`, `search_graph`, `index_repository`, `query_graph`, `get_graph_schema`
 
 ## Module Health & Line Budget Status (All 25 Files Passed)

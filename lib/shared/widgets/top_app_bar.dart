@@ -4,11 +4,13 @@ import '../../core/theme/app_theme.dart';
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool isOffline;
+  final VoidCallback? onSettingsTap;
 
   const TopAppBar({
     super.key,
     this.title = 'VIDEO UNIQUIFIER',
     this.isOffline = true,
+    this.onSettingsTap,
   });
 
   @override
@@ -30,7 +32,21 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _TitleSection(title: title),
-            if (isOffline) const _OfflineBadge(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (onSettingsTap != null)
+                  IconButton(
+                    icon: const Icon(Icons.tune, size: 18, color: AppColors.onSurfaceVariant),
+                    tooltip: 'Settings',
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    onPressed: onSettingsTap,
+                  ),
+                if (onSettingsTap != null && isOffline) const SizedBox(width: 6),
+                if (isOffline) const _OfflineBadge(),
+              ],
+            ),
           ],
         ),
       ),

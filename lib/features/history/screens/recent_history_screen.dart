@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:storage_space/storage_space.dart';
 import '../../../core/services/history_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/top_app_bar.dart';
@@ -17,6 +18,7 @@ class RecentHistoryScreen extends StatefulWidget {
 
 class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   List<VideoExportItem> _items = [];
+  StorageSpace? _deviceStorage;
   bool _isLoading = true;
   String? _error;
 
@@ -34,7 +36,14 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
 
     try {
       final items = await HistoryService.loadHistory();
-      if (mounted) setState(() { _items = items; _isLoading = false; });
+      final storage = await HistoryService.getDeviceStorage();
+      if (mounted) {
+        setState(() {
+          _items = items;
+          _deviceStorage = storage;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       if (mounted) setState(() { _error = e.toString(); _isLoading = false; });
     }
@@ -118,7 +127,11 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
             children: [
               HistoryHeader(itemCount: _items.length, totalSize: totalSize, onRefresh: _loadHistory),
               const SizedBox(height: 12),
-              StorageTelemetryBar(totalSize: totalSize, hasItems: _items.isNotEmpty),
+              StorageTelemetryBar(
+                totalSize: totalSize,
+                hasItems: _items.isNotEmpty,
+                deviceStorage: _deviceStorage,
+              ),
               const SizedBox(height: 16),
               _buildContentList(),
             ],

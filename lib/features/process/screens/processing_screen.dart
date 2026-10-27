@@ -80,6 +80,24 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           modifyAudio: provider.modifyAudio,
           modifyVisuals: provider.modifyVisuals,
           upscale1080p: provider.upscale1080p,
+          totalDurationMs: provider.totalDurationMs,
+          onProgress: (p, speed, timeMs) {
+            if (mounted && !_isCancelled) {
+              provider.updateRealtimeStats(p, speed, timeMs);
+              setState(() {
+                _progress = p.clamp(0.05, 0.98);
+                if (_progress < 0.25) {
+                  _step = 1;
+                } else if (_progress < 0.55) {
+                  _step = 2;
+                } else if (_progress < 0.85) {
+                  _step = 3;
+                } else {
+                  _step = 4;
+                }
+              });
+            }
+          },
         );
       }
 
@@ -123,7 +141,12 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _CentralModuleCard(progress: _progress, step: _step),
-              ProcessingLogViewer(fileName: fileName, duration: fileDuration),
+              ProcessingLogViewer(
+                fileName: fileName,
+                duration: fileDuration,
+                executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
+                estimatedRemaining: provider.eta,
+              ),
               _ActionSection(
                 onCancel: _handleCancel,
                 onSuccessTest: _finishSuccess,

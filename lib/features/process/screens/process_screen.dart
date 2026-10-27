@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/advanced_settings_bottom_sheet.dart';
+import '../../settings/screens/app_settings_bottom_sheet.dart';
 import '../widgets/engine_state_strip.dart';
 import '../widgets/modifiers_card.dart';
 import '../widgets/source_file_section.dart';
@@ -56,13 +57,22 @@ class ProcessScreen extends StatelessWidget {
     );
   }
 
+  void _openAppSettings(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const AppSettingsBottomSheet(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     final hasFile = provider.selectedFileName != null;
 
     return Scaffold(
-      appBar: const TopAppBar(),
+      appBar: TopAppBar(onSettingsTap: () => _openAppSettings(context)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

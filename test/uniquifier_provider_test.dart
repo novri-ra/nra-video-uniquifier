@@ -22,16 +22,15 @@ void main() {
       expect(provider.lastProcessedOutputPath, isNull);
     });
 
-    test('Default file properties are populated', () {
-      expect(provider.selectedFileName, equals('video_01.mp4'));
+    test('Default file properties are clean / empty', () {
+      expect(provider.selectedFileName, isNull);
       expect(provider.selectedFilePath, isNull);
+      expect(provider.thumbnailPath, isNull);
+      expect(provider.realtimeProgress, equals(0.0));
       expect(provider.fileResolution, equals('1080×1920'));
-      expect(provider.fileSize, equals('24.8 MB'));
+      expect(provider.fileSize, equals('0 B'));
       expect(provider.fileCodec, equals('H.264'));
-      expect(provider.fps, equals('60 FPS'));
-      expect(provider.audioInfo, equals('AAC 48kHz'));
-      expect(provider.duration, equals('0:15'));
-      expect(provider.sha256, isNotEmpty);
+      expect(provider.duration, equals('0:00'));
     });
   });
 
@@ -153,6 +152,13 @@ void main() {
       provider.clearSelection();
       expect(provider.selectedFileName, isNull);
       expect(provider.selectedFilePath, isNull);
+      expect(provider.thumbnailPath, isNull);
+    });
+
+    test('updateRealtimeStats updates progress, speed and calculates eta', () {
+      provider.updateRealtimeStats(0.45, 1.8, 18000);
+      expect(provider.realtimeProgress, equals(0.45));
+      expect(provider.renderingSpeed, equals(1.8));
     });
 
     test('formatDuration formats 0s, seconds-only, and hh:mm:ss spans', () {

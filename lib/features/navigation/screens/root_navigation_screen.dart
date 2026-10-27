@@ -123,8 +123,8 @@ class _PresetCardsList extends StatelessWidget {
       title: 'TikTok Fast Mode',
       tag: 'SPEED OPTIMIZED',
       tagColor: AppColors.primaryContainer,
-      description: 'Removes metadata, shifts audio pitch by 0.5%, and upscales to 1080p Lanczos.',
-      features: const ['Metadata: OFF', 'Audio: +0.5%', 'Visual: Original', '1080p Lanczos'],
+      description: 'Removes metadata, shifts audio/tempo, and upscales to 1080p Lanczos.',
+      features: const ['Metadata: OFF', 'Audio: Resample/EQ', 'Video: Fast Mode', '1080p Lanczos'],
       onApply: () => _apply(context, 'TikTok Fast Mode', () {
         provider.applyPreset(removeMetadata: true, modifyAudio: true, modifyVisuals: false, upscale1080p: true);
       }),
@@ -136,8 +136,8 @@ class _PresetCardsList extends StatelessWidget {
       title: 'Maximum Anti-Fingerprint',
       tag: 'MAX STEALTH',
       tagColor: AppColors.secondary,
-      description: 'Full algorithmic transformation: micro-crop, audio shift, metadata wipe, and 1080p.',
-      features: const ['Metadata: OFF', 'Audio: +0.5%', 'Crop: 4px Micro', '1080p Lanczos'],
+      description: 'Full algorithmic transformation: PTS shift, micro-crop, grain/color EQ, and audio retune.',
+      features: const ['Metadata: OFF', 'Audio: Resample/EQ', 'Matrix: Color/Grain', 'PTS & Crop'],
       onApply: () => _apply(context, 'Maximum Anti-Fingerprint', () {
         provider.applyPreset(removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: true);
       }),

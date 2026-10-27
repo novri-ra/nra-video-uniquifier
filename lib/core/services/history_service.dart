@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:storage_space/storage_space.dart';
 
 class VideoExportItem {
   final File file;
@@ -98,6 +99,17 @@ class HistoryService {
       return true;
     }
     return false;
+  }
+
+  static Future<StorageSpace?> getDeviceStorage() async {
+    try {
+      return await getStorageSpace(
+        fractionDigits: 1,
+        lowOnSpaceThreshold: 1024 * 1024 * 500,
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   static String formatTotalSize(List<VideoExportItem> items) {
