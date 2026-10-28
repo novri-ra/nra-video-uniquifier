@@ -36,6 +36,8 @@ class SettingsService {
   static const String keyDefaultPreset = 'app_default_preset';
   static const String keyCustomOutputPath = 'app_output_path';
   static const String keyUpscaleResolution = 'app_upscale_resolution';
+  static const String keyEnhanceAndDenoise = 'app_enhance_denoise';
+  static const String keyDeepAntiFingerprint = 'app_deep_anti_fingerprint';
 
   static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
       ValueNotifier<TargetResolution>(TargetResolution.r1080p);
@@ -52,6 +54,26 @@ class SettingsService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyUpscaleResolution, resolution.key);
     upscaleResolutionNotifier.value = resolution;
+  }
+
+  static Future<bool> getEnhanceAndDenoise() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyEnhanceAndDenoise) ?? true;
+  }
+
+  static Future<void> setEnhanceAndDenoise(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyEnhanceAndDenoise, enabled);
+  }
+
+  static Future<bool> getDeepAntiFingerprint() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyDeepAntiFingerprint) ?? true;
+  }
+
+  static Future<void> setDeepAntiFingerprint(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyDeepAntiFingerprint, enabled);
   }
 
   static Future<String> getEngineMode() async {

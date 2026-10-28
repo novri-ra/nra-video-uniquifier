@@ -17,6 +17,8 @@ class FfmpegService {
     bool upscale1080p = false,
     bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    bool enableEnhanceAndDenoise = true,
+    bool enableDeepAntiFingerprint = true,
   }) {
     final buffer = StringBuffer('-y -i "$inputPath"');
     if (removeMetadata) buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
@@ -26,10 +28,17 @@ class FfmpegService {
     buffer.write(_buildVideoFilter(
       hasVisual: hasVisual,
       hasAudio: modifyAudio,
+      modifyVisuals: modifyVisuals,
       upscale: shouldUpscale,
       targetResolution: targetResolution,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
     ));
-    buffer.write(_buildAudioFilter(hasAudio: modifyAudio, hasVisual: hasVisual));
+    buffer.write(_buildAudioFilter(
+      hasAudio: modifyAudio,
+      hasVisual: hasVisual,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+    ));
 
     if (!hasVisual && !modifyAudio) buffer.write(' -c copy');
     buffer.write(' "$outputPath"');
@@ -39,24 +48,54 @@ class FfmpegService {
   static String _buildVideoFilter({
     required bool hasVisual,
     required bool hasAudio,
+    bool modifyVisuals = true,
     bool upscale = false,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    bool enableEnhanceAndDenoise = true,
+    bool enableDeepAntiFingerprint = true,
   }) {
     if (hasVisual) {
       final filters = <String>[
-        'setpts=0.9852*PTS',
-        'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
+        // 1. Temporal (PTS)
+        if (modifyVisuals) 'setpts=0.9852*PTS',
+
+        // 2. Spatial (Crop -> Rotate)
+        if (modifyVisuals) ...[
+          if (enableDeepAntiFingerprint)
+            'crop=trunc(iw*0.95/2)*2:trunc(ih*0.95/2)*2'
+          else
+            'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
+          if (enableDeepAntiFingerprint)
+            'rotate=0.4*PI/180:ow=rotw(0.4*PI/180):oh=roth(0.4*PI/180):fillcolor=black',
+        ],
+
+        // 3. Resolution Scaling (Lanczos scale)
         if (upscale) 'scale=w=-2:h=${targetResolution.height}:flags=lanczos',
-        'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
-        'noise=alls=2:allf=t+u',
+
+        // 4. Enhancements (Denoise -> Unsharp -> EQ)
+        if (enableEnhanceAndDenoise) ...[
+          'hqdn3d=1.5:1.5:4:4',
+          'unsharp=3:3:0.6:3:3:0.0',
+        ],
+        if (modifyVisuals) 'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
+
+        // 5. Grain Injection (Noise)
+        if (modifyVisuals) 'noise=alls=2:allf=t+u',
       ];
-      return ' -vf "${filters.join(',')}" -c:v libx264 -preset veryfast -crf 22 -g 60 -keyint_min 30';
+      return ' -vf "${filters.join(',')}" -c:v libx264 -preset veryfast -crf 19 -b:v 8M -g 60 -keyint_min 30';
     }
     return hasAudio ? ' -c:v copy' : '';
   }
 
-  static String _buildAudioFilter({required bool hasAudio, required bool hasVisual}) {
+  static String _buildAudioFilter({
+    required bool hasAudio,
+    required bool hasVisual,
+    bool enableDeepAntiFingerprint = true,
+  }) {
     if (hasAudio) {
+      if (enableDeepAntiFingerprint) {
+        return ' -af "atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1" -c:a aac -b:a 192k';
+      }
       return ' -af "atempo=1.015,asetrate=48000*1.01,aresample=48000,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
     }
     return hasVisual ? ' -c:a copy' : '';
@@ -142,6 +181,8 @@ class FfmpegService {
     bool upscale1080p = false,
     bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    bool enableEnhanceAndDenoise = true,
+    bool enableDeepAntiFingerprint = true,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -154,6 +195,8 @@ class FfmpegService {
         upscale1080p: upscale1080p,
         upscale: upscale,
         targetResolution: targetResolution,
+        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
         customOutputPath: customOutputPath,
         onProgress: onProgress,
         totalDurationMs: totalDurationMs,
@@ -168,6 +211,8 @@ class FfmpegService {
     bool upscale1080p = false,
     bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    bool enableEnhanceAndDenoise = true,
+    bool enableDeepAntiFingerprint = true,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -195,6 +240,8 @@ class FfmpegService {
       upscale1080p: upscale1080p,
       upscale: upscale,
       targetResolution: targetResolution,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
     );
 
     if (onProgress != null) {

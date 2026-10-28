@@ -81,6 +81,8 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           modifyVisuals: provider.modifyVisuals,
           upscale1080p: provider.upscale1080p,
           targetResolution: provider.targetResolution,
+          enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
+          enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {

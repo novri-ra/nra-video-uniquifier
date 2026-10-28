@@ -80,15 +80,15 @@ Derived from `codebase-memory-mcp` query: `MATCH (a)-[r]->(b) ...`:
   ├── `lib/features/settings/widgets/audio_visual_tuning_card.dart`
   └── `lib/features/settings/widgets/hardware_acceleration_card.dart`
 
-Total indexed nodes: 1031. Total edges: 2418.
+Total indexed nodes: 1048. Total edges: 2489.
 
 ## 5. Core Entities / Data Model
 - **`UniquifierProvider`** (`lib/core/providers/uniquifier_provider.dart`):
-  - State: `selectedFilePath`, `selectedFileName`, `selectedFileSize`, `videoDuration`, `videoResolution`, `removeMetadata`, `modifyAudio`, `modifyVisuals`, `upscale1080p`, `targetResolution`, `hardwareAcceleration`.
-  - Methods: `setVideoFile()`, `applyPreset()`, `toggleRemoveMetadata()`, `toggleModifyAudio()`, `toggleModifyVisuals()`, `setUpscaleTarget()`, `formatDuration()`, `formatFileSize()`.
+  - State: `selectedFilePath`, `selectedFileName`, `selectedFileSize`, `videoDuration`, `videoResolution`, `removeMetadata`, `modifyAudio`, `modifyVisuals`, `upscale1080p`, `targetResolution`, `enableEnhanceAndDenoise`, `enableDeepAntiFingerprint`, `hardwareAcceleration`.
+  - Methods: `setVideoFile()`, `applyPreset()`, `toggleRemoveMetadata()`, `toggleModifyAudio()`, `toggleModifyVisuals()`, `toggleEnhanceAndDenoise()`, `toggleDeepAntiFingerprint()`, `setUpscaleTarget()`, `formatDuration()`, `formatFileSize()`.
 - **`SettingsService` & `TargetResolution`** (`lib/core/services/settings_service.dart`):
   - Enum: `TargetResolution(key, label, details, width, height)`: `r1080p` (1080p / 1920x1080), `r2k` (2K / 2560x1440), `r4k` (4K / 3840x2160).
-  - Methods: `getUpscaleResolution()`, `setUpscaleResolution()`, `upscaleResolutionNotifier`.
+  - Methods: `getUpscaleResolution()`, `setUpscaleResolution()`, `upscaleResolutionNotifier`, `getEnhanceAndDenoise()`, `setEnhanceAndDenoise()`, `getDeepAntiFingerprint()`, `setDeepAntiFingerprint()`.
 - **`HistoryService` & `VideoExportItem`** (`lib/core/services/history_service.dart`):
   - Model: `VideoExportItem(file, fileName, bytes, modified)` with `formattedSize` and `formattedDate`.
   - Methods: `getTargetDirectories()`, `scanDirectory()`, `loadHistory()`, `deleteItem()`, `formatTotalSize()`.

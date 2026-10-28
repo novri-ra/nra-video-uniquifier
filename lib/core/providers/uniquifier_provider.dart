@@ -27,8 +27,10 @@ class UniquifierProvider extends ChangeNotifier {
       final res = await SettingsService.getUpscaleResolution();
       if (_targetResolution != res) {
         _targetResolution = res;
-        notifyListeners();
       }
+      _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
+      _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
+      notifyListeners();
     } catch (_) {}
   }
   // Source Video State (initial is null / empty)
@@ -58,6 +60,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool _modifyAudio = true;
   bool _modifyVisuals = true;
   bool _upscale1080p = false;
+  bool _enableEnhanceAndDenoise = true;
+  bool _enableDeepAntiFingerprint = true;
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -89,6 +93,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool get modifyAudio => _modifyAudio;
   bool get modifyVisuals => _modifyVisuals;
   bool get upscale1080p => _upscale1080p;
+  bool get enableEnhanceAndDenoise => _enableEnhanceAndDenoise;
+  bool get enableDeepAntiFingerprint => _enableDeepAntiFingerprint;
 
   TargetResolution get targetResolution => _targetResolution;
   String get selectedUpscaleTarget => _targetResolution.key;
@@ -123,6 +129,22 @@ class UniquifierProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleEnhanceAndDenoise(bool val) {
+    _enableEnhanceAndDenoise = val;
+    try {
+      SettingsService.setEnhanceAndDenoise(val);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  void toggleDeepAntiFingerprint(bool val) {
+    _enableDeepAntiFingerprint = val;
+    try {
+      SettingsService.setDeepAntiFingerprint(val);
+    } catch (_) {}
+    notifyListeners();
+  }
+
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
     try {
@@ -153,14 +175,20 @@ class UniquifierProvider extends ChangeNotifier {
     required bool modifyVisuals,
     required bool upscale1080p,
     String upscaleTarget = '1080p',
+    bool enableEnhanceAndDenoise = true,
+    bool enableDeepAntiFingerprint = true,
   }) {
     _removeMetadata = removeMetadata;
     _modifyAudio = modifyAudio;
     _modifyVisuals = modifyVisuals;
     _upscale1080p = upscale1080p;
     _targetResolution = TargetResolution.fromString(upscaleTarget);
+    _enableEnhanceAndDenoise = enableEnhanceAndDenoise;
+    _enableDeepAntiFingerprint = enableDeepAntiFingerprint;
     try {
       SettingsService.setUpscaleResolution(_targetResolution);
+      SettingsService.setEnhanceAndDenoise(_enableEnhanceAndDenoise);
+      SettingsService.setDeepAntiFingerprint(_enableDeepAntiFingerprint);
     } catch (_) {}
     _currentTabIndex = 0;
     notifyListeners();

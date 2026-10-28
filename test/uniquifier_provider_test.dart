@@ -24,6 +24,8 @@ void main() {
       expect(provider.modifyAudio, isTrue);
       expect(provider.modifyVisuals, isTrue);
       expect(provider.upscale1080p, isFalse);
+      expect(provider.enableEnhanceAndDenoise, isTrue);
+      expect(provider.enableDeepAntiFingerprint, isTrue);
       expect(provider.selectedUpscaleTarget, equals('1080p'));
       expect(provider.targetResolutionLabel, equals('1080p'));
       expect(provider.targetResolutionDetails, equals('1920x1080'));
@@ -137,6 +139,30 @@ void main() {
       expect(provider.selectedUpscaleTarget, equals('4k'));
       expect(provider.targetResolutionLabel, equals('4K'));
       expect(provider.targetResolutionDetails, equals('3840x2160'));
+    });
+
+    test('toggleEnhanceAndDenoise flips flag and notifies listeners', () {
+      bool notified = false;
+      provider.addListener(() => notified = true);
+
+      provider.toggleEnhanceAndDenoise(false);
+      expect(provider.enableEnhanceAndDenoise, isFalse);
+      expect(notified, isTrue);
+
+      provider.toggleEnhanceAndDenoise(true);
+      expect(provider.enableEnhanceAndDenoise, isTrue);
+    });
+
+    test('toggleDeepAntiFingerprint flips flag and notifies listeners', () {
+      bool notified = false;
+      provider.addListener(() => notified = true);
+
+      provider.toggleDeepAntiFingerprint(false);
+      expect(provider.enableDeepAntiFingerprint, isFalse);
+      expect(notified, isTrue);
+
+      provider.toggleDeepAntiFingerprint(true);
+      expect(provider.enableDeepAntiFingerprint, isTrue);
     });
 
     test('toggleHardwareAcceleration flips mode', () {

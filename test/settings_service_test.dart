@@ -85,6 +85,18 @@ void main() {
       expect(TargetResolution.fromString(null), equals(TargetResolution.r1080p));
     });
 
+    test('Enhance & denoise toggle defaults to true and persists changes', () async {
+      expect(await SettingsService.getEnhanceAndDenoise(), isTrue);
+      await SettingsService.setEnhanceAndDenoise(false);
+      expect(await SettingsService.getEnhanceAndDenoise(), isFalse);
+    });
+
+    test('Deep anti-fingerprint toggle defaults to true and persists changes', () async {
+      expect(await SettingsService.getDeepAntiFingerprint(), isTrue);
+      await SettingsService.setDeepAntiFingerprint(false);
+      expect(await SettingsService.getDeepAntiFingerprint(), isFalse);
+    });
+
     test('purgeTempCache deletes staged and thumb files safely', () async {
       final tempDir = Directory.systemTemp.createTempSync('uniquifier_test_');
       final staged = File('${tempDir.path}/staged_dummy.mp4');

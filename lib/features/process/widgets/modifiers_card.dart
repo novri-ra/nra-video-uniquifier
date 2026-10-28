@@ -25,7 +25,7 @@ class ModifiersHeader extends StatelessWidget {
         ),
         SizedBox(width: 8),
         Text(
-          '4 MODIFIERS',
+          '6 MODIFIERS',
           style: TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 10,
@@ -77,6 +77,22 @@ class ModifiersCard extends StatelessWidget {
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
               _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.auto_fix_high,
+                title: 'Denoise & Clarity',
+                subtitle: 'HQ denoise & unsharp mask',
+                value: provider.enableEnhanceAndDenoise,
+                onChanged: provider.toggleEnhanceAndDenoise,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.security,
+                title: 'Deep Evasion',
+                subtitle: '5% margin crop & 0.4° tilt',
+                value: provider.enableDeepAntiFingerprint,
+                onChanged: provider.toggleDeepAntiFingerprint,
+              ),
             ],
           ),
         );

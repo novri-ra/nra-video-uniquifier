@@ -122,6 +122,8 @@ void main() {
       // Initial state: 1080p
       expect(find.text('Upscale to 1080p'), findsOneWidget);
       expect(find.text('Lanczos algorithm (1920x1080)'), findsOneWidget);
+      expect(find.text('Denoise & Clarity'), findsOneWidget);
+      expect(find.text('Deep Evasion'), findsOneWidget);
 
       // Change to 2K
       testProvider.setUpscaleTarget('2k');
