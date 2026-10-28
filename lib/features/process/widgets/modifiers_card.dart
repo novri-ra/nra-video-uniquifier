@@ -49,33 +49,38 @@ class ModifiersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Column(
-        children: [
-          _ToggleRow(
-            icon: Icons.fingerprint,
-            title: 'Remove Metadata',
-            subtitle: 'Cleans GPS & device info',
-            value: provider.removeMetadata,
-            onChanged: provider.toggleRemoveMetadata,
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: AppColors.surfaceContainerHighest),
           ),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-          _ToggleRow(
-            icon: Icons.graphic_eq,
-            title: 'Modify Audio',
-            subtitle: 'Shift pitch by 0.5%',
-            value: provider.modifyAudio,
-            onChanged: provider.toggleModifyAudio,
+          child: Column(
+            children: [
+              _ToggleRow(
+                icon: Icons.fingerprint,
+                title: 'Remove Metadata',
+                subtitle: 'Cleans GPS & device info',
+                value: provider.removeMetadata,
+                onChanged: provider.toggleRemoveMetadata,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.graphic_eq,
+                title: 'Modify Audio',
+                subtitle: 'Shift pitch by 0.5%',
+                value: provider.modifyAudio,
+                onChanged: provider.toggleModifyAudio,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
+            ],
           ),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-          _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -103,8 +108,8 @@ class _VisualAndUpscaleRows extends StatelessWidget {
         const Divider(color: AppColors.surfaceContainerHighest, height: 1),
         _ToggleRow(
           icon: Icons.hd,
-          title: 'Upscale to 1080p',
-          subtitle: 'Lanczos algorithm (${provider.selectedUpscaleTarget})',
+          title: 'Upscale to ${provider.targetResolutionLabel}',
+          subtitle: 'Lanczos algorithm (${provider.targetResolutionDetails})',
           value: provider.upscale1080p,
           onChanged: provider.toggleUpscale1080p,
           onTapSubtitle: onOpenAdvanced,

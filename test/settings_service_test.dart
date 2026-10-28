@@ -32,6 +32,59 @@ void main() {
       expect(await SettingsService.getCustomOutputPath(), equals('/custom/movies/dir'));
     });
 
+    test('Upscale resolution defaults to 1080p when unset', () async {
+      final res = await SettingsService.getUpscaleResolution();
+      expect(res, equals(TargetResolution.r1080p));
+      expect(res.label, equals('1080p'));
+      expect(res.details, equals('1920x1080'));
+      expect(SettingsService.upscaleResolutionNotifier.value, equals(TargetResolution.r1080p));
+    });
+
+    test('Upscale resolution persists and broadcasts reactively for 1080p, 2K, and 4K', () async {
+      final broadcastLog = <TargetResolution>[];
+      void listener() => broadcastLog.add(SettingsService.upscaleResolutionNotifier.value);
+      SettingsService.upscaleResolutionNotifier.addListener(listener);
+
+      try {
+        // Set to 2K
+        await SettingsService.setUpscaleResolution(TargetResolution.r2k);
+        expect(await SettingsService.getUpscaleResolution(), equals(TargetResolution.r2k));
+        expect(SettingsService.upscaleResolutionNotifier.value, equals(TargetResolution.r2k));
+        expect(SettingsService.upscaleResolutionNotifier.value.details, equals('2560x1440'));
+
+        // Set to 4K
+        await SettingsService.setUpscaleResolution(TargetResolution.r4k);
+        expect(await SettingsService.getUpscaleResolution(), equals(TargetResolution.r4k));
+        expect(SettingsService.upscaleResolutionNotifier.value, equals(TargetResolution.r4k));
+        expect(SettingsService.upscaleResolutionNotifier.value.details, equals('3840x2160'));
+
+        // Revert to 1080p
+        await SettingsService.setUpscaleResolution(TargetResolution.r1080p);
+        expect(await SettingsService.getUpscaleResolution(), equals(TargetResolution.r1080p));
+        expect(SettingsService.upscaleResolutionNotifier.value, equals(TargetResolution.r1080p));
+        expect(SettingsService.upscaleResolutionNotifier.value.details, equals('1920x1080'));
+
+        // Verify broadcast reactive notifications
+        expect(broadcastLog, containsAllInOrder([
+          TargetResolution.r2k,
+          TargetResolution.r4k,
+          TargetResolution.r1080p,
+        ]));
+      } finally {
+        SettingsService.upscaleResolutionNotifier.removeListener(listener);
+      }
+    });
+
+    test('TargetResolution.fromString parses various representations accurately', () {
+      expect(TargetResolution.fromString('1080p'), equals(TargetResolution.r1080p));
+      expect(TargetResolution.fromString('2k'), equals(TargetResolution.r2k));
+      expect(TargetResolution.fromString('1440p'), equals(TargetResolution.r2k));
+      expect(TargetResolution.fromString('4k'), equals(TargetResolution.r4k));
+      expect(TargetResolution.fromString('2160p'), equals(TargetResolution.r4k));
+      expect(TargetResolution.fromString('invalid'), equals(TargetResolution.r1080p));
+      expect(TargetResolution.fromString(null), equals(TargetResolution.r1080p));
+    });
+
     test('purgeTempCache deletes staged and thumb files safely', () async {
       final tempDir = Directory.systemTemp.createTempSync('uniquifier_test_');
       final staged = File('${tempDir.path}/staged_dummy.mp4');

@@ -80,6 +80,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           modifyAudio: provider.modifyAudio,
           modifyVisuals: provider.modifyVisuals,
           upscale1080p: provider.upscale1080p,
+          targetResolution: provider.targetResolution,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {

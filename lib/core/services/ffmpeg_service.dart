@@ -4,6 +4,7 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'media_scanner_service.dart';
+import 'settings_service.dart';
 
 class FfmpegService {
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
@@ -14,15 +15,19 @@ class FfmpegService {
     bool modifyAudio = true,
     bool modifyVisuals = true,
     bool upscale1080p = false,
+    bool? upscale,
+    TargetResolution targetResolution = TargetResolution.r1080p,
   }) {
     final buffer = StringBuffer('-y -i "$inputPath"');
     if (removeMetadata) buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
 
-    final hasVisual = modifyVisuals || upscale1080p;
+    final shouldUpscale = upscale ?? upscale1080p;
+    final hasVisual = modifyVisuals || shouldUpscale;
     buffer.write(_buildVideoFilter(
       hasVisual: hasVisual,
       hasAudio: modifyAudio,
-      upscale1080p: upscale1080p,
+      upscale: shouldUpscale,
+      targetResolution: targetResolution,
     ));
     buffer.write(_buildAudioFilter(hasAudio: modifyAudio, hasVisual: hasVisual));
 
@@ -34,13 +39,14 @@ class FfmpegService {
   static String _buildVideoFilter({
     required bool hasVisual,
     required bool hasAudio,
-    bool upscale1080p = false,
+    bool upscale = false,
+    TargetResolution targetResolution = TargetResolution.r1080p,
   }) {
     if (hasVisual) {
       final filters = <String>[
         'setpts=0.9852*PTS',
         'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
-        if (upscale1080p) 'scale=1920:1080:flags=lanczos',
+        if (upscale) 'scale=w=-2:h=${targetResolution.height}:flags=lanczos',
         'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
         'noise=alls=2:allf=t+u',
       ];
@@ -127,6 +133,32 @@ class FfmpegService {
     return '${targetDir.path}/UQ_${baseName}_$timestamp.mp4';
   }
 
+  /// Pipeline execution alias conforming to architectural execution contract.
+  static Future<String> executePipeline({
+    required String inputPath,
+    bool removeMetadata = true,
+    bool modifyAudio = true,
+    bool modifyVisuals = true,
+    bool upscale1080p = false,
+    bool? upscale,
+    TargetResolution targetResolution = TargetResolution.r1080p,
+    String? customOutputPath,
+    void Function(double progress, double speed, int timeMs)? onProgress,
+    int totalDurationMs = 0,
+  }) =>
+      processVideo(
+        inputPath: inputPath,
+        removeMetadata: removeMetadata,
+        modifyAudio: modifyAudio,
+        modifyVisuals: modifyVisuals,
+        upscale1080p: upscale1080p,
+        upscale: upscale,
+        targetResolution: targetResolution,
+        customOutputPath: customOutputPath,
+        onProgress: onProgress,
+        totalDurationMs: totalDurationMs,
+      );
+
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({
     required String inputPath,
@@ -134,6 +166,8 @@ class FfmpegService {
     bool modifyAudio = true,
     bool modifyVisuals = true,
     bool upscale1080p = false,
+    bool? upscale,
+    TargetResolution targetResolution = TargetResolution.r1080p,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -159,6 +193,8 @@ class FfmpegService {
       modifyAudio: modifyAudio,
       modifyVisuals: modifyVisuals,
       upscale1080p: upscale1080p,
+      upscale: upscale,
+      targetResolution: targetResolution,
     );
 
     if (onProgress != null) {
@@ -180,7 +216,9 @@ class FfmpegService {
       }
       if (stagedFile != null && stagedFile.existsSync()) {
         try {
-          stagedFile.deleteSync();
+          if (stagedFile.path != outputPath && stagedFile.path != inputPath) {
+            stagedFile.deleteSync();
+          }
         } catch (_) {}
       }
     }
@@ -200,7 +238,14 @@ class FfmpegService {
 
       final logs = await session.getAllLogsAsString();
       final failStackTrace = await session.getFailStackTrace();
-      throw Exception('FFmpeg failed with code $returnCode: $logs $failStackTrace');
+      final buffer = StringBuffer('FFmpeg failed with code $returnCode');
+      if (failStackTrace != null && failStackTrace.trim().isNotEmpty) {
+        buffer.write('\n\nStack trace:\n$failStackTrace');
+      }
+      if (logs != null && logs.trim().isNotEmpty) {
+        buffer.write('\n\nExecution logs:\n$logs');
+      }
+      throw Exception(buffer.toString());
     } catch (_) {
       _deletePartialFile(outputPath);
       rethrow;

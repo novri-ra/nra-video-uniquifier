@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
   Widget createTestWidget({required Size surfaceSize}) {
     return MultiProvider(
       providers: [
@@ -94,6 +99,41 @@ void main() {
       expect(find.text('EXECUTION TIME'), findsOneWidget);
       expect(find.text('SANDBOX STATE'), findsOneWidget);
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('ModifiersCard displays dynamic title and subtitle for resolution state', (tester) async {
+      final testProvider = UniquifierProvider();
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: testProvider,
+          child: MaterialApp(
+            home: Scaffold(
+              body: ModifiersCard(
+                provider: testProvider,
+                onOpenAdvanced: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Initial state: 1080p
+      expect(find.text('Upscale to 1080p'), findsOneWidget);
+      expect(find.text('Lanczos algorithm (1920x1080)'), findsOneWidget);
+
+      // Change to 2K
+      testProvider.setUpscaleTarget('2k');
+      await tester.pumpAndSettle();
+      expect(find.text('Upscale to 2K'), findsOneWidget);
+      expect(find.text('Lanczos algorithm (2560x1440)'), findsOneWidget);
+
+      // Change to 4K
+      testProvider.setUpscaleTarget('4k');
+      await tester.pumpAndSettle();
+      expect(find.text('Upscale to 4K'), findsOneWidget);
+      expect(find.text('Lanczos algorithm (3840x2160)'), findsOneWidget);
     });
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/ffmpeg_service.dart';
+import 'package:nra_video_uniquifier/core/services/settings_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -54,7 +55,7 @@ void main() {
       expect(cmd, contains('-map_metadata -1'));
     });
 
-    test('Visual tweak & upscale adds anti-fingerprint video filters and libx264 veryfast', () {
+    test('Visual tweak & upscale adds anti-fingerprint video filters and libx264 veryfast (1080p)', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -62,14 +63,42 @@ void main() {
         modifyAudio: false,
         modifyVisuals: true,
         upscale1080p: true,
+        targetResolution: TargetResolution.r1080p,
       );
       expect(cmd, contains('setpts=0.9852*PTS'));
       expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
-      expect(cmd, contains('scale=1920:1080:flags=lanczos'));
+      expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98'));
       expect(cmd, contains('noise=alls=2:allf=t+u'));
       expect(cmd, contains('-c:v libx264 -preset veryfast -crf 22 -g 60 -keyint_min 30'));
       expect(cmd, contains('-c:a copy'));
+    });
+
+    test('Upscale to 2K dynamically maps scale filter to 1440p without clashing with crop', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r2k,
+      );
+      expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
+      expect(cmd, contains('scale=w=-2:h=1440:flags=lanczos'));
+      final cropIdx = cmd.indexOf('crop=');
+      final scaleIdx = cmd.indexOf('scale=');
+      expect(cropIdx, lessThan(scaleIdx));
+    });
+
+    test('Upscale to 4K dynamically maps scale filter to 2160p', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r4k,
+      );
+      expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
+      expect(cmd, contains('scale=w=-2:h=2160:flags=lanczos'));
     });
 
     test('Full dynamic options combined', () {

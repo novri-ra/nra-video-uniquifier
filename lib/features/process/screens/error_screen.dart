@@ -161,7 +161,7 @@ class _TelemetryLogBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
-      child: Text(
+      child: SelectableText(
         errorDetails ??
             '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
                 'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
@@ -200,7 +200,7 @@ class _ErrorRecommendedFixes extends StatelessWidget {
           SizedBox(height: 8),
           Text(
             '• Switch to Software (libx264) Safe Engine in Settings.\n'
-            '• Toggle off 1080p Upscaling Lanczos.\n'
+            '• Toggle off Upscaling (or lower target resolution).\n'
             '• Clear temporary cache before retrying.',
             style: TextStyle(color: AppColors.onSurface, fontSize: 12, height: 1.5),
           ),

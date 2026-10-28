@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
+import 'package:nra_video_uniquifier/core/services/settings_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -7,7 +9,13 @@ void main() {
   late UniquifierProvider provider;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    SettingsService.upscaleResolutionNotifier.value = TargetResolution.r1080p;
     provider = UniquifierProvider();
+  });
+
+  tearDown(() {
+    provider.dispose();
   });
 
   group('UniquifierProvider - Initial State', () {
@@ -17,6 +25,8 @@ void main() {
       expect(provider.modifyVisuals, isTrue);
       expect(provider.upscale1080p, isFalse);
       expect(provider.selectedUpscaleTarget, equals('1080p'));
+      expect(provider.targetResolutionLabel, equals('1080p'));
+      expect(provider.targetResolutionDetails, equals('1920x1080'));
       expect(provider.hardwareAcceleration, isTrue);
       expect(provider.currentTabIndex, equals(0));
       expect(provider.lastProcessedOutputPath, isNull);
@@ -109,10 +119,24 @@ void main() {
       provider.toggleUpscale1080p(true);
       expect(provider.upscale1080p, isTrue);
 
-      provider.setUpscaleTarget('720p');
-      expect(provider.selectedUpscaleTarget, equals('720p'));
+      provider.setUpscaleTarget('2k');
+      expect(provider.selectedUpscaleTarget, equals('2k'));
+      expect(provider.targetResolutionLabel, equals('2K'));
+      expect(provider.targetResolutionDetails, equals('2560x1440'));
 
-      expect(notifications, equals(2));
+      provider.setUpscaleTarget('4k');
+      expect(provider.selectedUpscaleTarget, equals('4k'));
+      expect(provider.targetResolutionLabel, equals('4K'));
+      expect(provider.targetResolutionDetails, equals('3840x2160'));
+
+      expect(notifications, equals(3));
+    });
+
+    test('Reacts immediately when SettingsService broadcasts resolution change', () async {
+      await SettingsService.setUpscaleResolution(TargetResolution.r4k);
+      expect(provider.selectedUpscaleTarget, equals('4k'));
+      expect(provider.targetResolutionLabel, equals('4K'));
+      expect(provider.targetResolutionDetails, equals('3840x2160'));
     });
 
     test('toggleHardwareAcceleration flips mode', () {

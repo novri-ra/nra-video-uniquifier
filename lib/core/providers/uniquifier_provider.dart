@@ -1,8 +1,36 @@
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import '../services/ffmpeg_service.dart';
+import '../services/settings_service.dart';
 
 class UniquifierProvider extends ChangeNotifier {
+  UniquifierProvider() {
+    SettingsService.upscaleResolutionNotifier.addListener(_onResolutionNotifierChanged);
+    _initResolution();
+  }
+
+  @override
+  void dispose() {
+    SettingsService.upscaleResolutionNotifier.removeListener(_onResolutionNotifierChanged);
+    super.dispose();
+  }
+
+  void _onResolutionNotifierChanged() {
+    if (_targetResolution != SettingsService.upscaleResolutionNotifier.value) {
+      _targetResolution = SettingsService.upscaleResolutionNotifier.value;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _initResolution() async {
+    try {
+      final res = await SettingsService.getUpscaleResolution();
+      if (_targetResolution != res) {
+        _targetResolution = res;
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
   // Source Video State (initial is null / empty)
   String? _selectedFileName;
   String? _selectedFilePath;
@@ -32,7 +60,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool _upscale1080p = false;
 
   // Advanced Settings
-  String _selectedUpscaleTarget = '1080p'; // '720p', '1080p', '2k'
+  TargetResolution _targetResolution = TargetResolution.r1080p;
   bool _hardwareAcceleration = true;
 
   // Navigation
@@ -62,7 +90,10 @@ class UniquifierProvider extends ChangeNotifier {
   bool get modifyVisuals => _modifyVisuals;
   bool get upscale1080p => _upscale1080p;
 
-  String get selectedUpscaleTarget => _selectedUpscaleTarget;
+  TargetResolution get targetResolution => _targetResolution;
+  String get selectedUpscaleTarget => _targetResolution.key;
+  String get targetResolutionLabel => _targetResolution.label;
+  String get targetResolutionDetails => _targetResolution.details;
   bool get hardwareAcceleration => _hardwareAcceleration;
   int get currentTabIndex => _currentTabIndex;
 
@@ -93,7 +124,10 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   void setUpscaleTarget(String target) {
-    _selectedUpscaleTarget = target;
+    _targetResolution = TargetResolution.fromString(target);
+    try {
+      SettingsService.setUpscaleResolution(_targetResolution);
+    } catch (_) {}
     notifyListeners();
   }
 
@@ -124,7 +158,10 @@ class UniquifierProvider extends ChangeNotifier {
     _modifyAudio = modifyAudio;
     _modifyVisuals = modifyVisuals;
     _upscale1080p = upscale1080p;
-    _selectedUpscaleTarget = upscaleTarget;
+    _targetResolution = TargetResolution.fromString(upscaleTarget);
+    try {
+      SettingsService.setUpscaleResolution(_targetResolution);
+    } catch (_) {}
     _currentTabIndex = 0;
     notifyListeners();
   }

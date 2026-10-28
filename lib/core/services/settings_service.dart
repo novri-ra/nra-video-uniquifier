@@ -1,11 +1,58 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum TargetResolution {
+  r1080p('1080p', '1080p', '1920x1080', 1920, 1080),
+  r2k('2k', '2K', '2560x1440', 2560, 1440),
+  r4k('4k', '4K', '3840x2160', 3840, 2160);
+
+  final String key;
+  final String label;
+  final String details;
+  final int width;
+  final int height;
+
+  const TargetResolution(this.key, this.label, this.details, this.width, this.height);
+
+  static TargetResolution fromString(String? val) {
+    switch (val?.toLowerCase()) {
+      case '2k':
+      case '1440p':
+        return TargetResolution.r2k;
+      case '4k':
+      case '2160p':
+        return TargetResolution.r4k;
+      case '1080p':
+      default:
+        return TargetResolution.r1080p;
+    }
+  }
+}
 
 class SettingsService {
   static const String keyEngineMode = 'app_engine_mode';
   static const String keyDefaultPreset = 'app_default_preset';
   static const String keyCustomOutputPath = 'app_output_path';
+  static const String keyUpscaleResolution = 'app_upscale_resolution';
+
+  static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
+      ValueNotifier<TargetResolution>(TargetResolution.r1080p);
+
+  static Future<TargetResolution> getUpscaleResolution() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(keyUpscaleResolution);
+    final resolution = TargetResolution.fromString(raw);
+    upscaleResolutionNotifier.value = resolution;
+    return resolution;
+  }
+
+  static Future<void> setUpscaleResolution(TargetResolution resolution) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyUpscaleResolution, resolution.key);
+    upscaleResolutionNotifier.value = resolution;
+  }
 
   static Future<String> getEngineMode() async {
     final prefs = await SharedPreferences.getInstance();
