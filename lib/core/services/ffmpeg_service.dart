@@ -3,9 +3,10 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path_provider/path_provider.dart';
+import 'media_scanner_service.dart';
 
 class FfmpegService {
-  /// Builds dynamic FFmpeg command string with enhanced anti-fingerprint filters.
+  /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
   static String buildCommand({
     required String inputPath,
     required String outputPath,
@@ -75,12 +76,12 @@ class FfmpegService {
   }
 
   /// Extracts 1st-frame thumbnail via lightweight FFmpeg command.
-  static Future<String?> extractThumbnail(String inputPath) async {
+  static Future<String?> extractThumbnail(String inputPath, {String? targetPath}) async {
     try {
       final inputFile = File(inputPath);
       if (!inputFile.existsSync() || inputFile.lengthSync() == 0) return null;
       final tempDir = await getTemporaryDirectory();
-      final thumbPath = '${tempDir.path}/thumb_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final thumbPath = targetPath ?? '${tempDir.path}/thumb_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final cmd = '-y -ss 00:00:00.500 -i "$inputPath" -vframes 1 -q:v 2 "$thumbPath"';
       final session = await FFmpegKit.execute(cmd);
       final returnCode = await session.getReturnCode();
@@ -91,10 +92,10 @@ class FfmpegService {
     return null;
   }
 
-  /// Resolves the target directory, prioritizing public Movies on Android.
+  /// Resolves the public target directory (/storage/emulated/0/Movies/Uniquifier).
   static Future<Directory> _resolveTargetDir() async {
     if (Platform.isAndroid) {
-      final publicMovies = Directory('/storage/emulated/0/Movies/VideoUniquifier');
+      final publicMovies = Directory('/storage/emulated/0/Movies/Uniquifier');
       try {
         if (!await publicMovies.exists()) await publicMovies.create(recursive: true);
         return publicMovies;
@@ -102,26 +103,28 @@ class FfmpegService {
         try {
           final dirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
           if (dirs != null && dirs.isNotEmpty) {
-            return Directory('${dirs.first.path}/VideoUniquifier');
+            final fallback = Directory('${dirs.first.path}/Uniquifier');
+            if (!await fallback.exists()) await fallback.create(recursive: true);
+            return fallback;
           }
         } catch (_) {}
       }
     }
     final appDocs = await getApplicationDocumentsDirectory();
-    return Directory('${appDocs.path}/Movies/VideoUniquifier');
+    final localMovies = Directory('${appDocs.path}/Movies/Uniquifier');
+    if (!await localMovies.exists()) await localMovies.create(recursive: true);
+    return localMovies;
   }
 
-  /// Generates the target output path under /Movies/VideoUniquifier/
+  /// Generates the target output path with collision-free timestamp pattern.
   static Future<String> generateOutputPath(String inputPath) async {
     final fileName = inputPath.split(RegExp(r'[/\\]')).last;
     final dotIndex = fileName.lastIndexOf('.');
     final baseName = dotIndex != -1 ? fileName.substring(0, dotIndex) : fileName;
     final targetDir = await _resolveTargetDir();
 
-    if (!await targetDir.exists()) {
-      await targetDir.create(recursive: true);
-    }
-    return '${targetDir.path}/${baseName}_unique.mp4';
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    return '${targetDir.path}/UQ_${baseName}_$timestamp.mp4';
   }
 
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
@@ -168,7 +171,9 @@ class FfmpegService {
     }
 
     try {
-      return await _executeFFmpeg(command, outputPath);
+      final finalPath = await _executeFFmpeg(command, outputPath);
+      await MediaScannerService.scanFile(finalPath);
+      return finalPath;
     } finally {
       if (onProgress != null) {
         FFmpegKitConfig.enableStatisticsCallback(null);

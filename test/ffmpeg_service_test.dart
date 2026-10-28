@@ -1,8 +1,27 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/ffmpeg_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('plugins.flutter.io/path_provider'),
+      (MethodCall methodCall) async {
+        return '.';
+      },
+    );
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('plugins.flutter.io/path_provider'),
+      null,
+    );
+  });
 
   group('FfmpegService command generator', () {
     test('Base command with metadata removal only', () {
@@ -66,6 +85,17 @@ void main() {
       expect(cmd, contains('setpts=0.9852*PTS'));
       expect(cmd, contains('atempo=1.015'));
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
+    });
+
+    test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
+      final path1 = await FfmpegService.generateOutputPath('/some/dir/sample.mp4');
+      await Future.delayed(const Duration(milliseconds: 5));
+      final path2 = await FfmpegService.generateOutputPath('/some/dir/sample.mp4');
+
+      expect(path1, contains('UQ_sample_'));
+      expect(path1, endsWith('.mp4'));
+      expect(path2, contains('UQ_sample_'));
+      expect(path1, isNot(equals(path2)));
     });
 
     test('Throws exception if input video does not exist', () async {

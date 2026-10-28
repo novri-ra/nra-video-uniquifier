@@ -135,25 +135,39 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
     return Scaffold(
       appBar: const TopAppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _CentralModuleCard(progress: _progress, step: _step),
-              ProcessingLogViewer(
-                fileName: fileName,
-                duration: fileDuration,
-                executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
-                estimatedRemaining: provider.eta,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        _CentralModuleCard(progress: _progress, step: _step),
+                        const SizedBox(height: 16),
+                        ProcessingLogViewer(
+                          fileName: fileName,
+                          duration: fileDuration,
+                          executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
+                          estimatedRemaining: provider.eta,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _ActionSection(
+                      onCancel: _handleCancel,
+                      onSuccessTest: _finishSuccess,
+                      onErrorTest: _finishError,
+                    ),
+                  ],
+                ),
               ),
-              _ActionSection(
-                onCancel: _handleCancel,
-                onSuccessTest: _finishSuccess,
-                onErrorTest: _finishError,
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -231,13 +245,13 @@ class _ModuleHeaderTag extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 4),
             const Text(
               'ACTIVE',
               style: TextStyle(
                 color: AppColors.primaryContainer,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
                 fontFamily: 'monospace',
               ),
             ),
@@ -263,58 +277,33 @@ class _ActionSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _CancelButton(onPressed: onCancel),
-        const SizedBox(height: 8),
-        _TestRow(onSuccess: onSuccessTest, onError: onErrorTest),
-        const Text(
-          'Realme 3 Pro OOM guard active • Process isolate isolated',
-          style: TextStyle(color: AppColors.outline, fontSize: 10, fontFamily: 'monospace'),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.outline,
+            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            minimumSize: const Size.fromHeight(44),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          ),
+          onPressed: onCancel,
+          icon: const Icon(Icons.close, size: 16),
+          label: const Text('Cancel Processing', style: TextStyle(fontFamily: 'monospace', fontSize: 13)),
         ),
-      ],
-    );
-  }
-}
-
-class _CancelButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  const _CancelButton({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.error,
-        side: const BorderSide(color: AppColors.errorContainer),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        minimumSize: const Size.fromHeight(44),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-      ),
-      onPressed: onPressed,
-      icon: const Icon(Icons.close, size: 18),
-      label: const Text('Cancel Operation'),
-    );
-  }
-}
-
-class _TestRow extends StatelessWidget {
-  final VoidCallback onSuccess;
-  final VoidCallback onError;
-
-  const _TestRow({required this.onSuccess, required this.onError});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-          onPressed: onSuccess,
-          child: const Text('[Test Success]', style: TextStyle(color: AppColors.primaryContainer, fontSize: 11)),
-        ),
-        const SizedBox(width: 12),
-        TextButton(
-          onPressed: onError,
-          child: const Text('[Test Error]', style: TextStyle(color: AppColors.error, fontSize: 11)),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: onSuccessTest,
+              child: const Text('Simulate Success', style: TextStyle(color: AppColors.outline, fontSize: 11)),
+            ),
+            const SizedBox(width: 8),
+            const Text('•', style: TextStyle(color: AppColors.outline, fontSize: 11)),
+            const SizedBox(width: 8),
+            TextButton(
+              onPressed: onErrorTest,
+              child: const Text('Simulate Error', style: TextStyle(color: AppColors.outline, fontSize: 11)),
+            ),
+          ],
         ),
       ],
     );

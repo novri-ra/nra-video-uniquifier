@@ -1,15 +1,15 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/providers/uniquifier_provider.dart';
-import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/advanced_settings_bottom_sheet.dart';
 import '../../settings/screens/app_settings_bottom_sheet.dart';
 import '../widgets/engine_state_strip.dart';
 import '../widgets/modifiers_card.dart';
 import '../widgets/source_file_section.dart';
 import 'processing_screen.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/providers/uniquifier_provider.dart';
+import '../../../shared/widgets/top_app_bar.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProcessScreen extends StatelessWidget {
   const ProcessScreen({super.key});
@@ -75,6 +75,7 @@ class ProcessScreen extends StatelessWidget {
       appBar: TopAppBar(onSettingsTap: () => _openAppSettings(context)),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(16),
           child: _ProcessBody(
             hasFile: hasFile,
@@ -135,9 +136,12 @@ class _OfflineGuaranteeNote extends StatelessWidget {
       children: [
         Icon(Icons.verified_user, color: AppColors.primaryContainer, size: 14),
         SizedBox(width: 6),
-        Text(
-          '100% on-device processing • No data leaves device',
-          style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace'),
+        Flexible(
+          child: Text(
+            '100% on-device processing • No data leaves device',
+            style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace'),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -148,21 +152,32 @@ class _ProcessActionButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onPressed;
 
-  const _ProcessActionButton({required this.enabled, required this.onPressed});
+  const _ProcessActionButton({
+    required this.enabled,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryContainer,
-        foregroundColor: AppColors.onPrimary,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        backgroundColor: enabled ? AppColors.primaryContainer : AppColors.surfaceContainerHigh,
+        foregroundColor: enabled ? AppColors.onPrimary : AppColors.outline,
+        minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         elevation: 0,
       ),
       onPressed: enabled ? onPressed : null,
       icon: const Icon(Icons.bolt, size: 20),
-      label: const Text('Process Video', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+      label: const Text(
+        'START UNIQUIFYING',
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.2,
+          fontFamily: 'monospace',
+        ),
+      ),
     );
   }
 }

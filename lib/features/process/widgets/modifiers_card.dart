@@ -10,16 +10,20 @@ class ModifiersHeader extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'PROCESSING SETTINGS',
-          style: TextStyle(
-            color: AppColors.onSurfaceVariant,
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            fontFamily: 'monospace',
+        Flexible(
+          child: Text(
+            'PROCESSING SETTINGS',
+            style: TextStyle(
+              color: AppColors.onSurfaceVariant,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.8,
+              fontFamily: 'monospace',
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+        SizedBox(width: 8),
         Text(
           '4 MODIFIERS',
           style: TextStyle(
@@ -134,13 +138,18 @@ class _ToggleRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
-              const SizedBox(width: 10),
-              _ToggleLabel(title: title, subtitle: subtitle, onTapSubtitle: onTapSubtitle),
-            ],
+          Expanded(
+            child: Row(
+              children: [
+                Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _ToggleLabel(title: title, subtitle: subtitle, onTapSubtitle: onTapSubtitle),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Switch(value: value, onChanged: onChanged),
         ],
       ),
@@ -171,6 +180,8 @@ class _ToggleLabel extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         GestureDetector(
           onTap: onTapSubtitle,
@@ -182,6 +193,8 @@ class _ToggleLabel extends StatelessWidget {
               fontFamily: 'monospace',
               decoration: onTapSubtitle != null ? TextDecoration.underline : TextDecoration.none,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

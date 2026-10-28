@@ -43,11 +43,13 @@ class HistoryService {
   static Future<List<Directory>> getTargetDirectories() async {
     final dirs = <Directory>[];
     if (Platform.isAndroid) {
+      dirs.add(Directory('/storage/emulated/0/Movies/Uniquifier'));
       dirs.add(Directory('/storage/emulated/0/Movies/VideoUniquifier'));
       try {
         final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
         if (extDirs != null) {
           for (final dir in extDirs) {
+            dirs.add(Directory('${dir.path}/Uniquifier'));
             dirs.add(Directory('${dir.path}/VideoUniquifier'));
           }
         }
@@ -55,6 +57,7 @@ class HistoryService {
     }
     try {
       final appDocs = await getApplicationDocumentsDirectory();
+      dirs.add(Directory('${appDocs.path}/Movies/Uniquifier'));
       dirs.add(Directory('${appDocs.path}/Movies/VideoUniquifier'));
     } catch (_) {}
     return dirs;

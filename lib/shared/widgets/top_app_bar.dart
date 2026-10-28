@@ -31,7 +31,8 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            _TitleSection(title: title),
+            Expanded(child: _TitleSection(title: title)),
+            const SizedBox(width: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -43,7 +44,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     onPressed: onSettingsTap,
                   ),
-                if (onSettingsTap != null && isOffline) const SizedBox(width: 6),
+                if (onSettingsTap != null && isOffline) const SizedBox(width: 4),
                 if (isOffline) const _OfflineBadge(),
               ],
             ),
@@ -61,16 +62,21 @@ class _TitleSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const Icon(Icons.terminal, color: AppColors.primaryContainer, size: 20),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.onSurface,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+        Flexible(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.onSurface,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

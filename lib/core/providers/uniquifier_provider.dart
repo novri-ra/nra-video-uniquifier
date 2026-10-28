@@ -21,8 +21,9 @@ class UniquifierProvider extends ChangeNotifier {
   double _renderingSpeed = 1.0;
   String _eta = 'Calculating...';
 
-  // Last processed output
+  // Last processed output & Output thumbnail
   String? _lastProcessedOutputPath;
+  String? _outputThumbnailPath;
 
   // Toggle Settings
   bool _removeMetadata = true;
@@ -42,6 +43,7 @@ class UniquifierProvider extends ChangeNotifier {
   String? get selectedFilePath => _selectedFilePath;
   String? get thumbnailPath => _thumbnailPath;
   String? get lastProcessedOutputPath => _lastProcessedOutputPath;
+  String? get outputThumbnailPath => _outputThumbnailPath;
   String get fileResolution => _fileResolution;
   String get fileSize => _fileSize;
   String get fileCodec => _fileCodec;
@@ -132,12 +134,29 @@ class UniquifierProvider extends ChangeNotifier {
     _selectedFilePath = null;
     _thumbnailPath = null;
     _realtimeProgress = 0.0;
+    _outputThumbnailPath = null;
     notifyListeners();
   }
 
   void setLastProcessedResult(String outputPath) {
     _lastProcessedOutputPath = outputPath;
     notifyListeners();
+    _extractOutputThumbnailAsync(outputPath);
+  }
+
+  void setOutputThumbnail(String? thumbPath) {
+    _outputThumbnailPath = thumbPath;
+    notifyListeners();
+  }
+
+  Future<void> _extractOutputThumbnailAsync(String outputPath) async {
+    try {
+      final thumb = await FfmpegService.extractThumbnail(outputPath);
+      if (thumb != null && _lastProcessedOutputPath == outputPath) {
+        _outputThumbnailPath = thumb;
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   void setVideoFile({
