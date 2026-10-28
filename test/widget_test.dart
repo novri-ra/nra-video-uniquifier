@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -62,6 +63,36 @@ void main() {
       expect(find.text('VIDEO UNIQUIFIER'), findsOneWidget);
       expect(find.text('SOURCE FILE'), findsOneWidget);
       expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('ProcessingLogViewer truncates excessively long filename without overflow', (tester) async {
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 300,
+                child: ProcessingLogViewer(
+                  fileName: 'VeryLongVideoFileName_2026_Final_Render_Version_Ultra_Special_Export_Sample_Video_Archive.mp4',
+                  duration: '01:45:20',
+                  executionTime: '01:23s',
+                  estimatedRemaining: '00:12s rem',
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('SOURCE'), findsOneWidget);
+      expect(find.text('EXECUTION TIME'), findsOneWidget);
+      expect(find.text('SANDBOX STATE'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
