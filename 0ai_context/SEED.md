@@ -80,7 +80,7 @@ Derived from `codebase-memory-mcp` query: `MATCH (a)-[r]->(b) ...`:
   ├── `lib/features/settings/widgets/audio_visual_tuning_card.dart`
   └── `lib/features/settings/widgets/hardware_acceleration_card.dart`
 
-Total indexed nodes: 1067. Total edges: 2610.
+Total indexed nodes: 1119. Total edges: 2732.
 
 ## 5. Core Entities / Data Model
 - **`UniquifierProvider`** (`lib/core/providers/uniquifier_provider.dart`):
