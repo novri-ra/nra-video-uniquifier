@@ -97,6 +97,20 @@ void main() {
       expect(await SettingsService.getDeepAntiFingerprint(), isFalse);
     });
 
+    test('Horizontal flip, aggressive audio, and auto trim default to false and persist changes', () async {
+      expect(await SettingsService.getHorizontalFlip(), isFalse);
+      await SettingsService.setHorizontalFlip(true);
+      expect(await SettingsService.getHorizontalFlip(), isTrue);
+
+      expect(await SettingsService.getAggressiveAudio(), isFalse);
+      await SettingsService.setAggressiveAudio(true);
+      expect(await SettingsService.getAggressiveAudio(), isTrue);
+
+      expect(await SettingsService.getAutoTrim(), isFalse);
+      await SettingsService.setAutoTrim(true);
+      expect(await SettingsService.getAutoTrim(), isTrue);
+    });
+
     test('purgeTempCache deletes staged and thumb files safely', () async {
       final tempDir = Directory.systemTemp.createTempSync('uniquifier_test_');
       final staged = File('${tempDir.path}/staged_dummy.mp4');

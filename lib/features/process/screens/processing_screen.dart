@@ -83,6 +83,9 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           targetResolution: provider.targetResolution,
           enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
           enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,
+          enableHorizontalFlip: provider.enableHorizontalFlip,
+          enableAggressiveAudio: provider.enableAggressiveAudio,
+          enableAutoTrim: provider.enableAutoTrim,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {

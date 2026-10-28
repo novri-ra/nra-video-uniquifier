@@ -124,6 +124,9 @@ void main() {
       expect(find.text('Lanczos algorithm (1920x1080)'), findsOneWidget);
       expect(find.text('Denoise & Clarity'), findsOneWidget);
       expect(find.text('Deep Evasion'), findsOneWidget);
+      expect(find.text('Horizontal Flip'), findsOneWidget);
+      expect(find.text('Audio Masking'), findsOneWidget);
+      expect(find.text('Auto-Trim'), findsOneWidget);
 
       // Change to 2K
       testProvider.setUpscaleTarget('2k');

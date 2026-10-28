@@ -2,25 +2,30 @@
 
 ## Timestamp
 - **Date**: 2026-10-28
-- **Session**: 18-denoise-enhancer-and-deep-evasion
+- **Session**: 19-vdna-evasion-and-web-research
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Working Tree**: Modular video enhancement (hqdn3d, unsharp) and deep evasion (5% crop, 0.4° tilt, enhanced audio spectrum, 8M bitrate) active.
+- **Working Tree**: Advanced vDNA evasion, horizontal flip mirroring, pink noise audio masking, auto-trim, and Apple device tag spoofing active.
 
 ## Hardware & Device Verification Status
 - **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699` (Offline / Headless automated verification active)
 - **Target Emulators / Secondary**: LDPlayer 9 / PC Emulators (`x86_64`, `x86`) & Physical ARM (`arm64-v8a`, `armeabi-v7a`)
 - **OS / API Support**: Android 7.0 (API 24) through Android 15 (API 35+)
-- **Runtime Verdict**: **PASSED (53/53 automated tests passed, 0 analyze issues)**
+- **Runtime Verdict**: **PASSED (58/58 automated tests passed, 0 analyze issues)**
 - **Native Components**:
+  - Horizontal flip (mirroring `hflip`) for landmark coordinates disruption.
+  - Auto-Trim (`-ss 0.5` + duration clamping) for anchor keyframe sequence hash disruption.
+  - Non-linear color curves (`curves=preset=vintage`) and temporal uniform noise overlay (`noise=alls=3:allf=t+u`).
+  - Synthetic pink noise audio masking (`anoisesrc=d=7200:c=pink:a=0.003` via `amix`).
+  - Native container sanitization and Apple iPhone 15 Pro hardware spoofing metadata.
+  - ModifiersCard reactive UI with 9 toggles.
   - Denoise & Clarity filter integration: `hqdn3d=1.5:1.5:4:4` and `unsharp=3:3:0.6:3:3:0.0`.
   - Deep Evasion multi-layer pipeline: `crop=0.95`, `rotate=0.4°`, and enhanced audio spectrum `highpass/lowpass/equalizer`.
   - Output bitrate and quality: `-crf 19 -b:v 8M` eliminating platform low-quality downranking.
-  - ModifiersCard reactive UI with 6 toggles.
   - Dynamic resolution selection (1080p, 2K, 4K) with SharedPreferences persistence and reactive broadcasting.
   - ModifiersCard dynamically updates title ("Upscale to 1080p/2K/4K") and subtitle ("Lanczos algorithm 1920x1080/2560x1440/3840x2160") reactively via ListenableBuilder.
   - FFmpeg command generation dynamically injects `scale=w=-2:h=1080/1440/2160:flags=lanczos` preserving aspect ratio and macroblock parity without crop collision.
@@ -50,6 +55,7 @@
 - [x] **P15 Post-Fix Verification & Complete LOC Audit**: 100% LOC budget verification across all 28 Dart files, zero unconstrained layout rows, regression test suite expansion (41 passing tests).
 - [x] **P16 Dynamic Resolution (4K), Reactive UI & Pipeline Integrity**: 1080p/2K/4K resolution support, dynamic ModifiersCard binding, aspect-preserving Lanczos scaling (`scale=w=-2:h=...`), error log extraction and SelectableText diagnostics (48 passing tests).
 - [x] **P17 Modular Video Enhancement & Multi-Layer Evasion**: Denoise (`hqdn3d`), unsharp clarity, deep margin crop (5%), 0.4° tilt, enhanced audio spectrum, 8M bitrate (53 passing tests).
+- [x] **P18 Advanced vDNA Fingerprint Evasion & Full Pipeline Overhaul**: Horizontal mirror (`hflip`), auto-trim 0.5s intro/outro, vintage curves grading, pink noise spectrogram masking (`anoisesrc`), container stripping, and Apple iPhone 15 Pro hardware spoofing (58 passing tests).
 - [ ] **Next Maintenance (Active on `development`)**:
   - Deploy and test on LDPlayer 9 via adb when emulator is booted.
   - Batch video processing queue.
@@ -57,9 +63,9 @@
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
 - **Project**: `C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier`
-- **Indexed At**: 2026-10-28T17:10:00Z
-- **Nodes**: 1048 (Baseline: 1042, Delta: +6)
-- **Edges**: 2489 (Baseline: 2473, Delta: +16)
+- **Indexed At**: 2026-10-28T17:25:00Z
+- **Nodes**: 1067 (Baseline: 1058, Delta: +9)
+- **Edges**: 2610 (Baseline: 2568, Delta: +42)
 - **Tools Verified**: `index_status`, `search_graph`, `index_repository`, `query_graph`, `get_graph_schema`, `trace_path`
 
 ## Comprehensive Module Health & Line Budget Status (All 28 Files Passed)

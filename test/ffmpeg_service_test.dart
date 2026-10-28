@@ -88,18 +88,21 @@ void main() {
       expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
+      expect(cmd, contains('curves=preset=vintage'));
       expect(cmd, contains('eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98'));
-      expect(cmd, contains('noise=alls=2:allf=t+u'));
+      expect(cmd, contains('noise=alls=3:allf=t+u'));
       expect(cmd, contains('-c:v libx264 -preset veryfast -crf 19 -b:v 8M -g 60 -keyint_min 30'));
+      expect(cmd, contains('-metadata make="Apple" -metadata model="iPhone 15 Pro"'));
       expect(cmd, contains('-c:a copy'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> Curves/EQ -> Noise
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
       final scaleIdx = cmd.indexOf('scale=');
       final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
+      final curvesIdx = cmd.indexOf('curves=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
 
@@ -108,7 +111,8 @@ void main() {
       expect(rotIdx, lessThan(scaleIdx));
       expect(scaleIdx, lessThan(denoiseIdx));
       expect(denoiseIdx, lessThan(unsharpIdx));
-      expect(unsharpIdx, lessThan(eqIdx));
+      expect(unsharpIdx, lessThan(curvesIdx));
+      expect(curvesIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
     });
 
@@ -141,6 +145,40 @@ void main() {
       expect(cmd, contains('scale=w=-2:h=2160:flags=lanczos'));
       expect(cmd, isNot(contains('hqdn3d=')));
       expect(cmd, isNot(contains('unsharp=')));
+    });
+
+    test('Horizontal flip injects hflip in spatial stage', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        enableHorizontalFlip: true,
+      );
+      expect(cmd, contains('hflip'));
+      final rotIdx = cmd.indexOf('rotate=');
+      final flipIdx = cmd.indexOf('hflip');
+      expect(rotIdx, lessThan(flipIdx));
+    });
+
+    test('Aggressive audio masking injects pink noise mixing via amix', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyAudio: true,
+        enableAggressiveAudio: true,
+      );
+      expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.003[noise]'));
+      expect(cmd, contains('[a0][noise]amix=inputs=2:duration=first[out]'));
+    });
+
+    test('Auto-trim injects seek and duration limit when totalDurationMs > 1500', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableAutoTrim: true,
+        totalDurationMs: 5000,
+      );
+      expect(cmd, contains('-ss 0.5 -t 4.00 -i "/path/input.mp4"'));
     });
 
     test('Full dynamic options combined', () {

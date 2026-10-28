@@ -38,6 +38,9 @@ class SettingsService {
   static const String keyUpscaleResolution = 'app_upscale_resolution';
   static const String keyEnhanceAndDenoise = 'app_enhance_denoise';
   static const String keyDeepAntiFingerprint = 'app_deep_anti_fingerprint';
+  static const String keyHorizontalFlip = 'app_horizontal_flip';
+  static const String keyAggressiveAudio = 'app_aggressive_audio';
+  static const String keyAutoTrim = 'app_auto_trim';
 
   static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
       ValueNotifier<TargetResolution>(TargetResolution.r1080p);
@@ -74,6 +77,36 @@ class SettingsService {
   static Future<void> setDeepAntiFingerprint(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(keyDeepAntiFingerprint, enabled);
+  }
+
+  static Future<bool> getHorizontalFlip() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyHorizontalFlip) ?? false;
+  }
+
+  static Future<void> setHorizontalFlip(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyHorizontalFlip, enabled);
+  }
+
+  static Future<bool> getAggressiveAudio() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyAggressiveAudio) ?? false;
+  }
+
+  static Future<void> setAggressiveAudio(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyAggressiveAudio, enabled);
+  }
+
+  static Future<bool> getAutoTrim() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyAutoTrim) ?? false;
+  }
+
+  static Future<void> setAutoTrim(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyAutoTrim, enabled);
   }
 
   static Future<String> getEngineMode() async {

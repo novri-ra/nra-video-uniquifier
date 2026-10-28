@@ -30,6 +30,9 @@ class UniquifierProvider extends ChangeNotifier {
       }
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
       _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
+      _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
+      _enableAggressiveAudio = await SettingsService.getAggressiveAudio();
+      _enableAutoTrim = await SettingsService.getAutoTrim();
       notifyListeners();
     } catch (_) {}
   }
@@ -62,6 +65,9 @@ class UniquifierProvider extends ChangeNotifier {
   bool _upscale1080p = false;
   bool _enableEnhanceAndDenoise = true;
   bool _enableDeepAntiFingerprint = true;
+  bool _enableHorizontalFlip = false;
+  bool _enableAggressiveAudio = false;
+  bool _enableAutoTrim = false;
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -95,6 +101,9 @@ class UniquifierProvider extends ChangeNotifier {
   bool get upscale1080p => _upscale1080p;
   bool get enableEnhanceAndDenoise => _enableEnhanceAndDenoise;
   bool get enableDeepAntiFingerprint => _enableDeepAntiFingerprint;
+  bool get enableHorizontalFlip => _enableHorizontalFlip;
+  bool get enableAggressiveAudio => _enableAggressiveAudio;
+  bool get enableAutoTrim => _enableAutoTrim;
 
   TargetResolution get targetResolution => _targetResolution;
   String get selectedUpscaleTarget => _targetResolution.key;
@@ -145,6 +154,30 @@ class UniquifierProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleHorizontalFlip(bool val) {
+    _enableHorizontalFlip = val;
+    try {
+      SettingsService.setHorizontalFlip(val);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  void toggleAggressiveAudio(bool val) {
+    _enableAggressiveAudio = val;
+    try {
+      SettingsService.setAggressiveAudio(val);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  void toggleAutoTrim(bool val) {
+    _enableAutoTrim = val;
+    try {
+      SettingsService.setAutoTrim(val);
+    } catch (_) {}
+    notifyListeners();
+  }
+
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
     try {
@@ -177,6 +210,9 @@ class UniquifierProvider extends ChangeNotifier {
     String upscaleTarget = '1080p',
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false,
+    bool enableAggressiveAudio = false,
+    bool enableAutoTrim = false,
   }) {
     _removeMetadata = removeMetadata;
     _modifyAudio = modifyAudio;
@@ -185,10 +221,16 @@ class UniquifierProvider extends ChangeNotifier {
     _targetResolution = TargetResolution.fromString(upscaleTarget);
     _enableEnhanceAndDenoise = enableEnhanceAndDenoise;
     _enableDeepAntiFingerprint = enableDeepAntiFingerprint;
+    _enableHorizontalFlip = enableHorizontalFlip;
+    _enableAggressiveAudio = enableAggressiveAudio;
+    _enableAutoTrim = enableAutoTrim;
     try {
       SettingsService.setUpscaleResolution(_targetResolution);
       SettingsService.setEnhanceAndDenoise(_enableEnhanceAndDenoise);
       SettingsService.setDeepAntiFingerprint(_enableDeepAntiFingerprint);
+      SettingsService.setHorizontalFlip(_enableHorizontalFlip);
+      SettingsService.setAggressiveAudio(_enableAggressiveAudio);
+      SettingsService.setAutoTrim(_enableAutoTrim);
     } catch (_) {}
     _currentTabIndex = 0;
     notifyListeners();

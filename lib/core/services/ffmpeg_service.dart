@@ -19,12 +19,27 @@ class FfmpegService {
     TargetResolution targetResolution = TargetResolution.r1080p,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false,
+    bool enableAggressiveAudio = false,
+    bool enableAutoTrim = false,
+    int totalDurationMs = 0,
   }) {
-    final buffer = StringBuffer('-y -i "$inputPath"');
-    if (removeMetadata) buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
+    final buffer = StringBuffer('-y');
+    if (enableAutoTrim) {
+      buffer.write(' -ss 0.5');
+      if (totalDurationMs > 1500) {
+        final trimDur = ((totalDurationMs - 1000) / 1000).toStringAsFixed(2);
+        buffer.write(' -t $trimDur');
+      }
+    }
+    buffer.write(' -i "$inputPath"');
+    if (removeMetadata) {
+      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
+      buffer.write(' -metadata make="Apple" -metadata model="iPhone 15 Pro" -metadata encoder="Apple QuickTime"');
+    }
 
     final shouldUpscale = upscale ?? upscale1080p;
-    final hasVisual = modifyVisuals || shouldUpscale;
+    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip;
     buffer.write(_buildVideoFilter(
       hasVisual: hasVisual,
       hasAudio: modifyAudio,
@@ -33,11 +48,13 @@ class FfmpegService {
       targetResolution: targetResolution,
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableHorizontalFlip: enableHorizontalFlip,
     ));
     buffer.write(_buildAudioFilter(
       hasAudio: modifyAudio,
       hasVisual: hasVisual,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableAggressiveAudio: enableAggressiveAudio,
     ));
 
     if (!hasVisual && !modifyAudio) buffer.write(' -c copy');
@@ -53,13 +70,14 @@ class FfmpegService {
     TargetResolution targetResolution = TargetResolution.r1080p,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false,
   }) {
     if (hasVisual) {
       final filters = <String>[
         // 1. Temporal (PTS)
         if (modifyVisuals) 'setpts=0.9852*PTS',
 
-        // 2. Spatial (Crop -> Rotate)
+        // 2. Spatial (Crop -> Rotate -> Hflip)
         if (modifyVisuals) ...[
           if (enableDeepAntiFingerprint)
             'crop=trunc(iw*0.95/2)*2:trunc(ih*0.95/2)*2'
@@ -67,20 +85,26 @@ class FfmpegService {
             'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
           if (enableDeepAntiFingerprint)
             'rotate=0.4*PI/180:ow=rotw(0.4*PI/180):oh=roth(0.4*PI/180):fillcolor=black',
+          if (enableHorizontalFlip) 'hflip',
+        ] else if (enableHorizontalFlip) ...[
+          'hflip',
         ],
 
         // 3. Resolution Scaling (Lanczos scale)
         if (upscale) 'scale=w=-2:h=${targetResolution.height}:flags=lanczos',
 
-        // 4. Enhancements (Denoise -> Unsharp -> EQ)
+        // 4. Enhancements (Denoise -> Unsharp -> Curves/Color EQ)
         if (enableEnhanceAndDenoise) ...[
           'hqdn3d=1.5:1.5:4:4',
           'unsharp=3:3:0.6:3:3:0.0',
         ],
-        if (modifyVisuals) 'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
+        if (modifyVisuals) ...[
+          'curves=preset=vintage',
+          'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
+        ],
 
         // 5. Grain Injection (Noise)
-        if (modifyVisuals) 'noise=alls=2:allf=t+u',
+        if (modifyVisuals) 'noise=alls=3:allf=t+u',
       ];
       return ' -vf "${filters.join(',')}" -c:v libx264 -preset veryfast -crf 19 -b:v 8M -g 60 -keyint_min 30';
     }
@@ -91,8 +115,12 @@ class FfmpegService {
     required bool hasAudio,
     required bool hasVisual,
     bool enableDeepAntiFingerprint = true,
+    bool enableAggressiveAudio = false,
   }) {
     if (hasAudio) {
+      if (enableAggressiveAudio) {
+        return ' -af "[in]atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
+      }
       if (enableDeepAntiFingerprint) {
         return ' -af "atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1" -c:a aac -b:a 192k';
       }
@@ -183,6 +211,9 @@ class FfmpegService {
     TargetResolution targetResolution = TargetResolution.r1080p,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false,
+    bool enableAggressiveAudio = false,
+    bool enableAutoTrim = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -197,6 +228,9 @@ class FfmpegService {
         targetResolution: targetResolution,
         enableEnhanceAndDenoise: enableEnhanceAndDenoise,
         enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+        enableHorizontalFlip: enableHorizontalFlip,
+        enableAggressiveAudio: enableAggressiveAudio,
+        enableAutoTrim: enableAutoTrim,
         customOutputPath: customOutputPath,
         onProgress: onProgress,
         totalDurationMs: totalDurationMs,
@@ -213,6 +247,9 @@ class FfmpegService {
     TargetResolution targetResolution = TargetResolution.r1080p,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false,
+    bool enableAggressiveAudio = false,
+    bool enableAutoTrim = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -242,6 +279,10 @@ class FfmpegService {
       targetResolution: targetResolution,
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableHorizontalFlip: enableHorizontalFlip,
+      enableAggressiveAudio: enableAggressiveAudio,
+      enableAutoTrim: enableAutoTrim,
+      totalDurationMs: totalDurationMs,
     );
 
     if (onProgress != null) {

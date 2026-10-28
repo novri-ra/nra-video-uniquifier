@@ -26,6 +26,9 @@ void main() {
       expect(provider.upscale1080p, isFalse);
       expect(provider.enableEnhanceAndDenoise, isTrue);
       expect(provider.enableDeepAntiFingerprint, isTrue);
+      expect(provider.enableHorizontalFlip, isFalse);
+      expect(provider.enableAggressiveAudio, isFalse);
+      expect(provider.enableAutoTrim, isFalse);
       expect(provider.selectedUpscaleTarget, equals('1080p'));
       expect(provider.targetResolutionLabel, equals('1080p'));
       expect(provider.targetResolutionDetails, equals('1920x1080'));
@@ -163,6 +166,22 @@ void main() {
 
       provider.toggleDeepAntiFingerprint(true);
       expect(provider.enableDeepAntiFingerprint, isTrue);
+    });
+
+    test('toggleHorizontalFlip, toggleAggressiveAudio, and toggleAutoTrim flip flags and notify listeners', () {
+      int notifications = 0;
+      provider.addListener(() => notifications++);
+
+      provider.toggleHorizontalFlip(true);
+      expect(provider.enableHorizontalFlip, isTrue);
+
+      provider.toggleAggressiveAudio(true);
+      expect(provider.enableAggressiveAudio, isTrue);
+
+      provider.toggleAutoTrim(true);
+      expect(provider.enableAutoTrim, isTrue);
+
+      expect(notifications, equals(3));
     });
 
     test('toggleHardwareAcceleration flips mode', () {
