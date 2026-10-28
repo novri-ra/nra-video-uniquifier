@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storage_space/storage_space.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class HistoryHeader extends StatelessWidget {
@@ -77,11 +78,13 @@ class _HistoryHeaderTitle extends StatelessWidget {
 class StorageTelemetryBar extends StatelessWidget {
   final String totalSize;
   final bool hasItems;
+  final StorageSpace? deviceStorage;
 
   const StorageTelemetryBar({
     super.key,
     required this.totalSize,
     required this.hasItems,
+    this.deviceStorage,
   });
 
   @override
@@ -95,9 +98,12 @@ class StorageTelemetryBar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _StorageTopRow(totalSize: totalSize),
+          _StorageTopRow(totalSize: totalSize, deviceStorage: deviceStorage),
           const SizedBox(height: 8),
-          _StorageProgressBar(hasItems: hasItems),
+          _StorageProgressBar(
+            hasItems: hasItems,
+            usageFraction: deviceStorage?.usageValue,
+          ),
           const SizedBox(height: 6),
           const _StorageBottomTags(),
         ],
@@ -108,7 +114,8 @@ class StorageTelemetryBar extends StatelessWidget {
 
 class _StorageTopRow extends StatelessWidget {
   final String totalSize;
-  const _StorageTopRow({required this.totalSize});
+  final StorageSpace? deviceStorage;
+  const _StorageTopRow({required this.totalSize, this.deviceStorage});
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +126,7 @@ class _StorageTopRow extends StatelessWidget {
           children: [
             const Icon(Icons.storage, color: AppColors.outline, size: 14),
             const SizedBox(width: 6),
-            const Text('Local Sandbox Storage: ', style: TextStyle(color: AppColors.onSurface, fontSize: 11)),
+            const Text('Sandbox: ', style: TextStyle(color: AppColors.onSurface, fontSize: 11)),
             Text(
               '$totalSize used',
               style: const TextStyle(
@@ -131,9 +138,9 @@ class _StorageTopRow extends StatelessWidget {
             ),
           ],
         ),
-        const Text(
-          'DEVICE STORAGE',
-          style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
+        Text(
+          deviceStorage != null ? '${deviceStorage!.freeSize} FREE' : 'DEVICE STORAGE',
+          style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
         ),
       ],
     );
@@ -142,10 +149,12 @@ class _StorageTopRow extends StatelessWidget {
 
 class _StorageProgressBar extends StatelessWidget {
   final bool hasItems;
-  const _StorageProgressBar({required this.hasItems});
+  final double? usageFraction;
+  const _StorageProgressBar({required this.hasItems, this.usageFraction});
 
   @override
   Widget build(BuildContext context) {
+    final widthFactor = (usageFraction ?? (hasItems ? 0.15 : 0.01)).clamp(0.01, 1.0);
     return Container(
       height: 4,
       width: double.infinity,
@@ -156,7 +165,7 @@ class _StorageProgressBar extends StatelessWidget {
       ),
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
-        widthFactor: hasItems ? 0.15 : 0.01,
+        widthFactor: widthFactor,
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.primaryContainer,

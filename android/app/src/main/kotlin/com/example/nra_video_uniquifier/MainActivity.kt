@@ -1,5 +1,58 @@
 package com.example.nra_video_uniquifier
 
+import android.content.Intent
+import android.media.MediaScannerConnection
+import android.net.Uri
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
+import java.io.File
 
-class MainActivity : FlutterActivity()
+class MainActivity : FlutterActivity() {
+    private val CHANNEL = "com.example.nra_video_uniquifier/media_scanner"
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "scanFile" -> {
+                    val filePath = call.argument<String>("path")
+                    if (filePath != null) {
+                        try {
+                            MediaScannerConnection.scanFile(
+                                applicationContext,
+                                arrayOf(filePath),
+                                arrayOf("video/mp4")
+                            ) { path, uri ->
+                                // Scanned successfully
+                            }
+                            result.success(true)
+                        } catch (e: Exception) {
+                            result.error("SCAN_ERROR", e.message, null)
+                        }
+                    } else {
+                        result.error("INVALID_PATH", "Path is null", null)
+                    }
+                }
+                "openGallery" -> {
+                    val filePath = call.argument<String>("path")
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            if (filePath != null && File(filePath).exists()) {
+                                setDataAndType(Uri.parse(filePath), "video/*")
+                            } else {
+                                type = "video/*"
+                            }
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        }
+                        startActivity(Intent.createChooser(intent, "Open Video Gallery"))
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("INTENT_ERROR", e.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+}

@@ -12,23 +12,32 @@ class ErrorScreen extends StatelessWidget {
     return Scaffold(
       appBar: const TopAppBar(),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  const _ErrorHeroHeader(),
-                  const SizedBox(height: 20),
-                  _ErrorDiagnosticsLog(errorDetails: errorDetails),
-                  const SizedBox(height: 16),
-                  const _ErrorRecommendedFixes(),
-                ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const _ErrorHeroHeader(),
+                        const SizedBox(height: 20),
+                        _ErrorDiagnosticsLog(errorDetails: errorDetails),
+                        const SizedBox(height: 16),
+                        const _ErrorRecommendedFixes(),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const _ErrorActionButtons(),
+                  ],
+                ),
               ),
-              const _ErrorActionButtons(),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
@@ -148,18 +157,21 @@ class _TelemetryLogBox extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
-      child: Text(
+      child: SelectableText(
         errorDetails ??
-            '[00:04.12] Error initializing codec context: Function not implemented.\n'
-                '[00:04.13] [libx264 @ 0x7fa2810] Memory allocation failed (OOM).\n'
-                '[00:04.14] Exit Code 137 (SIGKILL) - Low RAM Android OOM Killer.',
-        style: const TextStyle(color: AppColors.error, fontSize: 11, fontFamily: 'monospace', height: 1.4),
-        maxLines: 6,
-        overflow: TextOverflow.ellipsis,
+            '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
+                'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
+                'Native pipeline state: 0/4 stages completed.',
+        style: const TextStyle(
+          color: AppColors.error,
+          fontSize: 11,
+          fontFamily: 'monospace',
+          height: 1.4,
+        ),
       ),
     );
   }
@@ -174,7 +186,7 @@ class _ErrorRecommendedFixes extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
@@ -182,14 +194,14 @@ class _ErrorRecommendedFixes extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'RECOMMENDED FIXES',
-            style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, letterSpacing: 0.8, fontFamily: 'monospace'),
+            'RECOMMENDED ACTION',
+            style: TextStyle(color: AppColors.outline, fontSize: 10, letterSpacing: 0.8, fontFamily: 'monospace'),
           ),
           SizedBox(height: 8),
           Text(
-            '• Close other running apps to free up system memory.\n'
-            '• Disable "Upscale to 1080p" to reduce RAM usage.\n'
-            '• Verify your storage has at least 500 MB free space.',
+            '• Switch to Software (libx264) Safe Engine in Settings.\n'
+            '• Toggle off Upscaling (or lower target resolution).\n'
+            '• Clear temporary cache before retrying.',
             style: TextStyle(color: AppColors.onSurface, fontSize: 12, height: 1.5),
           ),
         ],
@@ -215,19 +227,19 @@ class _ErrorActionButtons extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.refresh, size: 18),
-          label: const Text('Try Again with Lower Settings', style: TextStyle(fontWeight: FontWeight.w700)),
+          label: const Text('Try Safe Mode', style: TextStyle(fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.onSurface,
+            foregroundColor: AppColors.outline,
             side: const BorderSide(color: AppColors.surfaceContainerHighest),
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           ),
           onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.arrow_back, size: 18),
-          label: const Text('Back to File Selection'),
+          label: const Text('Return to Source File'),
         ),
       ],
     );

@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
+import 'package:nra_video_uniquifier/core/services/settings_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -7,7 +9,13 @@ void main() {
   late UniquifierProvider provider;
 
   setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    SettingsService.upscaleResolutionNotifier.value = TargetResolution.r1080p;
     provider = UniquifierProvider();
+  });
+
+  tearDown(() {
+    provider.dispose();
   });
 
   group('UniquifierProvider - Initial State', () {
@@ -16,22 +24,28 @@ void main() {
       expect(provider.modifyAudio, isTrue);
       expect(provider.modifyVisuals, isTrue);
       expect(provider.upscale1080p, isFalse);
+      expect(provider.enableEnhanceAndDenoise, isTrue);
+      expect(provider.enableDeepAntiFingerprint, isTrue);
+      expect(provider.enableHorizontalFlip, isFalse);
+      expect(provider.enableAggressiveAudio, isFalse);
+      expect(provider.enableAutoTrim, isFalse);
       expect(provider.selectedUpscaleTarget, equals('1080p'));
+      expect(provider.targetResolutionLabel, equals('1080p'));
+      expect(provider.targetResolutionDetails, equals('1920x1080'));
       expect(provider.hardwareAcceleration, isTrue);
       expect(provider.currentTabIndex, equals(0));
       expect(provider.lastProcessedOutputPath, isNull);
     });
 
-    test('Default file properties are populated', () {
-      expect(provider.selectedFileName, equals('video_01.mp4'));
+    test('Default file properties are clean / empty', () {
+      expect(provider.selectedFileName, isNull);
       expect(provider.selectedFilePath, isNull);
+      expect(provider.thumbnailPath, isNull);
+      expect(provider.realtimeProgress, equals(0.0));
       expect(provider.fileResolution, equals('1080×1920'));
-      expect(provider.fileSize, equals('24.8 MB'));
+      expect(provider.fileSize, equals('0 B'));
       expect(provider.fileCodec, equals('H.264'));
-      expect(provider.fps, equals('60 FPS'));
-      expect(provider.audioInfo, equals('AAC 48kHz'));
-      expect(provider.duration, equals('0:15'));
-      expect(provider.sha256, isNotEmpty);
+      expect(provider.duration, equals('0:00'));
     });
   });
 
@@ -110,10 +124,64 @@ void main() {
       provider.toggleUpscale1080p(true);
       expect(provider.upscale1080p, isTrue);
 
-      provider.setUpscaleTarget('720p');
-      expect(provider.selectedUpscaleTarget, equals('720p'));
+      provider.setUpscaleTarget('2k');
+      expect(provider.selectedUpscaleTarget, equals('2k'));
+      expect(provider.targetResolutionLabel, equals('2K'));
+      expect(provider.targetResolutionDetails, equals('2560x1440'));
 
-      expect(notifications, equals(2));
+      provider.setUpscaleTarget('4k');
+      expect(provider.selectedUpscaleTarget, equals('4k'));
+      expect(provider.targetResolutionLabel, equals('4K'));
+      expect(provider.targetResolutionDetails, equals('3840x2160'));
+
+      expect(notifications, equals(3));
+    });
+
+    test('Reacts immediately when SettingsService broadcasts resolution change', () async {
+      await SettingsService.setUpscaleResolution(TargetResolution.r4k);
+      expect(provider.selectedUpscaleTarget, equals('4k'));
+      expect(provider.targetResolutionLabel, equals('4K'));
+      expect(provider.targetResolutionDetails, equals('3840x2160'));
+    });
+
+    test('toggleEnhanceAndDenoise flips flag and notifies listeners', () {
+      bool notified = false;
+      provider.addListener(() => notified = true);
+
+      provider.toggleEnhanceAndDenoise(false);
+      expect(provider.enableEnhanceAndDenoise, isFalse);
+      expect(notified, isTrue);
+
+      provider.toggleEnhanceAndDenoise(true);
+      expect(provider.enableEnhanceAndDenoise, isTrue);
+    });
+
+    test('toggleDeepAntiFingerprint flips flag and notifies listeners', () {
+      bool notified = false;
+      provider.addListener(() => notified = true);
+
+      provider.toggleDeepAntiFingerprint(false);
+      expect(provider.enableDeepAntiFingerprint, isFalse);
+      expect(notified, isTrue);
+
+      provider.toggleDeepAntiFingerprint(true);
+      expect(provider.enableDeepAntiFingerprint, isTrue);
+    });
+
+    test('toggleHorizontalFlip, toggleAggressiveAudio, and toggleAutoTrim flip flags and notify listeners', () {
+      int notifications = 0;
+      provider.addListener(() => notifications++);
+
+      provider.toggleHorizontalFlip(true);
+      expect(provider.enableHorizontalFlip, isTrue);
+
+      provider.toggleAggressiveAudio(true);
+      expect(provider.enableAggressiveAudio, isTrue);
+
+      provider.toggleAutoTrim(true);
+      expect(provider.enableAutoTrim, isTrue);
+
+      expect(notifications, equals(3));
     });
 
     test('toggleHardwareAcceleration flips mode', () {
@@ -153,6 +221,13 @@ void main() {
       provider.clearSelection();
       expect(provider.selectedFileName, isNull);
       expect(provider.selectedFilePath, isNull);
+      expect(provider.thumbnailPath, isNull);
+    });
+
+    test('updateRealtimeStats updates progress, speed and calculates eta', () {
+      provider.updateRealtimeStats(0.45, 1.8, 18000);
+      expect(provider.realtimeProgress, equals(0.45));
+      expect(provider.renderingSpeed, equals(1.8));
     });
 
     test('formatDuration formats 0s, seconds-only, and hh:mm:ss spans', () {

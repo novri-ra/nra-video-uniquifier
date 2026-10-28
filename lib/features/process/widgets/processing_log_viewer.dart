@@ -67,12 +67,18 @@ class _TelemetryRow extends StatelessWidget {
             fontFamily: 'monospace',
           ),
         ),
-        Text(
-          value,
-          style: const TextStyle(
-            color: AppColors.onSurfaceVariant,
-            fontSize: 11,
-            fontFamily: 'monospace',
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: AppColors.onSurfaceVariant,
+              fontSize: 11,
+              fontFamily: 'monospace',
+            ),
           ),
         ),
       ],
@@ -96,19 +102,27 @@ class _SandboxStateRow extends StatelessWidget {
             fontFamily: 'monospace',
           ),
         ),
-        Row(
-          children: [
-            const Icon(Icons.memory, color: AppColors.primaryContainer, size: 13),
-            const SizedBox(width: 4),
-            Text(
-              'CPU Core Efficiency • On-Device',
-              style: TextStyle(
-                color: AppColors.onSurfaceVariant.withValues(alpha: 0.9),
-                fontSize: 11,
-                fontFamily: 'monospace',
+        const SizedBox(width: 8),
+        Flexible(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.memory, color: AppColors.primaryContainer, size: 13),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'CPU Core Efficiency • On-Device',
+                  style: TextStyle(
+                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.9),
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

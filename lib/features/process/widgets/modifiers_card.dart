@@ -10,18 +10,22 @@ class ModifiersHeader extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'PROCESSING SETTINGS',
-          style: TextStyle(
-            color: AppColors.onSurfaceVariant,
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            fontFamily: 'monospace',
+        Flexible(
+          child: Text(
+            'PROCESSING SETTINGS',
+            style: TextStyle(
+              color: AppColors.onSurfaceVariant,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.8,
+              fontFamily: 'monospace',
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
+        SizedBox(width: 8),
         Text(
-          '4 MODIFIERS',
+          '9 MODIFIERS',
           style: TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 10,
@@ -45,33 +49,78 @@ class ModifiersCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Column(
-        children: [
-          _ToggleRow(
-            icon: Icons.fingerprint,
-            title: 'Remove Metadata',
-            subtitle: 'Cleans GPS & device info',
-            value: provider.removeMetadata,
-            onChanged: provider.toggleRemoveMetadata,
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: AppColors.surfaceContainerHighest),
           ),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-          _ToggleRow(
-            icon: Icons.graphic_eq,
-            title: 'Modify Audio',
-            subtitle: 'Shift pitch by 0.5%',
-            value: provider.modifyAudio,
-            onChanged: provider.toggleModifyAudio,
+          child: Column(
+            children: [
+              _ToggleRow(
+                icon: Icons.fingerprint,
+                title: 'Remove Metadata',
+                subtitle: 'Cleans GPS & device info',
+                value: provider.removeMetadata,
+                onChanged: provider.toggleRemoveMetadata,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.graphic_eq,
+                title: 'Modify Audio',
+                subtitle: 'Shift pitch by 0.5%',
+                value: provider.modifyAudio,
+                onChanged: provider.toggleModifyAudio,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.auto_fix_high,
+                title: 'Denoise & Clarity',
+                subtitle: 'HQ denoise & unsharp mask',
+                value: provider.enableEnhanceAndDenoise,
+                onChanged: provider.toggleEnhanceAndDenoise,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.security,
+                title: 'Deep Evasion',
+                subtitle: '5% margin crop & 0.4° tilt',
+                value: provider.enableDeepAntiFingerprint,
+                onChanged: provider.toggleDeepAntiFingerprint,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.flip,
+                title: 'Horizontal Flip',
+                subtitle: 'Mirrors video landmarks',
+                value: provider.enableHorizontalFlip,
+                onChanged: provider.toggleHorizontalFlip,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.waves,
+                title: 'Audio Masking',
+                subtitle: 'Ambient pink noise layer',
+                value: provider.enableAggressiveAudio,
+                onChanged: provider.toggleAggressiveAudio,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.content_cut,
+                title: 'Auto-Trim',
+                subtitle: 'Cuts 0.5s intro & outro',
+                value: provider.enableAutoTrim,
+                onChanged: provider.toggleAutoTrim,
+              ),
+            ],
           ),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-          _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -99,8 +148,8 @@ class _VisualAndUpscaleRows extends StatelessWidget {
         const Divider(color: AppColors.surfaceContainerHighest, height: 1),
         _ToggleRow(
           icon: Icons.hd,
-          title: 'Upscale to 1080p',
-          subtitle: 'Lanczos algorithm (${provider.selectedUpscaleTarget})',
+          title: 'Upscale to ${provider.targetResolutionLabel}',
+          subtitle: 'Lanczos algorithm (${provider.targetResolutionDetails})',
           value: provider.upscale1080p,
           onChanged: provider.toggleUpscale1080p,
           onTapSubtitle: onOpenAdvanced,
@@ -134,13 +183,18 @@ class _ToggleRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
-              const SizedBox(width: 10),
-              _ToggleLabel(title: title, subtitle: subtitle, onTapSubtitle: onTapSubtitle),
-            ],
+          Expanded(
+            child: Row(
+              children: [
+                Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _ToggleLabel(title: title, subtitle: subtitle, onTapSubtitle: onTapSubtitle),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Switch(value: value, onChanged: onChanged),
         ],
       ),
@@ -171,6 +225,8 @@ class _ToggleLabel extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         GestureDetector(
           onTap: onTapSubtitle,
@@ -182,6 +238,8 @@ class _ToggleLabel extends StatelessWidget {
               fontFamily: 'monospace',
               decoration: onTapSubtitle != null ? TextDecoration.underline : TextDecoration.none,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -92,7 +93,10 @@ class _SelectedVideoCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _VideoThumbnail(duration: provider.duration),
+              _VideoThumbnail(
+                duration: provider.duration,
+                thumbnailPath: provider.thumbnailPath,
+              ),
               const SizedBox(width: 12),
               Expanded(child: _VideoMetaColumn(provider: provider)),
               _ClearIconButton(onPressed: onClear),
@@ -110,21 +114,32 @@ class _SelectedVideoCard extends StatelessWidget {
 
 class _VideoThumbnail extends StatelessWidget {
   final String duration;
-  const _VideoThumbnail({required this.duration});
+  final String? thumbnailPath;
+  const _VideoThumbnail({required this.duration, this.thumbnailPath});
 
   @override
   Widget build(BuildContext context) {
+    final hasThumb = thumbnailPath != null && File(thumbnailPath!).existsSync();
+
     return Container(
       width: 64,
       height: 80,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          const Center(child: Icon(Icons.videocam, color: AppColors.primaryContainer, size: 24)),
+          if (hasThumb)
+            Image.file(
+              File(thumbnailPath!),
+              fit: BoxFit.cover,
+            )
+          else
+            const Center(child: Icon(Icons.videocam, color: AppColors.primaryContainer, size: 24)),
           Positioned(
             bottom: 4,
             right: 4,

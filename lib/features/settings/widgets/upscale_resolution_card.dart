@@ -16,15 +16,6 @@ class UpscaleResolutionCard extends StatelessWidget {
     return Column(
       children: [
         _ResolutionOptionTile(
-          title: '720p HD (Fastest)',
-          subtitle: 'Best for older devices',
-          resolution: '1280×720',
-          value: '720p',
-          selectedValue: selectedValue,
-          onTap: () => onSelect('720p'),
-        ),
-        const SizedBox(height: 8),
-        _ResolutionOptionTile(
           title: '1080p Full HD (Recommended)',
           subtitle: 'Optimal quality & balance • Lanczos filter',
           resolution: '1920×1080',
@@ -41,6 +32,16 @@ class UpscaleResolutionCard extends StatelessWidget {
           selectedValue: selectedValue,
           onTap: () => onSelect('2k'),
           warningTag: 'HIGH THERMAL',
+        ),
+        const SizedBox(height: 8),
+        _ResolutionOptionTile(
+          title: '4K UHD (Extreme Load)',
+          subtitle: 'Requires flagship CPU • Max detail',
+          resolution: '3840×2160',
+          value: '4k',
+          selectedValue: selectedValue,
+          onTap: () => onSelect('4k'),
+          warningTag: 'EXTREME LOAD',
         ),
       ],
     );
