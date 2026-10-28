@@ -2,21 +2,24 @@
 
 ## Timestamp
 - **Date**: 2026-10-28
-- **Session**: 19-vdna-evasion-and-web-research
+- **Session**: 20-render-forensic-and-portrait-4k
 
 ## Git Status
 - **Repository**: Initialized & active.
 - **Remote Origin**: `https://github.com/novri-ra/nra-video-uniquifier.git`
 - **Active Branch**: `development` (tracking `origin/development`).
 - **Base Branch**: `main` (tracking `origin/main`).
-- **Working Tree**: Advanced vDNA evasion, horizontal flip mirroring, pink noise audio masking, auto-trim, and Apple device tag spoofing active.
+- **Working Tree**: Orientation-aware scaling (true portrait 4K 2160x3840), fast x264 preset, FFprobe diagnostic telemetry, and audio spectrogram destruction active.
 
 ## Hardware & Device Verification Status
 - **Physical Device**: Realme 3 Pro (`RMX1851`), Serial `5e599699` (Offline / Headless automated verification active)
 - **Target Emulators / Secondary**: LDPlayer 9 / PC Emulators (`x86_64`, `x86`) & Physical ARM (`arm64-v8a`, `armeabi-v7a`)
 - **OS / API Support**: Android 7.0 (API 24) through Android 15 (API 35+)
-- **Runtime Verdict**: **PASSED (58/58 automated tests passed, 0 analyze issues)**
+- **Runtime Verdict**: **PASSED (61/61 automated tests passed, 0 analyze issues)**
 - **Native Components**:
+  - Orientation-aware scaling in `TargetResolution` and `FfmpegService`: True 4K Portrait (2160x3840) via `scale=w=2160:h=-2` vs Landscape (3840x2160) via `scale=w=-2:h=2160`.
+  - Upgraded encoder preset to `-preset fast` for subpixel motion estimation.
+  - `RenderDiagnosticService` and `RenderDiagnosticInfo` for post-render stream telemetry.
   - Horizontal flip (mirroring `hflip`) for landmark coordinates disruption.
   - Auto-Trim (`-ss 0.5` + duration clamping) for anchor keyframe sequence hash disruption.
   - Non-linear color curves (`curves=preset=vintage`) and temporal uniform noise overlay (`noise=alls=3:allf=t+u`).
@@ -56,6 +59,7 @@
 - [x] **P16 Dynamic Resolution (4K), Reactive UI & Pipeline Integrity**: 1080p/2K/4K resolution support, dynamic ModifiersCard binding, aspect-preserving Lanczos scaling (`scale=w=-2:h=...`), error log extraction and SelectableText diagnostics (48 passing tests).
 - [x] **P17 Modular Video Enhancement & Multi-Layer Evasion**: Denoise (`hqdn3d`), unsharp clarity, deep margin crop (5%), 0.4° tilt, enhanced audio spectrum, 8M bitrate (53 passing tests).
 - [x] **P18 Advanced vDNA Fingerprint Evasion & Full Pipeline Overhaul**: Horizontal mirror (`hflip`), auto-trim 0.5s intro/outro, vintage curves grading, pink noise spectrogram masking (`anoisesrc`), container stripping, and Apple iPhone 15 Pro hardware spoofing (58 passing tests).
+- [x] **P19 Orientation-Aware Scaling & Output Forensic Diagnostics**: True 4K portrait 2160x3840 fix, x264 fast preset tuning, and RenderDiagnosticService (61 passing tests).
 - [ ] **Next Maintenance (Active on `development`)**:
   - Deploy and test on LDPlayer 9 via adb when emulator is booted.
   - Batch video processing queue.
@@ -63,9 +67,9 @@
 ## MCP Index Status
 - **Server**: `codebase-memory-mcp`
 - **Project**: `C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier`
-- **Indexed At**: 2026-10-28T17:25:00Z
-- **Nodes**: 1067 (Baseline: 1058, Delta: +9)
-- **Edges**: 2610 (Baseline: 2568, Delta: +42)
+- **Indexed At**: 2026-10-28T17:35:00Z
+- **Nodes**: 1076 (Baseline: 1067, Delta: +9)
+- **Edges**: 2634 (Baseline: 2610, Delta: +24)
 - **Tools Verified**: `index_status`, `search_graph`, `index_repository`, `query_graph`, `get_graph_schema`, `trace_path`
 
 ## Comprehensive Module Health & Line Budget Status (All 28 Files Passed)

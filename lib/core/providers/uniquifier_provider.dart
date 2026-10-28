@@ -41,6 +41,7 @@ class UniquifierProvider extends ChangeNotifier {
   String? _selectedFilePath;
   String? _thumbnailPath;
   String _fileResolution = '1080×1920';
+  bool _isPortrait = true;
   String _fileSize = '0 B';
   String _fileCodec = 'H.264';
   String _fps = '30 FPS';
@@ -57,6 +58,7 @@ class UniquifierProvider extends ChangeNotifier {
   // Last processed output & Output thumbnail
   String? _lastProcessedOutputPath;
   String? _outputThumbnailPath;
+  RenderDiagnosticInfo? _lastDiagnosticInfo;
 
   // Toggle Settings
   bool _removeMetadata = true;
@@ -82,6 +84,7 @@ class UniquifierProvider extends ChangeNotifier {
   String? get thumbnailPath => _thumbnailPath;
   String? get lastProcessedOutputPath => _lastProcessedOutputPath;
   String? get outputThumbnailPath => _outputThumbnailPath;
+  RenderDiagnosticInfo? get lastDiagnosticInfo => _lastDiagnosticInfo;
   String get fileResolution => _fileResolution;
   String get fileSize => _fileSize;
   String get fileCodec => _fileCodec;
@@ -104,6 +107,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableHorizontalFlip => _enableHorizontalFlip;
   bool get enableAggressiveAudio => _enableAggressiveAudio;
   bool get enableAutoTrim => _enableAutoTrim;
+  bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
   String get selectedUpscaleTarget => _targetResolution.key;
@@ -242,6 +246,7 @@ class UniquifierProvider extends ChangeNotifier {
     _thumbnailPath = null;
     _realtimeProgress = 0.0;
     _outputThumbnailPath = null;
+    _lastDiagnosticInfo = null;
     notifyListeners();
   }
 
@@ -249,11 +254,22 @@ class UniquifierProvider extends ChangeNotifier {
     _lastProcessedOutputPath = outputPath;
     notifyListeners();
     _extractOutputThumbnailAsync(outputPath);
+    _inspectOutputDiagnosticsAsync(outputPath);
   }
 
   void setOutputThumbnail(String? thumbPath) {
     _outputThumbnailPath = thumbPath;
     notifyListeners();
+  }
+
+  Future<void> _inspectOutputDiagnosticsAsync(String outputPath) async {
+    try {
+      final diag = await FfmpegService.inspectRenderedFile(outputPath);
+      if (diag != null && _lastProcessedOutputPath == outputPath) {
+        _lastDiagnosticInfo = diag;
+        notifyListeners();
+      }
+    } catch (_) {}
   }
 
   Future<void> _extractOutputThumbnailAsync(String outputPath) async {
@@ -321,7 +337,10 @@ class UniquifierProvider extends ChangeNotifier {
   void _applyVideoStream(dynamic s) {
     final width = s.getWidth();
     final height = s.getHeight();
-    if (width != null && height != null) _fileResolution = '$width×$height';
+    if (width != null && height != null) {
+      _fileResolution = '$width×$height';
+      _isPortrait = height >= width;
+    }
     final codec = s.getCodec();
     if (codec != null) _fileCodec = codec.toUpperCase();
     final rFrameRate = s.getRealFrameRate();

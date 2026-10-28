@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'media_scanner_service.dart';
+import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
+
+export 'render_diagnostic_service.dart';
 
 class FfmpegService {
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
@@ -23,6 +27,7 @@ class FfmpegService {
     bool enableAggressiveAudio = false,
     bool enableAutoTrim = false,
     int totalDurationMs = 0,
+    bool isPortrait = false,
   }) {
     final buffer = StringBuffer('-y');
     if (enableAutoTrim) {
@@ -49,6 +54,7 @@ class FfmpegService {
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableHorizontalFlip: enableHorizontalFlip,
+      isPortrait: isPortrait,
     ));
     buffer.write(_buildAudioFilter(
       hasAudio: modifyAudio,
@@ -71,6 +77,7 @@ class FfmpegService {
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
     bool enableHorizontalFlip = false,
+    bool isPortrait = false,
   }) {
     if (hasVisual) {
       final filters = <String>[
@@ -90,8 +97,8 @@ class FfmpegService {
           'hflip',
         ],
 
-        // 3. Resolution Scaling (Lanczos scale)
-        if (upscale) 'scale=w=-2:h=${targetResolution.height}:flags=lanczos',
+        // 3. Resolution Scaling (Lanczos scale - orientation aware)
+        if (upscale) targetResolution.scaleFilter(isPortrait: isPortrait),
 
         // 4. Enhancements (Denoise -> Unsharp -> Curves/Color EQ)
         if (enableEnhanceAndDenoise) ...[
@@ -106,7 +113,7 @@ class FfmpegService {
         // 5. Grain Injection (Noise)
         if (modifyVisuals) 'noise=alls=3:allf=t+u',
       ];
-      return ' -vf "${filters.join(',')}" -c:v libx264 -preset veryfast -crf 19 -b:v 8M -g 60 -keyint_min 30';
+      return ' -vf "${filters.join(',')}" -c:v libx264 -preset fast -crf 19 -b:v 8M -g 60 -keyint_min 30';
     }
     return hasAudio ? ' -c:v copy' : '';
   }
@@ -214,6 +221,7 @@ class FfmpegService {
     bool enableHorizontalFlip = false,
     bool enableAggressiveAudio = false,
     bool enableAutoTrim = false,
+    bool? isPortrait,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -231,6 +239,7 @@ class FfmpegService {
         enableHorizontalFlip: enableHorizontalFlip,
         enableAggressiveAudio: enableAggressiveAudio,
         enableAutoTrim: enableAutoTrim,
+        isPortrait: isPortrait,
         customOutputPath: customOutputPath,
         onProgress: onProgress,
         totalDurationMs: totalDurationMs,
@@ -250,6 +259,7 @@ class FfmpegService {
     bool enableHorizontalFlip = false,
     bool enableAggressiveAudio = false,
     bool enableAutoTrim = false,
+    bool? isPortrait,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -265,6 +275,27 @@ class FfmpegService {
     final inputFile = File(effectiveInput);
     if (!inputFile.existsSync() || inputFile.lengthSync() == 0) {
       throw Exception('Source video file does not exist or is empty: $inputPath');
+    }
+
+    bool resolvedIsPortrait = isPortrait ?? false;
+    if (isPortrait == null) {
+      try {
+        final session = await FFprobeKit.getMediaInformation(effectiveInput);
+        final info = session.getMediaInformation();
+        if (info != null) {
+          final streams = info.getStreams();
+          for (final s in streams) {
+            if (s.getType() == 'video') {
+              final w = s.getWidth();
+              final h = s.getHeight();
+              if (w != null && h != null && h > w) {
+                resolvedIsPortrait = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (_) {}
     }
 
     final outputPath = customOutputPath ?? await generateOutputPath(inputPath);
@@ -283,6 +314,7 @@ class FfmpegService {
       enableAggressiveAudio: enableAggressiveAudio,
       enableAutoTrim: enableAutoTrim,
       totalDurationMs: totalDurationMs,
+      isPortrait: resolvedIsPortrait,
     );
 
     if (onProgress != null) {
@@ -297,6 +329,7 @@ class FfmpegService {
     try {
       final finalPath = await _executeFFmpeg(command, outputPath);
       await MediaScannerService.scanFile(finalPath);
+      await inspectRenderedFile(finalPath);
       return finalPath;
     } finally {
       if (onProgress != null) {
@@ -311,6 +344,10 @@ class FfmpegService {
       }
     }
   }
+
+  /// Inspects rendered video using FFprobe to produce diagnostic report.
+  static Future<RenderDiagnosticInfo?> inspectRenderedFile(String filePath) =>
+      RenderDiagnosticService.inspectRenderedFile(filePath);
 
   static Future<String> _executeFFmpeg(String command, String outputPath) async {
     try {

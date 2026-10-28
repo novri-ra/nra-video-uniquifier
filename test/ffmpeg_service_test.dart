@@ -91,7 +91,7 @@ void main() {
       expect(cmd, contains('curves=preset=vintage'));
       expect(cmd, contains('eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98'));
       expect(cmd, contains('noise=alls=3:allf=t+u'));
-      expect(cmd, contains('-c:v libx264 -preset veryfast -crf 19 -b:v 8M -g 60 -keyint_min 30'));
+      expect(cmd, contains('-c:v libx264 -preset fast -crf 19 -b:v 8M -g 60 -keyint_min 30'));
       expect(cmd, contains('-metadata make="Apple" -metadata model="iPhone 15 Pro"'));
       expect(cmd, contains('-c:a copy'));
 
@@ -145,6 +145,110 @@ void main() {
       expect(cmd, contains('scale=w=-2:h=2160:flags=lanczos'));
       expect(cmd, isNot(contains('hqdn3d=')));
       expect(cmd, isNot(contains('unsharp=')));
+    });
+
+    test('Orientation-aware scaling: Landscape preserves horizontal dimensions', () {
+      final cmd1080 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r1080p,
+        isPortrait: false,
+      );
+      expect(cmd1080, contains('scale=w=-2:h=1080:flags=lanczos'));
+
+      final cmd2k = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r2k,
+        isPortrait: false,
+      );
+      expect(cmd2k, contains('scale=w=-2:h=1440:flags=lanczos'));
+
+      final cmd4k = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r4k,
+        isPortrait: false,
+      );
+      expect(cmd4k, contains('scale=w=-2:h=2160:flags=lanczos'));
+    });
+
+    test('Orientation-aware scaling: Portrait enforces true vertical 1080p, 2K, and 4K dimensions', () {
+      final cmd1080 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r1080p,
+        isPortrait: true,
+      );
+      expect(cmd1080, contains('scale=w=1080:h=-2:flags=lanczos'));
+
+      final cmd2k = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r2k,
+        isPortrait: true,
+      );
+      expect(cmd2k, contains('scale=w=1440:h=-2:flags=lanczos'));
+
+      final cmd4k = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale: true,
+        targetResolution: TargetResolution.r4k,
+        isPortrait: true,
+      );
+      expect(cmd4k, contains('scale=w=2160:h=-2:flags=lanczos'));
+    });
+
+    test('RenderDiagnosticInfo correctly evaluates orientation, true 4K, and truncation status', () {
+      const portrait4k = RenderDiagnosticInfo(
+        path: '/movies/UQ_video.mp4',
+        width: 2160,
+        height: 3840,
+        videoCodec: 'H264',
+        videoProfile: 'High',
+        videoBitrate: '8000000',
+        audioCodec: 'AAC',
+        audioSampleRate: '48000',
+        audioChannels: 2,
+        audioBitrate: '192000',
+        durationMs: 5000,
+        fileSizeBytes: 5242880,
+      );
+      expect(portrait4k.isPortrait, isTrue);
+      expect(portrait4k.isTrue4kPortrait, isTrue);
+      expect(portrait4k.isTruncatedPortrait, isFalse);
+      expect(portrait4k.summary, contains('True 4K Portrait (2160x3840)'));
+
+      const truncatedPortrait = RenderDiagnosticInfo(
+        path: '/movies/UQ_truncated.mp4',
+        width: 1216,
+        height: 2160,
+      );
+      expect(truncatedPortrait.isPortrait, isTrue);
+      expect(truncatedPortrait.isTrue4kPortrait, isFalse);
+      expect(truncatedPortrait.isTruncatedPortrait, isTrue);
+      expect(truncatedPortrait.summary, contains('Truncated Portrait (~1216x2160)'));
+
+      const landscape4k = RenderDiagnosticInfo(
+        path: '/movies/UQ_landscape.mp4',
+        width: 3840,
+        height: 2160,
+      );
+      expect(landscape4k.isPortrait, isFalse);
+      expect(landscape4k.isTrue4kPortrait, isFalse);
+      expect(landscape4k.isTruncatedPortrait, isFalse);
     });
 
     test('Horizontal flip injects hflip in spatial stage', () {

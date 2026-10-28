@@ -92,8 +92,9 @@ Total indexed nodes: 1067. Total edges: 2610.
 - **`HistoryService` & `VideoExportItem`** (`lib/core/services/history_service.dart`):
   - Model: `VideoExportItem(file, fileName, bytes, modified)` with `formattedSize` and `formattedDate`.
   - Methods: `getTargetDirectories()`, `scanDirectory()`, `loadHistory()`, `deleteItem()`, `formatTotalSize()`.
-- **`FfmpegService`** (`lib/core/services/ffmpeg_service.dart`):
-  - Methods: `buildCommand()`, `processVideo()`, `executePipeline()`, `cancel()`, `generateOutputPath()`.
+- **`FfmpegService` & `RenderDiagnosticService`** (`lib/core/services/ffmpeg_service.dart`, `lib/core/services/render_diagnostic_service.dart`):
+  - Model: `RenderDiagnosticInfo` (width, height, codecs, bitrates, isTrue4kPortrait, isTruncatedPortrait).
+  - Methods: `buildCommand()`, `processVideo()`, `executePipeline()`, `inspectRenderedFile()`, `cancel()`, `generateOutputPath()`.
 - **`AppTheme` & `AppColors`** (`lib/core/theme/app_theme.dart`):
   - Dark obsidian/mint theme tokens (`surfaceContainerLowest`, `primary`, `outlineVariant`, etc.).
 

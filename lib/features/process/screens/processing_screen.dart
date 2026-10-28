@@ -86,6 +86,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           enableHorizontalFlip: provider.enableHorizontalFlip,
           enableAggressiveAudio: provider.enableAggressiveAudio,
           enableAutoTrim: provider.enableAutoTrim,
+          isPortrait: provider.isPortrait,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {
