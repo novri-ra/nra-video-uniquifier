@@ -257,11 +257,6 @@ class UniquifierProvider extends ChangeNotifier {
     _inspectOutputDiagnosticsAsync(outputPath);
   }
 
-  void setOutputThumbnail(String? thumbPath) {
-    _outputThumbnailPath = thumbPath;
-    notifyListeners();
-  }
-
   Future<void> _inspectOutputDiagnosticsAsync(String outputPath) async {
     try {
       final diag = await FfmpegService.inspectRenderedFile(outputPath);
@@ -380,7 +375,6 @@ class UniquifierProvider extends ChangeNotifier {
 
   /// Formats byte count into human-readable string (B, KB, MB, GB).
   static String formatFileSize(int bytes) => _formatBytes(bytes);
-  static String formatBytes(int bytes) => _formatBytes(bytes);
 
   static String _formatBytes(int bytes) {
     if (bytes <= 0) return '0 B';

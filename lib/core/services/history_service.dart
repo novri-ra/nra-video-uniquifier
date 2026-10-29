@@ -71,12 +71,14 @@ class HistoryService {
         if (entry is File && entry.path.toLowerCase().endsWith('.mp4')) {
           if (seenPaths.add(entry.path)) {
             final stat = await entry.stat();
-            results.add(VideoExportItem(
-              file: entry,
-              fileName: entry.path.split(RegExp(r'[/\\]')).last,
-              bytes: stat.size,
-              modified: stat.modified,
-            ));
+            if (stat.size > 0) {
+              results.add(VideoExportItem(
+                file: entry,
+                fileName: entry.path.split(RegExp(r'[/\\]')).last,
+                bytes: stat.size,
+                modified: stat.modified,
+              ));
+            }
           }
         }
       }

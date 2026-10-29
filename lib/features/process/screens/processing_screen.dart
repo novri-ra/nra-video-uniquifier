@@ -35,6 +35,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   }
 
   void _onProgressTick() {
+    if (!mounted || _isCancelled) return;
     setState(() {
       _progress = 0.10 + (_controller.value * 0.85);
       if (_progress < 0.25) {
@@ -90,6 +91,9 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {
+              if (_controller.isAnimating) {
+                _controller.stop();
+              }
               provider.updateRealtimeStats(p, speed, timeMs);
               setState(() {
                 _progress = p.clamp(0.05, 0.98);

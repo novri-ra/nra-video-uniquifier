@@ -16,9 +16,6 @@ enum TargetResolution {
 
   const TargetResolution(this.key, this.label, this.details, this.width, this.height);
 
-  int targetWidth({bool isPortrait = false}) => isPortrait ? height : width;
-  int targetHeight({bool isPortrait = false}) => isPortrait ? width : height;
-
   String scaleFilter({bool isPortrait = false}) =>
       isPortrait ? 'scale=w=$height:h=-2:flags=lanczos' : 'scale=w=-2:h=$height:flags=lanczos';
 

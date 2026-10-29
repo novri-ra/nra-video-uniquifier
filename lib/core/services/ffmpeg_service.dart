@@ -95,7 +95,7 @@ class FfmpegService {
           else
             'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
           if (enableDeepAntiFingerprint)
-            'rotate=0.4*PI/180:ow=rotw(0.4*PI/180):oh=roth(0.4*PI/180):fillcolor=black',
+            'rotate=0.4*PI/180:ow=trunc(rotw(0.4*PI/180)/2)*2:oh=trunc(roth(0.4*PI/180)/2)*2:fillcolor=black',
           if (enableHorizontalFlip) 'hflip',
         ] else if (enableHorizontalFlip) ...[
           'hflip',
@@ -130,12 +130,12 @@ class FfmpegService {
   }) {
     if (hasAudio) {
       if (enableAggressiveAudio) {
-        return ' -af "[in]atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
+        return ' -af "[in]atempo=1.015,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1" -c:a aac -b:a 192k';
+        return ' -af "atempo=1.015,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1" -c:a aac -b:a 192k';
       }
-      return ' -af "atempo=1.015,asetrate=48000*1.01,aresample=48000,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
+      return ' -af "atempo=1.015,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
     }
     return hasVisual ? ' -c:a copy' : '';
   }
@@ -212,44 +212,6 @@ class FfmpegService {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     return '${targetDir.path}/UQ_${baseName}_$timestamp.mp4';
   }
-
-  /// Pipeline execution alias conforming to architectural execution contract.
-  static Future<String> executePipeline({
-    required String inputPath,
-    bool removeMetadata = true,
-    bool modifyAudio = true,
-    bool modifyVisuals = true,
-    bool upscale1080p = false,
-    bool? upscale,
-    TargetResolution targetResolution = TargetResolution.r1080p,
-    bool enableEnhanceAndDenoise = true,
-    bool enableDeepAntiFingerprint = true,
-    bool enableHorizontalFlip = false,
-    bool enableAggressiveAudio = false,
-    bool enableAutoTrim = false,
-    bool? isPortrait,
-    String? customOutputPath,
-    void Function(double progress, double speed, int timeMs)? onProgress,
-    int totalDurationMs = 0,
-  }) =>
-      processVideo(
-        inputPath: inputPath,
-        removeMetadata: removeMetadata,
-        modifyAudio: modifyAudio,
-        modifyVisuals: modifyVisuals,
-        upscale1080p: upscale1080p,
-        upscale: upscale,
-        targetResolution: targetResolution,
-        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableHorizontalFlip: enableHorizontalFlip,
-        enableAggressiveAudio: enableAggressiveAudio,
-        enableAutoTrim: enableAutoTrim,
-        isPortrait: isPortrait,
-        customOutputPath: customOutputPath,
-        onProgress: onProgress,
-        totalDurationMs: totalDurationMs,
-      );
 
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({

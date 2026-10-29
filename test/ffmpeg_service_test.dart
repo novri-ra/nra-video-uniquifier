@@ -51,7 +51,7 @@ void main() {
         enableDeepAntiFingerprint: true,
       );
       expect(cmd, contains('-c:v copy'));
-      expect(cmd, contains('atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1'));
+      expect(cmd, contains('atempo=1.015,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1'));
       expect(cmd, contains('-c:a aac -b:a 192k'));
       expect(cmd, contains('-map_metadata -1'));
     });
@@ -66,7 +66,7 @@ void main() {
         upscale1080p: false,
         enableDeepAntiFingerprint: false,
       );
-      expect(cmd, contains('atempo=1.015,asetrate=48000*1.01,aresample=48000,equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('atempo=1.015,equalizer=f=1000:t=q:w=1:g=0.5'));
     });
 
     test('Visual tweak & upscale enforces strict filtergraph pipeline order and 8M bitrate', () {
@@ -84,7 +84,7 @@ void main() {
       // Filter graph presence checks
       expect(cmd, contains('setpts=0.9852*PTS'));
       expect(cmd, contains('crop=trunc(iw*0.95/2)*2:trunc(ih*0.95/2)*2'));
-      expect(cmd, contains('rotate=0.4*PI/180:ow=rotw(0.4*PI/180):oh=roth(0.4*PI/180):fillcolor=black'));
+      expect(cmd, contains('rotate=0.4*PI/180:ow=trunc(rotw(0.4*PI/180)/2)*2:oh=trunc(roth(0.4*PI/180)/2)*2:fillcolor=black'));
       expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
@@ -298,6 +298,32 @@ void main() {
       expect(cmd, contains('setpts=0.9852*PTS'));
       expect(cmd, contains('atempo=1.015'));
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
+    });
+
+    test('Macroblock parity: rotation strictly enforces even dimensions without upscale', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale1080p: false,
+        upscale: false,
+        enableDeepAntiFingerprint: true,
+      );
+      expect(cmd, contains('ow=trunc(rotw(0.4*PI/180)/2)*2:oh=trunc(roth(0.4*PI/180)/2)*2'));
+    });
+
+    test('Audio-Visual timing alignment: tempo is pure 1.015 matching 0.9852*PTS without compound drift', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        modifyAudio: true,
+        enableDeepAntiFingerprint: true,
+      );
+      expect(cmd, contains('setpts=0.9852*PTS'));
+      expect(cmd, contains('atempo=1.015'));
+      expect(cmd, isNot(contains('asetrate=')));
+      expect(cmd, isNot(contains('aresample=')));
     });
 
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {

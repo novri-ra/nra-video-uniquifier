@@ -1,16 +1,16 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-29 08:35:00 UTC+07:00
+- **Timestamp**: 2026-10-29 19:15:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `1bfde3b fix(android): remove redundant ndk abiFilters to enable clean split-per-abi release builds`
-- **Working Tree**: Modified: `.gitignore`, `AGENTS.md`, `0ai_context/*` (clean pipeline, tests passing 61/61).
+- **HEAD Commit**: `de02417 fix(android): add ffmpegkit proguard keep rules, patch path security, and update workflow standards`
+- **Working Tree**: Pipeline hardened, tests passing (64/64), analyze 0 errors.
 - **Recent 5 Commits**:
+  - `de02417` fix(android): add ffmpegkit proguard keep rules, patch path security, and update workflow standards
   - `1bfde3b` fix(android): remove redundant ndk abiFilters to enable clean split-per-abi release builds
   - `ee17278` chore(release): finalize stable build with full anti-fingerprint evasion and 4K pipeline
   - `dbc8ebe` fix(ffmpeg): orientation-aware scaling for true portrait 4K and render diagnostics
   - `a5d2f7f` feat(pipeline): advanced vDNA evasion, audio spectrogram masking, and auto-trim
-  - `419437c` feat(pipeline): modular denoise, clarity enhancer, and deep evasion filters
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -21,31 +21,26 @@
 - [x] ProGuard/R8 keep rules applied for FFmpegKit release crash fix.
 - [x] Security vulnerabilities patched (SEC-01 quote escaping, SEC-02 source deletion guard, SEC-03 FileProvider).
 - [x] Workflow standards updated with declarative skill loading and graph verification blocks.
+- [x] Remediate A/V Desync (+5.84s drift eliminated, pure 1.015 tempo matched to 0.9852*PTS).
+- [x] Even macroblock bounds enforced on spatial rotation (`trunc(rotw/2)*2`).
+- [x] Enable release R8 minification (`isMinifyEnabled = true`, `isShrinkResources = true`).
+- [x] Purge dead code (5 functions, 5 color tokens) and free line budget.
+- [x] Storage & progress bar hardening (stop fake ticker on real onProgress, filter 0-byte history files, purge temp cache on startup).
 - [ ] Prepare Google Play Store release metadata and production key signing.
 - [ ] Implement optional batch video processing queue for multiple file selections.
 
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-29T01:23:38Z
-- **Index Counts**: 1119 nodes, 2734 edges, status ready.
-- **Node Breakdown**: File 132, Class 177, Method 236, Section 240, Module 126, Folder 80, Variable 68, Function 30, Field 13, Macro 12, Decorator 2, Enum 1, Branch 1, Project 1.
-- **Tools Tested & Discovered**: 17 tools discovered via `hermes mcp test codebase-memory-mcp` (pass in 6912ms).
-- **MCP Calls Performed**:
-  - `index_repository`: refreshed and verified.
-  - `index_status`: verified ready.
-  - `get_graph_schema`: full edge/node census.
-  - `search_graph`: symbol and degree filtering.
-  - `get_file_outline`: verified outline extraction.
-  - `trace_path`: verified call graph hops.
-  - `query_graph`: openCypher queries executed.
+- **Indexed At**: 2026-10-29T12:16:23Z
+- **Index Counts**: 1208 nodes, 2970 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
 All critical modules strictly respect the <= 400 lines ceiling:
-1. `lib/core/providers/uniquifier_provider.dart` — 396 lines (fan-in: 17)
-2. `lib/core/services/ffmpeg_service.dart` — 386 lines (fan-out: 12)
+1. `lib/core/providers/uniquifier_provider.dart` — 390 lines
+2. `lib/core/services/ffmpeg_service.dart` — 355 lines
 3. `lib/features/navigation/screens/root_navigation_screen.dart` — 343 lines
-4. `lib/features/process/screens/processing_screen.dart` — 318 lines
+4. `lib/features/process/screens/processing_screen.dart` — 322 lines
 5. `lib/features/process/widgets/source_file_section.dart` — 308 lines
 
 ## 5. Hygiene & Dead Code Audit
