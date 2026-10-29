@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../settings/screens/advanced_settings_bottom_sheet.dart';
-import '../../settings/screens/app_settings_bottom_sheet.dart';
 import '../widgets/engine_state_strip.dart';
 import '../widgets/modifiers_card.dart';
 import '../widgets/source_file_section.dart';
@@ -24,13 +22,8 @@ class ProcessScreen extends StatefulWidget {
 class _ProcessScreenState extends State<ProcessScreen> {
   bool _isNavigating = false;
 
-  void _openAdvancedSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const AdvancedSettingsBottomSheet(),
-    );
+  void _openSettingsTab(BuildContext context) {
+    context.read<UniquifierProvider>().setTabIndex(2);
   }
 
   Future<void> _pickVideo(BuildContext context) async {
@@ -107,15 +100,6 @@ class _ProcessScreenState extends State<ProcessScreen> {
     }
   }
 
-  void _openAppSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const AppSettingsBottomSheet(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
@@ -124,7 +108,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
     final batchCount = batchQueue.hasItems ? batchQueue.totalCount : (hasFile ? 1 : 0);
 
     return Scaffold(
-      appBar: TopAppBar(onSettingsTap: () => _openAppSettings(context)),
+      appBar: TopAppBar(onSettingsTap: () => _openSettingsTab(context)),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -134,7 +118,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
             batchCount: batchCount,
             provider: provider,
             onPickVideo: () => _pickVideo(context),
-            onOpenAdvanced: () => _openAdvancedSettings(context),
+            onOpenAdvanced: () => _openSettingsTab(context),
             onStartProcessing: () => _startProcessing(context),
           ),
         ),
