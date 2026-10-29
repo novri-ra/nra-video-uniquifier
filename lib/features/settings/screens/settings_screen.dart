@@ -72,6 +72,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
+            const SizedBox(height: 8),
+            _PresetProfileCard(provider: provider),
+            const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
             const SizedBox(height: 8),
             _CodecSelectorCard(currentCodec: provider.videoCodec, onSelect: provider.setVideoCodec),
@@ -321,6 +325,70 @@ class _AppInfoCard extends StatelessWidget {
                 SizedBox(width: 4),
                 Text('OFFLINE PRIVACY', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PresetProfileCard extends StatelessWidget {
+  final UniquifierProvider provider;
+  const _PresetProfileCard({required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          ActionChip(
+            label: const Text('TikTok Fast'),
+            onPressed: () => provider.applyPreset(
+              removeMetadata: true,
+              modifyAudio: true,
+              modifyVisuals: true,
+              upscale1080p: false,
+              enableEnhanceAndDenoise: false,
+              enableDeepAntiFingerprint: true,
+              enableAutoTrim: true,
+            ),
+          ),
+          ActionChip(
+            label: const Text('Maximum Anti-Fingerprint'),
+            onPressed: () => provider.applyPreset(
+              removeMetadata: true,
+              modifyAudio: true,
+              modifyVisuals: true,
+              upscale1080p: true,
+              upscaleTarget: '2k',
+              enableEnhanceAndDenoise: true,
+              enableDeepAntiFingerprint: true,
+              enableHorizontalFlip: true,
+              enableAggressiveAudio: true,
+              enableAutoTrim: true,
+            ),
+          ),
+          ActionChip(
+            label: const Text('Lossless Stealth'),
+            onPressed: () => provider.applyPreset(
+              removeMetadata: true,
+              modifyAudio: false,
+              modifyVisuals: false,
+              upscale1080p: false,
+              enableEnhanceAndDenoise: false,
+              enableDeepAntiFingerprint: false,
+              enableHorizontalFlip: false,
+              enableAggressiveAudio: false,
+              enableAutoTrim: false,
             ),
           ),
         ],

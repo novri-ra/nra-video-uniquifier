@@ -5,6 +5,7 @@ import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
+import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -181,6 +182,47 @@ void main() {
 
       // Observer records 1 for initial route + 1 for ProcessingScreen push = 2 total pushes
       expect(pushCount, equals(2));
+    });
+
+    testWidgets('D3-02: Preset profile chips update provider toggles per preset definition', (tester) async {
+      final provider = UniquifierProvider();
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: provider,
+          child: const MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap TikTok Fast
+      final tikTokChip = find.text('TikTok Fast');
+      expect(tikTokChip, findsOneWidget);
+      await tester.tap(tikTokChip);
+      await tester.pumpAndSettle();
+      expect(provider.modifyVisuals, isTrue);
+      expect(provider.enableEnhanceAndDenoise, isFalse);
+      expect(provider.enableAutoTrim, isTrue);
+
+      // Tap Maximum Anti-Fingerprint
+      final maxChip = find.text('Maximum Anti-Fingerprint');
+      expect(maxChip, findsOneWidget);
+      await tester.tap(maxChip);
+      await tester.pumpAndSettle();
+      expect(provider.upscale1080p, isTrue);
+      expect(provider.selectedUpscaleTarget, equals('2k'));
+      expect(provider.enableHorizontalFlip, isTrue);
+      expect(provider.enableAggressiveAudio, isTrue);
+
+      // Tap Lossless Stealth
+      final stealthChip = find.text('Lossless Stealth');
+      expect(stealthChip, findsOneWidget);
+      await tester.tap(stealthChip);
+      await tester.pumpAndSettle();
+      expect(provider.modifyAudio, isFalse);
+      expect(provider.modifyVisuals, isFalse);
+      expect(provider.enableDeepAntiFingerprint, isFalse);
     });
   });
 }
