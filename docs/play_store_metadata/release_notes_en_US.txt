@@ -1,0 +1,7 @@
+Initial production release of NRA Video Uniquifier (v1.0.0):
+- Offline video deduplication and anti-fingerprint evasion engine.
+- Orientation-aware Lanczos upscaling to 1080p, 2K, and true 4K (2160x3840 portrait / 3840x2160 landscape).
+- Deep audio spectrogram masking with synthetic pink noise and parametric EQ.
+- Batch processing queue for sequential multi-video transcoding.
+- Foreground notification progress bar and completion sound alert.
+- 100% on-device processing: zero external data transmission.

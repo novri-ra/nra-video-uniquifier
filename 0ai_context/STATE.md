@@ -1,16 +1,16 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-29 20:30:00 UTC+07:00
+- **Timestamp**: 2026-10-29 20:50:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `cc23d40 feat(notification): add ongoing progress notification, completion sound, and background execution support`
-- **Working Tree**: Batch queue implemented, 76/76 tests passing, analyze 0 errors.
+- **HEAD Commit**: `1ff0e7b feat(queue): implement batch video processing queue and multi-file sequential render`
+- **Working Tree**: Release key signing & Play Store metadata configured, 76/76 tests passing, analyze 0 errors.
 - **Recent 5 Commits**:
+  - `1ff0e7b` feat(queue): implement batch video processing queue and multi-file sequential render
   - `cc23d40` feat(notification): add ongoing progress notification, completion sound, and background execution support
   - `6bf9b9f` fix(android): add dontwarn com.google.android.play.core to fix R8 build failure
   - `de8536a` fix(pipeline): resolve A/V desync, enforce even macroblock rotation, enable release R8 minification
   - `de02417` fix(android): add ffmpegkit proguard keep rules, patch path security, and update workflow standards
-  - `1bfde3b` fix(android): remove redundant ndk abiFilters to enable clean split-per-abi release builds
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -30,7 +30,8 @@
 - [x] Purge dead code (5 functions, 5 color tokens) and free line budget.
 - [x] Storage & progress bar hardening (stop fake ticker on real onProgress, filter 0-byte history files, purge temp cache on startup).
 - [x] Implement batch video processing queue for multiple file selections.
-- [ ] Prepare Google Play Store release metadata and production key signing.
+- [x] Prepare Google Play Store release metadata and production key signing.
+- [ ] Connect physical device or emulator for end-to-end smoke test on device.
 
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`

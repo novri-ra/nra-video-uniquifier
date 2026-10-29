@@ -58,3 +58,9 @@ Movies/
 0ai_context[0-9]*/
 *.mp4
 
+# Keystore & Signing Secrets
+*.jks
+*.keystore
+key.properties
+**/key.properties
+
