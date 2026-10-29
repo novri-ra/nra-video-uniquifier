@@ -142,5 +142,56 @@ void main() {
       expect(find.text('Upscale to 4K'), findsOneWidget);
       expect(find.text('Lanczos algorithm (3840x2160)'), findsOneWidget);
     });
+
+    testWidgets('D2-01: Double-tap on start action button triggers exactly one route push', (tester) async {
+      final uniquifierProvider = UniquifierProvider();
+      final batchQueueProvider = BatchQueueProvider();
+
+      uniquifierProvider.setVideoFile(
+        path: '/dummy/path/video.mp4',
+        name: 'video.mp4',
+        sizeBytes: 1024,
+      );
+
+      int pushCount = 0;
+      final observer = _TestNavigatorObserver(onPushed: () => pushCount++);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: uniquifierProvider),
+            ChangeNotifierProvider.value(value: batchQueueProvider),
+          ],
+          child: MaterialApp(
+            navigatorObservers: [observer],
+            home: const RootNavigationScreen(),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      final button = find.text('START UNIQUIFYING');
+      expect(button, findsOneWidget);
+      await tester.ensureVisible(button);
+
+      // Tap twice rapidly
+      await tester.tap(button, warnIfMissed: false);
+      await tester.tap(button, warnIfMissed: false);
+      await tester.pump();
+
+      // Observer records 1 for initial route + 1 for ProcessingScreen push = 2 total pushes
+      expect(pushCount, equals(2));
+    });
   });
+}
+
+class _TestNavigatorObserver extends NavigatorObserver {
+  final VoidCallback onPushed;
+  _TestNavigatorObserver({required this.onPushed});
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    onPushed();
+  }
 }

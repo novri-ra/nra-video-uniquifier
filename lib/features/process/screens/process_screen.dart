@@ -14,8 +14,15 @@ import '../../../shared/widgets/top_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
-class ProcessScreen extends StatelessWidget {
+class ProcessScreen extends StatefulWidget {
   const ProcessScreen({super.key});
+
+  @override
+  State<ProcessScreen> createState() => _ProcessScreenState();
+}
+
+class _ProcessScreenState extends State<ProcessScreen> {
+  bool _isNavigating = false;
 
   void _openAdvancedSettings(BuildContext context) {
     showModalBottomSheet(
@@ -76,16 +83,27 @@ class ProcessScreen extends StatelessWidget {
     }
   }
 
-  void _startProcessing(BuildContext context) {
+  Future<void> _startProcessing(BuildContext context) async {
+    if (_isNavigating) return;
+    final provider = context.read<UniquifierProvider>();
     final batchQueue = context.read<BatchQueueProvider>();
-    if (batchQueue.hasItems && batchQueue.totalCount > 1) {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const BatchProcessingScreen()),
-      );
-    } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const ProcessingScreen()),
-      );
+    if (!batchQueue.hasItems && provider.selectedFilePath == null) return;
+
+    _isNavigating = true;
+    try {
+      if (batchQueue.hasItems && batchQueue.totalCount > 1) {
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const BatchProcessingScreen()),
+        );
+      } else {
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ProcessingScreen()),
+        );
+      }
+    } finally {
+      if (mounted) {
+        _isNavigating = false;
+      }
     }
   }
 
