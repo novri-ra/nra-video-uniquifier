@@ -103,8 +103,8 @@ class BatchQueueProvider extends ChangeNotifier {
           enableHorizontalFlip: config.enableHorizontalFlip,
           enableAggressiveAudio: config.enableAggressiveAudio,
           enableAutoTrim: config.enableAutoTrim,
-          isPortrait: config.isPortrait,
-          totalDurationMs: config.totalDurationMs,
+          isPortrait: null,
+          totalDurationMs: 0,
           onProgress: (p, speed, timeMs) {
             if (!_isCancelled && current.isProcessing) {
               current.progress = p;

@@ -3,6 +3,7 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'media_scanner_service.dart';
 import 'notification_service.dart';
@@ -221,6 +222,31 @@ class FfmpegService {
     return '${targetDir.path}/UQ_${baseName}_$timestamp.mp4';
   }
 
+  static Future<({int durationMs, int width, int height})> _probeMediaMeta(String path) async {
+    try {
+      final session = await FFprobeKit.getMediaInformation(path);
+      final info = session.getMediaInformation();
+      if (info != null) {
+        final durSec = double.tryParse(info.getDuration() ?? '') ?? 0.0;
+        final durMs = (durSec * 1000).toInt();
+        int width = 0, height = 0;
+        for (final s in info.getStreams()) {
+          if (s.getType() == 'video') {
+            width = s.getWidth() ?? 0;
+            height = s.getHeight() ?? 0;
+            break;
+          }
+        }
+        return (durationMs: durMs, width: width, height: height);
+      }
+    } catch (_) {}
+    return (durationMs: 0, width: 0, height: 0);
+  }
+
+  @visibleForTesting
+  static Future<({int durationMs, int width, int height})> probeMediaMeta(String path) =>
+      _probeMediaMeta(path);
+
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({
     required String inputPath,
@@ -255,24 +281,15 @@ class FfmpegService {
     }
 
     bool resolvedIsPortrait = isPortrait ?? false;
-    if (isPortrait == null) {
-      try {
-        final session = await FFprobeKit.getMediaInformation(effectiveInput);
-        final info = session.getMediaInformation();
-        if (info != null) {
-          final streams = info.getStreams();
-          for (final s in streams) {
-            if (s.getType() == 'video') {
-              final w = s.getWidth();
-              final h = s.getHeight();
-              if (w != null && h != null && h > w) {
-                resolvedIsPortrait = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (_) {}
+    int resolvedDurationMs = totalDurationMs;
+    if (isPortrait == null || totalDurationMs <= 0) {
+      final meta = await _probeMediaMeta(effectiveInput);
+      if (isPortrait == null && meta.width > 0 && meta.height > 0) {
+        resolvedIsPortrait = meta.height > meta.width;
+      }
+      if (totalDurationMs <= 0 && meta.durationMs > 0) {
+        resolvedDurationMs = meta.durationMs;
+      }
     }
 
     final outputPath = customOutputPath ?? await generateOutputPath(inputPath);
@@ -291,7 +308,7 @@ class FfmpegService {
       enableHorizontalFlip: enableHorizontalFlip,
       enableAggressiveAudio: enableAggressiveAudio,
       enableAutoTrim: enableAutoTrim,
-      totalDurationMs: totalDurationMs,
+      totalDurationMs: resolvedDurationMs,
       isPortrait: resolvedIsPortrait,
     );
 
@@ -300,7 +317,7 @@ class FfmpegService {
       FFmpegKitConfig.enableStatisticsCallback((statistics) {
         final timeMs = statistics.getTime();
         final speed = statistics.getSpeed();
-        final progress = totalDurationMs > 0 ? (timeMs / totalDurationMs).clamp(0.0, 1.0) : 0.0;
+        final progress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
         onProgress(progress, speed, timeMs);
         final percent = (progress * 100).toInt();
         NotificationService.showProgressNotification(

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/models/batch_video_item.dart';
 import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -118,6 +119,19 @@ void main() {
       expect(provider.isCancelled, isTrue);
       expect(item1.status, BatchItemStatus.cancelled);
       expect(item2.status, BatchItemStatus.cancelled);
+      expect(provider.isProcessing, isFalse);
+    });
+
+    test('D1-01 T3: runBatch processes queue items with isolated parameters', () async {
+      final provider = BatchQueueProvider();
+      final item1 = BatchVideoItem(id: '1', path: '/invalid1.mp4', name: 'v1.mp4', sizeBytes: 100);
+      final item2 = BatchVideoItem(id: '2', path: '/invalid2.mp4', name: 'v2.mp4', sizeBytes: 200);
+      provider.setItems([item1, item2]);
+
+      final dummyConfig = UniquifierProvider();
+      await provider.runBatch(dummyConfig);
+      expect(item1.status, BatchItemStatus.failed);
+      expect(item2.status, BatchItemStatus.failed);
       expect(provider.isProcessing, isFalse);
     });
   });

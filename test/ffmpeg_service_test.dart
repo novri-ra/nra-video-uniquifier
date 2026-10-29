@@ -392,5 +392,22 @@ void main() {
       expect(cmd, contains(r'-i "/path/video\"with\"quotes.mp4"'));
       expect(cmd, contains(r'"/path/out\"with\"quotes.mp4"'));
     });
+
+    test('D1-01 T1: probeMediaMeta returns zeros on probe failure without throwing', () async {
+      final meta = await FfmpegService.probeMediaMeta('/nonexistent_file_path.mp4');
+      expect(meta.durationMs, 0);
+      expect(meta.width, 0);
+      expect(meta.height, 0);
+    });
+
+    test('D1-01 T2: buildCommand respects auto-trim when totalDurationMs > 1500', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/input.mp4',
+        outputPath: '/output.mp4',
+        enableAutoTrim: true,
+        totalDurationMs: 5000,
+      );
+      expect(cmd, contains('-ss 0.5 -t 4.00 -i "/input.mp4"'));
+    });
   });
 }
