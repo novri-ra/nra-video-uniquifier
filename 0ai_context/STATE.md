@@ -1,16 +1,16 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-29 19:15:00 UTC+07:00
+- **Timestamp**: 2026-10-29 19:35:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `de02417 fix(android): add ffmpegkit proguard keep rules, patch path security, and update workflow standards`
-- **Working Tree**: Pipeline hardened, tests passing (64/64), analyze 0 errors.
+- **HEAD Commit**: `de8536a fix(pipeline): resolve A/V desync, enforce even macroblock rotation, enable release R8 minification`
+- **Working Tree**: Play Core ProGuard rules updated, tests passing (64/64), analyze 0 errors.
 - **Recent 5 Commits**:
+  - `de8536a` fix(pipeline): resolve A/V desync, enforce even macroblock rotation, enable release R8 minification
   - `de02417` fix(android): add ffmpegkit proguard keep rules, patch path security, and update workflow standards
   - `1bfde3b` fix(android): remove redundant ndk abiFilters to enable clean split-per-abi release builds
   - `ee17278` chore(release): finalize stable build with full anti-fingerprint evasion and 4K pipeline
   - `dbc8ebe` fix(ffmpeg): orientation-aware scaling for true portrait 4K and render diagnostics
-  - `a5d2f7f` feat(pipeline): advanced vDNA evasion, audio spectrogram masking, and auto-trim
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -24,6 +24,7 @@
 - [x] Remediate A/V Desync (+5.84s drift eliminated, pure 1.015 tempo matched to 0.9852*PTS).
 - [x] Even macroblock bounds enforced on spatial rotation (`trunc(rotw/2)*2`).
 - [x] Enable release R8 minification (`isMinifyEnabled = true`, `isShrinkResources = true`).
+- [x] Suppress Play Core / Dynamic Delivery R8 warnings (`-dontwarn com.google.android.play.core.**`).
 - [x] Purge dead code (5 functions, 5 color tokens) and free line budget.
 - [x] Storage & progress bar hardening (stop fake ticker on real onProgress, filter 0-byte history files, purge temp cache on startup).
 - [ ] Prepare Google Play Store release metadata and production key signing.
@@ -32,8 +33,8 @@
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-29T12:16:23Z
-- **Index Counts**: 1208 nodes, 2970 edges, status ready.
+- **Indexed At**: 2026-10-29T12:29:06Z
+- **Index Counts**: 1227 nodes, 3022 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
 All critical modules strictly respect the <= 400 lines ceiling:

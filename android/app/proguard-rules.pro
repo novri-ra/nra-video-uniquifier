@@ -27,3 +27,6 @@
 -keep class kotlin.coroutines.Continuation { *; }
 -keep class kotlin.coroutines.intrinsics.CoroutineSingletons { *; }
 -keep class kotlin.coroutines.intrinsics.IntrinsicsKt { *; }
+
+# Google Play Core & Dynamic Delivery warnings
+-dontwarn com.google.android.play.core.**
