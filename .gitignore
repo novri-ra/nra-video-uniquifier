@@ -54,4 +54,7 @@ Thumbs.db
 __pycache__/
 *.bak
 *.swp
+Movies/
+0ai_context[0-9]*/
+*.mp4
 

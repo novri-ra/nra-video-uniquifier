@@ -3,6 +3,7 @@ package com.example.nra_video_uniquifier
 import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.Uri
+import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -39,11 +40,22 @@ class MainActivity : FlutterActivity() {
                     try {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             if (filePath != null && File(filePath).exists()) {
-                                setDataAndType(Uri.parse(filePath), "video/*")
+                                val file = File(filePath)
+                                val uri: Uri = try {
+                                    FileProvider.getUriForFile(
+                                        applicationContext,
+                                        "${applicationContext.packageName}.fileprovider",
+                                        file
+                                    )
+                                } catch (_: Exception) {
+                                    Uri.fromFile(file)
+                                }
+                                setDataAndType(uri, "video/*")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             } else {
                                 type = "video/*"
                             }
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         }
                         startActivity(Intent.createChooser(intent, "Open Video Gallery"))
                         result.success(true)

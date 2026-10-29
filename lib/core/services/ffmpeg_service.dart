@@ -11,6 +11,8 @@ import 'settings_service.dart';
 export 'render_diagnostic_service.dart';
 
 class FfmpegService {
+  static String _escapePath(String path) => path.replaceAll('"', r'\"');
+
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
   static String buildCommand({
     required String inputPath,
@@ -29,6 +31,8 @@ class FfmpegService {
     int totalDurationMs = 0,
     bool isPortrait = false,
   }) {
+    final safeInput = _escapePath(inputPath);
+    final safeOutput = _escapePath(outputPath);
     final buffer = StringBuffer('-y');
     if (enableAutoTrim) {
       buffer.write(' -ss 0.5');
@@ -37,7 +41,7 @@ class FfmpegService {
         buffer.write(' -t $trimDur');
       }
     }
-    buffer.write(' -i "$inputPath"');
+    buffer.write(' -i "$safeInput"');
     if (removeMetadata) {
       buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
       buffer.write(' -metadata make="Apple" -metadata model="iPhone 15 Pro" -metadata encoder="Apple QuickTime"');
@@ -64,7 +68,7 @@ class FfmpegService {
     ));
 
     if (!hasVisual && !modifyAudio) buffer.write(' -c copy');
-    buffer.write(' "$outputPath"');
+    buffer.write(' "$safeOutput"');
     return buffer.toString();
   }
 
@@ -162,7 +166,9 @@ class FfmpegService {
       if (!inputFile.existsSync() || inputFile.lengthSync() == 0) return null;
       final tempDir = await getTemporaryDirectory();
       final thumbPath = targetPath ?? '${tempDir.path}/thumb_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final cmd = '-y -ss 00:00:00.500 -i "$inputPath" -vframes 1 -q:v 2 "$thumbPath"';
+      final safeInput = _escapePath(inputPath);
+      final safeThumb = _escapePath(thumbPath);
+      final cmd = '-y -ss 00:00:00.500 -i "$safeInput" -vframes 1 -q:v 2 "$safeThumb"';
       final session = await FFmpegKit.execute(cmd);
       final returnCode = await session.getReturnCode();
       if (ReturnCode.isSuccess(returnCode) && File(thumbPath).existsSync()) {
@@ -327,7 +333,7 @@ class FfmpegService {
     }
 
     try {
-      final finalPath = await _executeFFmpeg(command, outputPath);
+      final finalPath = await _executeFFmpeg(command, outputPath, sourcePath: effectiveInput);
       await MediaScannerService.scanFile(finalPath);
       await inspectRenderedFile(finalPath);
       return finalPath;
@@ -349,14 +355,14 @@ class FfmpegService {
   static Future<RenderDiagnosticInfo?> inspectRenderedFile(String filePath) =>
       RenderDiagnosticService.inspectRenderedFile(filePath);
 
-  static Future<String> _executeFFmpeg(String command, String outputPath) async {
+  static Future<String> _executeFFmpeg(String command, String outputPath, {String? sourcePath}) async {
     try {
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
 
       if (ReturnCode.isSuccess(returnCode)) return outputPath;
 
-      _deletePartialFile(outputPath);
+      _deletePartialFile(outputPath, sourcePath: sourcePath);
       if (ReturnCode.isCancel(returnCode)) {
         throw Exception('FFmpeg execution was canceled');
       }
@@ -372,13 +378,14 @@ class FfmpegService {
       }
       throw Exception(buffer.toString());
     } catch (_) {
-      _deletePartialFile(outputPath);
+      _deletePartialFile(outputPath, sourcePath: sourcePath);
       rethrow;
     }
   }
 
-  static void _deletePartialFile(String path) {
+  static void _deletePartialFile(String path, {String? sourcePath}) {
     try {
+      if (sourcePath != null && path == sourcePath) return;
       final file = File(path);
       if (file.existsSync()) file.deleteSync();
     } catch (_) {}

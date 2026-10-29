@@ -321,5 +321,17 @@ void main() {
     test('Cancel executes safely without throwing unhandled error', () async {
       await expectLater(FfmpegService.cancel(), completes);
     });
+
+    test('SEC-01: command generator escapes double quotes in input and output paths', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/video"with"quotes.mp4',
+        outputPath: '/path/out"with"quotes.mp4',
+        removeMetadata: false,
+        modifyAudio: false,
+        modifyVisuals: false,
+      );
+      expect(cmd, contains(r'-i "/path/video\"with\"quotes.mp4"'));
+      expect(cmd, contains(r'"/path/out\"with\"quotes.mp4"'));
+    });
   });
 }
