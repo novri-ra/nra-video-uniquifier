@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
@@ -15,6 +16,7 @@ void main() {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UniquifierProvider()),
+        ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
       ],
       child: MaterialApp(
         home: MediaQuery(

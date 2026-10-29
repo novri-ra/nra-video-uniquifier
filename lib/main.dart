@@ -1,6 +1,7 @@
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'core/providers/batch_queue_provider.dart';
 import 'core/providers/uniquifier_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/settings_service.dart';
@@ -23,6 +24,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UniquifierProvider()),
+        ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
       ],
       child: const VideoUniquifierApp(),
     ),
