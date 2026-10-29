@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-29 21:40:00 UTC+07:00
+- **Timestamp**: 2026-10-29 22:55:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `fed62ef feat(release): configure production release key signing and Play Store metadata specification`
-- **Working Tree**: Color corruption fixed, YUV420p + faststart enforced, H.264/H.265 codec selector added, 3-tab navbar with SettingsScreen, 80/80 tests passing, analyze 0 errors.
+- **HEAD Commit**: `bad0d80 feat(pipeline): fix color corruption, enforce yuv420p faststart, add H264/H265 codec selector and settings tab`
+- **Working Tree**: Anti-vDNA TikTok evasion hardened (8% crop with offset, 0.8 deg tilt, noise grain 4, 0.975*PTS, 1.0256 atempo, dual-band audio EQ), 80/80 tests passing, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -28,13 +28,14 @@
 - [x] Fix color corruption (purge `curves=preset=vintage`, enforce `format=yuv420p`, `-pix_fmt yuv420p`, `-movflags +faststart`, BT.709 color metadata).
 - [x] Implement configurable video codec engine (H.264 AVC vs H.265 HEVC with `-tag:v hvc1`).
 - [x] Dedicated Settings tab in root navigation bar (`SettingsScreen`).
+- [x] Harden anti-vDNA evasion filters to bypass TikTok originality detection (8% offset crop, 0.8° tilt, noise grain 4, 0.975*PTS, 1.0256 audio tempo & dual-band EQ).
 - [ ] Connect physical device or emulator for end-to-end smoke test on device.
 
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-29T14:38:15Z
-- **Index Counts**: 1328 nodes, 3371 edges, status ready.
+- **Indexed At**: 2026-10-29T15:52:44Z
+- **Index Counts**: 1338 nodes, 3404 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
 All critical modules strictly respect the <= 400 lines ceiling:
