@@ -3,6 +3,28 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum VideoCodec {
+  h264('h264', 'H.264 (AVC - TikTok Universal)'),
+  h265('h265', 'H.265 (HEVC - High Efficiency)');
+
+  final String key;
+  final String label;
+
+  const VideoCodec(this.key, this.label);
+
+  static VideoCodec fromString(String? val) {
+    switch (val?.toLowerCase()) {
+      case 'h265':
+      case 'hevc':
+        return VideoCodec.h265;
+      case 'h264':
+      case 'avc':
+      default:
+        return VideoCodec.h264;
+    }
+  }
+}
+
 enum TargetResolution {
   r1080p('1080p', '1080p', '1920x1080', 1920, 1080),
   r2k('2k', '2K', '2560x1440', 2560, 1440),
@@ -44,6 +66,46 @@ class SettingsService {
   static const String keyHorizontalFlip = 'app_horizontal_flip';
   static const String keyAggressiveAudio = 'app_aggressive_audio';
   static const String keyAutoTrim = 'app_auto_trim';
+  static const String keyVideoCodec = 'app_video_codec';
+  static const String keyNotificationSound = 'app_notification_sound';
+  static const String keyBackgroundProcessing = 'app_background_processing';
+
+  static final ValueNotifier<VideoCodec> videoCodecNotifier =
+      ValueNotifier<VideoCodec>(VideoCodec.h264);
+
+  static Future<VideoCodec> getVideoCodec() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(keyVideoCodec);
+    final codec = VideoCodec.fromString(raw);
+    videoCodecNotifier.value = codec;
+    return codec;
+  }
+
+  static Future<void> setVideoCodec(VideoCodec codec) async {
+    videoCodecNotifier.value = codec;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyVideoCodec, codec.key);
+  }
+
+  static Future<bool> getNotificationSound() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyNotificationSound) ?? true;
+  }
+
+  static Future<void> setNotificationSound(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyNotificationSound, enabled);
+  }
+
+  static Future<bool> getBackgroundProcessing() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyBackgroundProcessing) ?? true;
+  }
+
+  static Future<void> setBackgroundProcessing(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyBackgroundProcessing, enabled);
+  }
 
   static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
       ValueNotifier<TargetResolution>(TargetResolution.r1080p);
@@ -140,6 +202,26 @@ class SettingsService {
   static Future<void> setCustomOutputPath(String path) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyCustomOutputPath, path);
+  }
+
+  /// Gets total size of temporary staged videos and thumbnails.
+  static Future<int> getTempCacheSize([Directory? overrideDir]) async {
+    int totalBytes = 0;
+    try {
+      final tempDir = overrideDir ?? await getTemporaryDirectory();
+      if (tempDir.existsSync()) {
+        final entries = tempDir.listSync(followLinks: false);
+        for (final entry in entries) {
+          if (entry is File) {
+            final name = entry.path.split(RegExp(r'[/\\]')).last;
+            if (name.startsWith('staged_') || name.startsWith('thumb_')) {
+              totalBytes += entry.lengthSync();
+            }
+          }
+        }
+      }
+    } catch (_) {}
+    return totalBytes;
   }
 
   /// Purges temporary staged videos and thumbnails from sandbox cache.

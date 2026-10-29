@@ -121,13 +121,42 @@ void main() {
       await thumb.writeAsString('test-thumb-content');
       await other.writeAsString('keep-this');
 
+      final sizeBefore = await SettingsService.getTempCacheSize(tempDir);
+      expect(sizeBefore, greaterThan(0));
+
       final freed = await SettingsService.purgeTempCache(tempDir);
-      expect(freed, greaterThan(0));
+      expect(freed, equals(sizeBefore));
       expect(staged.existsSync(), isFalse);
       expect(thumb.existsSync(), isFalse);
       expect(other.existsSync(), isTrue);
 
+      final sizeAfter = await SettingsService.getTempCacheSize(tempDir);
+      expect(sizeAfter, equals(0));
+
       if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    });
+
+    test('VideoCodec enum parsing and persistence', () async {
+      expect(VideoCodec.fromString('h264'), equals(VideoCodec.h264));
+      expect(VideoCodec.fromString('avc'), equals(VideoCodec.h264));
+      expect(VideoCodec.fromString('h265'), equals(VideoCodec.h265));
+      expect(VideoCodec.fromString('hevc'), equals(VideoCodec.h265));
+      expect(VideoCodec.fromString('unknown'), equals(VideoCodec.h264));
+
+      expect(await SettingsService.getVideoCodec(), equals(VideoCodec.h264));
+      await SettingsService.setVideoCodec(VideoCodec.h265);
+      expect(await SettingsService.getVideoCodec(), equals(VideoCodec.h265));
+      expect(SettingsService.videoCodecNotifier.value, equals(VideoCodec.h265));
+    });
+
+    test('Notification sound and background processing persistence', () async {
+      expect(await SettingsService.getNotificationSound(), isTrue);
+      await SettingsService.setNotificationSound(false);
+      expect(await SettingsService.getNotificationSound(), isFalse);
+
+      expect(await SettingsService.getBackgroundProcessing(), isTrue);
+      await SettingsService.setBackgroundProcessing(false);
+      expect(await SettingsService.getBackgroundProcessing(), isFalse);
     });
   });
 }

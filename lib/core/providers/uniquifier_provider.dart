@@ -6,12 +6,14 @@ import '../services/settings_service.dart';
 class UniquifierProvider extends ChangeNotifier {
   UniquifierProvider() {
     SettingsService.upscaleResolutionNotifier.addListener(_onResolutionNotifierChanged);
+    SettingsService.videoCodecNotifier.addListener(_onCodecNotifierChanged);
     _initResolution();
   }
 
   @override
   void dispose() {
     SettingsService.upscaleResolutionNotifier.removeListener(_onResolutionNotifierChanged);
+    SettingsService.videoCodecNotifier.removeListener(_onCodecNotifierChanged);
     super.dispose();
   }
 
@@ -22,12 +24,17 @@ class UniquifierProvider extends ChangeNotifier {
     }
   }
 
+  void _onCodecNotifierChanged() {
+    if (_videoCodec != SettingsService.videoCodecNotifier.value) {
+      _videoCodec = SettingsService.videoCodecNotifier.value;
+      notifyListeners();
+    }
+  }
+
   Future<void> _initResolution() async {
     try {
-      final res = await SettingsService.getUpscaleResolution();
-      if (_targetResolution != res) {
-        _targetResolution = res;
-      }
+      _targetResolution = await SettingsService.getUpscaleResolution();
+      _videoCodec = await SettingsService.getVideoCodec();
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
       _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
       _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
@@ -37,27 +44,17 @@ class UniquifierProvider extends ChangeNotifier {
     } catch (_) {}
   }
   // Source Video State (initial is null / empty)
-  String? _selectedFileName;
-  String? _selectedFilePath;
-  String? _thumbnailPath;
-  String _fileResolution = '1080×1920';
+  String? _selectedFileName, _selectedFilePath, _thumbnailPath;
+  String _fileResolution = '1080×1920', _fileSize = '0 B', _fileCodec = 'H.264', _fps = '30 FPS', _audioInfo = 'AAC 48kHz', _duration = '0:00', _sha256 = '';
   bool _isPortrait = true;
-  String _fileSize = '0 B';
-  String _fileCodec = 'H.264';
-  String _fps = '30 FPS';
-  String _audioInfo = 'AAC 48kHz';
-  String _duration = '0:00';
-  String _sha256 = '';
   int _totalDurationMs = 0;
 
   // Real-time Telemetry
-  double _realtimeProgress = 0.0;
-  double _renderingSpeed = 1.0;
+  double _realtimeProgress = 0.0, _renderingSpeed = 1.0;
   String _eta = 'Calculating...';
 
   // Last processed output & Output thumbnail
-  String? _lastProcessedOutputPath;
-  String? _outputThumbnailPath;
+  String? _lastProcessedOutputPath, _outputThumbnailPath;
   RenderDiagnosticInfo? _lastDiagnosticInfo;
 
   // Toggle Settings
@@ -73,6 +70,7 @@ class UniquifierProvider extends ChangeNotifier {
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
+  VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
 
   // Navigation
@@ -110,6 +108,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
+  VideoCodec get videoCodec => _videoCodec;
   String get selectedUpscaleTarget => _targetResolution.key;
   String get targetResolutionLabel => _targetResolution.label;
   String get targetResolutionDetails => _targetResolution.details;
@@ -117,6 +116,14 @@ class UniquifierProvider extends ChangeNotifier {
   int get currentTabIndex => _currentTabIndex;
 
   // Actions
+  void setVideoCodec(VideoCodec codec) {
+    _videoCodec = codec;
+    try {
+      SettingsService.setVideoCodec(codec);
+    } catch (_) {}
+    notifyListeners();
+  }
+
   void setTabIndex(int index) {
     _currentTabIndex = index;
     notifyListeners();
@@ -144,41 +151,31 @@ class UniquifierProvider extends ChangeNotifier {
 
   void toggleEnhanceAndDenoise(bool val) {
     _enableEnhanceAndDenoise = val;
-    try {
-      SettingsService.setEnhanceAndDenoise(val);
-    } catch (_) {}
+    try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleDeepAntiFingerprint(bool val) {
     _enableDeepAntiFingerprint = val;
-    try {
-      SettingsService.setDeepAntiFingerprint(val);
-    } catch (_) {}
+    try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleHorizontalFlip(bool val) {
     _enableHorizontalFlip = val;
-    try {
-      SettingsService.setHorizontalFlip(val);
-    } catch (_) {}
+    try { SettingsService.setHorizontalFlip(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleAggressiveAudio(bool val) {
     _enableAggressiveAudio = val;
-    try {
-      SettingsService.setAggressiveAudio(val);
-    } catch (_) {}
+    try { SettingsService.setAggressiveAudio(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleAutoTrim(bool val) {
     _enableAutoTrim = val;
-    try {
-      SettingsService.setAutoTrim(val);
-    } catch (_) {}
+    try { SettingsService.setAutoTrim(val); } catch (_) {}
     notifyListeners();
   }
 

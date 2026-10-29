@@ -69,7 +69,7 @@ void main() {
       expect(cmd, contains('atempo=1.015,equalizer=f=1000:t=q:w=1:g=0.5'));
     });
 
-    test('Visual tweak & upscale enforces strict filtergraph pipeline order and 8M bitrate', () {
+    test('Visual tweak & upscale enforces strict filtergraph pipeline order and YUV format', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -78,6 +78,7 @@ void main() {
         modifyVisuals: true,
         upscale1080p: true,
         targetResolution: TargetResolution.r1080p,
+        videoCodec: VideoCodec.h264,
         enableEnhanceAndDenoise: true,
         enableDeepAntiFingerprint: true,
       );
@@ -88,32 +89,62 @@ void main() {
       expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
-      expect(cmd, contains('curves=preset=vintage'));
-      expect(cmd, contains('eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98'));
+      expect(cmd, isNot(contains('curves=preset=vintage')));
+      expect(cmd, contains('eq=contrast=1.03:saturation=1.04'));
       expect(cmd, contains('noise=alls=3:allf=t+u'));
-      expect(cmd, contains('-c:v libx264 -preset fast -crf 19 -b:v 8M -g 60 -keyint_min 30'));
+      expect(cmd, contains('format=yuv420p'));
+      expect(cmd, contains('-c:v libx264 -preset fast -crf 22'));
+      expect(cmd, contains('-pix_fmt yuv420p'));
+      expect(cmd, contains('-movflags +faststart'));
+      expect(cmd, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
       expect(cmd, contains('-metadata make="Apple" -metadata model="iPhone 15 Pro"'));
       expect(cmd, contains('-c:a copy'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> Curves/EQ -> Noise
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Format
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
       final scaleIdx = cmd.indexOf('scale=');
       final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
-      final curvesIdx = cmd.indexOf('curves=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
+      final formatIdx = cmd.indexOf('format=yuv420p');
 
       expect(ptsIdx, lessThan(cropIdx));
       expect(cropIdx, lessThan(rotIdx));
       expect(rotIdx, lessThan(scaleIdx));
       expect(scaleIdx, lessThan(denoiseIdx));
       expect(denoiseIdx, lessThan(unsharpIdx));
-      expect(unsharpIdx, lessThan(curvesIdx));
-      expect(curvesIdx, lessThan(eqIdx));
+      expect(unsharpIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
+      expect(noiseIdx, lessThan(formatIdx));
+    });
+
+    test('Video codec engine: H.264 outputs libx264 crf 22, H.265 outputs libx265 crf 26 tag hvc1', () {
+      final cmdH264 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        videoCodec: VideoCodec.h264,
+      );
+      expect(cmdH264, contains('-c:v libx264 -preset fast -crf 22'));
+      expect(cmdH264, contains('-pix_fmt yuv420p'));
+      expect(cmdH264, contains('-movflags +faststart'));
+      expect(cmdH264, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
+      expect(cmdH264, isNot(contains('curves=preset=vintage')));
+
+      final cmdH265 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        videoCodec: VideoCodec.h265,
+      );
+      expect(cmdH265, contains('-c:v libx265 -preset fast -crf 26 -tag:v hvc1'));
+      expect(cmdH265, contains('-pix_fmt yuv420p'));
+      expect(cmdH265, contains('-movflags +faststart'));
+      expect(cmdH265, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
+      expect(cmdH265, isNot(contains('curves=preset=vintage')));
     });
 
     test('Upscale to 2K dynamically maps scale filter to 1440p with deep evasion', () {

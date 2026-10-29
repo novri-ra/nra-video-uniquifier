@@ -24,6 +24,7 @@ class FfmpegService {
     bool upscale1080p = false,
     bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    VideoCodec videoCodec = VideoCodec.h264,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
     bool enableHorizontalFlip = false,
@@ -56,6 +57,7 @@ class FfmpegService {
       modifyVisuals: modifyVisuals,
       upscale: shouldUpscale,
       targetResolution: targetResolution,
+      videoCodec: videoCodec,
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableHorizontalFlip: enableHorizontalFlip,
@@ -79,6 +81,7 @@ class FfmpegService {
     bool modifyVisuals = true,
     bool upscale = false,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    VideoCodec videoCodec = VideoCodec.h264,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
     bool enableHorizontalFlip = false,
@@ -105,20 +108,23 @@ class FfmpegService {
         // 3. Resolution Scaling (Lanczos scale - orientation aware)
         if (upscale) targetResolution.scaleFilter(isPortrait: isPortrait),
 
-        // 4. Enhancements (Denoise -> Unsharp -> Curves/Color EQ)
+        // 4. Enhancements (Denoise -> Unsharp -> Micro-contrast/saturation EQ)
         if (enableEnhanceAndDenoise) ...[
           'hqdn3d=1.5:1.5:4:4',
           'unsharp=3:3:0.6:3:3:0.0',
         ],
-        if (modifyVisuals) ...[
-          'curves=preset=vintage',
-          'eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98',
-        ],
+        if (modifyVisuals) 'eq=contrast=1.03:saturation=1.04',
 
         // 5. Grain Injection (Noise)
         if (modifyVisuals) 'noise=alls=3:allf=t+u',
+
+        // 6. Explicit Termination with YUV 4:2:0 planar
+        'format=yuv420p',
       ];
-      return ' -vf "${filters.join(',')}" -c:v libx264 -preset fast -crf 19 -b:v 8M -g 60 -keyint_min 30';
+      final codecArgs = videoCodec == VideoCodec.h265
+          ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
+          : '-c:v libx264 -preset fast -crf 22';
+      return ' -vf "${filters.join(',')}" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     }
     return hasAudio ? ' -c:v copy' : '';
   }
@@ -224,6 +230,7 @@ class FfmpegService {
     bool upscale1080p = false,
     bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    VideoCodec videoCodec = VideoCodec.h264,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
     bool enableHorizontalFlip = false,
@@ -278,6 +285,7 @@ class FfmpegService {
       upscale1080p: upscale1080p,
       upscale: upscale,
       targetResolution: targetResolution,
+      videoCodec: videoCodec,
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableHorizontalFlip: enableHorizontalFlip,
