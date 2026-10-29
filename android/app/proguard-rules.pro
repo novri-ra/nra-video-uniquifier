@@ -30,3 +30,6 @@
 
 # Google Play Core & Dynamic Delivery warnings
 -dontwarn com.google.android.play.core.**
+
+# Flutter Local Notifications
+-keep class com.dexterous.flutterlocalnotifications.** { *; }

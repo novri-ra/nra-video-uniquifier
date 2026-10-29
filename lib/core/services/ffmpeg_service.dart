@@ -5,6 +5,7 @@ import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:path_provider/path_provider.dart';
 import 'media_scanner_service.dart';
+import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
 
@@ -143,6 +144,7 @@ class FfmpegService {
   /// Cancels any currently running FFmpeg operations.
   static Future<void> cancel() async {
     try {
+      await NotificationService.cancelProgressNotification();
       await FFmpegKit.cancel();
     } catch (_) {}
   }
@@ -285,12 +287,19 @@ class FfmpegService {
       isPortrait: resolvedIsPortrait,
     );
 
+    final baseName = inputPath.split(RegExp(r'[/\\]')).last;
     if (onProgress != null) {
       FFmpegKitConfig.enableStatisticsCallback((statistics) {
         final timeMs = statistics.getTime();
         final speed = statistics.getSpeed();
         final progress = totalDurationMs > 0 ? (timeMs / totalDurationMs).clamp(0.0, 1.0) : 0.0;
         onProgress(progress, speed, timeMs);
+        final percent = (progress * 100).toInt();
+        NotificationService.showProgressNotification(
+          progress: percent,
+          title: 'Uniquifying $baseName',
+          body: '$percent% complete (${speed > 0 ? speed.toStringAsFixed(1) : "1.0"}x)',
+        );
       });
     }
 
@@ -298,11 +307,17 @@ class FfmpegService {
       final finalPath = await _executeFFmpeg(command, outputPath, sourcePath: effectiveInput);
       await MediaScannerService.scanFile(finalPath);
       await inspectRenderedFile(finalPath);
+      await NotificationService.showCompleteNotification(
+        title: 'Video Processing Complete',
+        body: 'Saved to ${outputPath.split(RegExp(r"[/\\]")).last}',
+        success: true,
+      );
       return finalPath;
     } finally {
       if (onProgress != null) {
         FFmpegKitConfig.enableStatisticsCallback(null);
       }
+      await NotificationService.cancelProgressNotification();
       if (stagedFile != null && stagedFile.existsSync()) {
         try {
           if (stagedFile.path != outputPath && stagedFile.path != inputPath) {
