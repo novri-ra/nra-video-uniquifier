@@ -104,6 +104,7 @@ class BatchQueueProvider extends ChangeNotifier {
           enableAggressiveAudio: config.enableAggressiveAudio,
           enableAutoTrim: config.enableAutoTrim,
           isPortrait: null,
+          enableHardwareAcceleration: config.hardwareAcceleration,
           totalDurationMs: 0,
           onProgress: (p, speed, timeMs) {
             if (!_isCancelled && current.isProcessing) {

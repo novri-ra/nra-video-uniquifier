@@ -33,10 +33,14 @@ class FfmpegService {
     bool enableAutoTrim = false,
     int totalDurationMs = 0,
     bool isPortrait = false,
+    bool enableHardwareAcceleration = false,
   }) {
     final safeInput = _escapePath(inputPath);
     final safeOutput = _escapePath(outputPath);
     final buffer = StringBuffer('-y');
+    if (enableHardwareAcceleration) {
+      buffer.write(' -hwaccel auto');
+    }
     if (enableAutoTrim) {
       buffer.write(' -ss 0.5');
       if (totalDurationMs > 1500) {
@@ -227,17 +231,13 @@ class FfmpegService {
       final session = await FFprobeKit.getMediaInformation(path);
       final info = session.getMediaInformation();
       if (info != null) {
-        final durSec = double.tryParse(info.getDuration() ?? '') ?? 0.0;
-        final durMs = (durSec * 1000).toInt();
-        int width = 0, height = 0;
+        final durMs = ((double.tryParse(info.getDuration() ?? '') ?? 0.0) * 1000).toInt();
         for (final s in info.getStreams()) {
           if (s.getType() == 'video') {
-            width = s.getWidth() ?? 0;
-            height = s.getHeight() ?? 0;
-            break;
+            return (durationMs: durMs, width: s.getWidth() ?? 0, height: s.getHeight() ?? 0);
           }
         }
-        return (durationMs: durMs, width: width, height: height);
+        return (durationMs: durMs, width: 0, height: 0);
       }
     } catch (_) {}
     return (durationMs: 0, width: 0, height: 0);
@@ -263,6 +263,7 @@ class FfmpegService {
     bool enableAggressiveAudio = false,
     bool enableAutoTrim = false,
     bool? isPortrait,
+    bool enableHardwareAcceleration = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -310,6 +311,7 @@ class FfmpegService {
       enableAutoTrim: enableAutoTrim,
       totalDurationMs: resolvedDurationMs,
       isPortrait: resolvedIsPortrait,
+      enableHardwareAcceleration: enableHardwareAcceleration,
     );
 
     final baseName = inputPath.split(RegExp(r'[/\\]')).last;

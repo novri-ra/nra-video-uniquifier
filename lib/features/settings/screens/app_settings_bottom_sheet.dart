@@ -21,11 +21,11 @@ class _AppSettingsBottomSheetState extends State<AppSettingsBottomSheet> {
   }
 
   Future<void> _load() async {
-    final mode = await SettingsService.getEngineMode();
+    final hw = await SettingsService.getHardwareAcceleration();
     final pr = await SettingsService.getDefaultPreset();
     if (mounted) {
       setState(() {
-        _engineMode = mode;
+        _engineMode = hw ? 'hardware' : 'software';
         _preset = pr;
         _isLoading = false;
       });
@@ -101,9 +101,9 @@ class _AppSettingsBottomSheetState extends State<AppSettingsBottomSheet> {
                 title: 'DEFAULT ENCODER ENGINE',
                 value: _engineMode == 'software' ? 'Software (libx264 - Safe)' : 'Hardware (MediaCodec)',
                 onTap: () async {
-                  final newMode = _engineMode == 'software' ? 'hardware' : 'software';
-                  await SettingsService.setEngineMode(newMode);
-                  setState(() => _engineMode = newMode);
+                  final isHw = _engineMode == 'hardware';
+                  await SettingsService.setHardwareAcceleration(!isHw);
+                  setState(() => _engineMode = !isHw ? 'hardware' : 'software');
                 },
               ),
               const SizedBox(height: 12),

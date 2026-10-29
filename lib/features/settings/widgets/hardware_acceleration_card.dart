@@ -1,61 +1,68 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class HardwareAccelerationCard extends StatelessWidget {
-  final bool enabled;
-  final ValueChanged<bool> onToggle;
+  final bool? enabled;
+  final ValueChanged<bool>? onToggle;
 
   const HardwareAccelerationCard({
     super.key,
-    required this.enabled,
-    required this.onToggle,
+    this.enabled,
+    this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Row(
+    return ValueListenableBuilder<bool>(
+      valueListenable: SettingsService.hardwareAccelerationNotifier,
+      builder: (context, hwAccel, _) {
+        final active = enabled ?? hwAccel;
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: AppColors.surfaceContainerHighest),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.memory, color: AppColors.primaryContainer, size: 20),
-              SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const Row(
                 children: [
-                  Text(
-                    'Hardware Acceleration',
-                    style: TextStyle(
-                      color: AppColors.onSurface,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    'Force OpenGLES/Metal Shader Pipeline',
-                    style: TextStyle(
-                      color: AppColors.onSurfaceVariant,
-                      fontSize: 11,
-                      fontFamily: 'monospace',
-                    ),
+                  Icon(Icons.memory, color: AppColors.primaryContainer, size: 20),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hardware Acceleration',
+                        style: TextStyle(
+                          color: AppColors.onSurface,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        'Force OpenGLES/Metal Shader Pipeline',
+                        style: TextStyle(
+                          color: AppColors.onSurfaceVariant,
+                          fontSize: 11,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
+              Switch(
+                value: active,
+                onChanged: onToggle ?? SettingsService.setHardwareAcceleration,
+              ),
             ],
           ),
-          Switch(
-            value: enabled,
-            onChanged: onToggle,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

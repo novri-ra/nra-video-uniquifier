@@ -7,6 +7,7 @@ class UniquifierProvider extends ChangeNotifier {
   UniquifierProvider() {
     SettingsService.upscaleResolutionNotifier.addListener(_onResolutionNotifierChanged);
     SettingsService.videoCodecNotifier.addListener(_onCodecNotifierChanged);
+    SettingsService.hardwareAccelerationNotifier.addListener(_onHardwareAccelerationNotifierChanged);
     _initResolution();
   }
 
@@ -14,6 +15,7 @@ class UniquifierProvider extends ChangeNotifier {
   void dispose() {
     SettingsService.upscaleResolutionNotifier.removeListener(_onResolutionNotifierChanged);
     SettingsService.videoCodecNotifier.removeListener(_onCodecNotifierChanged);
+    SettingsService.hardwareAccelerationNotifier.removeListener(_onHardwareAccelerationNotifierChanged);
     super.dispose();
   }
 
@@ -31,10 +33,18 @@ class UniquifierProvider extends ChangeNotifier {
     }
   }
 
+  void _onHardwareAccelerationNotifierChanged() {
+    if (_hardwareAcceleration != SettingsService.hardwareAccelerationNotifier.value) {
+      _hardwareAcceleration = SettingsService.hardwareAccelerationNotifier.value;
+      notifyListeners();
+    }
+  }
+
   Future<void> _initResolution() async {
     try {
       _targetResolution = await SettingsService.getUpscaleResolution();
       _videoCodec = await SettingsService.getVideoCodec();
+      _hardwareAcceleration = await SettingsService.getHardwareAcceleration();
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
       _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
       _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
@@ -189,6 +199,7 @@ class UniquifierProvider extends ChangeNotifier {
 
   void toggleHardwareAcceleration(bool val) {
     _hardwareAcceleration = val;
+    SettingsService.setHardwareAcceleration(val);
     notifyListeners();
   }
 

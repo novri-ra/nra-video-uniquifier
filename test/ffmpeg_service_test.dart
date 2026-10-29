@@ -409,5 +409,14 @@ void main() {
       );
       expect(cmd, contains('-ss 0.5 -t 4.00 -i "/input.mp4"'));
     });
+
+    test('D1-02: buildCommand emits -hwaccel auto when enableHardwareAcceleration is true', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/input.mp4',
+        outputPath: '/output.mp4',
+        enableHardwareAcceleration: true,
+      );
+      expect(cmd, contains('-y -hwaccel auto -i "/input.mp4"'));
+    });
   });
 }

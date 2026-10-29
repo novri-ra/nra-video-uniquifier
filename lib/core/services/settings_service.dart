@@ -57,7 +57,7 @@ enum TargetResolution {
 }
 
 class SettingsService {
-  static const String keyEngineMode = 'app_engine_mode';
+  static const String keyHardwareAcceleration = 'app_hardware_acceleration';
   static const String keyDefaultPreset = 'app_default_preset';
   static const String keyCustomOutputPath = 'app_output_path';
   static const String keyUpscaleResolution = 'app_upscale_resolution';
@@ -69,6 +69,9 @@ class SettingsService {
   static const String keyVideoCodec = 'app_video_codec';
   static const String keyNotificationSound = 'app_notification_sound';
   static const String keyBackgroundProcessing = 'app_background_processing';
+
+  static final ValueNotifier<bool> hardwareAccelerationNotifier =
+      ValueNotifier<bool>(true);
 
   static final ValueNotifier<VideoCodec> videoCodecNotifier =
       ValueNotifier<VideoCodec>(VideoCodec.h264);
@@ -174,14 +177,17 @@ class SettingsService {
     await prefs.setBool(keyAutoTrim, enabled);
   }
 
-  static Future<String> getEngineMode() async {
+  static Future<bool> getHardwareAcceleration() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(keyEngineMode) ?? 'software';
+    final enabled = prefs.getBool(keyHardwareAcceleration) ?? true;
+    hardwareAccelerationNotifier.value = enabled;
+    return enabled;
   }
 
-  static Future<void> setEngineMode(String mode) async {
+  static Future<void> setHardwareAcceleration(bool enabled) async {
+    hardwareAccelerationNotifier.value = enabled;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(keyEngineMode, mode);
+    await prefs.setBool(keyHardwareAcceleration, enabled);
   }
 
   static Future<String> getDefaultPreset() async {

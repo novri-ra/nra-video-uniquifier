@@ -12,14 +12,18 @@ void main() {
 
   group('SettingsService - SharedPreferences persistence', () {
     test('Default values returned when unset', () async {
-      expect(await SettingsService.getEngineMode(), equals('software'));
+      expect(await SettingsService.getHardwareAcceleration(), isTrue);
       expect(await SettingsService.getDefaultPreset(), equals('balanced'));
       expect(await SettingsService.getCustomOutputPath(), isNull);
     });
 
-    test('Updating engine mode persists value', () async {
-      await SettingsService.setEngineMode('hardware');
-      expect(await SettingsService.getEngineMode(), equals('hardware'));
+    test('Updating hardware acceleration persists and broadcasts value', () async {
+      await SettingsService.setHardwareAcceleration(false);
+      expect(await SettingsService.getHardwareAcceleration(), isFalse);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
+      await SettingsService.setHardwareAcceleration(true);
+      expect(await SettingsService.getHardwareAcceleration(), isTrue);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
     });
 
     test('Updating default preset persists value', () async {

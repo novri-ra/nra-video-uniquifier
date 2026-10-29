@@ -185,11 +185,14 @@ void main() {
       expect(notifications, equals(3));
     });
 
-    test('toggleHardwareAcceleration flips mode', () {
+    test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {
       provider.toggleHardwareAcceleration(false);
       expect(provider.hardwareAcceleration, isFalse);
-      provider.toggleHardwareAcceleration(true);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
+
+      await SettingsService.setHardwareAcceleration(true);
       expect(provider.hardwareAcceleration, isTrue);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
     });
 
     test('setVideoCodec updates codec and notifies listeners', () {
