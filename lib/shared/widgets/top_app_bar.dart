@@ -40,8 +40,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                   IconButton(
                     icon: const Icon(Icons.tune, size: 18, color: AppColors.onSurfaceVariant),
                     tooltip: 'Settings',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                     onPressed: onSettingsTap,
                   ),
                 if (onSettingsTap != null && isOffline) const SizedBox(width: 4),

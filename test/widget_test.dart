@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
@@ -6,6 +7,9 @@ import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
+import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
+import 'package:nra_video_uniquifier/features/history/widgets/history_item_card.dart';
+import 'package:nra_video_uniquifier/core/services/history_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -261,6 +265,43 @@ void main() {
       await tester.tap(confirmButton);
       await tester.pumpAndSettle();
       expect(find.text('Purge cache?'), findsNothing);
+    });
+
+    testWidgets('D4-01: Touch target sizes for TopAppBar and HistoryItemCard meet >= 48x48dp', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: TopAppBar(
+              title: 'TEST',
+              onSettingsTap: () {},
+            ),
+            body: HistoryItemCard(
+              item: VideoExportItem(
+                file: File('/dummy.mp4'),
+                fileName: 'dummy.mp4',
+                bytes: 1024,
+                modified: DateTime.now(),
+              ),
+              onTap: () {},
+              onShare: () {},
+              onDelete: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final settingsTarget = tester.getSize(find.byTooltip('Settings'));
+      expect(settingsTarget.width, greaterThanOrEqualTo(48.0));
+      expect(settingsTarget.height, greaterThanOrEqualTo(48.0));
+
+      final shareTarget = tester.getSize(find.byTooltip('Share'));
+      expect(shareTarget.width, greaterThanOrEqualTo(48.0));
+      expect(shareTarget.height, greaterThanOrEqualTo(48.0));
+
+      final deleteTarget = tester.getSize(find.byTooltip('Delete'));
+      expect(deleteTarget.width, greaterThanOrEqualTo(48.0));
+      expect(deleteTarget.height, greaterThanOrEqualTo(48.0));
     });
   });
 }
