@@ -1,10 +1,11 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-31 00:25:00 UTC+07:00
+- **Timestamp**: 2026-10-31 01:10:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `4036fcc fix(storage): stage ffmpeg output in cache directory to prevent android scoped storage permission denied`
-- **Working Tree**: Sprint 54 black rotation corner triangles eliminated via inner-box crop (ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none), 112/112 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `b082166 chore(build): configure R8 full mode, resource shrinking and proguard rules for lean release`
+- **Main Branch Merge**: `ce2ba56 chore(release): merge development updates into main (Reports 47-55)`
+- **Working Tree**: Sprint 55 R8 full mode, resource shrinking, and lean split-per-ABI APK build complete (arm64: 59.0MB, armv7: 92.2MB, x86_64: 66.8MB), 112/112 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -47,6 +48,7 @@
 - [x] FFmpeg exit code 1 crash fix by hardening filtergraph syntax, escaping, and ordering (Report 52).
 - [x] FFmpeg scoped storage Permission Denied fix via two-stage internal cache rendering and MediaStore export (Report 53).
 - [x] Eliminate black corner artifacts from micro-tilt rotation filter via inner-box crop (Report 54).
+- [x] Configure R8 full-mode optimization, merge to main (ce2ba56), and build lean release split-per-ABI APKs (Report 55).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status
