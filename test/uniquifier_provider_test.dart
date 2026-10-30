@@ -200,7 +200,10 @@ void main() {
       provider.toggleChromaShift(true);
       expect(provider.enableChromaShift, isTrue);
 
-      expect(notifications, equals(9));
+      provider.setCanvasScalePercent(80.0);
+      expect(provider.canvasScalePercent, equals(80.0));
+
+      expect(notifications, equals(10));
     });
 
     test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {

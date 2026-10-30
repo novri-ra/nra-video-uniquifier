@@ -3,9 +3,14 @@ import 'settings_service.dart';
 
 /// Pure static builders for FFmpeg video and audio filtergraph chains.
 class FilterBuilders {
-  static String _buildCanvasChain({required bool isPortrait}) {
+  static String _buildCanvasChain({required bool isPortrait, double canvasScalePercent = 95.0}) {
     final bgDim = isPortrait ? '1080:1920' : '1920:1080';
-    final fgDim = isPortrait ? 'w=1026:h=1824' : 'w=1824:h=1026';
+    final targetW = isPortrait ? 1080 : 1920;
+    final targetH = isPortrait ? 1920 : 1080;
+    final factor = (canvasScalePercent / 100.0).clamp(0.0, 1.0);
+    final fgW = ((targetW * factor) / 2).floor() * 2;
+    final fgH = ((targetH * factor) / 2).floor() * 2;
+    final fgDim = 'w=$fgW:h=$fgH';
     return '[0:v]split=2[bg][fg];'
         '[bg]scale=$bgDim:force_original_aspect_ratio=increase,crop=$bgDim,boxblur=luma_radius=min(h\\,w)/40:luma_power=2[blurred];'
         '[fg]scale=$fgDim:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'
@@ -93,6 +98,7 @@ class FilterBuilders {
     bool enableHorizontalFlip = false,
     bool isPortrait = false,
     bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0,
     bool enableDynamicZoom = false,
     bool enableMicroOverlay = false,
     bool enableFrameSkip = false,
@@ -104,7 +110,7 @@ class FilterBuilders {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final String vfString;
       if (enableBlurredCanvas) {
-        final canvas = _buildCanvasChain(isPortrait: isPortrait);
+        final canvas = _buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent);
         final post = _buildPostCanvasFilters(
           modifyVisuals: modifyVisuals,
           enableHorizontalFlip: enableHorizontalFlip,

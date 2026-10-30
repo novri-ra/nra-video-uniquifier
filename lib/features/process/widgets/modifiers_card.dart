@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/setting_slider_toggle_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 
 class ModifiersHeader extends StatelessWidget {
@@ -172,12 +173,15 @@ class ModifiersCard extends StatelessWidget {
               totalCount: 3,
               initiallyExpanded: true,
               children: [
-                SettingToggleRow(
+                SettingSliderToggleRow(
                   icon: Icons.blur_on,
                   title: 'Blurred Canvas Frame',
                   subtitle: 'Padded background blur',
                   value: provider.enableBlurredCanvas,
                   onChanged: provider.toggleBlurredCanvas,
+                  sliderValue: provider.canvasScalePercent,
+                  sliderLabel: 'Scale: ${provider.canvasScalePercent.toInt()}%',
+                  onSliderChanged: provider.setCanvasScalePercent,
                 ),
                 const Divider(color: AppColors.surfaceContainerHighest, height: 1),
                 SettingToggleRow(

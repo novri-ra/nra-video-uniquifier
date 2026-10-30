@@ -70,6 +70,7 @@ class SettingsService {
   static const String keyMicroOverlay = 'app_micro_overlay';
   static const String keyFrameSkip = 'app_frame_skip';
   static const String keyChromaShift = 'app_chroma_shift';
+  static const String keyCanvasScalePercent = 'app_canvas_scale_percent';
   static const String keyVideoCodec = 'app_video_codec';
   static const String keyNotificationSound = 'app_notification_sound';
   static const String keyBackgroundProcessing = 'app_background_processing';
@@ -219,6 +220,16 @@ class SettingsService {
   static Future<void> setChromaShift(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(keyChromaShift, enabled);
+  }
+
+  static Future<double> getCanvasScalePercent() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keyCanvasScalePercent) ?? 95.0;
+  }
+
+  static Future<void> setCanvasScalePercent(double percent) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(keyCanvasScalePercent, percent);
   }
 
   static Future<bool> getHardwareAcceleration() async {

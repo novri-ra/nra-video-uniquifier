@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/hardware_acceleration_card.dart';
+import '../widgets/preset_profile_card.dart';
 import '../widgets/upscale_resolution_card.dart';
 import '../widgets/codec_selector_card.dart';
 
@@ -87,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
             const SizedBox(height: 8),
-            _PresetProfileCard(provider: provider),
+            PresetProfileCard(provider: provider),
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
             const SizedBox(height: 8),
@@ -258,76 +259,6 @@ class _AppInfoCard extends StatelessWidget {
                 SizedBox(width: 4),
                 Text('OFFLINE PRIVACY', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PresetProfileCard extends StatelessWidget {
-  final UniquifierProvider provider;
-  const _PresetProfileCard({required this.provider});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          ActionChip(
-            backgroundColor: AppColors.surfaceContainer,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            labelStyle: const TextStyle(
-              color: AppColors.onSurface,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            label: const Text('TikTok Fast'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: false,
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: true, enableAutoTrim: true,
-            ),
-          ),
-          ActionChip(
-            backgroundColor: AppColors.surfaceContainer,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            labelStyle: const TextStyle(
-              color: AppColors.onSurface,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            label: const Text('Maximum Anti-Fingerprint'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: true, upscaleTarget: '2k',
-              enableEnhanceAndDenoise: true, enableDeepAntiFingerprint: true, enableHorizontalFlip: true,
-              enableAggressiveAudio: true, enableAutoTrim: true,
-            ),
-          ),
-          ActionChip(
-            backgroundColor: AppColors.surfaceContainer,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            labelStyle: const TextStyle(
-              color: AppColors.onSurface,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-            label: const Text('Lossless Stealth'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: false, modifyVisuals: false, upscale1080p: false,
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: false, enableHorizontalFlip: false,
-              enableAggressiveAudio: false, enableAutoTrim: false,
             ),
           ),
         ],

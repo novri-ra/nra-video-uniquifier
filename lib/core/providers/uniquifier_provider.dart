@@ -52,6 +52,7 @@ class UniquifierProvider extends ChangeNotifier {
       _enableMicroOverlay = await SettingsService.getMicroOverlay();
       _enableFrameSkip = await SettingsService.getFrameSkip();
       _enableChromaShift = await SettingsService.getChromaShift();
+      _canvasScalePercent = await SettingsService.getCanvasScalePercent();
       notifyListeners();
     } catch (_) {}
   }
@@ -85,6 +86,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool _enableMicroOverlay = false;
   bool _enableFrameSkip = false;
   bool _enableChromaShift = false;
+  double _canvasScalePercent = 95.0;
+  String _activePreset = 'TikTok Fast';
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -129,6 +132,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableMicroOverlay => _enableMicroOverlay;
   bool get enableFrameSkip => _enableFrameSkip;
   bool get enableChromaShift => _enableChromaShift;
+  double get canvasScalePercent => _canvasScalePercent;
+  String get activePreset => _activePreset;
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
@@ -162,6 +167,11 @@ class UniquifierProvider extends ChangeNotifier {
   void toggleMicroOverlay(bool val) { _enableMicroOverlay = val; try { SettingsService.setMicroOverlay(val); } catch (_) {} notifyListeners(); }
   void toggleFrameSkip(bool val) { _enableFrameSkip = val; try { SettingsService.setFrameSkip(val); } catch (_) {} notifyListeners(); }
   void toggleChromaShift(bool val) { _enableChromaShift = val; try { SettingsService.setChromaShift(val); } catch (_) {} notifyListeners(); }
+  void setCanvasScalePercent(double val) {
+    _canvasScalePercent = val.clamp(0.0, 100.0);
+    try { SettingsService.setCanvasScalePercent(_canvasScalePercent); } catch (_) {}
+    notifyListeners();
+  }
 
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
@@ -202,7 +212,12 @@ class UniquifierProvider extends ChangeNotifier {
     bool enableMicroOverlay = false,
     bool enableFrameSkip = false,
     bool enableChromaShift = false,
+    String? presetName,
   }) {
+    if (presetName != null) {
+      _activePreset = presetName;
+      try { SettingsService.setDefaultPreset(presetName); } catch (_) {}
+    }
     _removeMetadata = removeMetadata;
     _modifyAudio = modifyAudio;
     _modifyVisuals = modifyVisuals;

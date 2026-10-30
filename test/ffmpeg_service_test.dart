@@ -478,6 +478,7 @@ void main() {
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
         enableBlurredCanvas: true,
+        canvasScalePercent: 95.0,
         isPortrait: true,
       );
       expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
@@ -490,10 +491,31 @@ void main() {
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
         enableBlurredCanvas: true,
+        canvasScalePercent: 95.0,
         isPortrait: false,
       );
       expect(cmdLandscape, contains(r'[bg]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
       expect(cmdLandscape, contains(r'[fg]scale=w=1824:h=1026:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'));
+
+      // Test 50% scale factor
+      final cmd50 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        canvasScalePercent: 50.0,
+        isPortrait: true,
+      );
+      expect(cmd50, contains(r'[fg]scale=w=540:h=960:force_original_aspect_ratio=decrease'));
+
+      // Test 100% scale factor
+      final cmd100 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        canvasScalePercent: 100.0,
+        isPortrait: true,
+      );
+      expect(cmd100, contains(r'[fg]scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
     });
 
     test('Mute original audio ducks volume to near-zero for platform background music overlay', () {

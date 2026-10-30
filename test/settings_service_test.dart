@@ -129,6 +129,10 @@ void main() {
       expect(await SettingsService.getChromaShift(), isFalse);
       await SettingsService.setChromaShift(true);
       expect(await SettingsService.getChromaShift(), isTrue);
+
+      expect(await SettingsService.getCanvasScalePercent(), equals(95.0));
+      await SettingsService.setCanvasScalePercent(85.0);
+      expect(await SettingsService.getCanvasScalePercent(), equals(85.0));
     });
 
     test('purgeTempCache deletes staged and thumb files safely', () async {
