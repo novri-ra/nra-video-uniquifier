@@ -1,8 +1,9 @@
-Initial production release of NRA Video Uniquifier (v1.0.0):
-- Offline video deduplication and anti-fingerprint evasion engine.
-- Orientation-aware Lanczos upscaling to 1080p, 2K, and true 4K (2160x3840 portrait / 3840x2160 landscape).
-- Deep audio spectrogram masking with synthetic pink noise and parametric EQ.
-- Batch processing queue for sequential multi-video transcoding.
-- Foreground notification progress bar and completion sound alert.
-- 100% on-device processing: zero external data transmission.
-- Release Notice: Tested on Android emulator with native bridge; physical arm64 device verification pending. Users on Snapdragon/MediaTek devices should expect similar behavior but hardware codec paths are not officially verified in this release.
+v1.0.0 — Initial Release
+
+• 100% offline video uniquification — no network required
+• Anti-fingerprint evasion: crop, tilt, grain, audio masking, metadata scrub
+• Batch processing for multiple videos at once
+• H.264 and H.265 codec selection, up to 4K output
+• Live progress notifications with completion alerts
+
+Note: Some device-specific hardware features may vary.

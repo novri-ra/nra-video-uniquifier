@@ -40,6 +40,21 @@ KEY CAPABILITIES:
 PRIVACY & DATA SAFETY:
 - 100% Offline Processing: Does not collect, transmit, or monetize your media.
 - No Accounts or Telemetry: No tracking SDKs, advertising IDs, or external network requests.
+
+System Requirements:
+- Android 7.0 or later (API 24+)
+- 2GB RAM minimum; 4GB recommended for 4K processing
+- ~200MB free storage per processed video
+
+Compatibility Notes:
+- Verified on Android emulator (API 28) with ARM64 native bridge
+- Hardware-accelerated codec behavior may vary by chipset
+- If hardware acceleration causes issues, disable it in Settings
+
+Privacy:
+- All processing happens on-device
+- No analytics, no telemetry, no network access required
+- Videos never leave your device unless you explicitly share them
 ```
 
 ## 2. Content Rating & Declarations

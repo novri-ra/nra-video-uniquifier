@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.nra_video_uniquifier"
+    namespace = "id.novrira.videouniquifier"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -26,7 +26,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.nra_video_uniquifier"
+        applicationId = "id.novrira.videouniquifier"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24
@@ -43,7 +43,10 @@ android {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias")
             keyPassword = keystoreProperties.getProperty("keyPassword")
-            storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
+            storeFile = keystoreProperties.getProperty("storeFile")?.let {
+                val f = file(it)
+                if (f.exists()) f else rootProject.file(it)
+            }
             storePassword = keystoreProperties.getProperty("storePassword")
         }
     }

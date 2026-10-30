@@ -1,4 +1,4 @@
-package com.example.nra_video_uniquifier
+package id.novrira.videouniquifier
 
 import android.content.Intent
 import android.media.MediaScannerConnection
@@ -10,7 +10,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.example.nra_video_uniquifier/media_scanner"
+    private val CHANNEL = "id.novrira.videouniquifier/media_scanner"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
