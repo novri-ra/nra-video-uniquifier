@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 23:00:00 UTC+07:00
+- **Timestamp**: 2026-10-30 23:45:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `f37c91d feat(evasion): add dynamic zoom, overlay noise, frame skip, chroma shift and group modifiers UI`
-- **Working Tree**: Sprint 51 preset profiles redesigned into obsidian tiles, in-line dynamic slider (0-100%) implemented for blurred canvas, 111/111 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `c547d86 feat(ui): redesign preset profiles card and add inline dynamic parameter sliders for modifiers`
+- **Working Tree**: Sprint 52 FFmpeg exit code 1 crash fixed, zoompan commas escaped, filter order strictly enforced (canvas/scale -> spatial -> color/curves -> noise -> decimate -> format=yuv420p), debugPrint error logging added, 111/111 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -44,6 +44,7 @@
 - [x] Deep audit of all algorithms, state wiring, and UI/UX component uniformity (Report 49).
 - [x] Advanced evasion features (dynamic zoom, micro-noise overlay, frame skip, chroma shift) and categorized accordion layout (Report 50).
 - [x] Preset profiles UI redesign and in-line dynamic parameter sliders (0% - 100%) (Report 51).
+- [x] FFmpeg exit code 1 crash fix by hardening filtergraph syntax, escaping, and ordering (Report 52).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

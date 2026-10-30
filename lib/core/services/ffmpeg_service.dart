@@ -363,6 +363,7 @@ class FfmpegService {
       if (logs != null && logs.trim().isNotEmpty) {
         buffer.write('\n\nExecution logs:\n$logs');
       }
+      debugPrint(buffer.toString());
       throw Exception(buffer.toString());
     } catch (_) {
       _deletePartialFile(outputPath, sourcePath: sourcePath);

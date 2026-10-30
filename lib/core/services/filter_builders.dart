@@ -25,20 +25,22 @@ class FilterBuilders {
     bool enableMicroOverlay = false,
     bool enableFrameSkip = false,
     bool enableChromaShift = false,
+    required bool isPortrait,
     required VideoVariations vars,
   }) {
+    final zoomDim = isPortrait ? '1080x1920' : '1920x1080';
     return <String>[
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
-      if (enableDynamicZoom)
-        "zoompan=z='if(lte(zoom,1.0),1.08,max(1.001,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=30",
       if (enableHorizontalFlip) 'hflip',
-      if (enableFrameSkip) 'decimate=cycle=25',
+      if (enableDynamicZoom)
+        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
       if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
       if (modifyVisuals)
         'eq=brightness=${vars.brightness.toStringAsFixed(4)}:contrast=${vars.contrast.toStringAsFixed(4)}:saturation=${vars.saturation.toStringAsFixed(4)}',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
+      if (enableFrameSkip) 'decimate=cycle=25',
       'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
     ];
@@ -64,15 +66,14 @@ class FilterBuilders {
     final zoomDim = isPortrait ? '1080x1920' : '1920x1080';
     return <String>[
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
-      if (enableDynamicZoom)
-        "zoompan=z='if(lte(zoom,1.0),1.08,max(1.001,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
       if (modifyVisuals && enableDeepAntiFingerprint) ...[
         'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
         'rotate=$rot:ow=trunc(rotw($rot)/2)*2:oh=trunc(roth($rot)/2)*2:fillcolor=black',
       ] else if (modifyVisuals)
         'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
       if (enableHorizontalFlip) 'hflip',
-      if (enableFrameSkip) 'decimate=cycle=25',
+      if (enableDynamicZoom)
+        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
       if (upscale) targetResolution.scaleFilter(isPortrait: isPortrait),
       if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
@@ -80,6 +81,7 @@ class FilterBuilders {
         'eq=brightness=${vars.brightness.toStringAsFixed(4)}:contrast=${vars.contrast.toStringAsFixed(4)}:saturation=${vars.saturation.toStringAsFixed(4)}',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
+      if (enableFrameSkip) 'decimate=cycle=25',
       'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
     ];
@@ -119,6 +121,7 @@ class FilterBuilders {
           enableMicroOverlay: enableMicroOverlay,
           enableFrameSkip: enableFrameSkip,
           enableChromaShift: enableChromaShift,
+          isPortrait: isPortrait,
           vars: vars,
         );
         vfString = '$canvas;[outv]${post.join(',')}';

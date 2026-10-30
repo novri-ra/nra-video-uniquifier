@@ -541,7 +541,7 @@ void main() {
         enableMicroOverlay: true,
         isPortrait: true,
       );
-      expect(cmd, contains('zoompan=z='));
+      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'"));
       expect(cmd, contains('s=1080x1920:fps=30'));
       expect(cmd, contains('decimate=cycle=25'));
       expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
@@ -577,7 +577,7 @@ void main() {
       expect(cmd, contains('-map_metadata -1')); // 1. removeMetadata
       expect(cmd, contains('-ss 0.5 -t 4.00')); // 2. autoTrim
       expect(cmd, contains(r'[0:v]split=2[bg][fg];')); // 3. blurredCanvas
-      expect(cmd, contains('zoompan=z=')); // 4. dynamicZoom
+      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'")); // 4. dynamicZoom
       expect(cmd, contains('hflip')); // 5. horizontalFlip
       expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4')); // 7. denoise
@@ -589,6 +589,20 @@ void main() {
       expect(cmd, contains('-tag:v hvc1')); // hvc1 tag
       expect(cmd, contains('volume=0.01')); // 11. muteOriginalAudio / 12. modifyAudio
       expect(cmd, contains('atempo=')); // A/V sync tempo
+
+      // Verify strict filter ordering: canvas -> spatial -> color/curves -> noise -> decimate -> format=yuv420p
+      final idxCanvas = cmd.indexOf('overlay=');
+      final idxZoom = cmd.indexOf('zoompan=');
+      final idxCurves = cmd.indexOf('curves=');
+      final idxNoise = cmd.indexOf('noise=alls=5');
+      final idxDecimate = cmd.indexOf('decimate=cycle=25');
+      final idxFormat = cmd.indexOf('format=yuv420p');
+
+      expect(idxCanvas < idxZoom, isTrue, reason: 'Canvas must precede zoompan');
+      expect(idxZoom < idxCurves, isTrue, reason: 'Spatial zoom must precede color curves');
+      expect(idxCurves < idxNoise, isTrue, reason: 'Color curves must precede noise');
+      expect(idxNoise < idxDecimate, isTrue, reason: 'Noise must precede decimate');
+      expect(idxDecimate < idxFormat, isTrue, reason: 'Decimate must precede format=yuv420p');
     });
 
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
