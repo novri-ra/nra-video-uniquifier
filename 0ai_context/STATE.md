@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 13:00:00 UTC+07:00
+- **Timestamp**: 2026-10-30 13:45:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `d9b8b89 refactor(ffmpeg): extract filter builders to FilterBuilders [P2-L-EXT-2]`
-- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 5 ffmpeg_service decomposition complete, 99/99 tests passed, analyze 0 errors.
+- **HEAD Commit**: `3565d47 refactor(settings): extract CodecSelectorCard from SettingsScreen [P2-L-EXT-3]`
+- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 6 settings_screen decomposition complete, all 35 lib files <= 367 LOC, 99/99 tests passed, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -34,16 +34,17 @@
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-30T05:55:00Z
-- **Index Counts**: 1444 nodes, 3690 edges, status ready.
+- **Indexed At**: 2026-10-30T06:40:00Z
+- **Index Counts**: 1467 nodes, 3729 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
-All critical modules strictly respect the <= 400 lines ceiling:
-1. `lib/features/settings/screens/settings_screen.dart` — 394 lines
-2. `lib/core/providers/uniquifier_provider.dart` — 367 lines
-3. `lib/core/services/ffmpeg_service.dart` — 325 lines
-4. `lib/features/process/screens/processing_screen.dart` — 318 lines
-5. `lib/features/process/widgets/source_file_section.dart` — 316 lines
+All critical modules strictly respect the <= 400 lines ceiling (all files <= 367 lines):
+1. `lib/core/providers/uniquifier_provider.dart` — 367 lines
+2. `lib/core/services/ffmpeg_service.dart` — 325 lines
+3. `lib/features/process/screens/processing_screen.dart` — 318 lines
+4. `lib/features/process/widgets/source_file_section.dart` — 316 lines
+5. `lib/features/process/screens/success_screen.dart` — 308 lines
+(Note: `lib/features/settings/screens/settings_screen.dart` reduced to 305 lines).
 
 ## 5. Hygiene & Dead Code Audit
 - **Junk Scan**: Scanned for `__pycache__`, `.DS_Store`, `Thumbs.db`, `*.tmp`, `*.log`. None found in tracked source paths.
@@ -51,7 +52,7 @@ All critical modules strictly respect the <= 400 lines ceiling:
 - **Dead Code Audit**:
   - Query: `tools["codebase-memory-mcp"].search_graph({ file_pattern: "lib/.*", max_degree: 0 })`
   - Result: 0 unreferenced symbols found in `lib/`.
-  - Manual import scan: All 34 Dart source files in `lib/` are actively imported and exercised in test suites.
+  - Manual import scan: All 35 Dart source files in `lib/` are actively imported and exercised in test suites.
 - **Dead Code Candidates**: 0 candidates flagged.
 
 ## 6. Skills Status
