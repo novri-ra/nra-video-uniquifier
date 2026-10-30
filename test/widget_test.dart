@@ -7,6 +7,7 @@ import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
 import 'package:nra_video_uniquifier/features/process/screens/processing_screen.dart';
+import 'package:nra_video_uniquifier/features/process/screens/error_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_radar_indicator.dart';
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
@@ -359,6 +360,21 @@ void main() {
       await tester.pumpWidget(const SizedBox());
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('D6-02: ErrorScreen redacts absolute user paths from rendered summary', (tester) async {
+      const sensitivePath = '/storage/emulated/0/Movies/private_video.mp4';
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: ErrorScreen(
+            errorDetails: 'Failed to transcode: $sensitivePath: permission denied',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('/storage/emulated/0/'), findsNothing);
+      expect(find.textContaining('<external storage>/...'), findsOneWidget);
     });
   });
 }
