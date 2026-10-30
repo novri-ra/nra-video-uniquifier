@@ -5,3 +5,4 @@ Initial production release of NRA Video Uniquifier (v1.0.0):
 - Batch processing queue for sequential multi-video transcoding.
 - Foreground notification progress bar and completion sound alert.
 - 100% on-device processing: zero external data transmission.
+- Release Notice: Tested on Android emulator with native bridge; physical arm64 device verification pending. Users on Snapdragon/MediaTek devices should expect similar behavior but hardware codec paths are not officially verified in this release.

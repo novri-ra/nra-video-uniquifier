@@ -121,7 +121,14 @@ ffprobe -v error -select_streams v:0 -show_entries stream=width,height,codec_nam
 
 - Artefak `app-arm64-v8a-release.apk` (59.7 MB) telah terinstal dan terverifikasi berjalan pada runtime Android dengan native translation.
 - Seluruh pipeline Dart, file staging, FFmpeg filtergraph generator, dan pemanggilan platform channel terbukti berfungsi 100%.
-- Pengujian perangkat fisik murni tetap disarankan sebelum distribusi massal untuk memverifikasi performa spesifik chipset hardware encoder (misal MediaTek Dimensity / Snapdragon NVENC) pada video 4K 60fps.
+
+### 6.1 Koreksi: ARM64 Bridge vs ARM64 Native [ERRATA-14]
+
+> **Koreksi Pernyataan Rilis**: V48 dan V49 membuktikan bahwa APK `arm64-v8a` terpasang dan kode ARM64 dapat dieksekusi pada emulator x86_64 melalui Android native bridge. Namun ini **BUKAN** verifikasi ARM64 native pada perangkat fisik. Yang **TIDAK** terverifikasi meliputi:
+> (a) MediaCodec hardware encoder arm64 (Qualcomm Snapdragon / MediaTek Dimensity / Samsung Exynos),
+> (b) perilaku thermal throttling pada chipset smartphone riil,
+> (c) low-memory-killer (LMK) saat batch render video resolusi 4K.
+> Pengujian pada perangkat fisik arm64 riil tetap diperlukan sebelum rilis final `arm64-v8a` ke Google Play Store.
 
 ---
 
