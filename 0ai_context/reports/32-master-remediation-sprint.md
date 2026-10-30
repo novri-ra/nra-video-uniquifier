@@ -188,9 +188,11 @@ Seluruh proses remediasi pada Sprint 2 diselesaikan dengan mematuhi kaidah isola
 
 ## 11. Sprint 3 Corrections
 
+> Note: E10, E12, and E13 commit references updated in Sprint 4 to cite actual correction commit `7cf624f` rather than initial report generation `853cb43`.
+
 | # | Correction | Evidence | Commit |
 |---|---|---|---|
-| **E10** | Phase 2 count corrected to 10 Done / 1 Partial / 2 Blocked of 13 | §1 table | `853cb43` |
+| **E10** | Phase 2 count corrected to 10 Done / 1 Partial / 2 Blocked of 13 | §1 table | `7cf624f` |
 | **E11** | P2-I false green test removed/replaced with explicit skip | `test/batch_queue_provider_test.dart:138-148` | `6bd5854` |
-| **E12** | P2-L status -> DEFERRED_TO_SPRINT_4 with rationale | §1, §6.2 | `853cb43` |
-| **E13** | Structural slack warning added | §6.3 | `853cb43` |
+| **E12** | P2-L status -> DEFERRED_TO_SPRINT_4 with rationale | §1, §6.2 | `7cf624f` |
+| **E13** | Structural slack warning added | §6.3 | `7cf624f` |
