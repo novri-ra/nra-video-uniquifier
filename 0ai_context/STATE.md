@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-31 00:05:00 UTC+07:00
+- **Timestamp**: 2026-10-31 00:25:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `ca4d7dd fix(pipeline): resolve ffmpeg exit code 1 crash by hardening evasion filtergraph syntax and argument escaping`
-- **Working Tree**: Sprint 53 scoped storage permission denied remediated by two-stage internal sandbox cache rendering and MediaStore export, 112/112 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `4036fcc fix(storage): stage ffmpeg output in cache directory to prevent android scoped storage permission denied`
+- **Working Tree**: Sprint 54 black rotation corner triangles eliminated via inner-box crop (ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none), 112/112 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -46,6 +46,7 @@
 - [x] Preset profiles UI redesign and in-line dynamic parameter sliders (0% - 100%) (Report 51).
 - [x] FFmpeg exit code 1 crash fix by hardening filtergraph syntax, escaping, and ordering (Report 52).
 - [x] FFmpeg scoped storage Permission Denied fix via two-stage internal cache rendering and MediaStore export (Report 53).
+- [x] Eliminate black corner artifacts from micro-tilt rotation filter via inner-box crop (Report 54).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

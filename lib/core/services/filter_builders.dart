@@ -68,7 +68,7 @@ class FilterBuilders {
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
       if (modifyVisuals && enableDeepAntiFingerprint) ...[
         'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
-        'rotate=$rot:ow=trunc(rotw($rot)/2)*2:oh=trunc(roth($rot)/2)*2:fillcolor=black',
+        'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
       ] else if (modifyVisuals)
         'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
       if (enableHorizontalFlip) 'hflip',

@@ -344,7 +344,7 @@ void main() {
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
     });
 
-    test('Macroblock parity: rotation strictly enforces even dimensions without upscale', () {
+    test('Macroblock parity & black corner defense: rotation enforces inner-box crop with even dimensions', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -353,8 +353,10 @@ void main() {
         upscale: false,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('ow=trunc(rotw('));
-      expect(cmd, contains('oh=trunc(roth('));
+      expect(cmd, contains('ow=trunc(iw*0.96/2)*2'));
+      expect(cmd, contains('oh=trunc(ih*0.96/2)*2'));
+      expect(cmd, contains('c=none'));
+      expect(cmd, isNot(contains('fillcolor=black')));
     });
 
     test('Audio-Visual timing alignment: tempo is pure reciprocal of speedFactor matching PTS without compound drift', () {
