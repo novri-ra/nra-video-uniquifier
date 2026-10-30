@@ -145,10 +145,7 @@ class _VideoThumbnail extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (hasThumb)
-            Image.file(
-              File(thumbnailPath!),
-              fit: BoxFit.cover,
-            )
+            Image.file(File(thumbnailPath!), cacheWidth: 240, cacheHeight: 240, fit: BoxFit.cover)
           else
             const Center(child: Icon(Icons.videocam, color: AppColors.primaryContainer, size: 24)),
           Positioned(
