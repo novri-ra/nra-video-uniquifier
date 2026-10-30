@@ -134,16 +134,5 @@ void main() {
       expect(item2.status, BatchItemStatus.failed);
       expect(provider.isProcessing, isFalse);
     });
-
-    test(
-      'D5-02: batch runner passes suppressCompleteNotification: true',
-      () async {
-        final provider = BatchQueueProvider();
-        final dummyConfig = UniquifierProvider();
-        await provider.runBatch(dummyConfig);
-        expect(provider.isProcessing, isFalse);
-      },
-      skip: 'requires NotificationService injectability — see Report 32 §6.1',
-    );
   });
 }
