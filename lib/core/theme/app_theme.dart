@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Obsidian Surfaces
-  static const Color background = Color(0xFF131315);
   static const Color surface = Color(0xFF131315);
-  static const Color surfaceDim = Color(0xFF131315);
-  static const Color surfaceBright = Color(0xFF39393B);
   static const Color surfaceContainerLowest = Color(0xFF0E0E10);
   static const Color surfaceContainerLow = Color(0xFF1C1B1D);
   static const Color surfaceContainer = Color(0xFF201F21);
@@ -19,8 +16,6 @@ class AppColors {
   static const Color onPrimaryContainer = Color(0xFF006847);
   static const Color secondary = Color(0xFF4DFFB2);
   static const Color onSecondary = Color(0xFF003822);
-  static const Color secondaryContainer = Color(0xFF00E296);
-  static const Color surfaceTint = Color(0xFF00E29E);
 
   // Text & Outlines
   static const Color onSurface = Color(0xFFE5E1E4);

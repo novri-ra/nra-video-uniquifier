@@ -2,32 +2,47 @@ import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
+import '../utils/formatters.dart';
 
 class UniquifierProvider extends ChangeNotifier {
   UniquifierProvider() {
     SettingsService.upscaleResolutionNotifier.addListener(_onResolutionNotifierChanged);
+    SettingsService.videoCodecNotifier.addListener(_onCodecNotifierChanged);
+    SettingsService.hardwareAccelerationNotifier.addListener(_onHardwareAccelerationNotifierChanged);
     _initResolution();
   }
 
   @override
   void dispose() {
     SettingsService.upscaleResolutionNotifier.removeListener(_onResolutionNotifierChanged);
+    SettingsService.videoCodecNotifier.removeListener(_onCodecNotifierChanged);
+    SettingsService.hardwareAccelerationNotifier.removeListener(_onHardwareAccelerationNotifierChanged);
     super.dispose();
   }
 
   void _onResolutionNotifierChanged() {
-    if (_targetResolution != SettingsService.upscaleResolutionNotifier.value) {
-      _targetResolution = SettingsService.upscaleResolutionNotifier.value;
-      notifyListeners();
-    }
+    if (_targetResolution == SettingsService.upscaleResolutionNotifier.value) return;
+    _targetResolution = SettingsService.upscaleResolutionNotifier.value;
+    notifyListeners();
+  }
+
+  void _onCodecNotifierChanged() {
+    if (_videoCodec == SettingsService.videoCodecNotifier.value) return;
+    _videoCodec = SettingsService.videoCodecNotifier.value;
+    notifyListeners();
+  }
+
+  void _onHardwareAccelerationNotifierChanged() {
+    if (_hardwareAcceleration == SettingsService.hardwareAccelerationNotifier.value) return;
+    _hardwareAcceleration = SettingsService.hardwareAccelerationNotifier.value;
+    notifyListeners();
   }
 
   Future<void> _initResolution() async {
     try {
-      final res = await SettingsService.getUpscaleResolution();
-      if (_targetResolution != res) {
-        _targetResolution = res;
-      }
+      _targetResolution = await SettingsService.getUpscaleResolution();
+      _videoCodec = await SettingsService.getVideoCodec();
+      _hardwareAcceleration = await SettingsService.getHardwareAcceleration();
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
       _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
       _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
@@ -37,27 +52,17 @@ class UniquifierProvider extends ChangeNotifier {
     } catch (_) {}
   }
   // Source Video State (initial is null / empty)
-  String? _selectedFileName;
-  String? _selectedFilePath;
-  String? _thumbnailPath;
-  String _fileResolution = '1080×1920';
+  String? _selectedFileName, _selectedFilePath, _thumbnailPath;
+  String _fileResolution = '1080×1920', _fileSize = '0 B', _fileCodec = 'H.264', _fps = '30 FPS', _audioInfo = 'AAC 48kHz', _duration = '0:00', _sha256 = '';
   bool _isPortrait = true;
-  String _fileSize = '0 B';
-  String _fileCodec = 'H.264';
-  String _fps = '30 FPS';
-  String _audioInfo = 'AAC 48kHz';
-  String _duration = '0:00';
-  String _sha256 = '';
   int _totalDurationMs = 0;
 
   // Real-time Telemetry
-  double _realtimeProgress = 0.0;
-  double _renderingSpeed = 1.0;
+  double _realtimeProgress = 0.0, _renderingSpeed = 1.0;
   String _eta = 'Calculating...';
 
   // Last processed output & Output thumbnail
-  String? _lastProcessedOutputPath;
-  String? _outputThumbnailPath;
+  String? _lastProcessedOutputPath, _outputThumbnailPath;
   RenderDiagnosticInfo? _lastDiagnosticInfo;
 
   // Toggle Settings
@@ -70,9 +75,12 @@ class UniquifierProvider extends ChangeNotifier {
   bool _enableHorizontalFlip = false;
   bool _enableAggressiveAudio = false;
   bool _enableAutoTrim = false;
+  bool _enableBlurredCanvas = false;
+  bool _muteOriginalAudio = false;
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
+  VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
 
   // Navigation
@@ -107,9 +115,12 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableHorizontalFlip => _enableHorizontalFlip;
   bool get enableAggressiveAudio => _enableAggressiveAudio;
   bool get enableAutoTrim => _enableAutoTrim;
+  bool get enableBlurredCanvas => _enableBlurredCanvas;
+  bool get muteOriginalAudio => _muteOriginalAudio;
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
+  VideoCodec get videoCodec => _videoCodec;
   String get selectedUpscaleTarget => _targetResolution.key;
   String get targetResolutionLabel => _targetResolution.label;
   String get targetResolutionDetails => _targetResolution.details;
@@ -117,6 +128,14 @@ class UniquifierProvider extends ChangeNotifier {
   int get currentTabIndex => _currentTabIndex;
 
   // Actions
+  void setVideoCodec(VideoCodec codec) {
+    _videoCodec = codec;
+    try {
+      SettingsService.setVideoCodec(codec);
+    } catch (_) {}
+    notifyListeners();
+  }
+
   void setTabIndex(int index) {
     _currentTabIndex = index;
     notifyListeners();
@@ -144,41 +163,41 @@ class UniquifierProvider extends ChangeNotifier {
 
   void toggleEnhanceAndDenoise(bool val) {
     _enableEnhanceAndDenoise = val;
-    try {
-      SettingsService.setEnhanceAndDenoise(val);
-    } catch (_) {}
+    try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleDeepAntiFingerprint(bool val) {
     _enableDeepAntiFingerprint = val;
-    try {
-      SettingsService.setDeepAntiFingerprint(val);
-    } catch (_) {}
+    try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleHorizontalFlip(bool val) {
     _enableHorizontalFlip = val;
-    try {
-      SettingsService.setHorizontalFlip(val);
-    } catch (_) {}
+    try { SettingsService.setHorizontalFlip(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleAggressiveAudio(bool val) {
     _enableAggressiveAudio = val;
-    try {
-      SettingsService.setAggressiveAudio(val);
-    } catch (_) {}
+    try { SettingsService.setAggressiveAudio(val); } catch (_) {}
     notifyListeners();
   }
 
   void toggleAutoTrim(bool val) {
     _enableAutoTrim = val;
-    try {
-      SettingsService.setAutoTrim(val);
-    } catch (_) {}
+    try { SettingsService.setAutoTrim(val); } catch (_) {}
+    notifyListeners();
+  }
+
+  void toggleBlurredCanvas(bool val) {
+    _enableBlurredCanvas = val;
+    notifyListeners();
+  }
+
+  void toggleMuteOriginalAudio(bool val) {
+    _muteOriginalAudio = val;
     notifyListeners();
   }
 
@@ -192,17 +211,19 @@ class UniquifierProvider extends ChangeNotifier {
 
   void toggleHardwareAcceleration(bool val) {
     _hardwareAcceleration = val;
+    SettingsService.setHardwareAcceleration(val);
     notifyListeners();
   }
 
   void updateRealtimeStats(double progress, double speed, int timeMs) {
     _realtimeProgress = progress;
     _renderingSpeed = speed > 0 ? speed : 1.0;
-    if (_totalDurationMs > 0 && timeMs > 0) {
-      final remMs = (_totalDurationMs - timeMs).clamp(0, 3600000);
-      final remSec = (remMs / (_renderingSpeed * 1000)).ceil();
-      _eta = '${(remSec ~/ 60).toString().padLeft(2, '0')}:${(remSec % 60).toString().padLeft(2, '0')}s rem';
-    }
+    _eta = Formatters.formatEta(
+      totalDurationMs: _totalDurationMs,
+      timeMs: timeMs,
+      speed: _renderingSpeed,
+      defaultEta: _eta,
+    );
     notifyListeners();
   }
 
@@ -257,11 +278,6 @@ class UniquifierProvider extends ChangeNotifier {
     _inspectOutputDiagnosticsAsync(outputPath);
   }
 
-  void setOutputThumbnail(String? thumbPath) {
-    _outputThumbnailPath = thumbPath;
-    notifyListeners();
-  }
-
   Future<void> _inspectOutputDiagnosticsAsync(String outputPath) async {
     try {
       final diag = await FfmpegService.inspectRenderedFile(outputPath);
@@ -289,7 +305,7 @@ class UniquifierProvider extends ChangeNotifier {
   }) {
     _selectedFilePath = path;
     _selectedFileName = name;
-    _fileSize = _formatBytes(sizeBytes);
+    _fileSize = Formatters.formatFileSize(sizeBytes);
     _fileResolution = '1080×1920';
     _fileCodec = name.toLowerCase().endsWith('.mov') ? 'ProRes/H.264' : 'H.264';
     _fps = '30 FPS';
@@ -335,8 +351,7 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   void _applyVideoStream(dynamic s) {
-    final width = s.getWidth();
-    final height = s.getHeight();
+    final width = s.getWidth(), height = s.getHeight();
     if (width != null && height != null) {
       _fileResolution = '$width×$height';
       _isPortrait = height >= width;
@@ -348,12 +363,7 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   void _applyAudioStream(dynamic s) {
-    final sampleRate = s.getSampleRate();
-    final audioCodec = s.getCodec()?.toUpperCase() ?? 'AAC';
-    final sampleKhz = sampleRate != null && int.tryParse(sampleRate) != null
-        ? '${(int.parse(sampleRate) / 1000).toStringAsFixed(0)}kHz'
-        : '48kHz';
-    _audioInfo = '$audioCodec $sampleKhz';
+    _audioInfo = Formatters.formatAudioInfo(s.getCodec(), s.getSampleRate());
   }
 
   void _applyMediaDuration(String? durationStr) {
@@ -364,33 +374,8 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   /// Formats raw seconds or duration strings to mm:ss or hh:mm:ss display.
-  static String formatDuration(String? durationStr) {
-    if (durationStr == null) return '0:00';
-    final sec = double.tryParse(durationStr)?.toInt() ?? 0;
-    if (sec <= 0) return '0:00';
-    final minutes = sec ~/ 60;
-    final remainingSec = sec % 60;
-    if (minutes >= 60) {
-      final hours = minutes ~/ 60;
-      final remMin = minutes % 60;
-      return '$hours:${remMin.toString().padLeft(2, '0')}:${remainingSec.toString().padLeft(2, '0')}';
-    }
-    return '$minutes:${remainingSec.toString().padLeft(2, '0')}';
-  }
+  static String formatDuration(String? durationStr) => Formatters.formatDuration(durationStr);
 
   /// Formats byte count into human-readable string (B, KB, MB, GB).
-  static String formatFileSize(int bytes) => _formatBytes(bytes);
-  static String formatBytes(int bytes) => _formatBytes(bytes);
-
-  static String _formatBytes(int bytes) {
-    if (bytes <= 0) return '0 B';
-    const suffixes = ['B', 'KB', 'MB', 'GB'];
-    int i = 0;
-    double d = bytes.toDouble();
-    while (d >= 1024 && i < suffixes.length - 1) {
-      d /= 1024;
-      i++;
-    }
-    return '${d.toStringAsFixed(1)} ${suffixes[i]}';
-  }
+  static String formatFileSize(int bytes) => Formatters.formatFileSize(bytes);
 }

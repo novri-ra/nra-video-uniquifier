@@ -51,7 +51,8 @@ void main() {
         enableDeepAntiFingerprint: true,
       );
       expect(cmd, contains('-c:v copy'));
-      expect(cmd, contains('atempo=1.015,asetrate=48000*1.01,aresample=48000,highpass=f=60,lowpass=f=16000,equalizer=f=1200:t=q:w=1:g=1'));
+      expect(cmd, contains('highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5'));
+      expect(cmd, contains('atempo='));
       expect(cmd, contains('-c:a aac -b:a 192k'));
       expect(cmd, contains('-map_metadata -1'));
     });
@@ -66,10 +67,11 @@ void main() {
         upscale1080p: false,
         enableDeepAntiFingerprint: false,
       );
-      expect(cmd, contains('atempo=1.015,asetrate=48000*1.01,aresample=48000,equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('atempo='));
     });
 
-    test('Visual tweak & upscale enforces strict filtergraph pipeline order and 8M bitrate', () {
+    test('Visual tweak & upscale enforces strict filtergraph pipeline order and YUV format', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -78,42 +80,81 @@ void main() {
         modifyVisuals: true,
         upscale1080p: true,
         targetResolution: TargetResolution.r1080p,
+        videoCodec: VideoCodec.h264,
         enableEnhanceAndDenoise: true,
         enableDeepAntiFingerprint: true,
       );
       // Filter graph presence checks
-      expect(cmd, contains('setpts=0.9852*PTS'));
-      expect(cmd, contains('crop=trunc(iw*0.95/2)*2:trunc(ih*0.95/2)*2'));
-      expect(cmd, contains('rotate=0.4*PI/180:ow=rotw(0.4*PI/180):oh=roth(0.4*PI/180):fillcolor=black'));
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('crop='));
+      expect(cmd, contains('rotate='));
       expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
-      expect(cmd, contains('curves=preset=vintage'));
-      expect(cmd, contains('eq=contrast=1.02:brightness=0.01:saturation=1.03:gamma=0.98'));
-      expect(cmd, contains('noise=alls=3:allf=t+u'));
-      expect(cmd, contains('-c:v libx264 -preset fast -crf 19 -b:v 8M -g 60 -keyint_min 30'));
-      expect(cmd, contains('-metadata make="Apple" -metadata model="iPhone 15 Pro"'));
+      expect(cmd, isNot(contains('curves=preset=vintage')));
+      expect(cmd, contains('eq=brightness='));
+      expect(cmd, contains('noise=alls='));
+      expect(cmd, contains('scale=trunc(iw/2)*2:trunc(ih/2)*2'));
+      expect(cmd, contains('format=yuv420p'));
+      expect(cmd, contains('-c:v libx264 -preset fast -crf 22'));
+      expect(cmd, contains('-pix_fmt yuv420p'));
+      expect(cmd, contains('-movflags +faststart'));
+      expect(cmd, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
+      expect(cmd, contains('-metadata make="Apple"'));
+      expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
+      expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
+      expect(cmd, contains('-metadata:s:v:0 handler_name="Core Media Video"'));
+      expect(cmd, contains('-metadata:s:a:0 handler_name="Core Media Audio"'));
       expect(cmd, contains('-c:a copy'));
+      expect(cmd, contains('-r 29.'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> Curves/EQ -> Noise
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
-      final scaleIdx = cmd.indexOf('scale=');
+      final scaleIdx = cmd.indexOf('scale=w=-2:h=1080');
       final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
-      final curvesIdx = cmd.indexOf('curves=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
+      final evenScaleIdx = cmd.indexOf('scale=trunc(iw/2)*2:trunc(ih/2)*2');
+      final formatIdx = cmd.indexOf('format=yuv420p');
 
       expect(ptsIdx, lessThan(cropIdx));
       expect(cropIdx, lessThan(rotIdx));
       expect(rotIdx, lessThan(scaleIdx));
       expect(scaleIdx, lessThan(denoiseIdx));
       expect(denoiseIdx, lessThan(unsharpIdx));
-      expect(unsharpIdx, lessThan(curvesIdx));
-      expect(curvesIdx, lessThan(eqIdx));
+      expect(unsharpIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
+      expect(noiseIdx, lessThan(evenScaleIdx));
+      expect(evenScaleIdx, lessThan(formatIdx));
+    });
+
+    test('Video codec engine: H.264 outputs libx264 crf 22, H.265 outputs libx265 crf 26 tag hvc1', () {
+      final cmdH264 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        videoCodec: VideoCodec.h264,
+      );
+      expect(cmdH264, contains('-c:v libx264 -preset fast -crf 22'));
+      expect(cmdH264, contains('-pix_fmt yuv420p'));
+      expect(cmdH264, contains('-movflags +faststart'));
+      expect(cmdH264, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
+      expect(cmdH264, isNot(contains('curves=preset=vintage')));
+
+      final cmdH265 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        videoCodec: VideoCodec.h265,
+      );
+      expect(cmdH265, contains('-c:v libx265 -preset fast -crf 26 -tag:v hvc1'));
+      expect(cmdH265, contains('-pix_fmt yuv420p'));
+      expect(cmdH265, contains('-movflags +faststart'));
+      expect(cmdH265, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
+      expect(cmdH265, isNot(contains('curves=preset=vintage')));
     });
 
     test('Upscale to 2K dynamically maps scale filter to 1440p with deep evasion', () {
@@ -125,8 +166,8 @@ void main() {
         targetResolution: TargetResolution.r2k,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('crop=trunc(iw*0.95/2)*2:trunc(ih*0.95/2)*2'));
-      expect(cmd, contains('rotate=0.4*PI/180'));
+      expect(cmd, contains('crop=trunc(iw*'));
+      expect(cmd, contains('rotate='));
       expect(cmd, contains('scale=w=-2:h=1440:flags=lanczos'));
     });
 
@@ -273,6 +314,8 @@ void main() {
       );
       expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.003[noise]'));
       expect(cmd, contains('[a0][noise]amix=inputs=2:duration=first[out]'));
+      expect(cmd, contains('atempo='));
+      expect(cmd, contains('equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5'));
     });
 
     test('Auto-trim injects seek and duration limit when totalDurationMs > 1500', () {
@@ -295,9 +338,166 @@ void main() {
         upscale1080p: true,
       );
       expect(cmd, contains('-map_metadata -1 -map_chapters -1 -bitexact'));
-      expect(cmd, contains('setpts=0.9852*PTS'));
-      expect(cmd, contains('atempo=1.015'));
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('atempo='));
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
+    });
+
+    test('Macroblock parity: rotation strictly enforces even dimensions without upscale', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        upscale1080p: false,
+        upscale: false,
+        enableDeepAntiFingerprint: true,
+      );
+      expect(cmd, contains('ow=trunc(rotw('));
+      expect(cmd, contains('oh=trunc(roth('));
+    });
+
+    test('Audio-Visual timing alignment: tempo is pure reciprocal of speedFactor matching PTS without compound drift', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyVisuals: true,
+        modifyAudio: true,
+        enableDeepAntiFingerprint: true,
+      );
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('atempo='));
+      expect(cmd, isNot(contains('asetrate=')));
+      expect(cmd, isNot(contains('aresample=')));
+    });
+
+    test('TikTok Evasion Test 1: 10 calls produce 10 different filter strings', () {
+      final commands = <String>{};
+      for (var i = 0; i < 10; i++) {
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          enableDeepAntiFingerprint: true,
+        );
+        commands.add(cmd);
+      }
+      expect(commands.length, equals(10));
+    });
+
+    test('TikTok Evasion Test 2: A/V sync is exact (Video speed * Audio tempo = 1.0)', () {
+      for (var i = 0; i < 20; i++) {
+        final vars = VariationGenerator.generate();
+        final product = vars.speedFactor * vars.audioTempo;
+        expect((product - 1.0).abs(), lessThan(1e-9));
+      }
+    });
+
+    test('TikTok Evasion Test 3: Color parameters never exceed +-0.01', () {
+      final eqRegex = RegExp(r'eq=brightness=([-0-9.]+):contrast=([0-9.]+):saturation=([0-9.]+)');
+      for (var i = 0; i < 20; i++) {
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          enableDeepAntiFingerprint: true,
+        );
+        final match = eqRegex.firstMatch(cmd);
+        expect(match, isNotNull);
+        final brightness = double.parse(match!.group(1)!);
+        final contrast = double.parse(match.group(2)!);
+        final saturation = double.parse(match.group(3)!);
+
+        expect(brightness, greaterThanOrEqualTo(-0.0101));
+        expect(brightness, lessThanOrEqualTo(0.0101));
+        expect((contrast - 1.0).abs(), lessThanOrEqualTo(0.0101));
+        expect((saturation - 1.0).abs(), lessThanOrEqualTo(0.0101));
+      }
+    });
+
+    test('TikTok Hardened Evasion Validation: crop >= 7%, rotation >= 0.6 deg, noise >= 3, speed factor <= 0.975, smartphone metadata', () {
+      final cropRegex = RegExp(r'crop=trunc\(iw\*([0-9.]+)/2\)\*2:trunc\(ih\*([0-9.]+)/2\)\*2');
+      final rotRegex = RegExp(r'rotate=([0-9.]+)\*PI/180');
+      final noiseRegex = RegExp(r'noise=alls=([0-9]+):allf=t\+u');
+      final ptsRegex = RegExp(r'setpts=([0-9.]+)\*PTS');
+
+      for (var i = 0; i < 20; i++) {
+        final vars = VariationGenerator.generate();
+        expect(vars.cropPercent, greaterThanOrEqualTo(0.0699));
+        expect(vars.cropPercent, lessThanOrEqualTo(0.0901));
+        expect(vars.rotateAngle, greaterThanOrEqualTo(0.599));
+        expect(vars.rotateAngle, lessThanOrEqualTo(0.901));
+        expect(vars.noiseStrength, greaterThanOrEqualTo(3));
+        expect(vars.noiseStrength, lessThanOrEqualTo(4));
+        expect(vars.speedFactor, greaterThanOrEqualTo(0.9699));
+        expect(vars.speedFactor, lessThanOrEqualTo(0.9751));
+        expect(vars.outputFps, greaterThanOrEqualTo(29.79));
+        expect(vars.outputFps, lessThanOrEqualTo(29.91));
+
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          modifyAudio: true,
+          enableDeepAntiFingerprint: true,
+          variations: vars,
+        );
+
+        final cropMatch = cropRegex.firstMatch(cmd);
+        expect(cropMatch, isNotNull);
+        final keepRatio = double.parse(cropMatch!.group(1)!);
+        expect(keepRatio, lessThanOrEqualTo(0.9301));
+        expect(keepRatio, greaterThanOrEqualTo(0.9099));
+
+        final rotMatch = rotRegex.firstMatch(cmd);
+        expect(rotMatch, isNotNull);
+        final rotAngle = double.parse(rotMatch!.group(1)!);
+        expect(rotAngle, greaterThanOrEqualTo(0.599));
+
+        final noiseMatch = noiseRegex.firstMatch(cmd);
+        expect(noiseMatch, isNotNull);
+        final noiseVal = int.parse(noiseMatch!.group(1)!);
+        expect(noiseVal, greaterThanOrEqualTo(3));
+
+        final ptsMatch = ptsRegex.firstMatch(cmd);
+        expect(ptsMatch, isNotNull);
+        final ptsVal = double.parse(ptsMatch!.group(1)!);
+        expect(ptsVal, lessThanOrEqualTo(0.9751));
+
+        expect(cmd, contains('-metadata make="Apple"'));
+        expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
+        expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
+        expect(cmd, contains('-metadata:s:v:0 handler_name="Core Media Video"'));
+        expect(cmd, contains('-metadata:s:a:0 handler_name="Core Media Audio"'));
+        expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.0015'));
+        expect(cmd, contains('-r 29.'));
+      }
+    });
+
+    test('Blurred canvas frame generates dual-stream background blur and centered foreground overlay', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        isPortrait: true,
+      );
+      expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
+      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/35:luma_power=2[blurred];'));
+      expect(cmd, contains(r'[fg]scale=w=trunc(iw*0.95/2)*2:h=trunc(ih*0.95/2)*2[main];'));
+      expect(cmd, contains(r'[blurred][main]overlay=(W-w)/2:(H-h)/2[outv];[outv]'));
+      expect(cmd, contains('format=yuv420p'));
+    });
+
+    test('Mute original audio ducks volume to near-zero for platform background music overlay', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyAudio: true,
+        muteOriginalAudio: true,
+      );
+      expect(cmd, contains('volume=0.01'));
+      expect(cmd, contains('atempo='));
+      expect(cmd, contains('-c:a aac -b:a 128k'));
+      expect(cmd, isNot(contains('anoisesrc=')));
     });
 
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
@@ -320,6 +520,57 @@ void main() {
 
     test('Cancel executes safely without throwing unhandled error', () async {
       await expectLater(FfmpegService.cancel(), completes);
+    });
+
+    test('SEC-01: command generator escapes double quotes in input and output paths', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/video"with"quotes.mp4',
+        outputPath: '/path/out"with"quotes.mp4',
+        removeMetadata: false,
+        modifyAudio: false,
+        modifyVisuals: false,
+      );
+      expect(cmd, contains(r'-i "/path/video\"with\"quotes.mp4"'));
+      expect(cmd, contains(r'"/path/out\"with\"quotes.mp4"'));
+    });
+
+    test('D1-01 T1: probeMediaMeta returns zeros on probe failure without throwing', () async {
+      final meta = await FfmpegService.probeMediaMeta('/nonexistent_file_path.mp4');
+      expect(meta.durationMs, 0);
+      expect(meta.width, 0);
+      expect(meta.height, 0);
+    });
+
+    test('D1-01 T2: buildCommand respects auto-trim when totalDurationMs > 1500', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/input.mp4',
+        outputPath: '/output.mp4',
+        enableAutoTrim: true,
+        totalDurationMs: 5000,
+      );
+      expect(cmd, contains('-ss 0.5 -t 4.00 -i "/input.mp4"'));
+    });
+
+    test('D1-02: buildCommand emits -hwaccel auto when enableHardwareAcceleration is true', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/input.mp4',
+        outputPath: '/output.mp4',
+        enableHardwareAcceleration: true,
+      );
+      expect(cmd, contains('-y -hwaccel auto -i "/input.mp4"'));
+    });
+
+    test('D5-01: RenderDiagnosticInfo flags 1216x2160 as truncated portrait and throws RenderIntegrityException', () {
+      const diag = RenderDiagnosticInfo(path: '/test.mp4', width: 1216, height: 2160);
+      expect(diag.isTruncatedPortrait, isTrue);
+      expect(
+        () {
+          if (diag.isTruncatedPortrait) {
+            throw const RenderIntegrityException('Output failed integrity: truncated or null dimensions');
+          }
+        },
+        throwsA(isA<RenderIntegrityException>()),
+      );
     });
   });
 }

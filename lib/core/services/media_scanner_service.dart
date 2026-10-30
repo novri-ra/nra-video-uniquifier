@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 class MediaScannerService {
-  static const MethodChannel _channel = MethodChannel('com.example.nra_video_uniquifier/media_scanner');
+  static const MethodChannel _channel = MethodChannel('id.novrira.videouniquifier/media_scanner');
 
   /// Requests Android MediaScanner to index the file so it shows in Gallery immediately.
   static Future<bool> scanFile(String filePath) async {

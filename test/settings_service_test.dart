@@ -12,14 +12,18 @@ void main() {
 
   group('SettingsService - SharedPreferences persistence', () {
     test('Default values returned when unset', () async {
-      expect(await SettingsService.getEngineMode(), equals('software'));
+      expect(await SettingsService.getHardwareAcceleration(), isTrue);
       expect(await SettingsService.getDefaultPreset(), equals('balanced'));
       expect(await SettingsService.getCustomOutputPath(), isNull);
     });
 
-    test('Updating engine mode persists value', () async {
-      await SettingsService.setEngineMode('hardware');
-      expect(await SettingsService.getEngineMode(), equals('hardware'));
+    test('Updating hardware acceleration persists and broadcasts value', () async {
+      await SettingsService.setHardwareAcceleration(false);
+      expect(await SettingsService.getHardwareAcceleration(), isFalse);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
+      await SettingsService.setHardwareAcceleration(true);
+      expect(await SettingsService.getHardwareAcceleration(), isTrue);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
     });
 
     test('Updating default preset persists value', () async {
@@ -121,13 +125,42 @@ void main() {
       await thumb.writeAsString('test-thumb-content');
       await other.writeAsString('keep-this');
 
+      final sizeBefore = await SettingsService.getTempCacheSize(tempDir);
+      expect(sizeBefore, greaterThan(0));
+
       final freed = await SettingsService.purgeTempCache(tempDir);
-      expect(freed, greaterThan(0));
+      expect(freed, equals(sizeBefore));
       expect(staged.existsSync(), isFalse);
       expect(thumb.existsSync(), isFalse);
       expect(other.existsSync(), isTrue);
 
+      final sizeAfter = await SettingsService.getTempCacheSize(tempDir);
+      expect(sizeAfter, equals(0));
+
       if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+    });
+
+    test('VideoCodec enum parsing and persistence', () async {
+      expect(VideoCodec.fromString('h264'), equals(VideoCodec.h264));
+      expect(VideoCodec.fromString('avc'), equals(VideoCodec.h264));
+      expect(VideoCodec.fromString('h265'), equals(VideoCodec.h265));
+      expect(VideoCodec.fromString('hevc'), equals(VideoCodec.h265));
+      expect(VideoCodec.fromString('unknown'), equals(VideoCodec.h264));
+
+      expect(await SettingsService.getVideoCodec(), equals(VideoCodec.h264));
+      await SettingsService.setVideoCodec(VideoCodec.h265);
+      expect(await SettingsService.getVideoCodec(), equals(VideoCodec.h265));
+      expect(SettingsService.videoCodecNotifier.value, equals(VideoCodec.h265));
+    });
+
+    test('Notification sound and background processing persistence', () async {
+      expect(await SettingsService.getNotificationSound(), isTrue);
+      await SettingsService.setNotificationSound(false);
+      expect(await SettingsService.getNotificationSound(), isFalse);
+
+      expect(await SettingsService.getBackgroundProcessing(), isTrue);
+      await SettingsService.setBackgroundProcessing(false);
+      expect(await SettingsService.getBackgroundProcessing(), isFalse);
     });
   });
 }

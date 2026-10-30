@@ -44,13 +44,11 @@ class HistoryService {
     final dirs = <Directory>[];
     if (Platform.isAndroid) {
       dirs.add(Directory('/storage/emulated/0/Movies/Uniquifier'));
-      dirs.add(Directory('/storage/emulated/0/Movies/VideoUniquifier'));
       try {
         final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
         if (extDirs != null) {
           for (final dir in extDirs) {
             dirs.add(Directory('${dir.path}/Uniquifier'));
-            dirs.add(Directory('${dir.path}/VideoUniquifier'));
           }
         }
       } catch (_) {}
@@ -58,7 +56,6 @@ class HistoryService {
     try {
       final appDocs = await getApplicationDocumentsDirectory();
       dirs.add(Directory('${appDocs.path}/Movies/Uniquifier'));
-      dirs.add(Directory('${appDocs.path}/Movies/VideoUniquifier'));
     } catch (_) {}
     return dirs;
   }
@@ -71,12 +68,14 @@ class HistoryService {
         if (entry is File && entry.path.toLowerCase().endsWith('.mp4')) {
           if (seenPaths.add(entry.path)) {
             final stat = await entry.stat();
-            results.add(VideoExportItem(
-              file: entry,
-              fileName: entry.path.split(RegExp(r'[/\\]')).last,
-              bytes: stat.size,
-              modified: stat.modified,
-            ));
+            if (stat.size > 0) {
+              results.add(VideoExportItem(
+                file: entry,
+                fileName: entry.path.split(RegExp(r'[/\\]')).last,
+                bytes: stat.size,
+                modified: stat.modified,
+              ));
+            }
           }
         }
       }

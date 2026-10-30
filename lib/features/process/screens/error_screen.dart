@@ -151,26 +151,56 @@ class _TelemetryLogBox extends StatelessWidget {
   final String? errorDetails;
   const _TelemetryLogBox({this.errorDetails});
 
+  String _redactPath(String text) {
+    return text.replaceAll(RegExp(r'/storage/emulated/0/[^\s]+'), '<external storage>/...');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final raw = errorDetails ??
+        '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
+        'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
+        'Native pipeline state: 0/4 stages completed.';
+    final redacted = _redactPath(raw);
+    final summary = redacted.split('\n').firstWhere((line) => line.trim().isNotEmpty, orElse: () => 'Processing error');
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
-      child: SelectableText(
-        errorDetails ??
-            '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
-                'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
-                'Native pipeline state: 0/4 stages completed.',
-        style: const TextStyle(
-          color: AppColors.error,
-          fontSize: 11,
-          fontFamily: 'monospace',
-          height: 1.4,
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                summary,
+                style: const TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.w600),
+              ),
+            ),
+            ExpansionTile(
+              title: const Text('View technical details', style: TextStyle(color: AppColors.outline, fontSize: 11)),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  child: SelectableText(
+                    redacted,
+                    style: const TextStyle(
+                      color: AppColors.error,
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

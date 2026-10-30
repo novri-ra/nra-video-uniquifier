@@ -25,7 +25,7 @@ class ModifiersHeader extends StatelessWidget {
         ),
         SizedBox(width: 8),
         Text(
-          '9 MODIFIERS',
+          '11 MODIFIERS',
           style: TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 10,
@@ -89,7 +89,7 @@ class ModifiersCard extends StatelessWidget {
               _ToggleRow(
                 icon: Icons.security,
                 title: 'Deep Evasion',
-                subtitle: '5% margin crop & 0.4° tilt',
+                subtitle: '8% margin crop & 0.8° tilt',
                 value: provider.enableDeepAntiFingerprint,
                 onChanged: provider.toggleDeepAntiFingerprint,
               ),
@@ -116,6 +116,22 @@ class ModifiersCard extends StatelessWidget {
                 subtitle: 'Cuts 0.5s intro & outro',
                 value: provider.enableAutoTrim,
                 onChanged: provider.toggleAutoTrim,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.blur_on,
+                title: 'Blurred Canvas Frame',
+                subtitle: 'Padded background blur',
+                value: provider.enableBlurredCanvas,
+                onChanged: provider.toggleBlurredCanvas,
+              ),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+              _ToggleRow(
+                icon: Icons.volume_off,
+                title: 'Mute Original Audio',
+                subtitle: 'Ducks audio for music overlay',
+                value: provider.muteOriginalAudio,
+                onChanged: provider.toggleMuteOriginalAudio,
               ),
             ],
           ),

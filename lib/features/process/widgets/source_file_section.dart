@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/batch_queue_provider.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -26,7 +28,10 @@ class SourceFileSection extends StatelessWidget {
           _SelectedVideoCard(
             provider: provider,
             onReplace: onPickVideo,
-            onClear: provider.clearSelection,
+            onClear: () {
+              context.read<BatchQueueProvider>().clear();
+              provider.clearSelection();
+            },
           )
         else
           _EmptyPickerCard(onTap: onPickVideo),
@@ -41,6 +46,12 @@ class _SourceFileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final batchQueue = context.watch<BatchQueueProvider>();
+    final isBatch = batchQueue.hasItems && batchQueue.totalCount > 1;
+    final statusText = isBatch
+        ? 'BATCH: ${batchQueue.totalCount} QUEUED'
+        : (hasFile ? 'READY FOR TRANSCODE' : 'NO FILE SELECTED');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -55,7 +66,7 @@ class _SourceFileHeader extends StatelessWidget {
           ),
         ),
         Text(
-          hasFile ? 'READY FOR TRANSCODE' : 'NO FILE SELECTED',
+          statusText,
           style: TextStyle(
             color: hasFile ? AppColors.primaryContainer : AppColors.outline,
             fontSize: 10,
@@ -134,10 +145,7 @@ class _VideoThumbnail extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (hasThumb)
-            Image.file(
-              File(thumbnailPath!),
-              fit: BoxFit.cover,
-            )
+            Image.file(File(thumbnailPath!), cacheWidth: 240, cacheHeight: 240, fit: BoxFit.cover)
           else
             const Center(child: Icon(Icons.videocam, color: AppColors.primaryContainer, size: 24)),
           Positioned(

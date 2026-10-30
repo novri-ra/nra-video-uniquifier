@@ -29,6 +29,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   }
 
   Future<void> _loadHistory() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
       _error = null;

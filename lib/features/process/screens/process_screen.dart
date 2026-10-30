@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
-import '../../settings/screens/advanced_settings_bottom_sheet.dart';
-import '../../settings/screens/app_settings_bottom_sheet.dart';
 import '../widgets/engine_state_strip.dart';
 import '../widgets/modifiers_card.dart';
 import '../widgets/source_file_section.dart';
+import 'batch_processing_screen.dart';
 import 'processing_screen.dart';
+import '../../../core/models/batch_video_item.dart';
+import '../../../core/providers/batch_queue_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
-class ProcessScreen extends StatelessWidget {
+class ProcessScreen extends StatefulWidget {
   const ProcessScreen({super.key});
 
-  void _openAdvancedSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => const AdvancedSettingsBottomSheet(),
-    );
+  @override
+  State<ProcessScreen> createState() => _ProcessScreenState();
+}
+
+class _ProcessScreenState extends State<ProcessScreen> {
+  bool _isNavigating = false;
+
+  void _openSettingsTab(BuildContext context) {
+    context.read<UniquifierProvider>().setTabIndex(2);
   }
 
   Future<void> _pickVideo(BuildContext context) async {
@@ -28,14 +31,36 @@ class ProcessScreen extends StatelessWidget {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['mp4', 'mov', 'mkv'],
+        allowMultiple: true,
       );
       if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        if (file.path != null && context.mounted) {
+        if (!context.mounted) return;
+        final validFiles = result.files.where((f) => f.path != null).toList();
+        if (validFiles.isEmpty) return;
+
+        if (validFiles.length == 1) {
+          final file = validFiles.first;
+          context.read<BatchQueueProvider>().clear();
           context.read<UniquifierProvider>().setVideoFile(
                 path: file.path!,
                 name: file.name,
                 sizeBytes: file.size,
+              );
+        } else {
+          final batchItems = validFiles
+              .map((f) => BatchVideoItem(
+                    id: f.path!,
+                    path: f.path!,
+                    name: f.name,
+                    sizeBytes: f.size,
+                  ))
+              .toList();
+          context.read<BatchQueueProvider>().setItems(batchItems);
+          final first = validFiles.first;
+          context.read<UniquifierProvider>().setVideoFile(
+                path: first.path!,
+                name: first.name,
+                sizeBytes: first.size,
               );
         }
       }
@@ -51,37 +76,49 @@ class ProcessScreen extends StatelessWidget {
     }
   }
 
-  void _startProcessing(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ProcessingScreen()),
-    );
-  }
+  Future<void> _startProcessing(BuildContext context) async {
+    if (_isNavigating) return;
+    final provider = context.read<UniquifierProvider>();
+    final batchQueue = context.read<BatchQueueProvider>();
+    if (!batchQueue.hasItems && provider.selectedFilePath == null) return;
 
-  void _openAppSettings(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const AppSettingsBottomSheet(),
-    );
+    _isNavigating = true;
+    try {
+      if (batchQueue.hasItems && batchQueue.totalCount > 1) {
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const BatchProcessingScreen()),
+        );
+      } else {
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ProcessingScreen()),
+        );
+      }
+    } finally {
+      if (mounted) {
+        _isNavigating = false;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
+    final batchQueue = context.watch<BatchQueueProvider>();
     final hasFile = provider.selectedFileName != null;
+    final batchCount = batchQueue.hasItems ? batchQueue.totalCount : (hasFile ? 1 : 0);
 
     return Scaffold(
-      appBar: TopAppBar(onSettingsTap: () => _openAppSettings(context)),
+      appBar: TopAppBar(onSettingsTap: () => _openSettingsTab(context)),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(16),
           child: _ProcessBody(
             hasFile: hasFile,
+            batchCount: batchCount,
             provider: provider,
             onPickVideo: () => _pickVideo(context),
-            onOpenAdvanced: () => _openAdvancedSettings(context),
+            onOpenAdvanced: () => _openSettingsTab(context),
             onStartProcessing: () => _startProcessing(context),
           ),
         ),
@@ -92,6 +129,7 @@ class ProcessScreen extends StatelessWidget {
 
 class _ProcessBody extends StatelessWidget {
   final bool hasFile;
+  final int batchCount;
   final UniquifierProvider provider;
   final VoidCallback onPickVideo;
   final VoidCallback onOpenAdvanced;
@@ -99,6 +137,7 @@ class _ProcessBody extends StatelessWidget {
 
   const _ProcessBody({
     required this.hasFile,
+    required this.batchCount,
     required this.provider,
     required this.onPickVideo,
     required this.onOpenAdvanced,
@@ -120,7 +159,11 @@ class _ProcessBody extends StatelessWidget {
         const SizedBox(height: 24),
         const _OfflineGuaranteeNote(),
         const SizedBox(height: 10),
-        _ProcessActionButton(enabled: hasFile, onPressed: onStartProcessing),
+        _ProcessActionButton(
+          enabled: hasFile,
+          batchCount: batchCount,
+          onPressed: onStartProcessing,
+        ),
       ],
     );
   }
@@ -150,15 +193,19 @@ class _OfflineGuaranteeNote extends StatelessWidget {
 
 class _ProcessActionButton extends StatelessWidget {
   final bool enabled;
+  final int batchCount;
   final VoidCallback onPressed;
 
   const _ProcessActionButton({
     required this.enabled,
+    this.batchCount = 1,
     required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    final labelText = batchCount > 1 ? 'START BATCH ($batchCount VIDEOS)' : 'START UNIQUIFYING';
+
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: enabled ? AppColors.primaryContainer : AppColors.surfaceContainerHigh,
@@ -169,9 +216,9 @@ class _ProcessActionButton extends StatelessWidget {
       ),
       onPressed: enabled ? onPressed : null,
       icon: const Icon(Icons.bolt, size: 20),
-      label: const Text(
-        'START UNIQUIFYING',
-        style: TextStyle(
+      label: Text(
+        labelText,
+        style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.2,

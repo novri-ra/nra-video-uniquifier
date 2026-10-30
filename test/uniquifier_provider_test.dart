@@ -11,6 +11,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     SettingsService.upscaleResolutionNotifier.value = TargetResolution.r1080p;
+    SettingsService.videoCodecNotifier.value = VideoCodec.h264;
     provider = UniquifierProvider();
   });
 
@@ -181,14 +182,37 @@ void main() {
       provider.toggleAutoTrim(true);
       expect(provider.enableAutoTrim, isTrue);
 
-      expect(notifications, equals(3));
+      provider.toggleBlurredCanvas(true);
+      expect(provider.enableBlurredCanvas, isTrue);
+
+      provider.toggleMuteOriginalAudio(true);
+      expect(provider.muteOriginalAudio, isTrue);
+
+      expect(notifications, equals(5));
     });
 
-    test('toggleHardwareAcceleration flips mode', () {
+    test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {
       provider.toggleHardwareAcceleration(false);
       expect(provider.hardwareAcceleration, isFalse);
-      provider.toggleHardwareAcceleration(true);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
+
+      await SettingsService.setHardwareAcceleration(true);
       expect(provider.hardwareAcceleration, isTrue);
+      expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
+    });
+
+    test('setVideoCodec updates codec and notifies listeners', () {
+      expect(provider.videoCodec, equals(VideoCodec.h264));
+      int notifyCount = 0;
+      provider.addListener(() => notifyCount++);
+
+      provider.setVideoCodec(VideoCodec.h265);
+      expect(provider.videoCodec, equals(VideoCodec.h265));
+      expect(notifyCount, equals(1));
+
+      // Test reaction to external notification
+      SettingsService.videoCodecNotifier.value = VideoCodec.h264;
+      expect(provider.videoCodec, equals(VideoCodec.h264));
     });
 
     test('setTabIndex updates navigation state', () {

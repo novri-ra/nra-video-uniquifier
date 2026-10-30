@@ -47,6 +47,13 @@ class RenderDiagnosticInfo {
       '  4K Status: ${isTrue4kPortrait ? "True 4K Portrait (2160x3840)" : (isTruncatedPortrait ? "Truncated Portrait (~1216x2160)" : "Standard / Landscape")}';
 }
 
+class RenderIntegrityException implements Exception {
+  final String message;
+  const RenderIntegrityException(this.message);
+  @override
+  String toString() => 'RenderIntegrityException: $message';
+}
+
 /// Service for inspecting rendered video metadata and encoding characteristics.
 class RenderDiagnosticService {
   /// Inspects rendered video using FFprobe to produce diagnostic report.

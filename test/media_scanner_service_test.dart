@@ -5,7 +5,7 @@ import 'package:nra_video_uniquifier/core/services/media_scanner_service.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('com.example.nra_video_uniquifier/media_scanner');
+  const channel = MethodChannel('id.novrira.videouniquifier/media_scanner');
   final log = <MethodCall>[];
 
   setUp(() {

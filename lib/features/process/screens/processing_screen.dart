@@ -19,9 +19,10 @@ class ProcessingScreen extends StatefulWidget {
 
 class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  double _progress = 0.45;
-  int _step = 2;
+  double _progress = 0.05;
+  int _step = 1;
   bool _isCancelled = false;
+  bool _hasNativeProgress = false;
 
   @override
   void initState() {
@@ -35,17 +36,10 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   }
 
   void _onProgressTick() {
+    if (!mounted || _isCancelled || _hasNativeProgress) return;
     setState(() {
-      _progress = 0.10 + (_controller.value * 0.85);
-      if (_progress < 0.25) {
-        _step = 1;
-      } else if (_progress < 0.55) {
-        _step = 2;
-      } else if (_progress < 0.85) {
-        _step = 3;
-      } else {
-        _step = 4;
-      }
+      _progress = (0.05 + (_controller.value * 0.10)).clamp(0.05, 0.15);
+      _step = 1;
     });
   }
 
@@ -81,15 +75,23 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           modifyVisuals: provider.modifyVisuals,
           upscale1080p: provider.upscale1080p,
           targetResolution: provider.targetResolution,
+          videoCodec: provider.videoCodec,
           enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
           enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,
           enableHorizontalFlip: provider.enableHorizontalFlip,
           enableAggressiveAudio: provider.enableAggressiveAudio,
           enableAutoTrim: provider.enableAutoTrim,
           isPortrait: provider.isPortrait,
+          enableHardwareAcceleration: provider.hardwareAcceleration,
+          enableBlurredCanvas: provider.enableBlurredCanvas,
+          muteOriginalAudio: provider.muteOriginalAudio,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {
+              _hasNativeProgress = true;
+              if (_controller.isAnimating) {
+                _controller.stop();
+              }
               provider.updateRealtimeStats(p, speed, timeMs);
               setState(() {
                 _progress = p.clamp(0.05, 0.98);
