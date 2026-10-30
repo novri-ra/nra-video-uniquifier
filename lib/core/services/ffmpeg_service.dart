@@ -10,8 +10,10 @@ import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
 import 'filter_builders.dart';
+import '../utils/variation_generator.dart';
 
 export 'render_diagnostic_service.dart';
+export '../utils/variation_generator.dart';
 
 class FfmpegService {
   static String _escapePath(String path) => path.replaceAll('"', r'\"');
@@ -35,6 +37,7 @@ class FfmpegService {
     int totalDurationMs = 0,
     bool isPortrait = false,
     bool enableHardwareAcceleration = false,
+    VideoVariations? variations,
   }) {
     final safeInput = _escapePath(inputPath);
     final safeOutput = _escapePath(outputPath);
@@ -51,8 +54,18 @@ class FfmpegService {
     }
     buffer.write(' -i "$safeInput"');
     if (removeMetadata) {
-      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact');
-      buffer.write(' -metadata make="Apple" -metadata model="iPhone 15 Pro" -metadata encoder="Apple QuickTime"');
+      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact');
+      buffer.write(' -metadata encoder="Lavf58.29.100"');
+    }
+
+    VideoVariations vars;
+    try {
+      vars = variations ??
+          (enableDeepAntiFingerprint
+              ? VariationGenerator.generate()
+              : VideoVariations.fallback);
+    } catch (_) {
+      vars = VideoVariations.fallback;
     }
 
     final shouldUpscale = upscale ?? upscale1080p;
@@ -68,12 +81,14 @@ class FfmpegService {
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableHorizontalFlip: enableHorizontalFlip,
       isPortrait: isPortrait,
+      variations: vars,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
       hasAudio: modifyAudio,
       hasVisual: hasVisual,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableAggressiveAudio: enableAggressiveAudio,
+      variations: vars,
     ));
 
     if (!hasVisual && !modifyAudio) buffer.write(' -c copy');

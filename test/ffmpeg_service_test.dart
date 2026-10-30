@@ -51,7 +51,8 @@ void main() {
         enableDeepAntiFingerprint: true,
       );
       expect(cmd, contains('-c:v copy'));
-      expect(cmd, contains('atempo=1.0256,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5'));
+      expect(cmd, contains('highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5'));
+      expect(cmd, contains('atempo='));
       expect(cmd, contains('-c:a aac -b:a 192k'));
       expect(cmd, contains('-map_metadata -1'));
     });
@@ -66,7 +67,8 @@ void main() {
         upscale1080p: false,
         enableDeepAntiFingerprint: false,
       );
-      expect(cmd, contains('atempo=1.0256,equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('atempo='));
     });
 
     test('Visual tweak & upscale enforces strict filtergraph pipeline order and YUV format', () {
@@ -83,32 +85,34 @@ void main() {
         enableDeepAntiFingerprint: true,
       );
       // Filter graph presence checks
-      expect(cmd, contains('setpts=0.975*PTS'));
-      expect(cmd, contains('crop=trunc(iw*0.92/2)*2:trunc(ih*0.92/2)*2:trunc(iw*0.04/2)*2:trunc(ih*0.04/2)*2'));
-      expect(cmd, contains('rotate=0.8*PI/180:ow=trunc(rotw(0.8*PI/180)/2)*2:oh=trunc(roth(0.8*PI/180)/2)*2:fillcolor=black'));
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('crop='));
+      expect(cmd, contains('rotate='));
       expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
       expect(cmd, isNot(contains('curves=preset=vintage')));
-      expect(cmd, contains('eq=contrast=1.04:brightness=0.01:saturation=1.05:gamma=0.98'));
-      expect(cmd, contains('noise=alls=4:allf=t+u'));
+      expect(cmd, contains('eq=brightness='));
+      expect(cmd, contains('noise=alls='));
+      expect(cmd, contains('scale=trunc(iw/2)*2:trunc(ih/2)*2'));
       expect(cmd, contains('format=yuv420p'));
       expect(cmd, contains('-c:v libx264 -preset fast -crf 22'));
       expect(cmd, contains('-pix_fmt yuv420p'));
       expect(cmd, contains('-movflags +faststart'));
       expect(cmd, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
-      expect(cmd, contains('-metadata make="Apple" -metadata model="iPhone 15 Pro"'));
+      expect(cmd, contains('-metadata encoder="Lavf58.29.100"'));
       expect(cmd, contains('-c:a copy'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Format
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
-      final scaleIdx = cmd.indexOf('scale=');
+      final scaleIdx = cmd.indexOf('scale=w=-2:h=1080');
       final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
+      final evenScaleIdx = cmd.indexOf('scale=trunc(iw/2)*2:trunc(ih/2)*2');
       final formatIdx = cmd.indexOf('format=yuv420p');
 
       expect(ptsIdx, lessThan(cropIdx));
@@ -118,7 +122,8 @@ void main() {
       expect(denoiseIdx, lessThan(unsharpIdx));
       expect(unsharpIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
-      expect(noiseIdx, lessThan(formatIdx));
+      expect(noiseIdx, lessThan(evenScaleIdx));
+      expect(evenScaleIdx, lessThan(formatIdx));
     });
 
     test('Video codec engine: H.264 outputs libx264 crf 22, H.265 outputs libx265 crf 26 tag hvc1', () {
@@ -156,8 +161,8 @@ void main() {
         targetResolution: TargetResolution.r2k,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('crop=trunc(iw*0.92/2)*2:trunc(ih*0.92/2)*2:trunc(iw*0.04/2)*2:trunc(ih*0.04/2)*2'));
-      expect(cmd, contains('rotate=0.8*PI/180'));
+      expect(cmd, contains('crop=trunc(iw*'));
+      expect(cmd, contains('rotate='));
       expect(cmd, contains('scale=w=-2:h=1440:flags=lanczos'));
     });
 
@@ -304,7 +309,7 @@ void main() {
       );
       expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.003[noise]'));
       expect(cmd, contains('[a0][noise]amix=inputs=2:duration=first[out]'));
-      expect(cmd, contains('atempo=1.0256'));
+      expect(cmd, contains('atempo='));
       expect(cmd, contains('equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5'));
     });
 
@@ -328,8 +333,8 @@ void main() {
         upscale1080p: true,
       );
       expect(cmd, contains('-map_metadata -1 -map_chapters -1 -bitexact'));
-      expect(cmd, contains('setpts=0.975*PTS'));
-      expect(cmd, contains('atempo=1.0256'));
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('atempo='));
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
     });
 
@@ -342,10 +347,11 @@ void main() {
         upscale: false,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('ow=trunc(rotw(0.8*PI/180)/2)*2:oh=trunc(roth(0.8*PI/180)/2)*2'));
+      expect(cmd, contains('ow=trunc(rotw('));
+      expect(cmd, contains('oh=trunc(roth('));
     });
 
-    test('Audio-Visual timing alignment: tempo is pure 1.0256 matching 0.975*PTS without compound drift', () {
+    test('Audio-Visual timing alignment: tempo is pure reciprocal of speedFactor matching PTS without compound drift', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -353,10 +359,54 @@ void main() {
         modifyAudio: true,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('setpts=0.975*PTS'));
-      expect(cmd, contains('atempo=1.0256'));
+      expect(cmd, contains('setpts='));
+      expect(cmd, contains('atempo='));
       expect(cmd, isNot(contains('asetrate=')));
       expect(cmd, isNot(contains('aresample=')));
+    });
+
+    test('TikTok Evasion Test 1: 10 calls produce 10 different filter strings', () {
+      final commands = <String>{};
+      for (var i = 0; i < 10; i++) {
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          enableDeepAntiFingerprint: true,
+        );
+        commands.add(cmd);
+      }
+      expect(commands.length, equals(10));
+    });
+
+    test('TikTok Evasion Test 2: A/V sync is exact (Video speed * Audio tempo = 1.0)', () {
+      for (var i = 0; i < 20; i++) {
+        final vars = VariationGenerator.generate();
+        final product = vars.speedFactor * vars.audioTempo;
+        expect((product - 1.0).abs(), lessThan(1e-9));
+      }
+    });
+
+    test('TikTok Evasion Test 3: Color parameters never exceed +-0.01', () {
+      final eqRegex = RegExp(r'eq=brightness=([-0-9.]+):contrast=([0-9.]+):saturation=([0-9.]+)');
+      for (var i = 0; i < 20; i++) {
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          enableDeepAntiFingerprint: true,
+        );
+        final match = eqRegex.firstMatch(cmd);
+        expect(match, isNotNull);
+        final brightness = double.parse(match!.group(1)!);
+        final contrast = double.parse(match.group(2)!);
+        final saturation = double.parse(match.group(3)!);
+
+        expect(brightness, greaterThanOrEqualTo(-0.0101));
+        expect(brightness, lessThanOrEqualTo(0.0101));
+        expect((contrast - 1.0).abs(), lessThanOrEqualTo(0.0101));
+        expect((saturation - 1.0).abs(), lessThanOrEqualTo(0.0101));
+      }
     });
 
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
