@@ -86,6 +86,23 @@ void main() {
       expect(specifics['ongoing'], isTrue);
     });
 
+    test('showProgressNotification allows 0% and 100% to bypass throttling without force', () async {
+      await NotificationService.showProgressNotification(
+        progress: 0,
+        title: 'Start',
+        body: '0%',
+      );
+      expect(capturedNotificationsCalls.where((call) => call.method == 'show').length, equals(1));
+
+      // 100% should also bypass throttling immediately
+      await NotificationService.showProgressNotification(
+        progress: 100,
+        title: 'Finished',
+        body: '100%',
+      );
+      expect(capturedNotificationsCalls.where((call) => call.method == 'show').length, equals(2));
+    });
+
     test('cancelProgressNotification invokes cancel with progressNotificationId', () async {
       await NotificationService.cancelProgressNotification();
 

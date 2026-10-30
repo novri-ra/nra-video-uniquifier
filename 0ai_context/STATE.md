@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 20:20:00 UTC+07:00
+- **Timestamp**: 2026-10-30 20:30:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `bf03e59 feat(pipeline): add blurred canvas background mode and audio mute toggle`
-- **Working Tree**: Sprint 45 launcher icons and splash branding configured, 106/106 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `1a4b5b5 feat(assets): generate android launcher icons and configure splash branding`
+- **Working Tree**: Sprint 46 blurred canvas proportion adjusted to 0.95 inset, background progress notifications, completion sounds, and startup permissions restored, 107/107 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -38,6 +38,7 @@
 - [x] Forensic drift audit & vDNA bypass remediation: hardened spatial/audio/temporal parameters, Apple device metadata, baseline pink noise masking, fps perturbation (Report 41 audit, Report 43 implementation).
 - [x] Dynamic blurred canvas padding and audio volume ducking/mute control (Report 44).
 - [x] Launcher icons and dark obsidian splash screen branding generated from assets (Report 45).
+- [x] Blurred canvas 0.95 inset refinement and background execution / sound notifications restoration (Report 46).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

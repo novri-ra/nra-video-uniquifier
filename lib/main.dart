@@ -8,17 +8,17 @@ import 'core/services/settings_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/navigation/screens/root_navigation_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     FFmpegKitConfig.setSessionHistorySize(3);
   } catch (_) {}
   try {
-    SettingsService.purgeTempCache();
+    await SettingsService.purgeTempCache();
   } catch (_) {}
   try {
-    NotificationService.init();
-    NotificationService.requestPermission();
+    await NotificationService.init();
+    await NotificationService.requestPermission();
   } catch (_) {}
   runApp(
     MultiProvider(

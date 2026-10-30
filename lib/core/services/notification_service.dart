@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'settings_service.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
@@ -30,6 +31,32 @@ class NotificationService {
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const initSettings = InitializationSettings(android: androidSettings);
       await _plugin.initialize(settings: initSettings);
+
+      final androidPlugin = _plugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        await androidPlugin.createNotificationChannel(
+          const AndroidNotificationChannel(
+            processChannelId,
+            'Video Processing',
+            description: 'Ongoing video processing progress',
+            importance: Importance.low,
+            playSound: false,
+            enableVibration: false,
+            showBadge: false,
+          ),
+        );
+        await androidPlugin.createNotificationChannel(
+          const AndroidNotificationChannel(
+            completeChannelId,
+            'Video Processing Complete',
+            description: 'Alerts when video processing finishes',
+            importance: Importance.high,
+            playSound: true,
+            enableVibration: true,
+          ),
+        );
+      }
       _initialized = true;
     } catch (e) {
       debugPrint('[NotificationService] init error: $e');
@@ -64,7 +91,7 @@ class NotificationService {
     final now = DateTime.now();
     final clamped = progress.clamp(0, 100);
 
-    if (!force) {
+    if (!force && clamped != 0 && clamped != 100) {
       final percentDiff = (clamped - _lastProgressPercent).abs();
       final timeDiff = now.difference(_lastProgressTime).inMilliseconds;
       if (percentDiff < 5 && timeDiff < 1000) {
@@ -119,13 +146,18 @@ class NotificationService {
     await init();
     await cancelProgressNotification();
 
+    bool playSound = true;
+    try {
+      playSound = await SettingsService.getNotificationSound();
+    } catch (_) {}
+
     final androidDetails = AndroidNotificationDetails(
       completeChannelId,
       'Video Processing Complete',
       channelDescription: 'Alerts when video processing finishes',
       importance: Importance.high,
       priority: Priority.high,
-      playSound: true,
+      playSound: playSound,
       enableVibration: true,
       autoCancel: true,
     );

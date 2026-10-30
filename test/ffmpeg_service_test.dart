@@ -481,8 +481,8 @@ void main() {
         isPortrait: true,
       );
       expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
-      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/20:luma_power=2[blurred];'));
-      expect(cmd, contains(r'[fg]scale=w=trunc(iw*0.88/2)*2:h=trunc(ih*0.88/2)*2[main];'));
+      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/35:luma_power=2[blurred];'));
+      expect(cmd, contains(r'[fg]scale=w=trunc(iw*0.95/2)*2:h=trunc(ih*0.95/2)*2[main];'));
       expect(cmd, contains(r'[blurred][main]overlay=(W-w)/2:(H-h)/2[outv];[outv]'));
       expect(cmd, contains('format=yuv420p'));
     });
