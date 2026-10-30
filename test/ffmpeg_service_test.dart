@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/ffmpeg_service.dart';
@@ -637,6 +638,17 @@ void main() {
       );
       expect(cmd, contains(r'-i "/path/video\"with\"quotes.mp4"'));
       expect(cmd, contains(r'"/path/out\"with\"quotes.mp4"'));
+    });
+
+    test('Scoped storage defense: stageInputFile stages file in temporary cache directory', () async {
+      final tempDir = Directory.systemTemp.createTempSync('uniquifier_test_stage_');
+      final sample = File('${tempDir.path}/test_source.mp4');
+      await sample.writeAsString('video-bytes-data');
+
+      final staged = await FfmpegService.stageInputFile(sample.path);
+      expect(staged.existsSync(), isTrue);
+      expect(staged.path, contains('staged_'));
+      expect(staged.lengthSync(), equals(sample.lengthSync()));
     });
 
     test('D1-01 T1: probeMediaMeta returns zeros on probe failure without throwing', () async {
