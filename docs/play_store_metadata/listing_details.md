@@ -67,6 +67,10 @@ Privacy:
   - Data collected: None
   - Data shared: None
   - Security practices: All operations executed locally in app sandbox and public Movies directory
+  - Does your app collect or share any required user data types? No
+  - Is all user data encrypted in transit? N/A (offline app)
+  - Do you provide a way for users to request data deletion? Uninstall removes all data
+  - Is data collection optional? N/A (no collection)
 
 ## 3. Production Release Keystore Instructions
 To generate a production release keystore:
