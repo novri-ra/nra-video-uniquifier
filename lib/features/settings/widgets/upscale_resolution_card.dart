@@ -77,7 +77,7 @@ class _ResolutionOptionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainer,
+          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
             color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,

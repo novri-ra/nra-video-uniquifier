@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/hardware_acceleration_card.dart';
 import '../widgets/upscale_resolution_card.dart';
@@ -153,24 +154,27 @@ class _AlertsSettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-      decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(child: Row(children: [Icon(Icons.work_outline, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Background Processing', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
-              Switch(value: backgroundProcessing, onChanged: onToggleBackground),
-            ],
+          SettingToggleRow(
+            icon: Icons.work_outline,
+            title: 'Background Processing',
+            subtitle: 'Keep rendering active when minimized',
+            value: backgroundProcessing,
+            onChanged: onToggleBackground,
           ),
           const Divider(height: 1, color: AppColors.surfaceContainerHighest),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(child: Row(children: [Icon(Icons.volume_up_outlined, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Notification Sound', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
-              Switch(value: notificationSound, onChanged: onToggleSound),
-            ],
+          SettingToggleRow(
+            icon: Icons.volume_up_outlined,
+            title: 'Notification Sound',
+            subtitle: 'Play completion chime on finish',
+            value: notificationSound,
+            onChanged: onToggleSound,
           ),
         ],
       ),
@@ -189,7 +193,11 @@ class _CacheMaintenanceCard extends StatelessWidget {
     final mb = (cacheBytes / (1024 * 1024)).toStringAsFixed(1);
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
       child: Wrap(
         spacing: 12,
         runSpacing: 8,
@@ -267,7 +275,7 @@ class _PresetProfileCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
@@ -276,6 +284,14 @@ class _PresetProfileCard extends StatelessWidget {
         runSpacing: 8,
         children: [
           ActionChip(
+            backgroundColor: AppColors.surfaceContainer,
+            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            labelStyle: const TextStyle(
+              color: AppColors.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
             label: const Text('TikTok Fast'),
             onPressed: () => provider.applyPreset(
               removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: false,
@@ -283,6 +299,14 @@ class _PresetProfileCard extends StatelessWidget {
             ),
           ),
           ActionChip(
+            backgroundColor: AppColors.surfaceContainer,
+            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            labelStyle: const TextStyle(
+              color: AppColors.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
             label: const Text('Maximum Anti-Fingerprint'),
             onPressed: () => provider.applyPreset(
               removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: true, upscaleTarget: '2k',
@@ -291,6 +315,14 @@ class _PresetProfileCard extends StatelessWidget {
             ),
           ),
           ActionChip(
+            backgroundColor: AppColors.surfaceContainer,
+            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            labelStyle: const TextStyle(
+              color: AppColors.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
             label: const Text('Lossless Stealth'),
             onPressed: () => provider.applyPreset(
               removeMetadata: true, modifyAudio: false, modifyVisuals: false, upscale1080p: false,

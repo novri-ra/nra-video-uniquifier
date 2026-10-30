@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/setting_toggle_row.dart';
 
 class ModifiersHeader extends StatelessWidget {
   const ModifiersHeader({super.key});
@@ -60,7 +61,7 @@ class ModifiersCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.fingerprint,
                 title: 'Remove Metadata',
                 subtitle: 'Cleans GPS & device info',
@@ -68,7 +69,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleRemoveMetadata,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.graphic_eq,
                 title: 'Modify Audio',
                 subtitle: 'Shift pitch by 0.5%',
@@ -78,7 +79,7 @@ class ModifiersCard extends StatelessWidget {
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
               _VisualAndUpscaleRows(provider: provider, onOpenAdvanced: onOpenAdvanced),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.auto_fix_high,
                 title: 'Denoise & Clarity',
                 subtitle: 'HQ denoise & unsharp mask',
@@ -86,7 +87,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleEnhanceAndDenoise,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.security,
                 title: 'Deep Evasion',
                 subtitle: '8% margin crop & 0.8° tilt',
@@ -94,7 +95,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleDeepAntiFingerprint,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.flip,
                 title: 'Horizontal Flip',
                 subtitle: 'Mirrors video landmarks',
@@ -102,7 +103,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleHorizontalFlip,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.waves,
                 title: 'Audio Masking',
                 subtitle: 'Ambient pink noise layer',
@@ -110,7 +111,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleAggressiveAudio,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.content_cut,
                 title: 'Auto-Trim',
                 subtitle: 'Cuts 0.5s intro & outro',
@@ -118,7 +119,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleAutoTrim,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.blur_on,
                 title: 'Blurred Canvas Frame',
                 subtitle: 'Padded background blur',
@@ -126,7 +127,7 @@ class ModifiersCard extends StatelessWidget {
                 onChanged: provider.toggleBlurredCanvas,
               ),
               const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-              _ToggleRow(
+              SettingToggleRow(
                 icon: Icons.volume_off,
                 title: 'Mute Original Audio',
                 subtitle: 'Ducks audio for music overlay',
@@ -154,7 +155,7 @@ class _VisualAndUpscaleRows extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _ToggleRow(
+        SettingToggleRow(
           icon: Icons.crop,
           title: 'Modify Visuals',
           subtitle: 'Micro-crop & color tweak',
@@ -162,101 +163,13 @@ class _VisualAndUpscaleRows extends StatelessWidget {
           onChanged: provider.toggleModifyVisuals,
         ),
         const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-        _ToggleRow(
+        SettingToggleRow(
           icon: Icons.hd,
           title: 'Upscale to ${provider.targetResolutionLabel}',
           subtitle: 'Lanczos algorithm (${provider.targetResolutionDetails})',
           value: provider.upscale1080p,
           onChanged: provider.toggleUpscale1080p,
           onTapSubtitle: onOpenAdvanced,
-        ),
-      ],
-    );
-  }
-}
-
-class _ToggleRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final VoidCallback? onTapSubtitle;
-
-  const _ToggleRow({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-    this.onTapSubtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _ToggleLabel(title: title, subtitle: subtitle, onTapSubtitle: onTapSubtitle),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Switch(value: value, onChanged: onChanged),
-        ],
-      ),
-    );
-  }
-}
-
-class _ToggleLabel extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final VoidCallback? onTapSubtitle;
-
-  const _ToggleLabel({
-    required this.title,
-    required this.subtitle,
-    this.onTapSubtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.onSurface,
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        GestureDetector(
-          onTap: onTapSubtitle,
-          child: Text(
-            subtitle,
-            style: TextStyle(
-              color: onTapSubtitle != null ? AppColors.primaryContainer : AppColors.outline,
-              fontSize: 10,
-              fontFamily: 'monospace',
-              decoration: onTapSubtitle != null ? TextDecoration.underline : TextDecoration.none,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
         ),
       ],
     );
