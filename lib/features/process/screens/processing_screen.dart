@@ -85,6 +85,10 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           enableHardwareAcceleration: provider.hardwareAcceleration,
           enableBlurredCanvas: provider.enableBlurredCanvas,
           muteOriginalAudio: provider.muteOriginalAudio,
+          enableDynamicZoom: provider.enableDynamicZoom,
+          enableMicroOverlay: provider.enableMicroOverlay,
+          enableFrameSkip: provider.enableFrameSkip,
+          enableChromaShift: provider.enableChromaShift,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {

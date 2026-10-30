@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 22:00:00 UTC+07:00
+- **Timestamp**: 2026-10-30 22:30:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `6de4c4c fix(pipeline): scale blurred canvas foreground relative to target dimensions for 5% margin`
-- **Working Tree**: Sprint 49 deep audit of algorithms and UI uniformity completed, dead code removed (-183 LOC), SettingToggleRow standardized, 108/108 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `bfa0920 fix(audit): harmonize settings UI uniformity and verify end-to-end algorithm pipelines`
+- **Working Tree**: Sprint 50 advanced evasion features (dynamic zoom, micro-noise overlay, frame skip, chroma shift) added, modifiers layout reorganized into 4 categorized accordion groups, 110/110 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -42,6 +42,7 @@
 - [x] System notification small icon updated to official @mipmap/launcher_icon branding (Report 47).
 - [x] Proportional blurred canvas foreground scaling relative to target canvas dimensions (Report 48).
 - [x] Deep audit of all algorithms, state wiring, and UI/UX component uniformity (Report 49).
+- [x] Advanced evasion features (dynamic zoom, micro-noise overlay, frame skip, chroma shift) and categorized accordion layout (Report 50).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

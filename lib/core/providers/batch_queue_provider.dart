@@ -107,6 +107,10 @@ class BatchQueueProvider extends ChangeNotifier {
           enableHardwareAcceleration: config.hardwareAcceleration,
           enableBlurredCanvas: config.enableBlurredCanvas,
           muteOriginalAudio: config.muteOriginalAudio,
+          enableDynamicZoom: config.enableDynamicZoom,
+          enableMicroOverlay: config.enableMicroOverlay,
+          enableFrameSkip: config.enableFrameSkip,
+          enableChromaShift: config.enableChromaShift,
           suppressCompleteNotification: true,
           totalDurationMs: 0,
           onProgress: (p, speed, timeMs) {

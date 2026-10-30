@@ -509,6 +509,66 @@ void main() {
       expect(cmd, isNot(contains('anoisesrc=')));
     });
 
+    test('Advanced evasion: dynamic zoom, frame skip, chroma shift, and micro overlay inject expected filter syntax', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableDynamicZoom: true,
+        enableFrameSkip: true,
+        enableChromaShift: true,
+        enableMicroOverlay: true,
+        isPortrait: true,
+      );
+      expect(cmd, contains('zoompan=z='));
+      expect(cmd, contains('s=1080x1920:fps=30'));
+      expect(cmd, contains('decimate=cycle=25'));
+      expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
+      expect(cmd, contains('noise=alls=5:allf=t+u'));
+    });
+
+    test('All 15 modifiers enabled combined pipeline validation', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        removeMetadata: true,
+        modifyAudio: true,
+        modifyVisuals: true,
+        upscale1080p: true,
+        targetResolution: TargetResolution.r2k,
+        videoCodec: VideoCodec.h265,
+        enableEnhanceAndDenoise: true,
+        enableDeepAntiFingerprint: true,
+        enableHorizontalFlip: true,
+        enableAggressiveAudio: true,
+        enableAutoTrim: true,
+        totalDurationMs: 5000,
+        enableBlurredCanvas: true,
+        muteOriginalAudio: true,
+        enableDynamicZoom: true,
+        enableMicroOverlay: true,
+        enableFrameSkip: true,
+        enableChromaShift: true,
+        isPortrait: true,
+      );
+
+      // Verify presence of all key pipeline components
+      expect(cmd, contains('-map_metadata -1')); // 1. removeMetadata
+      expect(cmd, contains('-ss 0.5 -t 4.00')); // 2. autoTrim
+      expect(cmd, contains(r'[0:v]split=2[bg][fg];')); // 3. blurredCanvas
+      expect(cmd, contains('zoompan=z=')); // 4. dynamicZoom
+      expect(cmd, contains('hflip')); // 5. horizontalFlip
+      expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
+      expect(cmd, contains('hqdn3d=1.5:1.5:4:4')); // 7. denoise
+      expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'")); // 8. chromaShift
+      expect(cmd, contains('noise=alls=')); // 9. modifyVisuals grain
+      expect(cmd, contains('noise=alls=5:allf=t+u')); // 10. microOverlay
+      expect(cmd, contains('format=yuv420p')); // color parity
+      expect(cmd, contains('-c:v libx265')); // videoCodec
+      expect(cmd, contains('-tag:v hvc1')); // hvc1 tag
+      expect(cmd, contains('volume=0.01')); // 11. muteOriginalAudio / 12. modifyAudio
+      expect(cmd, contains('atempo=')); // A/V sync tempo
+    });
+
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
       final path1 = await FfmpegService.generateOutputPath('/some/dir/sample.mp4');
       await Future.delayed(const Duration(milliseconds: 5));

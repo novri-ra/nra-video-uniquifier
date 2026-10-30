@@ -48,6 +48,10 @@ class UniquifierProvider extends ChangeNotifier {
       _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
       _enableAggressiveAudio = await SettingsService.getAggressiveAudio();
       _enableAutoTrim = await SettingsService.getAutoTrim();
+      _enableDynamicZoom = await SettingsService.getDynamicZoom();
+      _enableMicroOverlay = await SettingsService.getMicroOverlay();
+      _enableFrameSkip = await SettingsService.getFrameSkip();
+      _enableChromaShift = await SettingsService.getChromaShift();
       notifyListeners();
     } catch (_) {}
   }
@@ -77,6 +81,10 @@ class UniquifierProvider extends ChangeNotifier {
   bool _enableAutoTrim = false;
   bool _enableBlurredCanvas = false;
   bool _muteOriginalAudio = false;
+  bool _enableDynamicZoom = false;
+  bool _enableMicroOverlay = false;
+  bool _enableFrameSkip = false;
+  bool _enableChromaShift = false;
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -117,6 +125,10 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableAutoTrim => _enableAutoTrim;
   bool get enableBlurredCanvas => _enableBlurredCanvas;
   bool get muteOriginalAudio => _muteOriginalAudio;
+  bool get enableDynamicZoom => _enableDynamicZoom;
+  bool get enableMicroOverlay => _enableMicroOverlay;
+  bool get enableFrameSkip => _enableFrameSkip;
+  bool get enableChromaShift => _enableChromaShift;
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
@@ -130,82 +142,30 @@ class UniquifierProvider extends ChangeNotifier {
   // Actions
   void setVideoCodec(VideoCodec codec) {
     _videoCodec = codec;
-    try {
-      SettingsService.setVideoCodec(codec);
-    } catch (_) {}
+    try { SettingsService.setVideoCodec(codec); } catch (_) {}
     notifyListeners();
   }
 
-  void setTabIndex(int index) {
-    _currentTabIndex = index;
-    notifyListeners();
-  }
-
-  void toggleRemoveMetadata(bool val) {
-    _removeMetadata = val;
-    notifyListeners();
-  }
-
-  void toggleModifyAudio(bool val) {
-    _modifyAudio = val;
-    notifyListeners();
-  }
-
-  void toggleModifyVisuals(bool val) {
-    _modifyVisuals = val;
-    notifyListeners();
-  }
-
-  void toggleUpscale1080p(bool val) {
-    _upscale1080p = val;
-    notifyListeners();
-  }
-
-  void toggleEnhanceAndDenoise(bool val) {
-    _enableEnhanceAndDenoise = val;
-    try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {}
-    notifyListeners();
-  }
-
-  void toggleDeepAntiFingerprint(bool val) {
-    _enableDeepAntiFingerprint = val;
-    try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {}
-    notifyListeners();
-  }
-
-  void toggleHorizontalFlip(bool val) {
-    _enableHorizontalFlip = val;
-    try { SettingsService.setHorizontalFlip(val); } catch (_) {}
-    notifyListeners();
-  }
-
-  void toggleAggressiveAudio(bool val) {
-    _enableAggressiveAudio = val;
-    try { SettingsService.setAggressiveAudio(val); } catch (_) {}
-    notifyListeners();
-  }
-
-  void toggleAutoTrim(bool val) {
-    _enableAutoTrim = val;
-    try { SettingsService.setAutoTrim(val); } catch (_) {}
-    notifyListeners();
-  }
-
-  void toggleBlurredCanvas(bool val) {
-    _enableBlurredCanvas = val;
-    notifyListeners();
-  }
-
-  void toggleMuteOriginalAudio(bool val) {
-    _muteOriginalAudio = val;
-    notifyListeners();
-  }
+  void setTabIndex(int index) { _currentTabIndex = index; notifyListeners(); }
+  void toggleRemoveMetadata(bool val) { _removeMetadata = val; notifyListeners(); }
+  void toggleModifyAudio(bool val) { _modifyAudio = val; notifyListeners(); }
+  void toggleModifyVisuals(bool val) { _modifyVisuals = val; notifyListeners(); }
+  void toggleUpscale1080p(bool val) { _upscale1080p = val; notifyListeners(); }
+  void toggleEnhanceAndDenoise(bool val) { _enableEnhanceAndDenoise = val; try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {} notifyListeners(); }
+  void toggleDeepAntiFingerprint(bool val) { _enableDeepAntiFingerprint = val; try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {} notifyListeners(); }
+  void toggleHorizontalFlip(bool val) { _enableHorizontalFlip = val; try { SettingsService.setHorizontalFlip(val); } catch (_) {} notifyListeners(); }
+  void toggleAggressiveAudio(bool val) { _enableAggressiveAudio = val; try { SettingsService.setAggressiveAudio(val); } catch (_) {} notifyListeners(); }
+  void toggleAutoTrim(bool val) { _enableAutoTrim = val; try { SettingsService.setAutoTrim(val); } catch (_) {} notifyListeners(); }
+  void toggleBlurredCanvas(bool val) { _enableBlurredCanvas = val; notifyListeners(); }
+  void toggleMuteOriginalAudio(bool val) { _muteOriginalAudio = val; notifyListeners(); }
+  void toggleDynamicZoom(bool val) { _enableDynamicZoom = val; try { SettingsService.setDynamicZoom(val); } catch (_) {} notifyListeners(); }
+  void toggleMicroOverlay(bool val) { _enableMicroOverlay = val; try { SettingsService.setMicroOverlay(val); } catch (_) {} notifyListeners(); }
+  void toggleFrameSkip(bool val) { _enableFrameSkip = val; try { SettingsService.setFrameSkip(val); } catch (_) {} notifyListeners(); }
+  void toggleChromaShift(bool val) { _enableChromaShift = val; try { SettingsService.setChromaShift(val); } catch (_) {} notifyListeners(); }
 
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
-    try {
-      SettingsService.setUpscaleResolution(_targetResolution);
-    } catch (_) {}
+    try { SettingsService.setUpscaleResolution(_targetResolution); } catch (_) {}
     notifyListeners();
   }
 
@@ -238,6 +198,10 @@ class UniquifierProvider extends ChangeNotifier {
     bool enableHorizontalFlip = false,
     bool enableAggressiveAudio = false,
     bool enableAutoTrim = false,
+    bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false,
+    bool enableFrameSkip = false,
+    bool enableChromaShift = false,
   }) {
     _removeMetadata = removeMetadata;
     _modifyAudio = modifyAudio;
@@ -249,6 +213,10 @@ class UniquifierProvider extends ChangeNotifier {
     _enableHorizontalFlip = enableHorizontalFlip;
     _enableAggressiveAudio = enableAggressiveAudio;
     _enableAutoTrim = enableAutoTrim;
+    _enableDynamicZoom = enableDynamicZoom;
+    _enableMicroOverlay = enableMicroOverlay;
+    _enableFrameSkip = enableFrameSkip;
+    _enableChromaShift = enableChromaShift;
     try {
       SettingsService.setUpscaleResolution(_targetResolution);
       SettingsService.setEnhanceAndDenoise(_enableEnhanceAndDenoise);
@@ -256,6 +224,10 @@ class UniquifierProvider extends ChangeNotifier {
       SettingsService.setHorizontalFlip(_enableHorizontalFlip);
       SettingsService.setAggressiveAudio(_enableAggressiveAudio);
       SettingsService.setAutoTrim(_enableAutoTrim);
+      SettingsService.setDynamicZoom(_enableDynamicZoom);
+      SettingsService.setMicroOverlay(_enableMicroOverlay);
+      SettingsService.setFrameSkip(_enableFrameSkip);
+      SettingsService.setChromaShift(_enableChromaShift);
     } catch (_) {}
     _currentTabIndex = 0;
     notifyListeners();

@@ -113,6 +113,22 @@ void main() {
       expect(await SettingsService.getAutoTrim(), isFalse);
       await SettingsService.setAutoTrim(true);
       expect(await SettingsService.getAutoTrim(), isTrue);
+
+      expect(await SettingsService.getDynamicZoom(), isFalse);
+      await SettingsService.setDynamicZoom(true);
+      expect(await SettingsService.getDynamicZoom(), isTrue);
+
+      expect(await SettingsService.getMicroOverlay(), isFalse);
+      await SettingsService.setMicroOverlay(true);
+      expect(await SettingsService.getMicroOverlay(), isTrue);
+
+      expect(await SettingsService.getFrameSkip(), isFalse);
+      await SettingsService.setFrameSkip(true);
+      expect(await SettingsService.getFrameSkip(), isTrue);
+
+      expect(await SettingsService.getChromaShift(), isFalse);
+      await SettingsService.setChromaShift(true);
+      expect(await SettingsService.getChromaShift(), isTrue);
     });
 
     test('purgeTempCache deletes staged and thumb files safely', () async {

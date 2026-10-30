@@ -39,6 +39,10 @@ class FfmpegService {
     bool enableHardwareAcceleration = false,
     bool enableBlurredCanvas = false,
     bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false,
+    bool enableFrameSkip = false,
+    bool enableChromaShift = false,
     VideoVariations? variations,
   }) {
     final safeInput = _escapePath(inputPath);
@@ -72,7 +76,14 @@ class FfmpegService {
     }
 
     final shouldUpscale = upscale ?? upscale1080p;
-    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip || enableBlurredCanvas;
+    final hasVisual = modifyVisuals ||
+        shouldUpscale ||
+        enableHorizontalFlip ||
+        enableBlurredCanvas ||
+        enableDynamicZoom ||
+        enableMicroOverlay ||
+        enableFrameSkip ||
+        enableChromaShift;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
     buffer.write(FilterBuilders.buildVideoFilter(
       hasVisual: hasVisual,
@@ -86,6 +97,10 @@ class FfmpegService {
       enableHorizontalFlip: enableHorizontalFlip,
       isPortrait: isPortrait,
       enableBlurredCanvas: enableBlurredCanvas,
+      enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift,
       variations: vars,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
@@ -219,6 +234,10 @@ class FfmpegService {
     bool enableHardwareAcceleration = false,
     bool enableBlurredCanvas = false,
     bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false,
+    bool enableFrameSkip = false,
+    bool enableChromaShift = false,
     bool suppressCompleteNotification = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
@@ -262,6 +281,10 @@ class FfmpegService {
       enableHardwareAcceleration: enableHardwareAcceleration,
       enableBlurredCanvas: enableBlurredCanvas,
       muteOriginalAudio: muteOriginalAudio,
+      enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift,
     );
 
     final baseName = inputPath.split(RegExp(r'[/\\]')).last;
