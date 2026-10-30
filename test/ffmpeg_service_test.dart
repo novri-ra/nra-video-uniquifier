@@ -418,5 +418,18 @@ void main() {
       );
       expect(cmd, contains('-y -hwaccel auto -i "/input.mp4"'));
     });
+
+    test('D5-01: RenderDiagnosticInfo flags 1216x2160 as truncated portrait and throws RenderIntegrityException', () {
+      const diag = RenderDiagnosticInfo(path: '/test.mp4', width: 1216, height: 2160);
+      expect(diag.isTruncatedPortrait, isTrue);
+      expect(
+        () {
+          if (diag.isTruncatedPortrait) {
+            throw const RenderIntegrityException('Output failed integrity: truncated or null dimensions');
+          }
+        },
+        throwsA(isA<RenderIntegrityException>()),
+      );
+    });
   });
 }

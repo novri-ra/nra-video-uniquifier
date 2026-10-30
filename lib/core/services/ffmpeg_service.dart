@@ -269,11 +269,7 @@ class FfmpegService {
     int totalDurationMs = 0,
   }) async {
     File? stagedFile;
-    try {
-      stagedFile = await stageInputFile(inputPath);
-    } catch (_) {
-      stagedFile = null;
-    }
+    try { stagedFile = await stageInputFile(inputPath); } catch (_) {}
 
     final effectiveInput = stagedFile?.path ?? inputPath;
     final inputFile = File(effectiveInput);
@@ -285,12 +281,8 @@ class FfmpegService {
     int resolvedDurationMs = totalDurationMs;
     if (isPortrait == null || totalDurationMs <= 0) {
       final meta = await _probeMediaMeta(effectiveInput);
-      if (isPortrait == null && meta.width > 0 && meta.height > 0) {
-        resolvedIsPortrait = meta.height > meta.width;
-      }
-      if (totalDurationMs <= 0 && meta.durationMs > 0) {
-        resolvedDurationMs = meta.durationMs;
-      }
+      if (isPortrait == null && meta.width > 0 && meta.height > 0) resolvedIsPortrait = meta.height > meta.width;
+      if (totalDurationMs <= 0 && meta.durationMs > 0) resolvedDurationMs = meta.durationMs;
     }
 
     final outputPath = customOutputPath ?? await generateOutputPath(inputPath);
@@ -333,7 +325,11 @@ class FfmpegService {
     try {
       final finalPath = await _executeFFmpeg(command, outputPath, sourcePath: effectiveInput);
       await MediaScannerService.scanFile(finalPath);
-      await inspectRenderedFile(finalPath);
+      final diag = await inspectRenderedFile(finalPath);
+      if (diag != null && (diag.isTruncatedPortrait || diag.width == null || diag.height == null)) {
+        _deletePartialFile(finalPath, sourcePath: effectiveInput);
+        throw RenderIntegrityException('Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})');
+      }
       await NotificationService.showCompleteNotification(
         title: 'Video Processing Complete',
         body: 'Saved to ${outputPath.split(RegExp(r"[/\\]")).last}',
