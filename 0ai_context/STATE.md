@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 10:35:00 UTC+07:00
+- **Timestamp**: 2026-10-30 11:15:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `7cf624f docs(reports): correct Report 32 counts, update P2-L/P2-I status, add Section 11 [E10-E13]`
-- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 3 audit closures applied, 100 tests passed (1 skipped), analyze 0 errors.
+- **HEAD Commit**: `57ee297 refactor(provider): extract pure formatters from UniquifierProvider [P2-L-EXT-1]`
+- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 4 decomposition phase 1 complete, 99/99 tests passed, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -34,14 +34,14 @@
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-30T01:25:00Z
-- **Index Counts**: 1372 nodes, 3526 edges, status ready.
+- **Indexed At**: 2026-10-30T04:10:00Z
+- **Index Counts**: 1421 nodes, 3658 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
 All critical modules strictly respect the <= 400 lines ceiling:
-1. `lib/core/providers/uniquifier_provider.dart` — 398 lines
-2. `lib/core/services/ffmpeg_service.dart` — 396 lines
-3. `lib/features/settings/screens/settings_screen.dart` — 394 lines
+1. `lib/core/services/ffmpeg_service.dart` — 396 lines
+2. `lib/features/settings/screens/settings_screen.dart` — 394 lines
+3. `lib/core/providers/uniquifier_provider.dart` — 367 lines
 4. `lib/features/process/screens/processing_screen.dart` — 318 lines
 5. `lib/features/process/widgets/source_file_section.dart` — 316 lines
 
@@ -51,7 +51,7 @@ All critical modules strictly respect the <= 400 lines ceiling:
 - **Dead Code Audit**:
   - Query: `tools["codebase-memory-mcp"].search_graph({ file_pattern: "lib/.*", max_degree: 0 })`
   - Result: 0 unreferenced symbols found in `lib/`.
-  - Manual import scan: All 32 Dart source files in `lib/` are actively imported and exercised in test suites.
+  - Manual import scan: All 33 Dart source files in `lib/` are actively imported and exercised in test suites.
 - **Dead Code Candidates**: 0 candidates flagged.
 
 ## 6. Skills Status
