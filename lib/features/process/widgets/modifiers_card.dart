@@ -89,7 +89,7 @@ class ModifiersCard extends StatelessWidget {
               _ToggleRow(
                 icon: Icons.security,
                 title: 'Deep Evasion',
-                subtitle: '5% margin crop & 0.4° tilt',
+                subtitle: '8% margin crop & 0.8° tilt',
                 value: provider.enableDeepAntiFingerprint,
                 onChanged: provider.toggleDeepAntiFingerprint,
               ),
