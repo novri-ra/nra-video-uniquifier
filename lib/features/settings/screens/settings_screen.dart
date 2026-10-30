@@ -39,16 +39,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _purgeCache() async {
+    final mb = (_cacheSizeBytes / (1024 * 1024)).toStringAsFixed(1);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Purge cache?'),
+        content: Text('Delete $mb MB of temporary files and thumbnails?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Purge')),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+
     final freed = await SettingsService.purgeTempCache();
     final updated = await SettingsService.getTempCacheSize();
     if (!mounted) return;
     setState(() => _cacheSizeBytes = updated);
-    final mb = (freed / (1024 * 1024)).toStringAsFixed(1);
+    final freedMb = (freed / (1024 * 1024)).toStringAsFixed(1);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Cache purged: $mb MB freed'),
-        backgroundColor: AppColors.primaryContainer,
-      ),
+      SnackBar(content: Text('Cache purged: $freedMb MB freed'), backgroundColor: AppColors.primaryContainer),
     );
   }
 
@@ -353,42 +364,24 @@ class _PresetProfileCard extends StatelessWidget {
           ActionChip(
             label: const Text('TikTok Fast'),
             onPressed: () => provider.applyPreset(
-              removeMetadata: true,
-              modifyAudio: true,
-              modifyVisuals: true,
-              upscale1080p: false,
-              enableEnhanceAndDenoise: false,
-              enableDeepAntiFingerprint: true,
-              enableAutoTrim: true,
+              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: false,
+              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: true, enableAutoTrim: true,
             ),
           ),
           ActionChip(
             label: const Text('Maximum Anti-Fingerprint'),
             onPressed: () => provider.applyPreset(
-              removeMetadata: true,
-              modifyAudio: true,
-              modifyVisuals: true,
-              upscale1080p: true,
-              upscaleTarget: '2k',
-              enableEnhanceAndDenoise: true,
-              enableDeepAntiFingerprint: true,
-              enableHorizontalFlip: true,
-              enableAggressiveAudio: true,
-              enableAutoTrim: true,
+              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: true, upscaleTarget: '2k',
+              enableEnhanceAndDenoise: true, enableDeepAntiFingerprint: true, enableHorizontalFlip: true,
+              enableAggressiveAudio: true, enableAutoTrim: true,
             ),
           ),
           ActionChip(
             label: const Text('Lossless Stealth'),
             onPressed: () => provider.applyPreset(
-              removeMetadata: true,
-              modifyAudio: false,
-              modifyVisuals: false,
-              upscale1080p: false,
-              enableEnhanceAndDenoise: false,
-              enableDeepAntiFingerprint: false,
-              enableHorizontalFlip: false,
-              enableAggressiveAudio: false,
-              enableAutoTrim: false,
+              removeMetadata: true, modifyAudio: false, modifyVisuals: false, upscale1080p: false,
+              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: false, enableHorizontalFlip: false,
+              enableAggressiveAudio: false, enableAutoTrim: false,
             ),
           ),
         ],

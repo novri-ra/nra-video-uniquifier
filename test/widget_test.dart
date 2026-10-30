@@ -224,6 +224,44 @@ void main() {
       expect(provider.modifyVisuals, isFalse);
       expect(provider.enableDeepAntiFingerprint, isFalse);
     });
+
+    testWidgets('D4-02: Purge cache confirmation dialog cancels or confirms purge', (tester) async {
+      final provider = UniquifierProvider();
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: provider,
+          child: const MaterialApp(
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final purgeButton = find.text('Purge Cache');
+      expect(purgeButton, findsOneWidget);
+      await tester.ensureVisible(purgeButton);
+
+      // Tap Purge -> Dialog opens
+      await tester.tap(purgeButton);
+      await tester.pumpAndSettle();
+      expect(find.text('Purge cache?'), findsOneWidget);
+
+      // Tap Cancel -> Dialog closes
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(find.text('Purge cache?'), findsNothing);
+
+      // Tap Purge -> Dialog opens again
+      await tester.tap(purgeButton);
+      await tester.pumpAndSettle();
+      expect(find.text('Purge cache?'), findsOneWidget);
+
+      // Tap Purge button in dialog -> Confirms
+      final confirmButton = find.widgetWithText(TextButton, 'Purge');
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+      expect(find.text('Purge cache?'), findsNothing);
+    });
   });
 }
 
