@@ -249,7 +249,7 @@ class _AlertsSettingsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(children: [Icon(Icons.work_outline, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Text('Background Processing', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600))]),
+              const Expanded(child: Row(children: [Icon(Icons.work_outline, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Background Processing', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
               Switch(value: backgroundProcessing, onChanged: onToggleBackground),
             ],
           ),
@@ -257,7 +257,7 @@ class _AlertsSettingsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(children: [Icon(Icons.volume_up_outlined, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Text('Notification Sound', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600))]),
+              const Expanded(child: Row(children: [Icon(Icons.volume_up_outlined, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Notification Sound', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
               Switch(value: notificationSound, onChanged: onToggleSound),
             ],
           ),
@@ -279,8 +279,11 @@ class _CacheMaintenanceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,

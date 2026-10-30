@@ -303,6 +303,27 @@ void main() {
       expect(deleteTarget.width, greaterThanOrEqualTo(48.0));
       expect(deleteTarget.height, greaterThanOrEqualTo(48.0));
     });
+
+    testWidgets('D4-03: SettingsScreen renders cleanly on 320x480 with textScaleFactor 2.0 without RenderFlex overflow', (tester) async {
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      final provider = UniquifierProvider();
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: provider,
+          child: const MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(size: Size(320, 480), textScaler: TextScaler.linear(2.0)),
+              child: SettingsScreen(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
   });
 }
 
