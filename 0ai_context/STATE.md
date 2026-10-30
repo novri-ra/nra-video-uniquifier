@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 13:45:00 UTC+07:00
+- **Timestamp**: 2026-10-30 14:15:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `3565d47 refactor(settings): extract CodecSelectorCard from SettingsScreen [P2-L-EXT-3]`
-- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 6 settings_screen decomposition complete, all 35 lib files <= 367 LOC, 99/99 tests passed, analyze 0 errors.
+- **HEAD Commit**: `a2735d8 feat(test): add testOverride hook to NotificationService and restore real tests [P2-M, P2-L-CLOSE]`
+- **Working Tree**: Anti-vDNA TikTok evasion hardened, Sprint 7 notification testability complete, all audit findings closed, 100/100 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -34,8 +34,8 @@
 ## 3. MCP Index Status
 - **MCP Server**: `codebase-memory-mcp`
 - **Trust Tier**: Managed via Hermes config (`command: C:/Users/Administrator/.local/bin/codebase-memory-mcp.exe`).
-- **Indexed At**: 2026-10-30T06:40:00Z
-- **Index Counts**: 1467 nodes, 3729 edges, status ready.
+- **Indexed At**: 2026-10-30T07:15:00Z
+- **Index Counts**: 1492 nodes, 3771 edges, status ready.
 
 ## 4. Module Health (5 Most Critical Files)
 All critical modules strictly respect the <= 400 lines ceiling (all files <= 367 lines):
