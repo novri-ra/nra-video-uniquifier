@@ -4,10 +4,11 @@ import 'settings_service.dart';
 /// Pure static builders for FFmpeg video and audio filtergraph chains.
 class FilterBuilders {
   static String _buildCanvasChain({required bool isPortrait}) {
-    final dim = isPortrait ? '1080:1920' : '1920:1080';
+    final bgDim = isPortrait ? '1080:1920' : '1920:1080';
+    final fgDim = isPortrait ? 'w=1026:h=1824' : 'w=1824:h=1026';
     return '[0:v]split=2[bg][fg];'
-        '[bg]scale=$dim:force_original_aspect_ratio=increase,crop=$dim,boxblur=luma_radius=min(h\\,w)/35:luma_power=2[blurred];'
-        '[fg]scale=w=trunc(iw*0.95/2)*2:h=trunc(ih*0.95/2)*2[main];'
+        '[bg]scale=$bgDim:force_original_aspect_ratio=increase,crop=$bgDim,boxblur=luma_radius=min(h\\,w)/40:luma_power=2[blurred];'
+        '[fg]scale=$fgDim:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'
         '[blurred][main]overlay=(W-w)/2:(H-h)/2[outv]';
   }
 
