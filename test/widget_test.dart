@@ -6,6 +6,8 @@ import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
+import 'package:nra_video_uniquifier/features/process/screens/processing_screen.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/processing_radar_indicator.dart';
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
 import 'package:nra_video_uniquifier/features/history/widgets/history_item_card.dart';
@@ -323,6 +325,27 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('D2-02: ProcessingScreen ticker caps progress <= 15% before native completion', (tester) async {
+      final provider = UniquifierProvider();
+      await tester.pumpWidget(
+        ChangeNotifierProvider.value(
+          value: provider,
+          child: const MaterialApp(
+            home: ProcessingScreen(),
+          ),
+        ),
+      );
+      // Advance 2 seconds into 4-second ticker
+      await tester.pump(const Duration(seconds: 2));
+
+      final radar = tester.widget<ProcessingRadarIndicator>(find.byType(ProcessingRadarIndicator));
+      expect(radar.progress, lessThanOrEqualTo(0.15));
+
+      // Settle delayed mock engine timer
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
     });
   });
 }
