@@ -11,6 +11,7 @@ import 'package:nra_video_uniquifier/features/process/widgets/processing_radar_i
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
 import 'package:nra_video_uniquifier/features/history/widgets/history_item_card.dart';
+import 'package:nra_video_uniquifier/features/history/screens/recent_history_screen.dart';
 import 'package:nra_video_uniquifier/core/services/history_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -346,6 +347,18 @@ void main() {
       // Settle delayed mock engine timer
       await tester.pump(const Duration(seconds: 2));
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('D2-03: RecentHistoryScreen disposes safely mid-load without setState after dispose exception', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: RecentHistoryScreen(),
+        ),
+      );
+      // Immediately replace widget tree to dispose screen while async load is running
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
     });
   });
 }
