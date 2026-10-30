@@ -3,8 +3,10 @@
 ## 1. Executive Verdict
 
 - **Phase 1 (P1 Critical Logic & Concurrency)**: **DONE (3/3)** — `76e1cb6`, `5c07451`, `5f271c6`
-- **Phase 2 (P2 UX, Duplication, Integrity & Sizing)**: **PARTIAL (9/11 Done, 2 Blocked)** — `e9c3fe2`, `7f8f952`, `6e2b58b`, `7e94f7a`, `ee19e1c`, `35719d7`, `da60d7c`, `bd208c3`, `a62bb6e`, `8a51230`, `efa47c8`. P2-L & P2-M berstatus `BLOCKED`.
+- **Phase 2 (P2 UX, Duplication, Integrity & Sizing)**: **PARTIAL (10 Done, 1 Partial, 2 Blocked out of 13)** — `e9c3fe2`, `7f8f952`, `6e2b58b`, `7e94f7a`, `ee19e1c`, `35719d7`, `da60d7c`, `bd208c3`, `a62bb6e`, `8a51230`, `efa47c8`. P2-L berstatus `DEFERRED_TO_SPRINT_4` & P2-M berstatus `BLOCKED`.
 - **Phase 3 (P3 Hardening, Labeling & Documentation)**: **DONE (6/6)** — `3fd2911`, `4ebec88`, `23685eb`, `5805766`, `1ff6257`, absorbed `5f271c6`.
+
+> **Catatan Koreksi Sprint 3**: Hitungan pada ringkasan interim sebelumnya mencantumkan '9/11'. Aktual: 10 DONE, 1 PARTIAL (P2-I kode mendarat, pengujian unit false-green dihapus & di-skip secara jujur), 2 BLOCKED (P2-L didefer ke Sprint 4, P2-M terhalang refaktor struktural NotificationService).
 
 | Item ID | Status | Deskripsi | Commit SHA |
 |---|---|---|---|
@@ -20,10 +22,10 @@
 | **P2-F (D2-02)** | DONE | Ticker progress dibatasi max 15% sebelum native callback masuk | `35719d7` |
 | **P2-G (D2-03)** | DONE | Guard `if (!mounted) return;` pada `_loadHistory` | `da60d7c` |
 | **P2-H (D5-01)** | DONE | Diagnostic gate aktif melempar `RenderIntegrityException` | `bd208c3` |
-| **P2-I (D5-02)** | PARTIAL / BLOCKED | Flag `suppressCompleteNotification: true` aktif di engine & batch runner; pengujian unit berstatus BLOCKED karena keterbatasan mock Channel | `a62bb6e` |
+| **P2-I (D5-02)** | PARTIAL | Flag `suppressCompleteNotification: true` aktif di engine & batch runner; tes unit false green dihapus dan diganti skip eksplisit | `a62bb6e`, `6bd5854` |
 | **P2-J (D6-01)** | DONE | Tag `<root-path>` dihapus dari FileProvider | `8a51230` |
 | **P2-K (D7-01)** | DONE | `cacheWidth: 240, cacheHeight: 240` disetel pada seluruh `Image.file` | `efa47c8` |
-| **P2-L (D8-01)** | BLOCKED | Dekomposisi `processVideo` ditunda demi menjaga plafon 400 baris (aktual 396 LOC) | `BLOCKED` |
+| **P2-L (D8-01)** | DEFERRED_TO_SPRINT_4 | Dekomposisi memerlukan ekstraksi ke berkas baru karena ekspansi in-file akan mendorong ffmpeg_service.dart ke 410+ LOC. Dijadwalkan ke Sprint 4. | `DEFERRED` |
 | **P2-M (D9-01)** | BLOCKED | Perbaikan false-green Android test membutuhkan refaktor struktural NotificationService | `BLOCKED` |
 | **P3-A (D8-02)** | DONE | Subtitle ModifiersCard diperbarui ke 8% margin crop & 0.8° tilt | `3fd2911` |
 | **P3-B (D8-03)** | DONE | Direktori usang `/Movies/VideoUniquifier` dibersihkan dari seluruh kode | `4ebec88` |
@@ -85,10 +87,11 @@ Seluruh 9 poin errata telah diterapkan secara permanen ke `0ai_context/reports/3
 | **P2-F** | DONE | `lib/features/process/screens/processing_screen.dart` | `widget_test.dart` (Ticker progress clamp <= 15% assert) | `35719d7` |
 | **P2-G** | DONE | `lib/features/history/screens/recent_history_screen.dart` | `widget_test.dart` (Dispose screen mid-load no-exception assert) | `da60d7c` |
 | **P2-H** | DONE | `lib/core/services/render_diagnostic_service.dart`, `lib/core/services/ffmpeg_service.dart` | `ffmpeg_service_test.dart` (Truncated 1216x2160 throws RenderIntegrityException) | `bd208c3` |
-| **P2-I** | PARTIAL | `lib/core/services/ffmpeg_service.dart`, `lib/core/providers/batch_queue_provider.dart` | `batch_queue_provider_test.dart` (3-item batch runner execution) | `a62bb6e` |
+| **P2-I** | PARTIAL | `lib/core/services/ffmpeg_service.dart`, `lib/core/providers/batch_queue_provider.dart` | `batch_queue_provider_test.dart` (test removed as false green; blocked on structural debt) | `a62bb6e`, `6bd5854` |
 | **P2-J** | DONE | `android/app/src/main/res/xml/provider_paths.xml` | Inspeksi statis & verifikasi kode `MainActivity.kt` | `8a51230` |
 | **P2-K** | DONE | `lib/features/process/widgets/source_file_section.dart`, `lib/features/process/screens/success_screen.dart` | Grep verifikasi seluruh `Image.file` memiliki `cacheWidth: 240` | `efa47c8` |
-| **P3-A** | DONE | `lib/features/process/widgets/modifiers_card.dart` | Inspeksi statis teks subtitle '8% margin crop & 0.8° tilt' | `3fd2911` |
+| **P2-L** | DEFERRED_TO_SPRINT_4 | `lib/core/services/ffmpeg_service.dart` | Ekstraksi ke berkas terpisah dijadwalkan ke Sprint 4 | `DEFERRED` |
+| **P2-M** | BLOCKED | `lib/core/services/notification_service.dart`, `test/` | Perbaikan false-green Android test terhalang arsitektur tertutup | `BLOCKED` |
 | **P3-B** | DONE | `lib/core/services/history_service.dart` | Grep verifikasi penghapusan string `/Movies/VideoUniquifier` | `4ebec88` |
 | **P3-C** | DONE | `lib/features/process/screens/error_screen.dart` | `widget_test.dart` (Verifikasi redaksi path `/storage/emulated/0/` -> `<external storage>/...`) | `23685eb` |
 | **P3-D** | DONE | `0ai_context/STATE.md` | Inspeksi berkas dan sinkronisasi baseline MCP | `5805766` |
@@ -102,14 +105,14 @@ Seluruh 9 poin errata telah diterapkan secara permanen ke `0ai_context/reports/3
 1. **P2-D (Touch Target Sizing) Terbukti Defek Riil**:
    Inspeksi kode sebelum modifikasi menemukan bahwa `top_app_bar.dart` secara eksplisit menetapkan `constraints: BoxConstraints(minWidth: 32, minHeight: 32)` dan `history_item_card.dart` menyetel `minimumSize: Size(32, 32)` serta `fixedSize: Size(32, 32)` dengan jarak antar tombol hanya 6dp. Ini bukan false positive melainkan pelanggaran nyata standar Material 3. Telah diperbaiki ke minimum 48x48dp dengan margin antar tombol 8dp.
 
-2. **Insiden P2-I (Notification Suppression False Green)**:
-   Perubahan logika pada `ffmpeg_service.dart` dan `batch_queue_provider.dart` telah terbukti mendarat dengan benar (`suppressCompleteNotification: true` di baris 108, dan pembungkusan `if (!suppressCompleteNotification)` di engine). Namun, pengujian unit di `test/batch_queue_provider_test.dart` tidak dapat melakukan spy secara deterministik terhadap pemanggilan method channel karena `NotificationService` memblokir seluruh pemanggilan di host Windows via guard `if (!Platform.isAndroid) return;`. Menambahkan spy tanpa mengubah kode produksi `NotificationService` tidak dimungkinkan dalam lingkup sprint ini. Oleh karena itu, pengujian perilaku P2-I berstatus **BLOCKED** dan dicatat sebagai hutang teknis.
+2. **Insiden P2-I (Notification Suppression False Green & Test Removal)**:
+   Perubahan logika pada `ffmpeg_service.dart` dan `batch_queue_provider.dart` telah terbukti mendarat dengan benar (`suppressCompleteNotification: true` di baris 108, dan pembungkusan `if (!suppressCompleteNotification)` di engine). Namun, pengujian unit di `test/batch_queue_provider_test.dart` sebelumnya memvalidasi hal yang keliru (false green). Tes tersebut kini telah dihapus/digantikan dengan explicit skip (`skip: 'requires NotificationService injectability — see Report 32 §6.1'`) karena `NotificationService` memblokir seluruh pemanggilan di host Windows via guard `if (!Platform.isAndroid) return;` dan ketiadaan mekanisme spy tanpa perubahan kode produksi. Defek testing ini dicatat sebagai hutang struktural.
 
 3. **Status Audit Skill (V15 & V22)**:
    Pemeriksaan stempel waktu berkas `stat` pada `C:/Users/Administrator/AppData/Local/hermes/skills/devops/flutter-state-and-testing/SKILL.md` menunjukkan waktu modifikasi `2026-10-30 09:21:00 +0700`, yang berada di dalam jendela eksekusi sprint ini. Berkas skill tersebut berada di luar git repositori proyek (konfigurasi global user Hermes). Dampak penambahan dokumentasi best-practice di dalam berkas skill tersebut terhadap pola tes P1-A, P1-B, P2-B, dan P3-E adalah **UNVERIFIED**. Disarankan untuk membaca ulang `SKILL.md` sebelum memulai sprint berikutnya.
 
 4. **Koreksi Baseline MCP Sprint 2**:
-   Angka metrik yang sempat tercantum pada ringkasan interm Sprint 2 (1372 nodes / 3526 edges) digantikan oleh hasil audit re-index V21 yang deterministik, yaitu **1381 nodes dan 3547 edges**.
+   The figure reported in the Sprint 2 interim summary (1372/3526) is superseded by the V21 re-index (1381/3547); the interim summary was not reproducible against a clean working tree.
 
 5. **Pengujian Fisik Perangkat Android Masih Pending**:
    Perubahan `<external-path>` pada `provider_paths.xml` (P2-J), perilaku redaksi path (P3-C), dan validasi visual di lingkungan Android asli belum diuji pada hardware fisik karena ketiadaan koneksi USB debugging / emulator Android aktif pada host selama sprint.
@@ -121,8 +124,11 @@ Seluruh 9 poin errata telah diterapkan secara permanen ke `0ai_context/reports/3
 1. **Arsitektur `NotificationService` Tidak Mendukung Testing Injection (Structural Debt)**:
    Kelas `NotificationService` menggunakan implementasi statis tertutup dengan early return `if (!Platform.isAndroid) return;` langsung di awal fungsi tanpa dependensi yang dapat di-inject (misalnya interface atau notification handler callback). Hal ini memaksa setiap pengujian yang ingin memvalidasi notifikasi di host non-Android bergantung pada modifikasi kode produksi atau mock MethodChannel global pihak ketiga (`flutter_local_notifications`). Perlu refaktor arsitektur ke Dependency Injection / Service Locator pada sprint berikutnya agar temuan D9-01 dan D5-02 dapat diuji secara tuntas.
 
-2. **Risiko Plafon 400 Baris pada `ffmpeg_service.dart` dan `uniquifier_provider.dart`**:
-   Berkas `uniquifier_provider.dart` saat ini berada di 398 baris, dan `ffmpeg_service.dart` berada di 396 baris (keduanya <= 400 baris, mematuhi plafon keras). Dekomposisi P2-L sengaja ditunda karena refaktor fungsi `processVideo` tanpa ekstraksi file berisiko menaikkan jumlah baris melewati batas 400.
+2. **Dekomposisi P2-L Membutuhkan Ekstraksi Berkas Baru (P2-L Decomposition Feasibility)**:
+   Decomposition requires extracting processVideo's sub-helpers to a new file because in-file expansion (signatures + blank lines) would push `ffmpeg_service.dart` from 396 to 410+ LOC. Extracting to a new file is the correct remedy and is scheduled for Sprint 4.
+
+3. **Ruang Gerak Struktural Menipis (Structural Slack Exhausted)**:
+   Structural slack exhausted: 3 files at 394–398 of 400 LOC. Sprint 4 MUST begin with decomposition of `uniquifier_provider.dart` (398), `ffmpeg_service.dart` (396), and `settings_screen.dart` (394) before any new feature work.
 
 ---
 
@@ -130,7 +136,7 @@ Seluruh 9 poin errata telah diterapkan secara permanen ke `0ai_context/reports/3
 
 ### Status Kompilasi & Pengujian
 - `flutter analyze --fatal-infos`: **0 issues** (clean).
-- `flutter test`: **100/100 tests passed** (100% lulus di seluruh 12 test suite).
+- `flutter test`: **100 tests passed, 1 skipped** (100% lulus, 1 skip jujur pada `D5-02` karena dependensi native Android).
 
 ### Metrik Baris Kode (Plafon Keras <= 400 LOC)
 Semua 32 berkas Dart di `lib/` mematuhi batas <= 400 baris. Tiga berkas terpanjang (> 350 baris):
@@ -177,3 +183,14 @@ Seluruh proses remediasi pada Sprint 2 diselesaikan dengan mematuhi kaidah isola
 1. Pengujian P2-I (notifikasi batch tunggal) tidak dibuatkan assertions palsu saat diketahui bahwa `NotificationService` tidak dapat di-spy di host Windows. Defek testing ini secara jujur ditandai sebagai `BLOCKED` dan dicatat sebagai hutang struktural.
 2. Tidak ada klaim verifikasi perangkat keras Android nyata; seluruh kepatuhan intent FileProvider dan redaksi path diverifikasi melalui unit/widget test dan penelusuran kode statis.
 3. Seluruh berkas Dart di `lib/` dipastikan berada di bawah batas ketat 400 baris kode, dengan file terpanjang berada pada 398 baris.
+
+---
+
+## 11. Sprint 3 Corrections
+
+| # | Correction | Evidence | Commit |
+|---|---|---|---|
+| **E10** | Phase 2 count corrected to 10 Done / 1 Partial / 2 Blocked of 13 | §1 table | `853cb43` |
+| **E11** | P2-I false green test removed/replaced with explicit skip | `test/batch_queue_provider_test.dart:138-148` | `6bd5854` |
+| **E12** | P2-L status -> DEFERRED_TO_SPRINT_4 with rationale | §1, §6.2 | `853cb43` |
+| **E13** | Structural slack warning added | §6.3 | `853cb43` |
