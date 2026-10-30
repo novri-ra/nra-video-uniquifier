@@ -481,10 +481,19 @@ void main() {
         isPortrait: true,
       );
       expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
-      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/35:luma_power=2[blurred];'));
-      expect(cmd, contains(r'[fg]scale=w=trunc(iw*0.95/2)*2:h=trunc(ih*0.95/2)*2[main];'));
+      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
+      expect(cmd, contains(r'[fg]scale=w=1026:h=1824:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'));
       expect(cmd, contains(r'[blurred][main]overlay=(W-w)/2:(H-h)/2[outv];[outv]'));
       expect(cmd, contains('format=yuv420p'));
+
+      final cmdLandscape = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        isPortrait: false,
+      );
+      expect(cmdLandscape, contains(r'[bg]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
+      expect(cmdLandscape, contains(r'[fg]scale=w=1824:h=1026:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'));
     });
 
     test('Mute original audio ducks volume to near-zero for platform background music overlay', () {

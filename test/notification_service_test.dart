@@ -56,6 +56,8 @@ void main() {
       expect(capturedNotificationsCalls.any((call) => call.method == 'initialize'), isTrue);
       final initCall = capturedNotificationsCalls.firstWhere((call) => call.method == 'initialize');
       expect(initCall.arguments, isNotNull);
+      final args = Map<String, dynamic>.from(initCall.arguments as Map);
+      expect(args['defaultIcon'], equals('@mipmap/launcher_icon'));
     });
 
     test('requestPermission invokes checkPermissionStatus on permission channel and returns true', () async {
@@ -84,6 +86,7 @@ void main() {
       expect(specifics['showProgress'], isTrue);
       expect(specifics['progress'], equals(50));
       expect(specifics['ongoing'], isTrue);
+      expect(specifics['icon'], equals('@mipmap/launcher_icon'));
     });
 
     test('showProgressNotification allows 0% and 100% to bypass throttling without force', () async {
@@ -138,6 +141,7 @@ void main() {
       final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
       expect(specifics['playSound'], isTrue);
       expect(specifics['channelId'], equals(NotificationService.completeChannelId));
+      expect(specifics['icon'], equals('@mipmap/launcher_icon'));
     });
   });
 }

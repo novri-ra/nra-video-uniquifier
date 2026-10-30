@@ -28,7 +28,7 @@ class NotificationService {
   static Future<void> init() async {
     if (_initialized || !_canRun) return;
     try {
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
       const initSettings = InitializationSettings(android: androidSettings);
       await _plugin.initialize(settings: initSettings);
 
@@ -108,6 +108,7 @@ class NotificationService {
       channelDescription: 'Ongoing video processing progress',
       importance: Importance.low,
       priority: Priority.low,
+      icon: '@mipmap/launcher_icon',
       showProgress: true,
       maxProgress: 100,
       progress: clamped,
@@ -157,6 +158,7 @@ class NotificationService {
       channelDescription: 'Alerts when video processing finishes',
       importance: Importance.high,
       priority: Priority.high,
+      icon: '@mipmap/launcher_icon',
       playSound: playSound,
       enableVibration: true,
       autoCancel: true,
