@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 17:30:00 UTC+07:00
+- **Timestamp**: 2026-10-30 18:45:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `72e85f6 docs(release): resolve Play Store submission blockers with privacy policy, icon guide, and submission checklist`
-- **Working Tree**: Sprint 42 TikTok evasion with high visual fidelity complete, imperceptible bounded randomization active, 103/103 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `4118843 feat(pipeline): harden TikTok evasion with high visual fidelity, imperceptible micro-shifts, and exact A/V sync`
+- **Working Tree**: Sprint 43 hardened evasion implementation complete, 7-9% crop, 0.6-0.9 deg tilt, noise 3-4, 0.970-0.975 PTS, Apple iPhone 15 Pro Max QuickTime metadata, default pink noise masking, 29.85 fps perturbation, 104/104 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -35,6 +35,7 @@
 - [x] Automated release preparation: package id `id.novrira.videouniquifier`, release keystore generation, AAB signed deliverable (Report 40).
 - [x] Play Store submission blockers closed: privacy policy, icon generation guide, submission checklist (Report 41).
 - [x] High-fidelity imperceptible TikTok evasion: bounded dynamic micro-shifts, exact A/V sync, zero hue destruction (Report 42).
+- [x] Forensic drift audit & vDNA bypass remediation: hardened spatial/audio/temporal parameters, Apple device metadata, baseline pink noise masking, fps perturbation (Report 41 audit, Report 43 implementation).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

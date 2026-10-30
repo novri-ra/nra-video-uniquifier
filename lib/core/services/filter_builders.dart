@@ -98,11 +98,11 @@ class FilterBuilders {
         return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5" -c:a aac -b:a 192k';
+        return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
       }
       return ' -af "atempo=$tempo,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
     } catch (_) {
-      return ' -af "atempo=1.015228,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
+      return ' -af "atempo=1.025641,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
     }
   }
 }

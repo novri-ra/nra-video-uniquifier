@@ -100,8 +100,13 @@ void main() {
       expect(cmd, contains('-pix_fmt yuv420p'));
       expect(cmd, contains('-movflags +faststart'));
       expect(cmd, contains('-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv'));
-      expect(cmd, contains('-metadata encoder="Lavf58.29.100"'));
+      expect(cmd, contains('-metadata make="Apple"'));
+      expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
+      expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
+      expect(cmd, contains('-metadata:s:v:0 handler_name="Core Media Video"'));
+      expect(cmd, contains('-metadata:s:a:0 handler_name="Core Media Audio"'));
       expect(cmd, contains('-c:a copy'));
+      expect(cmd, contains('-r 29.'));
 
       // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
       final ptsIdx = cmd.indexOf('setpts=');
@@ -406,6 +411,65 @@ void main() {
         expect(brightness, lessThanOrEqualTo(0.0101));
         expect((contrast - 1.0).abs(), lessThanOrEqualTo(0.0101));
         expect((saturation - 1.0).abs(), lessThanOrEqualTo(0.0101));
+      }
+    });
+
+    test('TikTok Hardened Evasion Validation: crop >= 7%, rotation >= 0.6 deg, noise >= 3, speed factor <= 0.975, smartphone metadata', () {
+      final cropRegex = RegExp(r'crop=trunc\(iw\*([0-9.]+)/2\)\*2:trunc\(ih\*([0-9.]+)/2\)\*2');
+      final rotRegex = RegExp(r'rotate=([0-9.]+)\*PI/180');
+      final noiseRegex = RegExp(r'noise=alls=([0-9]+):allf=t\+u');
+      final ptsRegex = RegExp(r'setpts=([0-9.]+)\*PTS');
+
+      for (var i = 0; i < 20; i++) {
+        final vars = VariationGenerator.generate();
+        expect(vars.cropPercent, greaterThanOrEqualTo(0.0699));
+        expect(vars.cropPercent, lessThanOrEqualTo(0.0901));
+        expect(vars.rotateAngle, greaterThanOrEqualTo(0.599));
+        expect(vars.rotateAngle, lessThanOrEqualTo(0.901));
+        expect(vars.noiseStrength, greaterThanOrEqualTo(3));
+        expect(vars.noiseStrength, lessThanOrEqualTo(4));
+        expect(vars.speedFactor, greaterThanOrEqualTo(0.9699));
+        expect(vars.speedFactor, lessThanOrEqualTo(0.9751));
+        expect(vars.outputFps, greaterThanOrEqualTo(29.79));
+        expect(vars.outputFps, lessThanOrEqualTo(29.91));
+
+        final cmd = FfmpegService.buildCommand(
+          inputPath: '/path/input.mp4',
+          outputPath: '/path/output.mp4',
+          modifyVisuals: true,
+          modifyAudio: true,
+          enableDeepAntiFingerprint: true,
+          variations: vars,
+        );
+
+        final cropMatch = cropRegex.firstMatch(cmd);
+        expect(cropMatch, isNotNull);
+        final keepRatio = double.parse(cropMatch!.group(1)!);
+        expect(keepRatio, lessThanOrEqualTo(0.9301));
+        expect(keepRatio, greaterThanOrEqualTo(0.9099));
+
+        final rotMatch = rotRegex.firstMatch(cmd);
+        expect(rotMatch, isNotNull);
+        final rotAngle = double.parse(rotMatch!.group(1)!);
+        expect(rotAngle, greaterThanOrEqualTo(0.599));
+
+        final noiseMatch = noiseRegex.firstMatch(cmd);
+        expect(noiseMatch, isNotNull);
+        final noiseVal = int.parse(noiseMatch!.group(1)!);
+        expect(noiseVal, greaterThanOrEqualTo(3));
+
+        final ptsMatch = ptsRegex.firstMatch(cmd);
+        expect(ptsMatch, isNotNull);
+        final ptsVal = double.parse(ptsMatch!.group(1)!);
+        expect(ptsVal, lessThanOrEqualTo(0.9751));
+
+        expect(cmd, contains('-metadata make="Apple"'));
+        expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
+        expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
+        expect(cmd, contains('-metadata:s:v:0 handler_name="Core Media Video"'));
+        expect(cmd, contains('-metadata:s:a:0 handler_name="Core Media Audio"'));
+        expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.0015'));
+        expect(cmd, contains('-r 29.'));
       }
     });
 

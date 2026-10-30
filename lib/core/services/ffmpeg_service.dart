@@ -55,7 +55,8 @@ class FfmpegService {
     buffer.write(' -i "$safeInput"');
     if (removeMetadata) {
       buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact');
-      buffer.write(' -metadata encoder="Lavf58.29.100"');
+      buffer.write(' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"');
+      buffer.write(' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"');
     }
 
     VideoVariations vars;
@@ -91,6 +92,9 @@ class FfmpegService {
       variations: vars,
     ));
 
+    if (hasVisual) {
+      buffer.write(' -r ${vars.outputFps.toStringAsFixed(2)}');
+    }
     if (!hasVisual && !modifyAudio) buffer.write(' -c copy');
     buffer.write(' "$safeOutput"');
     return buffer.toString();
