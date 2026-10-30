@@ -105,6 +105,8 @@ class BatchQueueProvider extends ChangeNotifier {
           enableAutoTrim: config.enableAutoTrim,
           isPortrait: null,
           enableHardwareAcceleration: config.hardwareAcceleration,
+          enableBlurredCanvas: config.enableBlurredCanvas,
+          muteOriginalAudio: config.muteOriginalAudio,
           suppressCompleteNotification: true,
           totalDurationMs: 0,
           onProgress: (p, speed, timeMs) {

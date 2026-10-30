@@ -3,6 +3,32 @@ import 'settings_service.dart';
 
 /// Pure static builders for FFmpeg video and audio filtergraph chains.
 class FilterBuilders {
+  static String _buildCanvasChain({required bool isPortrait}) {
+    final dim = isPortrait ? '1080:1920' : '1920:1080';
+    return '[0:v]split=2[bg][fg];'
+        '[bg]scale=$dim:force_original_aspect_ratio=increase,crop=$dim,boxblur=luma_radius=min(h\\,w)/20:luma_power=2[blurred];'
+        '[fg]scale=w=trunc(iw*0.88/2)*2:h=trunc(ih*0.88/2)*2[main];'
+        '[blurred][main]overlay=(W-w)/2:(H-h)/2[outv]';
+  }
+
+  static List<String> _buildPostCanvasFilters({
+    required bool modifyVisuals,
+    required bool enableHorizontalFlip,
+    required bool enableEnhanceAndDenoise,
+    required VideoVariations vars,
+  }) {
+    return <String>[
+      if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
+      if (enableHorizontalFlip) 'hflip',
+      if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
+      if (modifyVisuals)
+        'eq=brightness=${vars.brightness.toStringAsFixed(4)}:contrast=${vars.contrast.toStringAsFixed(4)}:saturation=${vars.saturation.toStringAsFixed(4)}',
+      if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'format=yuv420p',
+    ];
+  }
+
   static List<String> _buildFiltersList({
     required bool modifyVisuals,
     required bool enableDeepAntiFingerprint,
@@ -46,25 +72,39 @@ class FilterBuilders {
     bool enableDeepAntiFingerprint = true,
     bool enableHorizontalFlip = false,
     bool isPortrait = false,
+    bool enableBlurredCanvas = false,
     VideoVariations? variations,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
-      final filters = _buildFiltersList(
-        modifyVisuals: modifyVisuals,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableHorizontalFlip: enableHorizontalFlip,
-        upscale: upscale,
-        targetResolution: targetResolution,
-        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-        isPortrait: isPortrait,
-        vars: vars,
-      );
+      final String vfString;
+      if (enableBlurredCanvas) {
+        final canvas = _buildCanvasChain(isPortrait: isPortrait);
+        final post = _buildPostCanvasFilters(
+          modifyVisuals: modifyVisuals,
+          enableHorizontalFlip: enableHorizontalFlip,
+          enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+          vars: vars,
+        );
+        vfString = '$canvas;[outv]${post.join(',')}';
+      } else {
+        final filters = _buildFiltersList(
+          modifyVisuals: modifyVisuals,
+          enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+          enableHorizontalFlip: enableHorizontalFlip,
+          upscale: upscale,
+          targetResolution: targetResolution,
+          enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+          isPortrait: isPortrait,
+          vars: vars,
+        );
+        vfString = filters.join(',');
+      }
       final codecArgs = videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
           : '-c:v libx264 -preset fast -crf 22';
-      return ' -vf "${filters.join(',')}" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
+      return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {
       return buildVideoFilter(
         hasVisual: hasVisual,
@@ -77,6 +117,7 @@ class FilterBuilders {
         enableDeepAntiFingerprint: false,
         enableHorizontalFlip: enableHorizontalFlip,
         isPortrait: isPortrait,
+        enableBlurredCanvas: false,
         variations: VideoVariations.fallback,
       );
     }
@@ -88,12 +129,16 @@ class FilterBuilders {
     required bool hasVisual,
     bool enableDeepAntiFingerprint = true,
     bool enableAggressiveAudio = false,
+    bool muteOriginalAudio = false,
     VideoVariations? variations,
   }) {
     if (!hasAudio) return hasVisual ? ' -c:a copy' : '';
     try {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final tempo = vars.audioTempo.toStringAsFixed(6);
+      if (muteOriginalAudio) {
+        return ' -af "volume=0.01,atempo=$tempo" -c:a aac -b:a 128k';
+      }
       if (enableAggressiveAudio) {
         return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
       }

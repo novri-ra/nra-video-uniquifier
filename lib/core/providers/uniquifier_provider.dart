@@ -75,6 +75,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool _enableHorizontalFlip = false;
   bool _enableAggressiveAudio = false;
   bool _enableAutoTrim = false;
+  bool _enableBlurredCanvas = false;
+  bool _muteOriginalAudio = false;
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -113,6 +115,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableHorizontalFlip => _enableHorizontalFlip;
   bool get enableAggressiveAudio => _enableAggressiveAudio;
   bool get enableAutoTrim => _enableAutoTrim;
+  bool get enableBlurredCanvas => _enableBlurredCanvas;
+  bool get muteOriginalAudio => _muteOriginalAudio;
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
@@ -184,6 +188,16 @@ class UniquifierProvider extends ChangeNotifier {
   void toggleAutoTrim(bool val) {
     _enableAutoTrim = val;
     try { SettingsService.setAutoTrim(val); } catch (_) {}
+    notifyListeners();
+  }
+
+  void toggleBlurredCanvas(bool val) {
+    _enableBlurredCanvas = val;
+    notifyListeners();
+  }
+
+  void toggleMuteOriginalAudio(bool val) {
+    _muteOriginalAudio = val;
     notifyListeners();
   }
 

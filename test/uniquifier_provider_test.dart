@@ -182,7 +182,13 @@ void main() {
       provider.toggleAutoTrim(true);
       expect(provider.enableAutoTrim, isTrue);
 
-      expect(notifications, equals(3));
+      provider.toggleBlurredCanvas(true);
+      expect(provider.enableBlurredCanvas, isTrue);
+
+      provider.toggleMuteOriginalAudio(true);
+      expect(provider.muteOriginalAudio, isTrue);
+
+      expect(notifications, equals(5));
     });
 
     test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {

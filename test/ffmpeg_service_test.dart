@@ -473,6 +473,33 @@ void main() {
       }
     });
 
+    test('Blurred canvas frame generates dual-stream background blur and centered foreground overlay', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        isPortrait: true,
+      );
+      expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
+      expect(cmd, contains(r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/20:luma_power=2[blurred];'));
+      expect(cmd, contains(r'[fg]scale=w=trunc(iw*0.88/2)*2:h=trunc(ih*0.88/2)*2[main];'));
+      expect(cmd, contains(r'[blurred][main]overlay=(W-w)/2:(H-h)/2[outv];[outv]'));
+      expect(cmd, contains('format=yuv420p'));
+    });
+
+    test('Mute original audio ducks volume to near-zero for platform background music overlay', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        modifyAudio: true,
+        muteOriginalAudio: true,
+      );
+      expect(cmd, contains('volume=0.01'));
+      expect(cmd, contains('atempo='));
+      expect(cmd, contains('-c:a aac -b:a 128k'));
+      expect(cmd, isNot(contains('anoisesrc=')));
+    });
+
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
       final path1 = await FfmpegService.generateOutputPath('/some/dir/sample.mp4');
       await Future.delayed(const Duration(milliseconds: 5));

@@ -37,6 +37,8 @@ class FfmpegService {
     int totalDurationMs = 0,
     bool isPortrait = false,
     bool enableHardwareAcceleration = false,
+    bool enableBlurredCanvas = false,
+    bool muteOriginalAudio = false,
     VideoVariations? variations,
   }) {
     final safeInput = _escapePath(inputPath);
@@ -70,10 +72,11 @@ class FfmpegService {
     }
 
     final shouldUpscale = upscale ?? upscale1080p;
-    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip;
+    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip || enableBlurredCanvas;
+    final hasAudioProcess = modifyAudio || muteOriginalAudio;
     buffer.write(FilterBuilders.buildVideoFilter(
       hasVisual: hasVisual,
-      hasAudio: modifyAudio,
+      hasAudio: hasAudioProcess,
       modifyVisuals: modifyVisuals,
       upscale: shouldUpscale,
       targetResolution: targetResolution,
@@ -82,20 +85,22 @@ class FfmpegService {
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableHorizontalFlip: enableHorizontalFlip,
       isPortrait: isPortrait,
+      enableBlurredCanvas: enableBlurredCanvas,
       variations: vars,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
-      hasAudio: modifyAudio,
+      hasAudio: hasAudioProcess,
       hasVisual: hasVisual,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint,
       enableAggressiveAudio: enableAggressiveAudio,
+      muteOriginalAudio: muteOriginalAudio,
       variations: vars,
     ));
 
     if (hasVisual) {
       buffer.write(' -r ${vars.outputFps.toStringAsFixed(2)}');
     }
-    if (!hasVisual && !modifyAudio) buffer.write(' -c copy');
+    if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
     buffer.write(' "$safeOutput"');
     return buffer.toString();
   }
@@ -212,6 +217,8 @@ class FfmpegService {
     bool enableAutoTrim = false,
     bool? isPortrait,
     bool enableHardwareAcceleration = false,
+    bool enableBlurredCanvas = false,
+    bool muteOriginalAudio = false,
     bool suppressCompleteNotification = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
@@ -253,6 +260,8 @@ class FfmpegService {
       totalDurationMs: resolvedDurationMs,
       isPortrait: resolvedIsPortrait,
       enableHardwareAcceleration: enableHardwareAcceleration,
+      enableBlurredCanvas: enableBlurredCanvas,
+      muteOriginalAudio: muteOriginalAudio,
     );
 
     final baseName = inputPath.split(RegExp(r'[/\\]')).last;

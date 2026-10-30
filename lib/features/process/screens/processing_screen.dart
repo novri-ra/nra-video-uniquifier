@@ -83,6 +83,8 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           enableAutoTrim: provider.enableAutoTrim,
           isPortrait: provider.isPortrait,
           enableHardwareAcceleration: provider.hardwareAcceleration,
+          enableBlurredCanvas: provider.enableBlurredCanvas,
+          muteOriginalAudio: provider.muteOriginalAudio,
           totalDurationMs: provider.totalDurationMs,
           onProgress: (p, speed, timeMs) {
             if (mounted && !_isCancelled) {
