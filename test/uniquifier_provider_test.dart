@@ -188,7 +188,22 @@ void main() {
       provider.toggleMuteOriginalAudio(true);
       expect(provider.muteOriginalAudio, isTrue);
 
-      expect(notifications, equals(5));
+      provider.toggleDynamicZoom(true);
+      expect(provider.enableDynamicZoom, isTrue);
+
+      provider.toggleMicroOverlay(true);
+      expect(provider.enableMicroOverlay, isTrue);
+
+      provider.toggleFrameSkip(true);
+      expect(provider.enableFrameSkip, isTrue);
+
+      provider.toggleChromaShift(true);
+      expect(provider.enableChromaShift, isTrue);
+
+      provider.setCanvasScalePercent(80.0);
+      expect(provider.canvasScalePercent, equals(80.0));
+
+      expect(notifications, equals(10));
     });
 
     test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {

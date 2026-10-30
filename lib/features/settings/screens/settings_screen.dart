@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/hardware_acceleration_card.dart';
+import '../widgets/preset_profile_card.dart';
 import '../widgets/upscale_resolution_card.dart';
 import '../widgets/codec_selector_card.dart';
 
@@ -86,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
             const SizedBox(height: 8),
-            _PresetProfileCard(provider: provider),
+            PresetProfileCard(provider: provider),
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
             const SizedBox(height: 8),
@@ -153,24 +155,27 @@ class _AlertsSettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-      decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(child: Row(children: [Icon(Icons.work_outline, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Background Processing', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
-              Switch(value: backgroundProcessing, onChanged: onToggleBackground),
-            ],
+          SettingToggleRow(
+            icon: Icons.work_outline,
+            title: 'Background Processing',
+            subtitle: 'Keep rendering active when minimized',
+            value: backgroundProcessing,
+            onChanged: onToggleBackground,
           ),
           const Divider(height: 1, color: AppColors.surfaceContainerHighest),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Expanded(child: Row(children: [Icon(Icons.volume_up_outlined, color: AppColors.primaryContainer, size: 18), SizedBox(width: 10), Flexible(child: Text('Notification Sound', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)))])),
-              Switch(value: notificationSound, onChanged: onToggleSound),
-            ],
+          SettingToggleRow(
+            icon: Icons.volume_up_outlined,
+            title: 'Notification Sound',
+            subtitle: 'Play completion chime on finish',
+            value: notificationSound,
+            onChanged: onToggleSound,
           ),
         ],
       ),
@@ -189,7 +194,11 @@ class _CacheMaintenanceCard extends StatelessWidget {
     final mb = (cacheBytes / (1024 * 1024)).toStringAsFixed(1);
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
       child: Wrap(
         spacing: 12,
         runSpacing: 8,
@@ -250,52 +259,6 @@ class _AppInfoCard extends StatelessWidget {
                 SizedBox(width: 4),
                 Text('OFFLINE PRIVACY', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PresetProfileCard extends StatelessWidget {
-  final UniquifierProvider provider;
-  const _PresetProfileCard({required this.provider});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          ActionChip(
-            label: const Text('TikTok Fast'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: false,
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: true, enableAutoTrim: true,
-            ),
-          ),
-          ActionChip(
-            label: const Text('Maximum Anti-Fingerprint'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true, upscale1080p: true, upscaleTarget: '2k',
-              enableEnhanceAndDenoise: true, enableDeepAntiFingerprint: true, enableHorizontalFlip: true,
-              enableAggressiveAudio: true, enableAutoTrim: true,
-            ),
-          ),
-          ActionChip(
-            label: const Text('Lossless Stealth'),
-            onPressed: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: false, modifyVisuals: false, upscale1080p: false,
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: false, enableHorizontalFlip: false,
-              enableAggressiveAudio: false, enableAutoTrim: false,
             ),
           ),
         ],

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/ffmpeg_service.dart';
@@ -343,7 +344,7 @@ void main() {
       expect(cmd, endsWith('"/path/out_unique.mp4"'));
     });
 
-    test('Macroblock parity: rotation strictly enforces even dimensions without upscale', () {
+    test('Macroblock parity & black corner defense: rotation enforces inner-box crop with even dimensions', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -352,8 +353,10 @@ void main() {
         upscale: false,
         enableDeepAntiFingerprint: true,
       );
-      expect(cmd, contains('ow=trunc(rotw('));
-      expect(cmd, contains('oh=trunc(roth('));
+      expect(cmd, contains('ow=trunc(iw*0.96/2)*2'));
+      expect(cmd, contains('oh=trunc(ih*0.96/2)*2'));
+      expect(cmd, contains('c=none'));
+      expect(cmd, isNot(contains('fillcolor=black')));
     });
 
     test('Audio-Visual timing alignment: tempo is pure reciprocal of speedFactor matching PTS without compound drift', () {
@@ -478,6 +481,7 @@ void main() {
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
         enableBlurredCanvas: true,
+        canvasScalePercent: 95.0,
         isPortrait: true,
       );
       expect(cmd, contains(r'[0:v]split=2[bg][fg];'));
@@ -490,10 +494,31 @@ void main() {
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
         enableBlurredCanvas: true,
+        canvasScalePercent: 95.0,
         isPortrait: false,
       );
       expect(cmdLandscape, contains(r'[bg]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
       expect(cmdLandscape, contains(r'[fg]scale=w=1824:h=1026:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'));
+
+      // Test 50% scale factor
+      final cmd50 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        canvasScalePercent: 50.0,
+        isPortrait: true,
+      );
+      expect(cmd50, contains(r'[fg]scale=w=540:h=960:force_original_aspect_ratio=decrease'));
+
+      // Test 100% scale factor
+      final cmd100 = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        canvasScalePercent: 100.0,
+        isPortrait: true,
+      );
+      expect(cmd100, contains(r'[fg]scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
     });
 
     test('Mute original audio ducks volume to near-zero for platform background music overlay', () {
@@ -507,6 +532,80 @@ void main() {
       expect(cmd, contains('atempo='));
       expect(cmd, contains('-c:a aac -b:a 128k'));
       expect(cmd, isNot(contains('anoisesrc=')));
+    });
+
+    test('Advanced evasion: dynamic zoom, frame skip, chroma shift, and micro overlay inject expected filter syntax', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableDynamicZoom: true,
+        enableFrameSkip: true,
+        enableChromaShift: true,
+        enableMicroOverlay: true,
+        isPortrait: true,
+      );
+      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'"));
+      expect(cmd, contains('s=1080x1920:fps=30'));
+      expect(cmd, contains('decimate=cycle=25'));
+      expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
+      expect(cmd, contains('noise=alls=5:allf=t+u'));
+    });
+
+    test('All 15 modifiers enabled combined pipeline validation', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        removeMetadata: true,
+        modifyAudio: true,
+        modifyVisuals: true,
+        upscale1080p: true,
+        targetResolution: TargetResolution.r2k,
+        videoCodec: VideoCodec.h265,
+        enableEnhanceAndDenoise: true,
+        enableDeepAntiFingerprint: true,
+        enableHorizontalFlip: true,
+        enableAggressiveAudio: true,
+        enableAutoTrim: true,
+        totalDurationMs: 5000,
+        enableBlurredCanvas: true,
+        muteOriginalAudio: true,
+        enableDynamicZoom: true,
+        enableMicroOverlay: true,
+        enableFrameSkip: true,
+        enableChromaShift: true,
+        isPortrait: true,
+      );
+
+      // Verify presence of all key pipeline components
+      expect(cmd, contains('-map_metadata -1')); // 1. removeMetadata
+      expect(cmd, contains('-ss 0.5 -t 4.00')); // 2. autoTrim
+      expect(cmd, contains(r'[0:v]split=2[bg][fg];')); // 3. blurredCanvas
+      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'")); // 4. dynamicZoom
+      expect(cmd, contains('hflip')); // 5. horizontalFlip
+      expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
+      expect(cmd, contains('hqdn3d=1.5:1.5:4:4')); // 7. denoise
+      expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'")); // 8. chromaShift
+      expect(cmd, contains('noise=alls=')); // 9. modifyVisuals grain
+      expect(cmd, contains('noise=alls=5:allf=t+u')); // 10. microOverlay
+      expect(cmd, contains('format=yuv420p')); // color parity
+      expect(cmd, contains('-c:v libx265')); // videoCodec
+      expect(cmd, contains('-tag:v hvc1')); // hvc1 tag
+      expect(cmd, contains('volume=0.01')); // 11. muteOriginalAudio / 12. modifyAudio
+      expect(cmd, contains('atempo=')); // A/V sync tempo
+
+      // Verify strict filter ordering: canvas -> spatial -> color/curves -> noise -> decimate -> format=yuv420p
+      final idxCanvas = cmd.indexOf('overlay=');
+      final idxZoom = cmd.indexOf('zoompan=');
+      final idxCurves = cmd.indexOf('curves=');
+      final idxNoise = cmd.indexOf('noise=alls=5');
+      final idxDecimate = cmd.indexOf('decimate=cycle=25');
+      final idxFormat = cmd.indexOf('format=yuv420p');
+
+      expect(idxCanvas < idxZoom, isTrue, reason: 'Canvas must precede zoompan');
+      expect(idxZoom < idxCurves, isTrue, reason: 'Spatial zoom must precede color curves');
+      expect(idxCurves < idxNoise, isTrue, reason: 'Color curves must precede noise');
+      expect(idxNoise < idxDecimate, isTrue, reason: 'Noise must precede decimate');
+      expect(idxDecimate < idxFormat, isTrue, reason: 'Decimate must precede format=yuv420p');
     });
 
     test('generateOutputPath generates collision-free timestamp pattern in public dir', () async {
@@ -541,6 +640,17 @@ void main() {
       );
       expect(cmd, contains(r'-i "/path/video\"with\"quotes.mp4"'));
       expect(cmd, contains(r'"/path/out\"with\"quotes.mp4"'));
+    });
+
+    test('Scoped storage defense: stageInputFile stages file in temporary cache directory', () async {
+      final tempDir = Directory.systemTemp.createTempSync('uniquifier_test_stage_');
+      final sample = File('${tempDir.path}/test_source.mp4');
+      await sample.writeAsString('video-bytes-data');
+
+      final staged = await FfmpegService.stageInputFile(sample.path);
+      expect(staged.existsSync(), isTrue);
+      expect(staged.path, contains('staged_'));
+      expect(staged.lengthSync(), equals(sample.lengthSync()));
     });
 
     test('D1-01 T1: probeMediaMeta returns zeros on probe failure without throwing', () async {

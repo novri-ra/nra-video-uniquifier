@@ -66,6 +66,11 @@ class SettingsService {
   static const String keyHorizontalFlip = 'app_horizontal_flip';
   static const String keyAggressiveAudio = 'app_aggressive_audio';
   static const String keyAutoTrim = 'app_auto_trim';
+  static const String keyDynamicZoom = 'app_dynamic_zoom';
+  static const String keyMicroOverlay = 'app_micro_overlay';
+  static const String keyFrameSkip = 'app_frame_skip';
+  static const String keyChromaShift = 'app_chroma_shift';
+  static const String keyCanvasScalePercent = 'app_canvas_scale_percent';
   static const String keyVideoCodec = 'app_video_codec';
   static const String keyNotificationSound = 'app_notification_sound';
   static const String keyBackgroundProcessing = 'app_background_processing';
@@ -175,6 +180,56 @@ class SettingsService {
   static Future<void> setAutoTrim(bool enabled) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(keyAutoTrim, enabled);
+  }
+
+  static Future<bool> getDynamicZoom() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyDynamicZoom) ?? false;
+  }
+
+  static Future<void> setDynamicZoom(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyDynamicZoom, enabled);
+  }
+
+  static Future<bool> getMicroOverlay() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyMicroOverlay) ?? false;
+  }
+
+  static Future<void> setMicroOverlay(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyMicroOverlay, enabled);
+  }
+
+  static Future<bool> getFrameSkip() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyFrameSkip) ?? false;
+  }
+
+  static Future<void> setFrameSkip(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyFrameSkip, enabled);
+  }
+
+  static Future<bool> getChromaShift() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyChromaShift) ?? false;
+  }
+
+  static Future<void> setChromaShift(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyChromaShift, enabled);
+  }
+
+  static Future<double> getCanvasScalePercent() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keyCanvasScalePercent) ?? 95.0;
+  }
+
+  static Future<void> setCanvasScalePercent(double percent) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(keyCanvasScalePercent, percent);
   }
 
   static Future<bool> getHardwareAcceleration() async {

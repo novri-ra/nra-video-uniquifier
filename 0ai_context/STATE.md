@@ -1,10 +1,10 @@
 # Project State: NRA Video Uniquifier
 
 ## 1. Environment & Git Status
-- **Timestamp**: 2026-10-30 21:30:00 UTC+07:00
+- **Timestamp**: 2026-10-31 00:25:00 UTC+07:00
 - **Git Branch**: `development`
-- **HEAD Commit**: `e976c27 fix(notifications): set notification small icon to @mipmap/launcher_icon`
-- **Working Tree**: Sprint 48 blurred canvas proportional scale fixed to target dimensions (5% universal inset margin), 107/107 tests passed, zero skips, analyze 0 errors.
+- **HEAD Commit**: `4036fcc fix(storage): stage ffmpeg output in cache directory to prevent android scoped storage permission denied`
+- **Working Tree**: Sprint 54 black rotation corner triangles eliminated via inner-box crop (ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none), 112/112 tests passed, zero skips, analyze 0 errors.
 
 ## 2. Active Roadmap & Next Items
 - [x] Full responsive UI across phone, desktop, and tablet layouts.
@@ -41,6 +41,12 @@
 - [x] Blurred canvas 0.95 inset refinement and background execution / sound notifications restoration (Report 46).
 - [x] System notification small icon updated to official @mipmap/launcher_icon branding (Report 47).
 - [x] Proportional blurred canvas foreground scaling relative to target canvas dimensions (Report 48).
+- [x] Deep audit of all algorithms, state wiring, and UI/UX component uniformity (Report 49).
+- [x] Advanced evasion features (dynamic zoom, micro-noise overlay, frame skip, chroma shift) and categorized accordion layout (Report 50).
+- [x] Preset profiles UI redesign and in-line dynamic parameter sliders (0% - 100%) (Report 51).
+- [x] FFmpeg exit code 1 crash fix by hardening filtergraph syntax, escaping, and ordering (Report 52).
+- [x] FFmpeg scoped storage Permission Denied fix via two-stage internal cache rendering and MediaStore export (Report 53).
+- [x] Eliminate black corner artifacts from micro-tilt rotation filter via inner-box crop (Report 54).
 - [ ] Physical device ARM64 E2E verification (Deferred — shipping emulator-verified release per decision; arm64 native verification pending physical device).
 
 ## 3. MCP Index Status

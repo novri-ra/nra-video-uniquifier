@@ -38,7 +38,12 @@ class FfmpegService {
     bool isPortrait = false,
     bool enableHardwareAcceleration = false,
     bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0,
     bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false,
+    bool enableFrameSkip = false,
+    bool enableChromaShift = false,
     VideoVariations? variations,
   }) {
     final safeInput = _escapePath(inputPath);
@@ -56,9 +61,9 @@ class FfmpegService {
     }
     buffer.write(' -i "$safeInput"');
     if (removeMetadata) {
-      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact');
-      buffer.write(' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"');
-      buffer.write(' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"');
+      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact'
+          ' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"'
+          ' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"');
     }
 
     VideoVariations vars;
@@ -72,7 +77,14 @@ class FfmpegService {
     }
 
     final shouldUpscale = upscale ?? upscale1080p;
-    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip || enableBlurredCanvas;
+    final hasVisual = modifyVisuals ||
+        shouldUpscale ||
+        enableHorizontalFlip ||
+        enableBlurredCanvas ||
+        enableDynamicZoom ||
+        enableMicroOverlay ||
+        enableFrameSkip ||
+        enableChromaShift;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
     buffer.write(FilterBuilders.buildVideoFilter(
       hasVisual: hasVisual,
@@ -86,6 +98,11 @@ class FfmpegService {
       enableHorizontalFlip: enableHorizontalFlip,
       isPortrait: isPortrait,
       enableBlurredCanvas: enableBlurredCanvas,
+      canvasScalePercent: canvasScalePercent,
+      enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift,
       variations: vars,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
@@ -121,8 +138,7 @@ class FfmpegService {
     }
     final tempDir = await getTemporaryDirectory();
     final ext = inputPath.contains('.') ? inputPath.split('.').last : 'mp4';
-    final staged = File('${tempDir.path}/staged_${DateTime.now().millisecondsSinceEpoch}.$ext');
-    return await inputFile.copy(staged.path);
+    return await inputFile.copy('${tempDir.path}/staged_${DateTime.now().millisecondsSinceEpoch}.$ext');
   }
 
   /// Extracts 1st-frame thumbnail via lightweight FFmpeg command.
@@ -132,14 +148,9 @@ class FfmpegService {
       if (!inputFile.existsSync() || inputFile.lengthSync() == 0) return null;
       final tempDir = await getTemporaryDirectory();
       final thumbPath = targetPath ?? '${tempDir.path}/thumb_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final safeInput = _escapePath(inputPath);
-      final safeThumb = _escapePath(thumbPath);
-      final cmd = '-y -ss 00:00:00.500 -i "$safeInput" -vframes 1 -q:v 2 "$safeThumb"';
+      final cmd = '-y -ss 00:00:00.500 -i "${_escapePath(inputPath)}" -vframes 1 -q:v 2 "${_escapePath(thumbPath)}"';
       final session = await FFmpegKit.execute(cmd);
-      final returnCode = await session.getReturnCode();
-      if (ReturnCode.isSuccess(returnCode) && File(thumbPath).existsSync()) {
-        return thumbPath;
-      }
+      if (ReturnCode.isSuccess(await session.getReturnCode()) && File(thumbPath).existsSync()) return thumbPath;
     } catch (_) {}
     return null;
   }
@@ -166,6 +177,30 @@ class FfmpegService {
     final localMovies = Directory('${appDocs.path}/Movies/Uniquifier');
     if (!await localMovies.exists()) await localMovies.create(recursive: true);
     return localMovies;
+  }
+
+  /// Exports rendered video from sandbox cache to target destination.
+  static Future<String> _exportStagedFile(String stagedPath, String destinationPath) async {
+    try {
+      final destFile = File(destinationPath);
+      if (!destFile.parent.existsSync()) destFile.parent.createSync(recursive: true);
+      await File(stagedPath).copy(destinationPath);
+      return destinationPath;
+    } catch (_) {
+      try {
+        final dirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
+        final fallbackDir = (dirs != null && dirs.isNotEmpty)
+            ? Directory('${dirs.first.path}/Uniquifier')
+            : Directory('${(await getApplicationDocumentsDirectory()).path}/Movies/Uniquifier');
+        if (!fallbackDir.existsSync()) fallbackDir.createSync(recursive: true);
+        final fileName = destinationPath.split(RegExp(r'[/\\]')).last;
+        final fallbackPath = '${fallbackDir.path}/$fileName';
+        await File(stagedPath).copy(fallbackPath);
+        return fallbackPath;
+      } catch (_) {
+        return stagedPath;
+      }
+    }
   }
 
   /// Generates the target output path with collision-free timestamp pattern.
@@ -218,7 +253,12 @@ class FfmpegService {
     bool? isPortrait,
     bool enableHardwareAcceleration = false,
     bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0,
     bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false,
+    bool enableFrameSkip = false,
+    bool enableChromaShift = false,
     bool suppressCompleteNotification = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
@@ -241,10 +281,12 @@ class FfmpegService {
       if (totalDurationMs <= 0 && meta.durationMs > 0) resolvedDurationMs = meta.durationMs;
     }
 
-    final outputPath = customOutputPath ?? await generateOutputPath(inputPath);
+    final finalDestPath = customOutputPath ?? await generateOutputPath(inputPath);
+    final tempDir = await getTemporaryDirectory();
+    final stagedOutputPath = '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
     final command = buildCommand(
       inputPath: effectiveInput,
-      outputPath: outputPath,
+      outputPath: stagedOutputPath,
       removeMetadata: removeMetadata,
       modifyAudio: modifyAudio,
       modifyVisuals: modifyVisuals,
@@ -261,14 +303,18 @@ class FfmpegService {
       isPortrait: resolvedIsPortrait,
       enableHardwareAcceleration: enableHardwareAcceleration,
       enableBlurredCanvas: enableBlurredCanvas,
+      canvasScalePercent: canvasScalePercent,
       muteOriginalAudio: muteOriginalAudio,
+      enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift,
     );
 
     final baseName = inputPath.split(RegExp(r'[/\\]')).last;
     if (onProgress != null) {
       FFmpegKitConfig.enableStatisticsCallback((statistics) {
-        final timeMs = statistics.getTime();
-        final speed = statistics.getSpeed();
+        final timeMs = statistics.getTime(), speed = statistics.getSpeed();
         final progress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
         onProgress(progress, speed, timeMs);
         final percent = (progress * 100).toInt();
@@ -281,29 +327,30 @@ class FfmpegService {
     }
 
     try {
-      final finalPath = await _executeFFmpeg(command, outputPath, sourcePath: effectiveInput);
-      await MediaScannerService.scanFile(finalPath);
-      final diag = await inspectRenderedFile(finalPath);
+      final stagedRenderedPath = await _executeFFmpeg(command, stagedOutputPath, sourcePath: effectiveInput);
+      final diag = await inspectRenderedFile(stagedRenderedPath);
       if (diag != null && (diag.isTruncatedPortrait || diag.width == null || diag.height == null)) {
-        _deletePartialFile(finalPath, sourcePath: effectiveInput);
+        _deletePartialFile(stagedRenderedPath, sourcePath: effectiveInput);
         throw RenderIntegrityException('Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})');
       }
+      final exportedPath = await _exportStagedFile(stagedRenderedPath, finalDestPath);
+      await MediaScannerService.scanFile(exportedPath);
+      _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
       if (!suppressCompleteNotification) {
         await NotificationService.showCompleteNotification(
           title: 'Video Processing Complete',
-          body: 'Saved to ${outputPath.split(RegExp(r"[/\\]")).last}',
+          body: 'Saved to ${exportedPath.split(RegExp(r"[/\\]")).last}',
           success: true,
         );
       }
-      return finalPath;
+      return exportedPath;
     } finally {
-      if (onProgress != null) {
-        FFmpegKitConfig.enableStatisticsCallback(null);
-      }
+      if (onProgress != null) FFmpegKitConfig.enableStatisticsCallback(null);
       await NotificationService.cancelProgressNotification();
+      _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
       if (stagedFile != null && stagedFile.existsSync()) {
         try {
-          if (stagedFile.path != outputPath && stagedFile.path != inputPath) {
+          if (stagedFile.path != finalDestPath && stagedFile.path != inputPath) {
             stagedFile.deleteSync();
           }
         } catch (_) {}
@@ -319,23 +366,16 @@ class FfmpegService {
     try {
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
-
       if (ReturnCode.isSuccess(returnCode)) return outputPath;
-
       _deletePartialFile(outputPath, sourcePath: sourcePath);
-      if (ReturnCode.isCancel(returnCode)) {
-        throw Exception('FFmpeg execution was canceled');
-      }
+      if (ReturnCode.isCancel(returnCode)) throw Exception('FFmpeg execution was canceled');
 
       final logs = await session.getAllLogsAsString();
       final failStackTrace = await session.getFailStackTrace();
       final buffer = StringBuffer('FFmpeg failed with code $returnCode');
-      if (failStackTrace != null && failStackTrace.trim().isNotEmpty) {
-        buffer.write('\n\nStack trace:\n$failStackTrace');
-      }
-      if (logs != null && logs.trim().isNotEmpty) {
-        buffer.write('\n\nExecution logs:\n$logs');
-      }
+      if (failStackTrace != null && failStackTrace.trim().isNotEmpty) buffer.write('\n\nStack trace:\n$failStackTrace');
+      if (logs != null && logs.trim().isNotEmpty) buffer.write('\n\nExecution logs:\n$logs');
+      debugPrint(buffer.toString());
       throw Exception(buffer.toString());
     } catch (_) {
       _deletePartialFile(outputPath, sourcePath: sourcePath);
