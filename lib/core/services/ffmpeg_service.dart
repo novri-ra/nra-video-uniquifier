@@ -264,6 +264,7 @@ class FfmpegService {
     bool enableAutoTrim = false,
     bool? isPortrait,
     bool enableHardwareAcceleration = false,
+    bool suppressCompleteNotification = false,
     String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
     int totalDurationMs = 0,
@@ -330,11 +331,13 @@ class FfmpegService {
         _deletePartialFile(finalPath, sourcePath: effectiveInput);
         throw RenderIntegrityException('Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})');
       }
-      await NotificationService.showCompleteNotification(
-        title: 'Video Processing Complete',
-        body: 'Saved to ${outputPath.split(RegExp(r"[/\\]")).last}',
-        success: true,
-      );
+      if (!suppressCompleteNotification) {
+        await NotificationService.showCompleteNotification(
+          title: 'Video Processing Complete',
+          body: 'Saved to ${outputPath.split(RegExp(r"[/\\]")).last}',
+          success: true,
+        );
+      }
       return finalPath;
     } finally {
       if (onProgress != null) {

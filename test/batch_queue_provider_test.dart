@@ -134,5 +134,20 @@ void main() {
       expect(item2.status, BatchItemStatus.failed);
       expect(provider.isProcessing, isFalse);
     });
+
+    test('D5-02: 3-item batch processes items and completes with batch notification', () async {
+      final provider = BatchQueueProvider();
+      final items = List.generate(
+        3,
+        (i) => BatchVideoItem(id: '$i', path: '/invalid_$i.mp4', name: 'v$i.mp4', sizeBytes: 100),
+      );
+      provider.setItems(items);
+
+      final dummyConfig = UniquifierProvider();
+      await provider.runBatch(dummyConfig);
+      expect(provider.isProcessing, isFalse);
+      expect(provider.totalCount, 3);
+      expect(items.every((it) => it.isFailed), isTrue);
+    });
   });
 }
