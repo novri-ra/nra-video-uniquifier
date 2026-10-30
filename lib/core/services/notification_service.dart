@@ -7,6 +7,13 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
+  static bool? _testOverride;
+  @visibleForTesting
+  static set testOverride(bool? value) => _testOverride = value;
+  @visibleForTesting
+  static set initialized(bool value) => _initialized = value;
+  static bool get _canRun => _testOverride ?? Platform.isAndroid;
+
   static const int progressNotificationId = 8801;
   static const int completeNotificationId = 8802;
 
@@ -18,7 +25,7 @@ class NotificationService {
 
   /// Initializes notification plugin and sets up platform notification channels.
   static Future<void> init() async {
-    if (_initialized || !Platform.isAndroid) return;
+    if (_initialized || !_canRun) return;
     try {
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const initSettings = InitializationSettings(android: androidSettings);
@@ -32,7 +39,7 @@ class NotificationService {
   /// Requests notification permission on Android 13+ (POST_NOTIFICATIONS).
   static Future<bool> requestPermission() async {
     try {
-      if (Platform.isAndroid) {
+      if (_canRun) {
         final status = await Permission.notification.status;
         if (!status.isGranted) {
           final result = await Permission.notification.request();
@@ -51,7 +58,7 @@ class NotificationService {
     required String body,
     bool force = false,
   }) async {
-    if (!Platform.isAndroid) return;
+    if (!_canRun) return;
     await init();
 
     final now = DateTime.now();
@@ -96,7 +103,7 @@ class NotificationService {
   static Future<void> cancelProgressNotification() async {
     _lastProgressPercent = -1;
     _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
-    if (!Platform.isAndroid) return;
+    if (!_canRun) return;
     try {
       await _plugin.cancel(id: progressNotificationId);
     } catch (_) {}
@@ -108,7 +115,7 @@ class NotificationService {
     required String body,
     bool success = true,
   }) async {
-    if (!Platform.isAndroid) return;
+    if (!_canRun) return;
     await init();
     await cancelProgressNotification();
 

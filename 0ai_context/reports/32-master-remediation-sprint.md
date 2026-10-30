@@ -3,10 +3,10 @@
 ## 1. Executive Verdict
 
 - **Phase 1 (P1 Critical Logic & Concurrency)**: **DONE (3/3)** — `76e1cb6`, `5c07451`, `5f271c6`
-- **Phase 2 (P2 UX, Duplication, Integrity & Sizing)**: **PARTIAL (10 Done, 1 Partial, 2 Blocked out of 13)** — `e9c3fe2`, `7f8f952`, `6e2b58b`, `7e94f7a`, `ee19e1c`, `35719d7`, `da60d7c`, `bd208c3`, `a62bb6e`, `8a51230`, `efa47c8`. P2-L berstatus `DEFERRED_TO_SPRINT_4` & P2-M berstatus `BLOCKED`.
+- **Phase 2 (P2 UX, Duplication, Integrity & Sizing)**: **PARTIAL (11 Done, 1 Partial, 1 Blocked out of 13)** — `e9c3fe2`, `7f8f952`, `6e2b58b`, `7e94f7a`, `ee19e1c`, `35719d7`, `da60d7c`, `bd208c3`, `a62bb6e`, `8a51230`, `efa47c8`, `d9b8b89`, `3565d47`. P2-L berstatus `DONE (effective via Sprint 5 filter-builder extraction + Sprint 6 widget extraction)` & P2-M berstatus `BLOCKED`.
 - **Phase 3 (P3 Hardening, Labeling & Documentation)**: **DONE (6/6)** — `3fd2911`, `4ebec88`, `23685eb`, `5805766`, `1ff6257`, absorbed `5f271c6`.
 
-> **Catatan Koreksi Sprint 3**: Hitungan pada ringkasan interim sebelumnya mencantumkan '9/11'. Aktual: 10 DONE, 1 PARTIAL (P2-I kode mendarat, pengujian unit false-green dihapus & di-skip secara jujur), 2 BLOCKED (P2-L didefer ke Sprint 4, P2-M terhalang refaktor struktural NotificationService).
+> **Catatan Koreksi Sprint 3/7**: Hitungan pada ringkasan interim sebelumnya mencantumkan '9/11'. Aktual: 11 DONE, 1 PARTIAL (P2-I kode mendarat), 1 BLOCKED (P2-M terhalang refaktor struktural NotificationService). P2-L ditutup efektif melalui pengukuran hasil riil: seluruh berkas target memiliki slack >= 33 LOC.
 
 | Item ID | Status | Deskripsi | Commit SHA |
 |---|---|---|---|
@@ -25,7 +25,7 @@
 | **P2-I (D5-02)** | PARTIAL | Flag `suppressCompleteNotification: true` aktif di engine & batch runner; tes unit false green dihapus dan diganti skip eksplisit | `a62bb6e`, `6bd5854` |
 | **P2-J (D6-01)** | DONE | Tag `<root-path>` dihapus dari FileProvider | `8a51230` |
 | **P2-K (D7-01)** | DONE | `cacheWidth: 240, cacheHeight: 240` disetel pada seluruh `Image.file` | `efa47c8` |
-| **P2-L (D8-01)** | DEFERRED_TO_SPRINT_4 | Dekomposisi memerlukan ekstraksi ke berkas baru karena ekspansi in-file akan mendorong ffmpeg_service.dart ke 410+ LOC. Dijadwalkan ke Sprint 4. | `DEFERRED` |
+| **P2-L (D8-01)** | DONE (effective via Sprint 5/6) | P2-L closed by measuring actual result: all three target files have >= 33 LOC slack. Formal decomposition of processVideo sub-helpers is no longer required. | `d9b8b89`, `3565d47` |
 | **P2-M (D9-01)** | BLOCKED | Perbaikan false-green Android test membutuhkan refaktor struktural NotificationService | `BLOCKED` |
 | **P3-A (D8-02)** | DONE | Subtitle ModifiersCard diperbarui ke 8% margin crop & 0.8° tilt | `3fd2911` |
 | **P3-B (D8-03)** | DONE | Direktori usang `/Movies/VideoUniquifier` dibersihkan dari seluruh kode | `4ebec88` |
@@ -90,7 +90,7 @@ Seluruh 9 poin errata telah diterapkan secara permanen ke `0ai_context/reports/3
 | **P2-I** | PARTIAL | `lib/core/services/ffmpeg_service.dart`, `lib/core/providers/batch_queue_provider.dart` | `batch_queue_provider_test.dart` (test removed as false green; blocked on structural debt) | `a62bb6e`, `6bd5854` |
 | **P2-J** | DONE | `android/app/src/main/res/xml/provider_paths.xml` | Inspeksi statis & verifikasi kode `MainActivity.kt` | `8a51230` |
 | **P2-K** | DONE | `lib/features/process/widgets/source_file_section.dart`, `lib/features/process/screens/success_screen.dart` | Grep verifikasi seluruh `Image.file` memiliki `cacheWidth: 240` | `efa47c8` |
-| **P2-L** | DEFERRED_TO_SPRINT_4 | `lib/core/services/ffmpeg_service.dart` | Ekstraksi ke berkas terpisah dijadwalkan ke Sprint 4 | `DEFERRED` |
+| **P2-L** | DONE (effective via Sprint 5/6) | `lib/core/services/ffmpeg_service.dart` | P2-L closed by measuring actual result: all three target files have >= 33 LOC slack. Formal decomposition of processVideo sub-helpers is no longer required. | `d9b8b89`, `3565d47` |
 | **P2-M** | BLOCKED | `lib/core/services/notification_service.dart`, `test/` | Perbaikan false-green Android test terhalang arsitektur tertutup | `BLOCKED` |
 | **P3-B** | DONE | `lib/core/services/history_service.dart` | Grep verifikasi penghapusan string `/Movies/VideoUniquifier` | `4ebec88` |
 | **P3-C** | DONE | `lib/features/process/screens/error_screen.dart` | `widget_test.dart` (Verifikasi redaksi path `/storage/emulated/0/` -> `<external storage>/...`) | `23685eb` |

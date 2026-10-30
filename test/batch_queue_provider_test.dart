@@ -1,7 +1,11 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/models/batch_video_item.dart';
 import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
+import 'package:nra_video_uniquifier/core/services/notification_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -133,6 +137,55 @@ void main() {
       expect(item1.status, BatchItemStatus.failed);
       expect(item2.status, BatchItemStatus.failed);
       expect(provider.isProcessing, isFalse);
+    });
+
+    test('D5-02: 3-item batch emits exactly one batch completion notification, suppressing per-item alerts', () async {
+      AndroidFlutterLocalNotificationsPlugin.registerWith();
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      NotificationService.testOverride = true;
+      NotificationService.initialized = false;
+
+      const channel = MethodChannel('dexterous.com/flutter/local_notifications');
+      final completeCalls = <MethodCall>[];
+
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(channel, (MethodCall call) async {
+        if (call.method == 'initialize') return true;
+        if (call.method == 'show') {
+          final args = Map<String, dynamic>.from(call.arguments as Map);
+          if (args['id'] == NotificationService.completeNotificationId) {
+            completeCalls.add(call);
+          }
+        }
+        return null;
+      });
+
+      try {
+        final provider = BatchQueueProvider();
+        final items = [
+          BatchVideoItem(id: '1', path: '/inv1.mp4', name: 'v1.mp4', sizeBytes: 100),
+          BatchVideoItem(id: '2', path: '/inv2.mp4', name: 'v2.mp4', sizeBytes: 100),
+          BatchVideoItem(id: '3', path: '/inv3.mp4', name: 'v3.mp4', sizeBytes: 100),
+        ];
+        provider.setItems(items);
+
+        final dummyConfig = UniquifierProvider();
+        await provider.runBatch(dummyConfig);
+
+        expect(provider.isProcessing, isFalse);
+        expect(items.length, 3);
+        // Crucial contract assertion: exactly 1 batch summary notification emitted, not 3
+        expect(completeCalls.length, 1,
+            reason: 'Batch must emit exactly one final completion alert, suppressing intermediate items');
+        final args = Map<String, dynamic>.from(completeCalls.first.arguments as Map);
+        expect(args['title'], equals('Batch Processing Finished'));
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+        NotificationService.testOverride = null;
+        NotificationService.initialized = false;
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(channel, null);
+      }
     });
   });
 }
