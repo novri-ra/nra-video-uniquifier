@@ -712,5 +712,34 @@ void main() {
         throwsA(isA<RenderIntegrityException>()),
       );
     });
+
+    test('Evasion-vDNA: Sprint 61 anti-vDNA evasion pipeline enforces micro-trim, hflip, curves, zoompan, and canonical lock', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/sample.mp4',
+        outputPath: '/out.mp4',
+        enableAutoTrim: true,
+        totalDurationMs: 6000,
+        enableHorizontalFlip: true,
+        enableDynamicZoom: true,
+        enableChromaShift: true,
+        enableEnhanceAndDenoise: true,
+        enableDeepAntiFingerprint: true,
+        upscale: true,
+        targetResolution: TargetResolution.r1080p,
+        isPortrait: true,
+      );
+
+      // Micro-trim first 0.5s to break first-frame vDNA hash
+      expect(cmd, contains('-ss 0.5 -t 5.00'));
+      // Invert geometry via hflip
+      expect(cmd, contains('hflip'));
+      // Dynamic zoompan
+      expect(cmd, contains('zoompan='));
+      // Non-linear color curves
+      expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
+      // Terminal canonical scale and format lock
+      expect(cmd, contains('scale=w=1080:h=1920:flags=lanczos,unsharp=5:5:0.7:5:5:0.3'));
+      expect(cmd, contains('format=yuv420p'));
+    });
   });
 }

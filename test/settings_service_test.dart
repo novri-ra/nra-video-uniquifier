@@ -113,6 +113,10 @@ void main() {
       expect(await SettingsService.getAutoTrim(), isFalse);
       await SettingsService.setAutoTrim(true);
       expect(await SettingsService.getAutoTrim(), isTrue);
+      expect(await SettingsService.getMicroTrim(), isTrue);
+      await SettingsService.setMicroTrim(false);
+      expect(await SettingsService.getMicroTrim(), isFalse);
+      expect(await SettingsService.getAutoTrim(), isFalse);
 
       expect(await SettingsService.getDynamicZoom(), isFalse);
       await SettingsService.setDynamicZoom(true);

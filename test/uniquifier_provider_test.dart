@@ -175,12 +175,22 @@ void main() {
 
       provider.toggleHorizontalFlip(true);
       expect(provider.enableHorizontalFlip, isTrue);
+      expect(provider.enableHFlip, isTrue);
 
       provider.toggleAggressiveAudio(true);
       expect(provider.enableAggressiveAudio, isTrue);
 
       provider.toggleAutoTrim(true);
       expect(provider.enableAutoTrim, isTrue);
+      expect(provider.enableMicroTrim, isTrue);
+
+      provider.toggleHFlip(false);
+      expect(provider.enableHorizontalFlip, isFalse);
+      expect(provider.enableHFlip, isFalse);
+
+      provider.toggleMicroTrim(false);
+      expect(provider.enableAutoTrim, isFalse);
+      expect(provider.enableMicroTrim, isFalse);
 
       provider.toggleBlurredCanvas(true);
       expect(provider.enableBlurredCanvas, isTrue);
@@ -203,7 +213,7 @@ void main() {
       provider.setCanvasScalePercent(80.0);
       expect(provider.canvasScalePercent, equals(80.0));
 
-      expect(notifications, equals(10));
+      expect(notifications, equals(12));
     });
 
     test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {

@@ -136,6 +136,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableHorizontalFlip => _enableHorizontalFlip;
   bool get enableAggressiveAudio => _enableAggressiveAudio;
   bool get enableAutoTrim => _enableAutoTrim;
+  bool get enableMicroTrim => _enableAutoTrim;
+  bool get enableHFlip => _enableHorizontalFlip;
   bool get enableBlurredCanvas => _enableBlurredCanvas;
   bool get muteOriginalAudio => _muteOriginalAudio;
   bool get enableDynamicZoom => _enableDynamicZoom;
@@ -170,8 +172,10 @@ class UniquifierProvider extends ChangeNotifier {
   void toggleEnhanceAndDenoise(bool val) { _enableEnhanceAndDenoise = val; try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {} notifyListeners(); }
   void toggleDeepAntiFingerprint(bool val) { _enableDeepAntiFingerprint = val; try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {} notifyListeners(); }
   void toggleHorizontalFlip(bool val) { _enableHorizontalFlip = val; try { SettingsService.setHorizontalFlip(val); } catch (_) {} notifyListeners(); }
+  void toggleHFlip(bool val) => toggleHorizontalFlip(val);
   void toggleAggressiveAudio(bool val) { _enableAggressiveAudio = val; try { SettingsService.setAggressiveAudio(val); } catch (_) {} notifyListeners(); }
   void toggleAutoTrim(bool val) { _enableAutoTrim = val; try { SettingsService.setAutoTrim(val); } catch (_) {} notifyListeners(); }
+  void toggleMicroTrim(bool val) => toggleAutoTrim(val);
   void toggleBlurredCanvas(bool val) { _enableBlurredCanvas = val; notifyListeners(); }
   void toggleMuteOriginalAudio(bool val) { _muteOriginalAudio = val; notifyListeners(); }
   void toggleDynamicZoom(bool val) { _enableDynamicZoom = val; try { SettingsService.setDynamicZoom(val); } catch (_) {} notifyListeners(); }

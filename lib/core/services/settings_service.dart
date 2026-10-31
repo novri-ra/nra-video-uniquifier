@@ -94,6 +94,7 @@ class SettingsService {
   static const String keyHorizontalFlip = 'app_horizontal_flip';
   static const String keyAggressiveAudio = 'app_aggressive_audio';
   static const String keyAutoTrim = 'app_auto_trim';
+  static const String keyMicroTrim = 'app_auto_trim'; // Alias for vDNA micro-head trim
   static const String keyDynamicZoom = 'app_dynamic_zoom';
   static const String keyMicroOverlay = 'app_micro_overlay';
   static const String keyFrameSkip = 'app_frame_skip';
@@ -226,6 +227,9 @@ class SettingsService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(keyAutoTrim, enabled);
   }
+
+  static Future<bool> getMicroTrim() => getAutoTrim();
+  static Future<void> setMicroTrim(bool enabled) => setAutoTrim(enabled);
 
   static Future<bool> getDynamicZoom() async {
     final prefs = await SharedPreferences.getInstance();
