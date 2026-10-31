@@ -22,6 +22,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 58 | `58-full-system-verification-audit.md` | Audit Pengesahan Pasca-Kompilasi & Integriti Sistem (Full Pipeline End-to-End Verification) | `0ai_context/reports/` |
 | 59 | `59-fix-2k-upscale-and-clarity.md` | Fix 2K Upscale Output Clamping & Real-ESRGAN NCNN Blurriness Elimination | `0ai_context/reports/` |
 | 60 | `60-project-cleanup-and-report-archival.md` | Deep Clean Build Artifacts, Disk Space Reclamation (>3.5 GB), & Legacy Report Archival | `0ai_context/reports/` |
+| 61 | `61-anti-vdna-evasion-enhancement.md` | Anti-vDNA Visual Fingerprint Hardening & TikTok Detection Evasion Pipeline | `0ai_context/reports/` |
 
 ---
 
