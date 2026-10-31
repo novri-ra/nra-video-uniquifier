@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'settings_service.dart';
 
@@ -69,6 +70,9 @@ class AiSuperResolutionService {
 
     if (engine == UpscaleEngine.neuralAi) {
       final vulkanAvailable = await isVulkanSupported();
+      if (!vulkanAvailable) {
+        debugPrint('[AiSuperResolution] Vulkan compute unavailable on this device. Transparent fallback: Real-ESRGAN -> Lanczos3.');
+      }
       return AiSuperResolutionPlan(
         engine: engine,
         targetResolution: targetResolution,

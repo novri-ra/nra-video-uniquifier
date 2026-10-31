@@ -182,9 +182,8 @@ void main() {
       );
       expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
       expect(cmd, isNot(contains('rotate=')));
-      expect(cmd, contains('scale=w=3840:h=2160:flags=lanczos'));
+      expect(cmd, contains('scale=w=3840:h=2160:flags=lanczos,unsharp=5:5:0.7:5:5:0.3'));
       expect(cmd, isNot(contains('hqdn3d=')));
-      expect(cmd, isNot(contains('unsharp=')));
     });
 
     test('Orientation-aware scaling: Landscape preserves horizontal dimensions', () {
@@ -517,6 +516,30 @@ void main() {
         isPortrait: true,
       );
       expect(cmd100, contains(r'[fg]scale=w=1080:h=1920:force_original_aspect_ratio=decrease'));
+
+      // Test 2K Portrait Canvas scaling
+      final cmd2kCanvas = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        targetResolution: TargetResolution.r2k,
+        canvasScalePercent: 95.0,
+        isPortrait: true,
+      );
+      expect(cmd2kCanvas, contains(r'[bg]scale=1440:2560:force_original_aspect_ratio=increase,crop=1440:2560,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
+      expect(cmd2kCanvas, contains(r'[fg]scale=w=1368:h=2432:force_original_aspect_ratio=decrease'));
+
+      // Test 4K Portrait Canvas scaling
+      final cmd4kCanvas = FfmpegService.buildCommand(
+        inputPath: '/path/input.mp4',
+        outputPath: '/path/output.mp4',
+        enableBlurredCanvas: true,
+        targetResolution: TargetResolution.r4k,
+        canvasScalePercent: 95.0,
+        isPortrait: true,
+      );
+      expect(cmd4kCanvas, contains(r'[bg]scale=2160:3840:force_original_aspect_ratio=increase,crop=2160:3840,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];'));
+      expect(cmd4kCanvas, contains(r'[fg]scale=w=2052:h=3648:force_original_aspect_ratio=decrease'));
     });
 
     test('Mute original audio ducks volume to near-zero for platform background music overlay', () {
