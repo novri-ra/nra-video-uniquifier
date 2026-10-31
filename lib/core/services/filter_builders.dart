@@ -62,6 +62,7 @@ class FilterBuilders {
   static String buildScaleFilter({
     required TargetResolution targetResolution,
     required bool isPortrait,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
   }) {
     final (w, h) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     return 'scale=w=$w:h=$h:flags=lanczos';
@@ -73,6 +74,7 @@ class FilterBuilders {
     required bool enableHorizontalFlip,
     required bool upscale,
     required TargetResolution targetResolution,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
     required bool enableEnhanceAndDenoise,
     required bool isPortrait,
     bool enableDynamicZoom = false,
@@ -103,7 +105,7 @@ class FilterBuilders {
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (enableFrameSkip) 'decimate=cycle=25',
       if (upscale)
-        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait)
+        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
@@ -117,6 +119,7 @@ class FilterBuilders {
     bool modifyVisuals = true,
     bool upscale = false,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
     VideoCodec videoCodec = VideoCodec.h264,
     bool enableEnhanceAndDenoise = true,
     bool enableDeepAntiFingerprint = true,
@@ -155,6 +158,7 @@ class FilterBuilders {
           enableHorizontalFlip: enableHorizontalFlip,
           upscale: upscale,
           targetResolution: targetResolution,
+          upscaleEngine: upscaleEngine,
           enableEnhanceAndDenoise: enableEnhanceAndDenoise,
           isPortrait: isPortrait,
           enableDynamicZoom: enableDynamicZoom,
@@ -176,6 +180,7 @@ class FilterBuilders {
         modifyVisuals: modifyVisuals,
         upscale: upscale,
         targetResolution: targetResolution,
+        upscaleEngine: upscaleEngine,
         videoCodec: videoCodec,
         enableEnhanceAndDenoise: enableEnhanceAndDenoise,
         enableDeepAntiFingerprint: false,

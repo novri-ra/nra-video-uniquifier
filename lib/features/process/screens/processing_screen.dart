@@ -75,6 +75,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           modifyVisuals: provider.modifyVisuals,
           upscale1080p: provider.upscale1080p,
           targetResolution: provider.targetResolution,
+          upscaleEngine: provider.upscaleEngine,
           videoCodec: provider.videoCodec,
           enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
           enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,

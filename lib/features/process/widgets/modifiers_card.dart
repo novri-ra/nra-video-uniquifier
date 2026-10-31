@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
+import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/setting_slider_toggle_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
@@ -126,7 +127,9 @@ class ModifiersCard extends StatelessWidget {
                 SettingToggleRow(
                   icon: Icons.hd,
                   title: 'Upscale to ${provider.targetResolutionLabel}',
-                  subtitle: 'Lanczos algorithm (${provider.targetResolutionDetails})',
+                  subtitle: provider.upscaleEngine == UpscaleEngine.neuralAi
+                      ? 'Real-ESRGAN AI (${provider.targetResolutionDetails})'
+                      : 'Lanczos algorithm (${provider.targetResolutionDetails})',
                   value: provider.upscale1080p,
                   onChanged: provider.toggleUpscale1080p,
                   onTapSubtitle: onOpenAdvanced,

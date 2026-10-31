@@ -25,6 +25,30 @@ enum VideoCodec {
   }
 }
 
+enum UpscaleEngine {
+  lanczos('lanczos', 'Lanczos3 (Standard)', 'Fast mathematical 3-lobe anti-aliased scaling matrix'),
+  neuralAi('neural_ai', 'Real-ESRGAN AI (Neural)', 'NCNN Vulkan AnimeVideo-v3 / Compact neural upscale');
+
+  final String key;
+  final String label;
+  final String details;
+
+  const UpscaleEngine(this.key, this.label, this.details);
+
+  static UpscaleEngine fromString(String? val) {
+    switch (val?.toLowerCase()) {
+      case 'neural_ai':
+      case 'ai':
+      case 'realesrgan':
+      case 'neural':
+        return UpscaleEngine.neuralAi;
+      case 'lanczos':
+      default:
+        return UpscaleEngine.lanczos;
+    }
+  }
+}
+
 enum TargetResolution {
   r1080p('1080p', '1080p', '1920x1080', 1920, 1080),
   r2k('2k', '2K', '2560x1440', 2560, 1440),
@@ -64,6 +88,7 @@ class SettingsService {
   static const String keyDefaultPreset = 'app_default_preset';
   static const String keyCustomOutputPath = 'app_output_path';
   static const String keyUpscaleResolution = 'app_upscale_resolution';
+  static const String keyUpscaleEngine = 'app_upscale_engine';
   static const String keyEnhanceAndDenoise = 'app_enhance_denoise';
   static const String keyDeepAntiFingerprint = 'app_deep_anti_fingerprint';
   static const String keyHorizontalFlip = 'app_horizontal_flip';
@@ -133,6 +158,23 @@ class SettingsService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyUpscaleResolution, resolution.key);
     upscaleResolutionNotifier.value = resolution;
+  }
+
+  static final ValueNotifier<UpscaleEngine> upscaleEngineNotifier =
+      ValueNotifier<UpscaleEngine>(UpscaleEngine.lanczos);
+
+  static Future<UpscaleEngine> getUpscaleEngine() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(keyUpscaleEngine);
+    final engine = UpscaleEngine.fromString(raw);
+    upscaleEngineNotifier.value = engine;
+    return engine;
+  }
+
+  static Future<void> setUpscaleEngine(UpscaleEngine engine) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyUpscaleEngine, engine.key);
+    upscaleEngineNotifier.value = engine;
   }
 
   static Future<bool> getEnhanceAndDenoise() async {

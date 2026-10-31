@@ -182,5 +182,18 @@ void main() {
       await SettingsService.setBackgroundProcessing(false);
       expect(await SettingsService.getBackgroundProcessing(), isFalse);
     });
+
+    test('UpscaleEngine enum parsing and persistence', () async {
+      expect(UpscaleEngine.fromString('lanczos'), equals(UpscaleEngine.lanczos));
+      expect(UpscaleEngine.fromString('neural_ai'), equals(UpscaleEngine.neuralAi));
+      expect(UpscaleEngine.fromString('ai'), equals(UpscaleEngine.neuralAi));
+      expect(UpscaleEngine.fromString('realesrgan'), equals(UpscaleEngine.neuralAi));
+      expect(UpscaleEngine.fromString('unknown'), equals(UpscaleEngine.lanczos));
+
+      expect(await SettingsService.getUpscaleEngine(), equals(UpscaleEngine.lanczos));
+      await SettingsService.setUpscaleEngine(UpscaleEngine.neuralAi);
+      expect(await SettingsService.getUpscaleEngine(), equals(UpscaleEngine.neuralAi));
+      expect(SettingsService.upscaleEngineNotifier.value, equals(UpscaleEngine.neuralAi));
+    });
   });
 }

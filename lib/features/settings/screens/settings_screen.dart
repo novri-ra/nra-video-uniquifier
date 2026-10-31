@@ -8,6 +8,7 @@ import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/hardware_acceleration_card.dart';
 import '../widgets/preset_profile_card.dart';
 import '../widgets/upscale_resolution_card.dart';
+import '../widgets/upscale_engine_card.dart';
 import '../widgets/codec_selector_card.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -97,6 +98,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
             const SizedBox(height: 8),
             UpscaleResolutionCard(selectedValue: provider.selectedUpscaleTarget, onSelect: provider.setUpscaleTarget),
+            const SizedBox(height: 16),
+            const _SettingsSectionHeader(title: 'SUPER-RESOLUTION ENGINE', subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3'),
+            const SizedBox(height: 8),
+            UpscaleEngineCard(selectedEngine: provider.upscaleEngine, onSelect: provider.setUpscaleEngine),
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'HARDWARE ACCELERATION', subtitle: 'MediaCodec / OpenGL shader pipeline'),
             const SizedBox(height: 8),
