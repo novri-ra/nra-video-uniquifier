@@ -3,10 +3,13 @@ import 'settings_service.dart';
 
 /// Pure static builders for FFmpeg video and audio filtergraph chains.
 class FilterBuilders {
-  static String _buildCanvasChain({required bool isPortrait, double canvasScalePercent = 95.0}) {
-    final bgDim = isPortrait ? '1080:1920' : '1920:1080';
-    final targetW = isPortrait ? 1080 : 1920;
-    final targetH = isPortrait ? 1920 : 1080;
+  static String _buildCanvasChain({
+    required bool isPortrait,
+    double canvasScalePercent = 95.0,
+    TargetResolution targetResolution = TargetResolution.r1080p,
+  }) {
+    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final bgDim = '$targetW:$targetH';
     final factor = (canvasScalePercent / 100.0).clamp(0.0, 1.0);
     final fgW = ((targetW * factor) / 2).floor() * 2;
     final fgH = ((targetH * factor) / 2).floor() * 2;
@@ -27,8 +30,12 @@ class FilterBuilders {
     bool enableChromaShift = false,
     required bool isPortrait,
     required VideoVariations vars,
+    TargetResolution targetResolution = TargetResolution.r1080p,
+    bool upscale = false,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
   }) {
-    final zoomDim = isPortrait ? '1080x1920' : '1920x1080';
+    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final zoomDim = '${targetW}x$targetH';
     return <String>[
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
       if (enableHorizontalFlip) 'hflip',
@@ -41,7 +48,10 @@ class FilterBuilders {
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (enableFrameSkip) 'decimate=cycle=25',
-      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      if (upscale)
+        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
+      else
+        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
     ];
   }
@@ -65,7 +75,7 @@ class FilterBuilders {
     UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
   }) {
     final (w, h) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
-    return 'scale=w=$w:h=$h:flags=lanczos';
+    return 'scale=w=$w:h=$h:flags=lanczos,unsharp=5:5:0.7:5:5:0.3';
   }
 
   static List<String> _buildFiltersList({
@@ -86,7 +96,8 @@ class FilterBuilders {
     final keep = (1.0 - vars.cropPercent).toStringAsFixed(4);
     final off = (vars.cropPercent / 2.0).toStringAsFixed(4);
     final rot = '${vars.rotateAngle.toStringAsFixed(3)}*PI/180';
-    final zoomDim = isPortrait ? '1080x1920' : '1920x1080';
+    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final zoomDim = '${targetW}x$targetH';
     return <String>[
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
       if (modifyVisuals && enableDeepAntiFingerprint) ...[
@@ -138,7 +149,11 @@ class FilterBuilders {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final String vfString;
       if (enableBlurredCanvas) {
-        final canvas = _buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent);
+        final canvas = _buildCanvasChain(
+          isPortrait: isPortrait,
+          canvasScalePercent: canvasScalePercent,
+          targetResolution: targetResolution,
+        );
         final post = _buildPostCanvasFilters(
           modifyVisuals: modifyVisuals,
           enableHorizontalFlip: enableHorizontalFlip,
@@ -149,6 +164,9 @@ class FilterBuilders {
           enableChromaShift: enableChromaShift,
           isPortrait: isPortrait,
           vars: vars,
+          targetResolution: targetResolution,
+          upscale: upscale,
+          upscaleEngine: upscaleEngine,
         );
         vfString = '$canvas;[outv]${post.join(',')}';
       } else {
