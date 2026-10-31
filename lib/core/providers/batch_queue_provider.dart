@@ -97,6 +97,7 @@ class BatchQueueProvider extends ChangeNotifier {
           modifyVisuals: config.modifyVisuals,
           upscale1080p: config.upscale1080p,
           targetResolution: config.targetResolution,
+          upscaleEngine: config.upscaleEngine,
           videoCodec: config.videoCodec,
           enableEnhanceAndDenoise: config.enableEnhanceAndDenoise,
           enableDeepAntiFingerprint: config.enableDeepAntiFingerprint,

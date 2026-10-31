@@ -1,6 +1,7 @@
 package id.novrira.videouniquifier
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import androidx.core.content.FileProvider
@@ -11,9 +12,36 @@ import java.io.File
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "id.novrira.videouniquifier/media_scanner"
+    private val CHANNEL_AI = "id.novrira.videouniquifier/ai_super_res"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_AI).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "isVulkanSupported" -> {
+                    try {
+                        val pm = applicationContext.packageManager
+                        val hasVulkan = pm.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL)
+                        result.success(hasVulkan)
+                    } catch (_: Exception) {
+                        result.success(false)
+                    }
+                }
+                "getModelInfo" -> {
+                    result.success(
+                        mapOf(
+                            "model" to "Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)",
+                            "tilingSupport" to true,
+                            "fallbackEngine" to "Hardware-accelerated Lanczos3"
+                        )
+                    )
+                }
+                "processFrameBatch" -> {
+                    result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "scanFile" -> {

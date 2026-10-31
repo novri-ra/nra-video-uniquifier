@@ -7,6 +7,7 @@ import '../utils/formatters.dart';
 class UniquifierProvider extends ChangeNotifier {
   UniquifierProvider() {
     SettingsService.upscaleResolutionNotifier.addListener(_onResolutionNotifierChanged);
+    SettingsService.upscaleEngineNotifier.addListener(_onUpscaleEngineNotifierChanged);
     SettingsService.videoCodecNotifier.addListener(_onCodecNotifierChanged);
     SettingsService.hardwareAccelerationNotifier.addListener(_onHardwareAccelerationNotifierChanged);
     _initResolution();
@@ -15,6 +16,7 @@ class UniquifierProvider extends ChangeNotifier {
   @override
   void dispose() {
     SettingsService.upscaleResolutionNotifier.removeListener(_onResolutionNotifierChanged);
+    SettingsService.upscaleEngineNotifier.removeListener(_onUpscaleEngineNotifierChanged);
     SettingsService.videoCodecNotifier.removeListener(_onCodecNotifierChanged);
     SettingsService.hardwareAccelerationNotifier.removeListener(_onHardwareAccelerationNotifierChanged);
     super.dispose();
@@ -23,6 +25,12 @@ class UniquifierProvider extends ChangeNotifier {
   void _onResolutionNotifierChanged() {
     if (_targetResolution == SettingsService.upscaleResolutionNotifier.value) return;
     _targetResolution = SettingsService.upscaleResolutionNotifier.value;
+    notifyListeners();
+  }
+
+  void _onUpscaleEngineNotifierChanged() {
+    if (_upscaleEngine == SettingsService.upscaleEngineNotifier.value) return;
+    _upscaleEngine = SettingsService.upscaleEngineNotifier.value;
     notifyListeners();
   }
 
@@ -41,6 +49,7 @@ class UniquifierProvider extends ChangeNotifier {
   Future<void> _initResolution() async {
     try {
       _targetResolution = await SettingsService.getUpscaleResolution();
+      _upscaleEngine = await SettingsService.getUpscaleEngine();
       _videoCodec = await SettingsService.getVideoCodec();
       _hardwareAcceleration = await SettingsService.getHardwareAcceleration();
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
@@ -91,6 +100,7 @@ class UniquifierProvider extends ChangeNotifier {
 
   // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
+  UpscaleEngine _upscaleEngine = UpscaleEngine.lanczos;
   VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
 
@@ -137,6 +147,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool get isPortrait => _isPortrait;
 
   TargetResolution get targetResolution => _targetResolution;
+  UpscaleEngine get upscaleEngine => _upscaleEngine;
   VideoCodec get videoCodec => _videoCodec;
   String get selectedUpscaleTarget => _targetResolution.key;
   String get targetResolutionLabel => _targetResolution.label;
@@ -176,6 +187,12 @@ class UniquifierProvider extends ChangeNotifier {
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
     try { SettingsService.setUpscaleResolution(_targetResolution); } catch (_) {}
+    notifyListeners();
+  }
+
+  void setUpscaleEngine(UpscaleEngine engine) {
+    _upscaleEngine = engine;
+    try { SettingsService.setUpscaleEngine(engine); } catch (_) {}
     notifyListeners();
   }
 
