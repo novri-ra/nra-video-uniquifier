@@ -89,13 +89,13 @@ void main() {
       expect(cmd, contains('setpts='));
       expect(cmd, contains('crop='));
       expect(cmd, contains('rotate='));
-      expect(cmd, contains('scale=w=-2:h=1080:flags=lanczos'));
+      expect(cmd, contains('scale=w=1920:h=1080:flags=lanczos'));
       expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
       expect(cmd, isNot(contains('curves=preset=vintage')));
       expect(cmd, contains('eq=brightness='));
       expect(cmd, contains('noise=alls='));
-      expect(cmd, contains('scale=trunc(iw/2)*2:trunc(ih/2)*2'));
+      expect(cmd, isNot(contains('scale=trunc(iw/2)*2:trunc(ih/2)*2')));
       expect(cmd, contains('format=yuv420p'));
       expect(cmd, contains('-c:v libx264 -preset fast -crf 22'));
       expect(cmd, contains('-pix_fmt yuv420p'));
@@ -109,27 +109,25 @@ void main() {
       expect(cmd, contains('-c:a copy'));
       expect(cmd, contains('-r 29.'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Scale -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
-      final scaleIdx = cmd.indexOf('scale=w=-2:h=1080');
       final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
-      final evenScaleIdx = cmd.indexOf('scale=trunc(iw/2)*2:trunc(ih/2)*2');
+      final scaleIdx = cmd.indexOf('scale=w=1920:h=1080:flags=lanczos');
       final formatIdx = cmd.indexOf('format=yuv420p');
 
       expect(ptsIdx, lessThan(cropIdx));
       expect(cropIdx, lessThan(rotIdx));
-      expect(rotIdx, lessThan(scaleIdx));
-      expect(scaleIdx, lessThan(denoiseIdx));
+      expect(rotIdx, lessThan(denoiseIdx));
       expect(denoiseIdx, lessThan(unsharpIdx));
       expect(unsharpIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
-      expect(noiseIdx, lessThan(evenScaleIdx));
-      expect(evenScaleIdx, lessThan(formatIdx));
+      expect(noiseIdx, lessThan(scaleIdx));
+      expect(scaleIdx, lessThan(formatIdx));
     });
 
     test('Video codec engine: H.264 outputs libx264 crf 22, H.265 outputs libx265 crf 26 tag hvc1', () {
@@ -169,7 +167,7 @@ void main() {
       );
       expect(cmd, contains('crop=trunc(iw*'));
       expect(cmd, contains('rotate='));
-      expect(cmd, contains('scale=w=-2:h=1440:flags=lanczos'));
+      expect(cmd, contains('scale=w=2560:h=1440:flags=lanczos'));
     });
 
     test('Upscale to 4K dynamically maps scale filter to 2160p with standard crop when deep evasion off', () {
@@ -184,7 +182,7 @@ void main() {
       );
       expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
       expect(cmd, isNot(contains('rotate=')));
-      expect(cmd, contains('scale=w=-2:h=2160:flags=lanczos'));
+      expect(cmd, contains('scale=w=3840:h=2160:flags=lanczos'));
       expect(cmd, isNot(contains('hqdn3d=')));
       expect(cmd, isNot(contains('unsharp=')));
     });
@@ -198,7 +196,7 @@ void main() {
         targetResolution: TargetResolution.r1080p,
         isPortrait: false,
       );
-      expect(cmd1080, contains('scale=w=-2:h=1080:flags=lanczos'));
+      expect(cmd1080, contains('scale=w=1920:h=1080:flags=lanczos'));
 
       final cmd2k = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
@@ -208,7 +206,7 @@ void main() {
         targetResolution: TargetResolution.r2k,
         isPortrait: false,
       );
-      expect(cmd2k, contains('scale=w=-2:h=1440:flags=lanczos'));
+      expect(cmd2k, contains('scale=w=2560:h=1440:flags=lanczos'));
 
       final cmd4k = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
@@ -218,7 +216,7 @@ void main() {
         targetResolution: TargetResolution.r4k,
         isPortrait: false,
       );
-      expect(cmd4k, contains('scale=w=-2:h=2160:flags=lanczos'));
+      expect(cmd4k, contains('scale=w=3840:h=2160:flags=lanczos'));
     });
 
     test('Orientation-aware scaling: Portrait enforces true vertical 1080p, 2K, and 4K dimensions', () {
@@ -230,7 +228,7 @@ void main() {
         targetResolution: TargetResolution.r1080p,
         isPortrait: true,
       );
-      expect(cmd1080, contains('scale=w=1080:h=-2:flags=lanczos'));
+      expect(cmd1080, contains('scale=w=1080:h=1920:flags=lanczos'));
 
       final cmd2k = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
@@ -240,7 +238,7 @@ void main() {
         targetResolution: TargetResolution.r2k,
         isPortrait: true,
       );
-      expect(cmd2k, contains('scale=w=1440:h=-2:flags=lanczos'));
+      expect(cmd2k, contains('scale=w=1440:h=2560:flags=lanczos'));
 
       final cmd4k = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
@@ -250,7 +248,7 @@ void main() {
         targetResolution: TargetResolution.r4k,
         isPortrait: true,
       );
-      expect(cmd4k, contains('scale=w=2160:h=-2:flags=lanczos'));
+      expect(cmd4k, contains('scale=w=2160:h=3840:flags=lanczos'));
     });
 
     test('RenderDiagnosticInfo correctly evaluates orientation, true 4K, and truncation status', () {

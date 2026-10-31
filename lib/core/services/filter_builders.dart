@@ -46,6 +46,27 @@ class FilterBuilders {
     ];
   }
 
+  /// Determines canonical target resolution bounds (width, height).
+  static (int, int) canonicalDimensions(TargetResolution res, {required bool isPortrait}) {
+    switch (res) {
+      case TargetResolution.r1080p:
+        return isPortrait ? (1080, 1920) : (1920, 1080);
+      case TargetResolution.r2k:
+        return isPortrait ? (1440, 2560) : (2560, 1440);
+      case TargetResolution.r4k:
+        return isPortrait ? (2160, 3840) : (3840, 2160);
+    }
+  }
+
+  /// Builds absolute Lanczos scale filter enforcing exact canonical pixel dimensions.
+  static String buildScaleFilter({
+    required TargetResolution targetResolution,
+    required bool isPortrait,
+  }) {
+    final (w, h) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    return 'scale=w=$w:h=$h:flags=lanczos';
+  }
+
   static List<String> _buildFiltersList({
     required bool modifyVisuals,
     required bool enableDeepAntiFingerprint,
@@ -74,7 +95,6 @@ class FilterBuilders {
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
-      if (upscale) targetResolution.scaleFilter(isPortrait: isPortrait),
       if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
       if (modifyVisuals)
@@ -82,7 +102,10 @@ class FilterBuilders {
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (enableFrameSkip) 'decimate=cycle=25',
-      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      if (upscale)
+        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait)
+      else
+        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
     ];
   }

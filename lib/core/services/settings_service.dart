@@ -38,8 +38,11 @@ enum TargetResolution {
 
   const TargetResolution(this.key, this.label, this.details, this.width, this.height);
 
-  String scaleFilter({bool isPortrait = false}) =>
-      isPortrait ? 'scale=w=$height:h=-2:flags=lanczos' : 'scale=w=-2:h=$height:flags=lanczos';
+  String scaleFilter({bool isPortrait = false}) {
+    final targetW = isPortrait ? height : width;
+    final targetH = isPortrait ? width : height;
+    return 'scale=w=$targetW:h=$targetH:flags=lanczos';
+  }
 
   static TargetResolution fromString(String? val) {
     switch (val?.toLowerCase()) {
