@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'settings_service.dart';
 
 /// Execution plan descriptor for neural and mathematical upscaling engines.
@@ -35,6 +36,31 @@ class AiSuperResolutionService {
 
   static const String modelRealEsrganAnimeVideoV3 = 'Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)';
   static const String modelLanczosFallback = 'Lanczos3 Anti-Aliased Mathematical Matrix';
+
+  /// Extracts bundled NCNN model weights from assets to internal storage cache.
+  static Future<List<String>> prepareModelAssets() async {
+    const modelFiles = [
+      'realesr-animevideov3-x2.bin',
+      'realesr-animevideov3-x2.param',
+      'realesr-animevideov3-x4.bin',
+      'realesr-animevideov3-x4.param',
+    ];
+    final outPaths = <String>[];
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final modelsDir = Directory('${tempDir.path}/models');
+      if (!await modelsDir.exists()) await modelsDir.create(recursive: true);
+      for (final name in modelFiles) {
+        final target = File('${modelsDir.path}/$name');
+        if (!await target.exists() || await target.length() == 0) {
+          final data = await rootBundle.load('assets/models/$name');
+          await target.writeAsBytes(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes), flush: true);
+        }
+        outPaths.add(target.path);
+      }
+    } catch (_) {}
+    return outPaths;
+  }
 
   /// Queries whether native Vulkan compute is supported on the target GPU.
   static Future<bool> isVulkanSupported() async {

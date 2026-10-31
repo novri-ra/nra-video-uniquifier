@@ -89,8 +89,9 @@ void main() {
       expect(cmd, contains('setpts='));
       expect(cmd, contains('crop='));
       expect(cmd, contains('rotate='));
-      expect(cmd, contains('scale=w=1920:h=1080:flags=lanczos'));
-      expect(cmd, contains('hqdn3d=1.5:1.5:4:4'));
+      expect(cmd, contains('scale=w=1920:h=1080:flags=lanczos+accurate_rnd'));
+      // When upscale is enabled, destructive hqdn3d is bypassed to preserve clarity
+      expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
       expect(cmd, isNot(contains('curves=preset=vintage')));
       expect(cmd, contains('eq=brightness='));
@@ -109,21 +110,19 @@ void main() {
       expect(cmd, contains('-c:a copy'));
       expect(cmd, contains('-r 29.'));
 
-      // Strict sequential order checks: PTS -> Crop -> Rotate -> Denoise -> Unsharp -> EQ -> Noise -> Scale -> Format
+      // Strict sequential order checks: PTS -> Crop -> Rotate -> Unsharp -> EQ -> Noise -> Scale -> Format
       final ptsIdx = cmd.indexOf('setpts=');
       final cropIdx = cmd.indexOf('crop=');
       final rotIdx = cmd.indexOf('rotate=');
-      final denoiseIdx = cmd.indexOf('hqdn3d=');
       final unsharpIdx = cmd.indexOf('unsharp=');
       final eqIdx = cmd.indexOf('eq=');
       final noiseIdx = cmd.indexOf('noise=');
-      final scaleIdx = cmd.indexOf('scale=w=1920:h=1080:flags=lanczos');
+      final scaleIdx = cmd.indexOf('scale=w=1920:h=1080:flags=lanczos+accurate_rnd');
       final formatIdx = cmd.indexOf('format=yuv420p');
 
       expect(ptsIdx, lessThan(cropIdx));
       expect(cropIdx, lessThan(rotIdx));
-      expect(rotIdx, lessThan(denoiseIdx));
-      expect(denoiseIdx, lessThan(unsharpIdx));
+      expect(rotIdx, lessThan(unsharpIdx));
       expect(unsharpIdx, lessThan(eqIdx));
       expect(eqIdx, lessThan(noiseIdx));
       expect(noiseIdx, lessThan(scaleIdx));
@@ -182,7 +181,7 @@ void main() {
       );
       expect(cmd, contains('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'));
       expect(cmd, isNot(contains('rotate=')));
-      expect(cmd, contains('scale=w=3840:h=2160:flags=lanczos,unsharp=5:5:0.7:5:5:0.3'));
+      expect(cmd, contains('scale=w=3840:h=2160:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5'));
       expect(cmd, isNot(contains('hqdn3d=')));
     });
 
@@ -604,7 +603,9 @@ void main() {
       expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'")); // 4. dynamicZoom
       expect(cmd, contains('hflip')); // 5. horizontalFlip
       expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
-      expect(cmd, contains('hqdn3d=1.5:1.5:4:4')); // 7. denoise
+      // 7. upscale active, so hqdn3d is bypassed to retain crisp textures
+      expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
+      expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0')); // pre-scale edge sharpness
       expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'")); // 8. chromaShift
       expect(cmd, contains('noise=alls=')); // 9. modifyVisuals grain
       expect(cmd, contains('noise=alls=5:allf=t+u')); // 10. microOverlay
@@ -738,7 +739,7 @@ void main() {
       // Non-linear color curves
       expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
       // Terminal canonical scale and format lock
-      expect(cmd, contains('scale=w=1080:h=1920:flags=lanczos,unsharp=5:5:0.7:5:5:0.3'));
+      expect(cmd, contains('scale=w=1080:h=1920:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5'));
       expect(cmd, contains('format=yuv420p'));
     });
   });

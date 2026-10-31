@@ -97,5 +97,10 @@ void main() {
       expect(descAi, contains('2160×3840'));
       expect(descAi, contains('Auto-Fallback Lanczos3 Enabled'));
     });
+
+    test('prepareModelAssets safely extracts or returns asset model paths', () async {
+      final paths = await AiSuperResolutionService.prepareModelAssets();
+      expect(paths, isA<List<String>>());
+    });
   });
 }

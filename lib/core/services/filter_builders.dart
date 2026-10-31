@@ -41,7 +41,8 @@ class FilterBuilders {
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
-      if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
+      if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
+      if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
       if (modifyVisuals)
         'eq=brightness=${vars.brightness.toStringAsFixed(4)}:contrast=${vars.contrast.toStringAsFixed(4)}:saturation=${vars.saturation.toStringAsFixed(4)}',
@@ -75,7 +76,31 @@ class FilterBuilders {
     UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
   }) {
     final (w, h) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
-    return 'scale=w=$w:h=$h:flags=lanczos,unsharp=5:5:0.7:5:5:0.3';
+    return 'scale=w=$w:h=$h:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5';
+  }
+
+  static String _resolveCodecArgs(VideoCodec videoCodec, TargetResolution targetResolution) {
+    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    if (isHighRes) {
+      return videoCodec == VideoCodec.h265
+          ? '-c:v libx265 -preset medium -crf 17 -tag:v hvc1 -tune film'
+          : '-c:v libx264 -preset medium -crf 17 -tune film';
+    }
+    return videoCodec == VideoCodec.h265
+        ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
+        : '-c:v libx264 -preset fast -crf 22';
+  }
+
+  static List<String> _buildSpatialCrop(VideoVariations vars, bool modifyVisuals, bool deep) {
+    if (!modifyVisuals) return const [];
+    if (!deep) return ['crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'];
+    final keep = (1.0 - vars.cropPercent).toStringAsFixed(4);
+    final off = (vars.cropPercent / 2.0).toStringAsFixed(4);
+    final rot = '${vars.rotateAngle.toStringAsFixed(3)}*PI/180';
+    return [
+      'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
+      'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
+    ];
   }
 
   static List<String> _buildFiltersList({
@@ -93,22 +118,16 @@ class FilterBuilders {
     bool enableChromaShift = false,
     required VideoVariations vars,
   }) {
-    final keep = (1.0 - vars.cropPercent).toStringAsFixed(4);
-    final off = (vars.cropPercent / 2.0).toStringAsFixed(4);
-    final rot = '${vars.rotateAngle.toStringAsFixed(3)}*PI/180';
     final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     final zoomDim = '${targetW}x$targetH';
     return <String>[
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
-      if (modifyVisuals && enableDeepAntiFingerprint) ...[
-        'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
-        'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
-      ] else if (modifyVisuals)
-        'crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2',
+      ..._buildSpatialCrop(vars, modifyVisuals, enableDeepAntiFingerprint),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
-      if (enableEnhanceAndDenoise) ...['hqdn3d=1.5:1.5:4:4', 'unsharp=3:3:0.6:3:3:0.0'],
+      if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
+      if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
       if (modifyVisuals)
         'eq=brightness=${vars.brightness.toStringAsFixed(4)}:contrast=${vars.contrast.toStringAsFixed(4)}:saturation=${vars.saturation.toStringAsFixed(4)}',
@@ -121,6 +140,39 @@ class FilterBuilders {
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'format=yuv420p',
     ];
+  }
+
+  static String _fallbackVideoFilter({
+    required bool hasVisual,
+    required bool hasAudio,
+    required bool modifyVisuals,
+    required bool upscale,
+    required TargetResolution targetResolution,
+    required UpscaleEngine upscaleEngine,
+    required VideoCodec videoCodec,
+    required bool enableEnhanceAndDenoise,
+    required bool enableHorizontalFlip,
+    required bool isPortrait,
+  }) {
+    return buildVideoFilter(
+      hasVisual: hasVisual,
+      hasAudio: hasAudio,
+      modifyVisuals: modifyVisuals,
+      upscale: upscale,
+      targetResolution: targetResolution,
+      upscaleEngine: upscaleEngine,
+      videoCodec: videoCodec,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: false,
+      enableHorizontalFlip: enableHorizontalFlip,
+      isPortrait: isPortrait,
+      enableBlurredCanvas: false,
+      enableDynamicZoom: false,
+      enableMicroOverlay: false,
+      enableFrameSkip: false,
+      enableChromaShift: false,
+      variations: VideoVariations.fallback,
+    );
   }
 
   /// Builds video filtergraph chain (-vf) with PTS, spatial transforms, scaling, enhancements, and grain.
@@ -147,70 +199,13 @@ class FilterBuilders {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
-      final String vfString;
-      if (enableBlurredCanvas) {
-        final canvas = _buildCanvasChain(
-          isPortrait: isPortrait,
-          canvasScalePercent: canvasScalePercent,
-          targetResolution: targetResolution,
-        );
-        final post = _buildPostCanvasFilters(
-          modifyVisuals: modifyVisuals,
-          enableHorizontalFlip: enableHorizontalFlip,
-          enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-          enableDynamicZoom: enableDynamicZoom,
-          enableMicroOverlay: enableMicroOverlay,
-          enableFrameSkip: enableFrameSkip,
-          enableChromaShift: enableChromaShift,
-          isPortrait: isPortrait,
-          vars: vars,
-          targetResolution: targetResolution,
-          upscale: upscale,
-          upscaleEngine: upscaleEngine,
-        );
-        vfString = '$canvas;[outv]${post.join(',')}';
-      } else {
-        final filters = _buildFiltersList(
-          modifyVisuals: modifyVisuals,
-          enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-          enableHorizontalFlip: enableHorizontalFlip,
-          upscale: upscale,
-          targetResolution: targetResolution,
-          upscaleEngine: upscaleEngine,
-          enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-          isPortrait: isPortrait,
-          enableDynamicZoom: enableDynamicZoom,
-          enableMicroOverlay: enableMicroOverlay,
-          enableFrameSkip: enableFrameSkip,
-          enableChromaShift: enableChromaShift,
-          vars: vars,
-        );
-        vfString = filters.join(',');
-      }
-      final codecArgs = videoCodec == VideoCodec.h265
-          ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
-          : '-c:v libx264 -preset fast -crf 22';
+      final vfString = enableBlurredCanvas
+          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine).join(',')}'
+          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars).join(',');
+      final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {
-      return buildVideoFilter(
-        hasVisual: hasVisual,
-        hasAudio: hasAudio,
-        modifyVisuals: modifyVisuals,
-        upscale: upscale,
-        targetResolution: targetResolution,
-        upscaleEngine: upscaleEngine,
-        videoCodec: videoCodec,
-        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-        enableDeepAntiFingerprint: false,
-        enableHorizontalFlip: enableHorizontalFlip,
-        isPortrait: isPortrait,
-        enableBlurredCanvas: false,
-        enableDynamicZoom: false,
-        enableMicroOverlay: false,
-        enableFrameSkip: false,
-        enableChromaShift: false,
-        variations: VideoVariations.fallback,
-      );
+      return _fallbackVideoFilter(hasVisual: hasVisual, hasAudio: hasAudio, modifyVisuals: modifyVisuals, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableHorizontalFlip: enableHorizontalFlip, isPortrait: isPortrait);
     }
   }
 
