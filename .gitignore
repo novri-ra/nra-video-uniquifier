@@ -57,6 +57,10 @@ __pycache__/
 Movies/
 0ai_context[0-9]*/
 *.mp4
+*.aac
+*.ts
+*.m4a
+*.dump
 0ai_context/reports/screenshots/
 
 # Keystore & Signing Secrets
