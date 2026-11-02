@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/device_capability_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class UpscaleResolutionCard extends StatelessWidget {
   final String selectedValue;
   final ValueChanged<String> onSelect;
+  final DeviceTier tier;
 
   const UpscaleResolutionCard({
     super.key,
     required this.selectedValue,
     required this.onSelect,
+    this.tier = DeviceTier.mid,
   });
 
   @override
   Widget build(BuildContext context) {
+    final warn2k = DeviceCapabilityService.getResolutionWarning(targetKey: '2k', tier: tier);
+    final warn4k = DeviceCapabilityService.getResolutionWarning(targetKey: '4k', tier: tier);
+
     return Column(
       children: [
         _ResolutionOptionTile(
@@ -25,23 +31,23 @@ class UpscaleResolutionCard extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         _ResolutionOptionTile(
-          title: '2K QHD (May lag)',
-          subtitle: 'Requires heavy CPU usage',
+          title: tier == DeviceTier.flagship ? '2K QHD (Optimal / Safe)' : '2K QHD (Heavy CPU)',
+          subtitle: tier == DeviceTier.flagship ? 'Full hardware acceleration • Smooth' : 'Requires heavy CPU usage',
           resolution: '2560×1440',
           value: '2k',
           selectedValue: selectedValue,
           onTap: () => onSelect('2k'),
-          warningTag: 'HIGH THERMAL',
+          warningTag: warn2k,
         ),
         const SizedBox(height: 8),
         _ResolutionOptionTile(
-          title: '4K UHD (Extreme Load)',
-          subtitle: 'Requires flagship CPU • Max detail',
+          title: tier == DeviceTier.flagship ? '4K UHD (Fully Supported)' : '4K UHD (High Compute)',
+          subtitle: tier == DeviceTier.flagship ? 'Flagship GPU accelerated • Max detail' : 'Extreme computation load',
           resolution: '3840×2160',
           value: '4k',
           selectedValue: selectedValue,
           onTap: () => onSelect('4k'),
-          warningTag: 'EXTREME LOAD',
+          warningTag: warn4k,
         ),
       ],
     );

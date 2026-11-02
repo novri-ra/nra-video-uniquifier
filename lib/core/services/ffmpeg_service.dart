@@ -9,6 +9,7 @@ import 'media_scanner_service.dart';
 import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
+import 'wakelock_service.dart';
 import 'filter_builders.dart';
 import '../utils/variation_generator.dart';
 
@@ -20,108 +21,102 @@ class FfmpegService {
 
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
   static String buildCommand({
-    required String inputPath,
-    required String outputPath,
-    bool removeMetadata = true,
-    bool modifyAudio = true,
-    bool modifyVisuals = true,
-    bool upscale1080p = false,
-    bool? upscale,
+    required String inputPath, required String outputPath,
+    bool removeMetadata = true, bool modifyAudio = true, bool modifyVisuals = true,
+    bool upscale1080p = false, bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
-    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
-    VideoCodec videoCodec = VideoCodec.h264,
-    bool enableEnhanceAndDenoise = true,
-    bool enableDeepAntiFingerprint = true,
-    bool enableHorizontalFlip = false,
-    bool enableAggressiveAudio = false,
-    bool enableAutoTrim = false,
-    int totalDurationMs = 0,
-    bool isPortrait = false,
-    bool enableHardwareAcceleration = false,
-    bool enableBlurredCanvas = false,
-    double canvasScalePercent = 95.0,
-    bool muteOriginalAudio = false,
-    bool enableDynamicZoom = false,
-    bool enableMicroOverlay = false,
-    bool enableFrameSkip = false,
-    bool enableChromaShift = false,
-    VideoVariations? variations,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos, VideoCodec videoCodec = VideoCodec.h264,
+    bool enableEnhanceAndDenoise = true, bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false, bool enableAggressiveAudio = false, bool enableAutoTrim = false,
+    int totalDurationMs = 0, bool isPortrait = false, bool enableHardwareAcceleration = false,
+    bool enableBlurredCanvas = false, double canvasScalePercent = 95.0, bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false, bool enableMicroOverlay = false,
+    bool enableFrameSkip = false, bool enableChromaShift = false, VideoVariations? variations,
   }) {
-    final safeInput = _escapePath(inputPath);
-    final safeOutput = _escapePath(outputPath);
     final buffer = StringBuffer('-y');
-    if (enableHardwareAcceleration) {
-      buffer.write(' -hwaccel auto');
-    }
-    if (enableAutoTrim) {
+    _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs);
+    if (removeMetadata) _writeMetadataTags(buffer);
+    _writeFilterAndCodecOptions(
+      buffer: buffer, modifyVisuals: modifyVisuals, shouldUpscale: upscale ?? upscale1080p,
+      targetResolution: targetResolution, upscaleEngine: upscaleEngine, videoCodec: videoCodec,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableHorizontalFlip: enableHorizontalFlip, enableAggressiveAudio: enableAggressiveAudio,
+      isPortrait: isPortrait, enableBlurredCanvas: enableBlurredCanvas, canvasScalePercent: canvasScalePercent,
+      muteOriginalAudio: muteOriginalAudio, enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift, modifyAudio: modifyAudio, variations: variations,
+    );
+    buffer.write(' "${_escapePath(outputPath)}"');
+    return buffer.toString();
+  }
+
+  static void _writeInputOptions(StringBuffer buffer, String inputPath, bool hwAccel, bool autoTrim, int durationMs) {
+    if (hwAccel) buffer.write(' -hwaccel auto');
+    if (autoTrim) {
       buffer.write(' -ss 0.5');
-      if (totalDurationMs > 1500) {
-        final trimDur = ((totalDurationMs - 1000) / 1000).toStringAsFixed(2);
+      if (durationMs > 1500) {
+        final trimDur = ((durationMs - 1000) / 1000).toStringAsFixed(2);
         buffer.write(' -t $trimDur');
       }
     }
-    buffer.write(' -i "$safeInput"');
-    if (removeMetadata) {
-      buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact'
-          ' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"'
-          ' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"');
-    }
+    buffer.write(' -i "${_escapePath(inputPath)}"');
+  }
 
+  static void _writeMetadataTags(StringBuffer buffer) {
+    buffer.write(' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact'
+        ' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"'
+        ' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"');
+  }
+
+  static void _writeFilterAndCodecOptions({
+    required StringBuffer buffer,
+    required bool modifyVisuals,
+    required bool shouldUpscale,
+    required TargetResolution targetResolution,
+    required UpscaleEngine upscaleEngine,
+    required VideoCodec videoCodec,
+    required bool enableEnhanceAndDenoise,
+    required bool enableDeepAntiFingerprint,
+    required bool enableHorizontalFlip,
+    required bool enableAggressiveAudio,
+    required bool isPortrait,
+    required bool enableBlurredCanvas,
+    required double canvasScalePercent,
+    required bool muteOriginalAudio,
+    required bool enableDynamicZoom,
+    required bool enableMicroOverlay,
+    required bool enableFrameSkip,
+    required bool enableChromaShift,
+    required bool modifyAudio,
+    VideoVariations? variations,
+  }) {
     VideoVariations vars;
     try {
-      vars = variations ??
-          (enableDeepAntiFingerprint
-              ? VariationGenerator.generate()
-              : VideoVariations.fallback);
+      vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
     } catch (_) {
       vars = VideoVariations.fallback;
     }
-
-    final shouldUpscale = upscale ?? upscale1080p;
-    final hasVisual = modifyVisuals ||
-        shouldUpscale ||
-        enableHorizontalFlip ||
-        enableBlurredCanvas ||
-        enableDynamicZoom ||
-        enableMicroOverlay ||
-        enableFrameSkip ||
-        enableChromaShift;
+    final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip || enableBlurredCanvas ||
+        enableDynamicZoom || enableMicroOverlay || enableFrameSkip || enableChromaShift;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
+
     buffer.write(FilterBuilders.buildVideoFilter(
-      hasVisual: hasVisual,
-      hasAudio: hasAudioProcess,
-      modifyVisuals: modifyVisuals,
-      upscale: shouldUpscale,
-      targetResolution: targetResolution,
-      upscaleEngine: upscaleEngine,
-      videoCodec: videoCodec,
-      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-      enableHorizontalFlip: enableHorizontalFlip,
-      isPortrait: isPortrait,
-      enableBlurredCanvas: enableBlurredCanvas,
-      canvasScalePercent: canvasScalePercent,
-      enableDynamicZoom: enableDynamicZoom,
-      enableMicroOverlay: enableMicroOverlay,
-      enableFrameSkip: enableFrameSkip,
-      enableChromaShift: enableChromaShift,
-      variations: vars,
+      hasVisual: hasVisual, hasAudio: hasAudioProcess, modifyVisuals: modifyVisuals,
+      upscale: shouldUpscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine,
+      videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip,
+      isPortrait: isPortrait, enableBlurredCanvas: enableBlurredCanvas,
+      canvasScalePercent: canvasScalePercent, enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift, variations: vars,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
-      hasAudio: hasAudioProcess,
-      hasVisual: hasVisual,
-      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-      enableAggressiveAudio: enableAggressiveAudio,
-      muteOriginalAudio: muteOriginalAudio,
-      variations: vars,
+      hasAudio: hasAudioProcess, hasVisual: hasVisual,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableAggressiveAudio: enableAggressiveAudio,
+      muteOriginalAudio: muteOriginalAudio, variations: vars,
     ));
-
-    if (hasVisual) {
-      buffer.write(' -r ${vars.outputFps.toStringAsFixed(2)}');
-    }
+    if (hasVisual) buffer.write(' -r ${vars.outputFps.toStringAsFixed(2)}');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
-    buffer.write(' "$safeOutput"');
-    return buffer.toString();
   }
 
   /// Cancels any currently running FFmpeg operations.
@@ -240,88 +235,93 @@ class FfmpegService {
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({
     required String inputPath,
-    bool removeMetadata = true,
-    bool modifyAudio = true,
-    bool modifyVisuals = true,
-    bool upscale1080p = false,
-    bool? upscale,
+    bool removeMetadata = true, bool modifyAudio = true, bool modifyVisuals = true,
+    bool upscale1080p = false, bool? upscale,
     TargetResolution targetResolution = TargetResolution.r1080p,
-    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
-    VideoCodec videoCodec = VideoCodec.h264,
-    bool enableEnhanceAndDenoise = true,
-    bool enableDeepAntiFingerprint = true,
-    bool enableHorizontalFlip = false,
-    bool enableAggressiveAudio = false,
-    bool enableAutoTrim = false,
-    bool? isPortrait,
-    bool enableHardwareAcceleration = false,
-    bool enableBlurredCanvas = false,
-    double canvasScalePercent = 95.0,
-    bool muteOriginalAudio = false,
-    bool enableDynamicZoom = false,
-    bool enableMicroOverlay = false,
-    bool enableFrameSkip = false,
-    bool enableChromaShift = false,
-    bool suppressCompleteNotification = false,
-    String? customOutputPath,
+    UpscaleEngine upscaleEngine = UpscaleEngine.lanczos, VideoCodec videoCodec = VideoCodec.h264,
+    bool enableEnhanceAndDenoise = true, bool enableDeepAntiFingerprint = true,
+    bool enableHorizontalFlip = false, bool enableAggressiveAudio = false, bool enableAutoTrim = false,
+    bool? isPortrait, bool enableHardwareAcceleration = false, bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0, bool muteOriginalAudio = false, bool enableDynamicZoom = false,
+    bool enableMicroOverlay = false, bool enableFrameSkip = false, bool enableChromaShift = false,
+    bool suppressCompleteNotification = false, String? customOutputPath,
     void Function(double progress, double speed, int timeMs)? onProgress,
-    int totalDurationMs = 0,
+    void Function(String log)? onLog, int totalDurationMs = 0,
   }) async {
+    final meta = await _resolveInputMeta(inputPath, isPortrait, totalDurationMs);
+    final finalDestPath = customOutputPath ?? await generateOutputPath(inputPath);
+    final tempDir = await getTemporaryDirectory();
+    final stagedOutputPath = '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
+
+    final command = buildCommand(
+      inputPath: meta.effectiveInput, outputPath: stagedOutputPath,
+      removeMetadata: removeMetadata, modifyAudio: modifyAudio, modifyVisuals: modifyVisuals,
+      upscale1080p: upscale1080p, upscale: upscale, targetResolution: targetResolution,
+      upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip,
+      enableAggressiveAudio: enableAggressiveAudio, enableAutoTrim: enableAutoTrim,
+      totalDurationMs: meta.durationMs, isPortrait: meta.isPortrait,
+      enableHardwareAcceleration: enableHardwareAcceleration, enableBlurredCanvas: enableBlurredCanvas,
+      canvasScalePercent: canvasScalePercent, muteOriginalAudio: muteOriginalAudio,
+      enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
+    );
+
+    _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);
+    await WakeLockService.acquire();
+    try {
+      return await _executeAndExport(
+        command: command, stagedOutputPath: stagedOutputPath, effectiveInput: meta.effectiveInput,
+        finalDestPath: finalDestPath, suppressCompleteNotification: suppressCompleteNotification,
+      );
+    } finally {
+      await WakeLockService.release();
+      if (onProgress != null) FFmpegKitConfig.enableStatisticsCallback(null);
+      if (onLog != null) FFmpegKitConfig.enableLogCallback(null);
+      await NotificationService.cancelProgressNotification();
+      _deletePartialFile(stagedOutputPath, sourcePath: meta.effectiveInput);
+      if (meta.stagedFile != null && meta.stagedFile!.existsSync()) {
+        try {
+          if (meta.stagedFile!.path != finalDestPath && meta.stagedFile!.path != inputPath) meta.stagedFile!.deleteSync();
+        } catch (_) {}
+      }
+    }
+  }
+
+  static Future<({String effectiveInput, File? stagedFile, bool isPortrait, int durationMs})> _resolveInputMeta(
+    String inputPath, bool? isPortrait, int totalDurationMs,
+  ) async {
     File? stagedFile;
     try { stagedFile = await stageInputFile(inputPath); } catch (_) {}
-
     final effectiveInput = stagedFile?.path ?? inputPath;
     final inputFile = File(effectiveInput);
     if (!inputFile.existsSync() || inputFile.lengthSync() == 0) {
       throw Exception('Source video file does not exist or is empty: $inputPath');
     }
-
-    bool resolvedIsPortrait = isPortrait ?? false;
-    int resolvedDurationMs = totalDurationMs;
+    bool resolvedPortrait = isPortrait ?? false;
+    int resolvedDuration = totalDurationMs;
     if (isPortrait == null || totalDurationMs <= 0) {
       final meta = await _probeMediaMeta(effectiveInput);
-      if (isPortrait == null && meta.width > 0 && meta.height > 0) resolvedIsPortrait = meta.height > meta.width;
-      if (totalDurationMs <= 0 && meta.durationMs > 0) resolvedDurationMs = meta.durationMs;
+      if (isPortrait == null && meta.width > 0 && meta.height > 0) resolvedPortrait = meta.height > meta.width;
+      if (totalDurationMs <= 0 && meta.durationMs > 0) resolvedDuration = meta.durationMs;
     }
+    return (effectiveInput: effectiveInput, stagedFile: stagedFile, isPortrait: resolvedPortrait, durationMs: resolvedDuration);
+  }
 
-    final finalDestPath = customOutputPath ?? await generateOutputPath(inputPath);
-    final tempDir = await getTemporaryDirectory();
-    final stagedOutputPath = '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
-    final command = buildCommand(
-      inputPath: effectiveInput,
-      outputPath: stagedOutputPath,
-      removeMetadata: removeMetadata,
-      modifyAudio: modifyAudio,
-      modifyVisuals: modifyVisuals,
-      upscale1080p: upscale1080p,
-      upscale: upscale,
-      targetResolution: targetResolution,
-      upscaleEngine: upscaleEngine,
-      videoCodec: videoCodec,
-      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-      enableHorizontalFlip: enableHorizontalFlip,
-      enableAggressiveAudio: enableAggressiveAudio,
-      enableAutoTrim: enableAutoTrim,
-      totalDurationMs: resolvedDurationMs,
-      isPortrait: resolvedIsPortrait,
-      enableHardwareAcceleration: enableHardwareAcceleration,
-      enableBlurredCanvas: enableBlurredCanvas,
-      canvasScalePercent: canvasScalePercent,
-      muteOriginalAudio: muteOriginalAudio,
-      enableDynamicZoom: enableDynamicZoom,
-      enableMicroOverlay: enableMicroOverlay,
-      enableFrameSkip: enableFrameSkip,
-      enableChromaShift: enableChromaShift,
-    );
-
-    final baseName = inputPath.split(RegExp(r'[/\\]')).last;
+  static void _setupCallbacks({
+    void Function(double progress, double speed, int timeMs)? onProgress,
+    void Function(String log)? onLog,
+    required int resolvedDurationMs,
+    required String baseName,
+  }) {
     if (onProgress != null) {
+      double maxProgress = 0.0;
       FFmpegKitConfig.enableStatisticsCallback((statistics) {
         final timeMs = statistics.getTime(), speed = statistics.getSpeed();
-        final progress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
-        onProgress(progress, speed, timeMs);
-        final percent = (progress * 100).toInt();
+        final rawProgress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
+        if (rawProgress > maxProgress) maxProgress = rawProgress;
+        onProgress(maxProgress, speed, timeMs);
+        final percent = (maxProgress * 100).toInt();
         NotificationService.showProgressNotification(
           progress: percent,
           title: 'Uniquifying $baseName',
@@ -329,37 +329,38 @@ class FfmpegService {
         );
       });
     }
-
-    try {
-      final stagedRenderedPath = await _executeFFmpeg(command, stagedOutputPath, sourcePath: effectiveInput);
-      final diag = await inspectRenderedFile(stagedRenderedPath);
-      if (diag != null && (diag.isTruncatedPortrait || diag.width == null || diag.height == null)) {
-        _deletePartialFile(stagedRenderedPath, sourcePath: effectiveInput);
-        throw RenderIntegrityException('Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})');
-      }
-      final exportedPath = await _exportStagedFile(stagedRenderedPath, finalDestPath);
-      await MediaScannerService.scanFile(exportedPath);
-      _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
-      if (!suppressCompleteNotification) {
-        await NotificationService.showCompleteNotification(
-          title: 'Video Processing Complete',
-          body: 'Saved to ${exportedPath.split(RegExp(r"[/\\]")).last}',
-          success: true,
-        );
-      }
-      return exportedPath;
-    } finally {
-      if (onProgress != null) FFmpegKitConfig.enableStatisticsCallback(null);
-      await NotificationService.cancelProgressNotification();
-      _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
-      if (stagedFile != null && stagedFile.existsSync()) {
-        try {
-          if (stagedFile.path != finalDestPath && stagedFile.path != inputPath) {
-            stagedFile.deleteSync();
-          }
-        } catch (_) {}
-      }
+    if (onLog != null) {
+      FFmpegKitConfig.enableLogCallback((log) {
+        final msg = log.getMessage();
+        if (msg.isNotEmpty) onLog(msg);
+      });
     }
+  }
+
+  static Future<String> _executeAndExport({
+    required String command,
+    required String stagedOutputPath,
+    required String effectiveInput,
+    required String finalDestPath,
+    required bool suppressCompleteNotification,
+  }) async {
+    final stagedRenderedPath = await _executeFFmpeg(command, stagedOutputPath, sourcePath: effectiveInput);
+    final diag = await inspectRenderedFile(stagedRenderedPath);
+    if (diag != null && (diag.isTruncatedPortrait || diag.width == null || diag.height == null)) {
+      _deletePartialFile(stagedRenderedPath, sourcePath: effectiveInput);
+      throw RenderIntegrityException('Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})');
+    }
+    final exportedPath = await _exportStagedFile(stagedRenderedPath, finalDestPath);
+    await MediaScannerService.scanFile(exportedPath);
+    _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
+    if (!suppressCompleteNotification) {
+      await NotificationService.showCompleteNotification(
+        title: 'Video Processing Complete',
+        body: 'Saved to ${exportedPath.split(RegExp(r"[/\\]")).last}',
+        success: true,
+      );
+    }
+    return exportedPath;
   }
 
   /// Inspects rendered video using FFprobe to produce diagnostic report.

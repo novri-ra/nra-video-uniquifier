@@ -1,9 +1,13 @@
 package id.novrira.videouniquifier
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
+import android.os.PowerManager
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -13,9 +17,20 @@ import java.io.File
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "id.novrira.videouniquifier/media_scanner"
     private val CHANNEL_AI = "id.novrira.videouniquifier/ai_super_res"
+    private val CHANNEL_DEVICE = "id.novrira.videouniquifier/device_capability"
+    private val CHANNEL_WAKELOCK = "id.novrira.videouniquifier/wakelock"
+
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        setupAiChannel(flutterEngine)
+        setupScannerChannel(flutterEngine)
+        setupDeviceChannel(flutterEngine)
+        setupWakeLockChannel(flutterEngine)
+    }
+
+    private fun setupAiChannel(flutterEngine: FlutterEngine) {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_AI).setMethodCallHandler { call, result ->
             when (call.method) {
                 "isVulkanSupported" -> {
@@ -36,12 +51,13 @@ class MainActivity : FlutterActivity() {
                         )
                     )
                 }
-                "processFrameBatch" -> {
-                    result.success(true)
-                }
+                "processFrameBatch" -> result.success(true)
                 else -> result.notImplemented()
             }
         }
+    }
+
+    private fun setupScannerChannel(flutterEngine: FlutterEngine) {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "scanFile" -> {
@@ -52,9 +68,7 @@ class MainActivity : FlutterActivity() {
                                 applicationContext,
                                 arrayOf(filePath),
                                 arrayOf("video/mp4")
-                            ) { path, uri ->
-                                // Scanned successfully
-                            }
+                            ) { _, _ -> }
                             result.success(true)
                         } catch (e: Exception) {
                             result.error("SCAN_ERROR", e.message, null)
@@ -90,6 +104,82 @@ class MainActivity : FlutterActivity() {
                     } catch (e: Exception) {
                         result.error("INTENT_ERROR", e.message, null)
                     }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun setupDeviceChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_DEVICE).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getDeviceSpecs" -> {
+                    try {
+                        val actManager = getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+                        val memInfo = ActivityManager.MemoryInfo()
+                        actManager?.getMemoryInfo(memInfo)
+                        val totalRamBytes = memInfo.totalMem
+                        val availRamBytes = memInfo.availMem
+                        val cpuCores = Runtime.getRuntime().availableProcessors()
+                        val abi = if (Build.SUPPORTED_ABIS.isNotEmpty()) Build.SUPPORTED_ABIS[0] else "unknown"
+                        val isArm64 = abi.contains("arm64") || abi.contains("aarch64")
+
+                        val pm = applicationContext.packageManager
+                        val hasVulkan = pm.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL)
+                        val hasVulkanCompute = pm.hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION)
+
+                        result.success(
+                            mapOf(
+                                "totalRamBytes" to totalRamBytes,
+                                "availRamBytes" to availRamBytes,
+                                "cpuCores" to cpuCores,
+                                "primaryAbi" to abi,
+                                "isArm64" to isArm64,
+                                "hasVulkan" to hasVulkan,
+                                "hasVulkanCompute" to (hasVulkan || hasVulkanCompute)
+                            )
+                        )
+                    } catch (e: Exception) {
+                        result.error("SPECS_ERROR", e.message, null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun setupWakeLockChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_WAKELOCK).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "acquireWakeLock" -> {
+                    try {
+                        if (wakeLock == null) {
+                            val powerManager = getSystemService(Context.POWER_SERVICE) as? PowerManager
+                            wakeLock = powerManager?.newWakeLock(
+                                PowerManager.PARTIAL_WAKE_LOCK,
+                                "VideoUniquifier:ProcessingWakeLock"
+                            )
+                        }
+                        if (wakeLock?.isHeld == false) {
+                            wakeLock?.acquire(60 * 60 * 1000L) // Safety cap 1 hour
+                        }
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("WAKELOCK_ERROR", e.message, null)
+                    }
+                }
+                "releaseWakeLock" -> {
+                    try {
+                        if (wakeLock?.isHeld == true) {
+                            wakeLock?.release()
+                        }
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("WAKELOCK_ERROR", e.message, null)
+                    }
+                }
+                "isWakeLockHeld" -> {
+                    result.success(wakeLock?.isHeld == true)
                 }
                 else -> result.notImplemented()
             }

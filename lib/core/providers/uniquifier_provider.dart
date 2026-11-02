@@ -1,5 +1,6 @@
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
+import '../services/device_capability_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
 import '../utils/formatters.dart';
@@ -48,10 +49,15 @@ class UniquifierProvider extends ChangeNotifier {
 
   Future<void> _initResolution() async {
     try {
+      _deviceSpecs = await DeviceCapabilityService.getSpecs();
       _targetResolution = await SettingsService.getUpscaleResolution();
       _upscaleEngine = await SettingsService.getUpscaleEngine();
       _videoCodec = await SettingsService.getVideoCodec();
       _hardwareAcceleration = await SettingsService.getHardwareAcceleration();
+      _removeMetadata = await SettingsService.getRemoveMetadata();
+      _modifyVisuals = await SettingsService.getModifyVisuals();
+      _modifyAudio = await SettingsService.getModifyAudio();
+      _upscale1080p = await SettingsService.getUpscale1080p();
       _enableEnhanceAndDenoise = await SettingsService.getEnhanceAndDenoise();
       _enableDeepAntiFingerprint = await SettingsService.getDeepAntiFingerprint();
       _enableHorizontalFlip = await SettingsService.getHorizontalFlip();
@@ -61,6 +67,8 @@ class UniquifierProvider extends ChangeNotifier {
       _enableMicroOverlay = await SettingsService.getMicroOverlay();
       _enableFrameSkip = await SettingsService.getFrameSkip();
       _enableChromaShift = await SettingsService.getChromaShift();
+      _enableBlurredCanvas = await SettingsService.getBlurredCanvas();
+      _muteOriginalAudio = await SettingsService.getMuteOriginalAudio();
       _canvasScalePercent = await SettingsService.getCanvasScalePercent();
       notifyListeners();
     } catch (_) {}
@@ -80,21 +88,11 @@ class UniquifierProvider extends ChangeNotifier {
   RenderDiagnosticInfo? _lastDiagnosticInfo;
 
   // Toggle Settings
-  bool _removeMetadata = true;
-  bool _modifyAudio = true;
-  bool _modifyVisuals = true;
-  bool _upscale1080p = false;
-  bool _enableEnhanceAndDenoise = true;
-  bool _enableDeepAntiFingerprint = true;
-  bool _enableHorizontalFlip = false;
-  bool _enableAggressiveAudio = false;
-  bool _enableAutoTrim = false;
-  bool _enableBlurredCanvas = false;
-  bool _muteOriginalAudio = false;
-  bool _enableDynamicZoom = false;
-  bool _enableMicroOverlay = false;
-  bool _enableFrameSkip = false;
-  bool _enableChromaShift = false;
+  bool _removeMetadata = true, _modifyAudio = true, _modifyVisuals = true;
+  bool _upscale1080p = false, _enableEnhanceAndDenoise = true, _enableDeepAntiFingerprint = true;
+  bool _enableHorizontalFlip = false, _enableAggressiveAudio = false, _enableAutoTrim = false;
+  bool _enableBlurredCanvas = false, _muteOriginalAudio = false, _enableDynamicZoom = false;
+  bool _enableMicroOverlay = false, _enableFrameSkip = false, _enableChromaShift = false;
   double _canvasScalePercent = 95.0;
   String _activePreset = 'TikTok Fast';
 
@@ -103,6 +101,7 @@ class UniquifierProvider extends ChangeNotifier {
   UpscaleEngine _upscaleEngine = UpscaleEngine.lanczos;
   VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
+  DeviceSpecs _deviceSpecs = DeviceSpecs.defaultFallback();
 
   // Navigation
   int _currentTabIndex = 0;
@@ -155,6 +154,8 @@ class UniquifierProvider extends ChangeNotifier {
   String get targetResolutionLabel => _targetResolution.label;
   String get targetResolutionDetails => _targetResolution.details;
   bool get hardwareAcceleration => _hardwareAcceleration;
+  DeviceSpecs get deviceSpecs => _deviceSpecs;
+  DeviceTier get deviceTier => _deviceSpecs.tier;
   int get currentTabIndex => _currentTabIndex;
 
   // Actions
@@ -165,10 +166,10 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   void setTabIndex(int index) { _currentTabIndex = index; notifyListeners(); }
-  void toggleRemoveMetadata(bool val) { _removeMetadata = val; notifyListeners(); }
-  void toggleModifyAudio(bool val) { _modifyAudio = val; notifyListeners(); }
-  void toggleModifyVisuals(bool val) { _modifyVisuals = val; notifyListeners(); }
-  void toggleUpscale1080p(bool val) { _upscale1080p = val; notifyListeners(); }
+  void toggleRemoveMetadata(bool val) { _removeMetadata = val; try { SettingsService.setRemoveMetadata(val); } catch (_) {} notifyListeners(); }
+  void toggleModifyAudio(bool val) { _modifyAudio = val; try { SettingsService.setModifyAudio(val); } catch (_) {} notifyListeners(); }
+  void toggleModifyVisuals(bool val) { _modifyVisuals = val; try { SettingsService.setModifyVisuals(val); } catch (_) {} notifyListeners(); }
+  void toggleUpscale1080p(bool val) { _upscale1080p = val; try { SettingsService.setUpscale1080p(val); } catch (_) {} notifyListeners(); }
   void toggleEnhanceAndDenoise(bool val) { _enableEnhanceAndDenoise = val; try { SettingsService.setEnhanceAndDenoise(val); } catch (_) {} notifyListeners(); }
   void toggleDeepAntiFingerprint(bool val) { _enableDeepAntiFingerprint = val; try { SettingsService.setDeepAntiFingerprint(val); } catch (_) {} notifyListeners(); }
   void toggleHorizontalFlip(bool val) { _enableHorizontalFlip = val; try { SettingsService.setHorizontalFlip(val); } catch (_) {} notifyListeners(); }
@@ -176,8 +177,8 @@ class UniquifierProvider extends ChangeNotifier {
   void toggleAggressiveAudio(bool val) { _enableAggressiveAudio = val; try { SettingsService.setAggressiveAudio(val); } catch (_) {} notifyListeners(); }
   void toggleAutoTrim(bool val) { _enableAutoTrim = val; try { SettingsService.setAutoTrim(val); } catch (_) {} notifyListeners(); }
   void toggleMicroTrim(bool val) => toggleAutoTrim(val);
-  void toggleBlurredCanvas(bool val) { _enableBlurredCanvas = val; notifyListeners(); }
-  void toggleMuteOriginalAudio(bool val) { _muteOriginalAudio = val; notifyListeners(); }
+  void toggleBlurredCanvas(bool val) { _enableBlurredCanvas = val; try { SettingsService.setBlurredCanvas(val); } catch (_) {} notifyListeners(); }
+  void toggleMuteOriginalAudio(bool val) { _muteOriginalAudio = val; try { SettingsService.setMuteOriginalAudio(val); } catch (_) {} notifyListeners(); }
   void toggleDynamicZoom(bool val) { _enableDynamicZoom = val; try { SettingsService.setDynamicZoom(val); } catch (_) {} notifyListeners(); }
   void toggleMicroOverlay(bool val) { _enableMicroOverlay = val; try { SettingsService.setMicroOverlay(val); } catch (_) {} notifyListeners(); }
   void toggleFrameSkip(bool val) { _enableFrameSkip = val; try { SettingsService.setFrameSkip(val); } catch (_) {} notifyListeners(); }
@@ -254,6 +255,10 @@ class UniquifierProvider extends ChangeNotifier {
     _enableFrameSkip = enableFrameSkip;
     _enableChromaShift = enableChromaShift;
     try {
+      SettingsService.setRemoveMetadata(_removeMetadata);
+      SettingsService.setModifyVisuals(_modifyVisuals);
+      SettingsService.setModifyAudio(_modifyAudio);
+      SettingsService.setUpscale1080p(_upscale1080p);
       SettingsService.setUpscaleResolution(_targetResolution);
       SettingsService.setEnhanceAndDenoise(_enableEnhanceAndDenoise);
       SettingsService.setDeepAntiFingerprint(_enableDeepAntiFingerprint);

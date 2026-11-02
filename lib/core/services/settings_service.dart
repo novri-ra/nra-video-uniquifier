@@ -103,6 +103,18 @@ class SettingsService {
   static const String keyVideoCodec = 'app_video_codec';
   static const String keyNotificationSound = 'app_notification_sound';
   static const String keyBackgroundProcessing = 'app_background_processing';
+  static const String keyRemoveMetadata = 'app_remove_metadata';
+  static const String keyModifyVisuals = 'app_modify_visuals';
+  static const String keyModifyAudio = 'app_modify_audio';
+  static const String keyUpscale1080p = 'app_upscale_1080p';
+  static const String keyBlurredCanvas = 'app_blurred_canvas';
+  static const String keyMuteOriginalAudio = 'app_mute_original_audio';
+
+  static Future<bool> _getBool(String key, bool fallback) async =>
+      (await SharedPreferences.getInstance()).getBool(key) ?? fallback;
+
+  static Future<void> _setBool(String key, bool value) async =>
+      (await SharedPreferences.getInstance()).setBool(key, value);
 
   static final ValueNotifier<bool> hardwareAccelerationNotifier =
       ValueNotifier<bool>(true);
@@ -124,25 +136,11 @@ class SettingsService {
     await prefs.setString(keyVideoCodec, codec.key);
   }
 
-  static Future<bool> getNotificationSound() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyNotificationSound) ?? true;
-  }
+  static Future<bool> getNotificationSound() => _getBool(keyNotificationSound, true);
+  static Future<void> setNotificationSound(bool enabled) => _setBool(keyNotificationSound, enabled);
 
-  static Future<void> setNotificationSound(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyNotificationSound, enabled);
-  }
-
-  static Future<bool> getBackgroundProcessing() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyBackgroundProcessing) ?? true;
-  }
-
-  static Future<void> setBackgroundProcessing(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyBackgroundProcessing, enabled);
-  }
+  static Future<bool> getBackgroundProcessing() => _getBool(keyBackgroundProcessing, true);
+  static Future<void> setBackgroundProcessing(bool enabled) => _setBool(keyBackgroundProcessing, enabled);
 
   static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
       ValueNotifier<TargetResolution>(TargetResolution.r1080p);
@@ -178,98 +176,53 @@ class SettingsService {
     upscaleEngineNotifier.value = engine;
   }
 
-  static Future<bool> getEnhanceAndDenoise() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyEnhanceAndDenoise) ?? true;
-  }
+  static Future<bool> getRemoveMetadata() => _getBool(keyRemoveMetadata, true);
+  static Future<void> setRemoveMetadata(bool enabled) => _setBool(keyRemoveMetadata, enabled);
 
-  static Future<void> setEnhanceAndDenoise(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyEnhanceAndDenoise, enabled);
-  }
+  static Future<bool> getModifyVisuals() => _getBool(keyModifyVisuals, true);
+  static Future<void> setModifyVisuals(bool enabled) => _setBool(keyModifyVisuals, enabled);
 
-  static Future<bool> getDeepAntiFingerprint() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyDeepAntiFingerprint) ?? true;
-  }
+  static Future<bool> getModifyAudio() => _getBool(keyModifyAudio, true);
+  static Future<void> setModifyAudio(bool enabled) => _setBool(keyModifyAudio, enabled);
 
-  static Future<void> setDeepAntiFingerprint(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyDeepAntiFingerprint, enabled);
-  }
+  static Future<bool> getUpscale1080p() => _getBool(keyUpscale1080p, false);
+  static Future<void> setUpscale1080p(bool enabled) => _setBool(keyUpscale1080p, enabled);
 
-  static Future<bool> getHorizontalFlip() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyHorizontalFlip) ?? false;
-  }
+  static Future<bool> getBlurredCanvas() => _getBool(keyBlurredCanvas, false);
+  static Future<void> setBlurredCanvas(bool enabled) => _setBool(keyBlurredCanvas, enabled);
 
-  static Future<void> setHorizontalFlip(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyHorizontalFlip, enabled);
-  }
+  static Future<bool> getMuteOriginalAudio() => _getBool(keyMuteOriginalAudio, false);
+  static Future<void> setMuteOriginalAudio(bool enabled) => _setBool(keyMuteOriginalAudio, enabled);
 
-  static Future<bool> getAggressiveAudio() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyAggressiveAudio) ?? false;
-  }
+  static Future<bool> getEnhanceAndDenoise() => _getBool(keyEnhanceAndDenoise, true);
+  static Future<void> setEnhanceAndDenoise(bool enabled) => _setBool(keyEnhanceAndDenoise, enabled);
 
-  static Future<void> setAggressiveAudio(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyAggressiveAudio, enabled);
-  }
+  static Future<bool> getDeepAntiFingerprint() => _getBool(keyDeepAntiFingerprint, true);
+  static Future<void> setDeepAntiFingerprint(bool enabled) => _setBool(keyDeepAntiFingerprint, enabled);
 
-  static Future<bool> getAutoTrim() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyAutoTrim) ?? false;
-  }
+  static Future<bool> getHorizontalFlip() => _getBool(keyHorizontalFlip, false);
+  static Future<void> setHorizontalFlip(bool enabled) => _setBool(keyHorizontalFlip, enabled);
 
-  static Future<void> setAutoTrim(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyAutoTrim, enabled);
-  }
+  static Future<bool> getAggressiveAudio() => _getBool(keyAggressiveAudio, false);
+  static Future<void> setAggressiveAudio(bool enabled) => _setBool(keyAggressiveAudio, enabled);
+
+  static Future<bool> getAutoTrim() => _getBool(keyAutoTrim, false);
+  static Future<void> setAutoTrim(bool enabled) => _setBool(keyAutoTrim, enabled);
 
   static Future<bool> getMicroTrim() => getAutoTrim();
   static Future<void> setMicroTrim(bool enabled) => setAutoTrim(enabled);
 
-  static Future<bool> getDynamicZoom() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyDynamicZoom) ?? false;
-  }
+  static Future<bool> getDynamicZoom() => _getBool(keyDynamicZoom, false);
+  static Future<void> setDynamicZoom(bool enabled) => _setBool(keyDynamicZoom, enabled);
 
-  static Future<void> setDynamicZoom(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyDynamicZoom, enabled);
-  }
+  static Future<bool> getMicroOverlay() => _getBool(keyMicroOverlay, false);
+  static Future<void> setMicroOverlay(bool enabled) => _setBool(keyMicroOverlay, enabled);
 
-  static Future<bool> getMicroOverlay() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyMicroOverlay) ?? false;
-  }
+  static Future<bool> getFrameSkip() => _getBool(keyFrameSkip, false);
+  static Future<void> setFrameSkip(bool enabled) => _setBool(keyFrameSkip, enabled);
 
-  static Future<void> setMicroOverlay(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyMicroOverlay, enabled);
-  }
-
-  static Future<bool> getFrameSkip() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyFrameSkip) ?? false;
-  }
-
-  static Future<void> setFrameSkip(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyFrameSkip, enabled);
-  }
-
-  static Future<bool> getChromaShift() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(keyChromaShift) ?? false;
-  }
-
-  static Future<void> setChromaShift(bool enabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(keyChromaShift, enabled);
-  }
+  static Future<bool> getChromaShift() => _getBool(keyChromaShift, false);
+  static Future<void> setChromaShift(bool enabled) => _setBool(keyChromaShift, enabled);
 
   static Future<double> getCanvasScalePercent() async {
     final prefs = await SharedPreferences.getInstance();
