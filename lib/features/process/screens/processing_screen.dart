@@ -23,6 +23,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   int _step = 1;
   bool _isCancelled = false;
   bool _hasNativeProgress = false;
+  String _liveTerminalLogs = '';
 
   @override
   void initState() {
@@ -61,61 +62,10 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   Future<void> _runEngine() async {
     final provider = context.read<UniquifierProvider>();
     final inputPath = provider.selectedFilePath;
-
     try {
-      String outputPath;
-      if (inputPath == null || inputPath.isEmpty) {
-        await Future.delayed(const Duration(seconds: 3));
-        outputPath = await FfmpegService.generateOutputPath('video_01.mp4');
-      } else {
-        outputPath = await FfmpegService.processVideo(
-          inputPath: inputPath,
-          removeMetadata: provider.removeMetadata,
-          modifyAudio: provider.modifyAudio,
-          modifyVisuals: provider.modifyVisuals,
-          upscale1080p: provider.upscale1080p,
-          targetResolution: provider.targetResolution,
-          upscaleEngine: provider.upscaleEngine,
-          videoCodec: provider.videoCodec,
-          enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
-          enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,
-          enableHorizontalFlip: provider.enableHorizontalFlip,
-          enableAggressiveAudio: provider.enableAggressiveAudio,
-          enableAutoTrim: provider.enableAutoTrim,
-          isPortrait: provider.isPortrait,
-          enableHardwareAcceleration: provider.hardwareAcceleration,
-          enableBlurredCanvas: provider.enableBlurredCanvas,
-          canvasScalePercent: provider.canvasScalePercent,
-          muteOriginalAudio: provider.muteOriginalAudio,
-          enableDynamicZoom: provider.enableDynamicZoom,
-          enableMicroOverlay: provider.enableMicroOverlay,
-          enableFrameSkip: provider.enableFrameSkip,
-          enableChromaShift: provider.enableChromaShift,
-          totalDurationMs: provider.totalDurationMs,
-          onProgress: (p, speed, timeMs) {
-            if (mounted && !_isCancelled) {
-              _hasNativeProgress = true;
-              if (_controller.isAnimating) {
-                _controller.stop();
-              }
-              provider.updateRealtimeStats(p, speed, timeMs);
-              setState(() {
-                _progress = p.clamp(0.05, 0.98);
-                if (_progress < 0.25) {
-                  _step = 1;
-                } else if (_progress < 0.55) {
-                  _step = 2;
-                } else if (_progress < 0.85) {
-                  _step = 3;
-                } else {
-                  _step = 4;
-                }
-              });
-            }
-          },
-        );
-      }
-
+      final outputPath = (inputPath == null || inputPath.isEmpty)
+          ? await _simulateFallback()
+          : await _processWithNative(provider, inputPath);
       if (!mounted || _isCancelled) return;
       provider.setLastProcessedResult(outputPath);
       Navigator.of(context).pushReplacement(
@@ -127,6 +77,69 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
         MaterialPageRoute(builder: (_) => ErrorScreen(errorDetails: e.toString())),
       );
     }
+  }
+
+  Future<String> _simulateFallback() async {
+    await Future.delayed(const Duration(seconds: 3));
+    return await FfmpegService.generateOutputPath('video_01.mp4');
+  }
+
+  Future<String> _processWithNative(UniquifierProvider provider, String inputPath) {
+    return FfmpegService.processVideo(
+      inputPath: inputPath,
+      removeMetadata: provider.removeMetadata,
+      modifyAudio: provider.modifyAudio,
+      modifyVisuals: provider.modifyVisuals,
+      upscale1080p: provider.upscale1080p,
+      targetResolution: provider.targetResolution,
+      upscaleEngine: provider.upscaleEngine,
+      videoCodec: provider.videoCodec,
+      enableEnhanceAndDenoise: provider.enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: provider.enableDeepAntiFingerprint,
+      enableHorizontalFlip: provider.enableHorizontalFlip,
+      enableAggressiveAudio: provider.enableAggressiveAudio,
+      enableAutoTrim: provider.enableAutoTrim,
+      isPortrait: provider.isPortrait,
+      enableHardwareAcceleration: provider.hardwareAcceleration,
+      enableBlurredCanvas: provider.enableBlurredCanvas,
+      canvasScalePercent: provider.canvasScalePercent,
+      muteOriginalAudio: provider.muteOriginalAudio,
+      enableDynamicZoom: provider.enableDynamicZoom,
+      enableMicroOverlay: provider.enableMicroOverlay,
+      enableFrameSkip: provider.enableFrameSkip,
+      enableChromaShift: provider.enableChromaShift,
+      totalDurationMs: provider.totalDurationMs,
+      onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
+      onLog: (log) {
+        if (mounted && !_isCancelled) {
+          setState(() {
+            _liveTerminalLogs = _liveTerminalLogs.isEmpty ? log : '$_liveTerminalLogs\n$log';
+            if (_liveTerminalLogs.length > 5000) {
+              _liveTerminalLogs = _liveTerminalLogs.substring(_liveTerminalLogs.length - 4000);
+            }
+          });
+        }
+      },
+    );
+  }
+
+  void _handleProgress(double p, double speed, int timeMs, UniquifierProvider provider) {
+    if (!mounted || _isCancelled) return;
+    _hasNativeProgress = true;
+    if (_controller.isAnimating) _controller.stop();
+    provider.updateRealtimeStats(p, speed, timeMs);
+    setState(() {
+      _progress = p.clamp(0.05, 0.98);
+      if (_progress < 0.25) {
+        _step = 1;
+      } else if (_progress < 0.55) {
+        _step = 2;
+      } else if (_progress < 0.85) {
+        _step = 3;
+      } else {
+        _step = 4;
+      }
+    });
   }
 
   void _finishSuccess() {
@@ -169,6 +182,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
                           duration: fileDuration,
                           executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
                           estimatedRemaining: provider.eta,
+                          terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
                         ),
                       ],
                     ),

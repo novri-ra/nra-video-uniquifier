@@ -95,6 +95,11 @@ Java_id_novrira_videouniquifier_MainActivity_nativeProcessFrame(
 
     jbyte* in_ptr = env->GetByteArrayElements(in_bytes, nullptr);
     jbyte* out_ptr = env->GetByteArrayElements(out_bytes, nullptr);
+    if (!in_ptr || !out_ptr) {
+        if (in_ptr) env->ReleaseByteArrayElements(in_bytes, in_ptr, JNI_ABORT);
+        if (out_ptr) env->ReleaseByteArrayElements(out_bytes, out_ptr, JNI_ABORT);
+        return JNI_FALSE;
+    }
 
     bool ok = g_realesrgan->process_frame(
         reinterpret_cast<const unsigned char*>(in_ptr),

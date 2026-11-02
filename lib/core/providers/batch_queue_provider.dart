@@ -75,78 +75,17 @@ class BatchQueueProvider extends ChangeNotifier {
 
   Future<void> runBatch(UniquifierProvider config) async {
     if (_isProcessing || _items.isEmpty) return;
-
     _isProcessing = true;
     _isCancelled = false;
     notifyListeners();
 
     for (int i = 0; i < _items.length; i++) {
       if (_isCancelled) break;
-
-      _currentIndex = i;
-      final current = _items[i];
-      current.status = BatchItemStatus.processing;
-      current.progress = 0.0;
-      notifyListeners();
-
-      try {
-        final outputPath = await FfmpegService.processVideo(
-          inputPath: current.path,
-          removeMetadata: config.removeMetadata,
-          modifyAudio: config.modifyAudio,
-          modifyVisuals: config.modifyVisuals,
-          upscale1080p: config.upscale1080p,
-          targetResolution: config.targetResolution,
-          upscaleEngine: config.upscaleEngine,
-          videoCodec: config.videoCodec,
-          enableEnhanceAndDenoise: config.enableEnhanceAndDenoise,
-          enableDeepAntiFingerprint: config.enableDeepAntiFingerprint,
-          enableHorizontalFlip: config.enableHorizontalFlip,
-          enableAggressiveAudio: config.enableAggressiveAudio,
-          enableAutoTrim: config.enableAutoTrim,
-          isPortrait: null,
-          enableHardwareAcceleration: config.hardwareAcceleration,
-          enableBlurredCanvas: config.enableBlurredCanvas,
-          canvasScalePercent: config.canvasScalePercent,
-          muteOriginalAudio: config.muteOriginalAudio,
-          enableDynamicZoom: config.enableDynamicZoom,
-          enableMicroOverlay: config.enableMicroOverlay,
-          enableFrameSkip: config.enableFrameSkip,
-          enableChromaShift: config.enableChromaShift,
-          suppressCompleteNotification: true,
-          totalDurationMs: 0,
-          onProgress: (p, speed, timeMs) {
-            if (!_isCancelled && current.isProcessing) {
-              current.progress = p;
-              config.updateRealtimeStats(p, speed, timeMs);
-              final pct = (p * 100).toInt();
-              NotificationService.showProgressNotification(
-                progress: pct,
-                title: 'Batch [${i + 1}/${_items.length}] ${current.name}',
-                body: '$pct% • Overall ${(overallProgress * 100).toInt()}%',
-              );
-              notifyListeners();
-            }
-          },
-        );
-
-        current.status = BatchItemStatus.completed;
-        current.outputPath = outputPath;
-        current.progress = 1.0;
-      } catch (e) {
-        if (_isCancelled) {
-          current.status = BatchItemStatus.cancelled;
-        } else {
-          current.status = BatchItemStatus.failed;
-          current.error = e.toString();
-        }
-      }
-      notifyListeners();
+      await _processSingleItem(i, _items[i], config);
     }
 
     _isProcessing = false;
     await NotificationService.cancelProgressNotification();
-
     if (!_isCancelled) {
       await NotificationService.showCompleteNotification(
         title: 'Batch Processing Finished',
@@ -154,7 +93,67 @@ class BatchQueueProvider extends ChangeNotifier {
         success: failedCount == 0,
       );
     }
+    notifyListeners();
+  }
 
+  Future<void> _processSingleItem(int i, BatchVideoItem current, UniquifierProvider config) async {
+    _currentIndex = i;
+    current.status = BatchItemStatus.processing;
+    current.progress = 0.0;
+    notifyListeners();
+
+    try {
+      final outputPath = await _executeBatchItem(i, current, config);
+      current.status = BatchItemStatus.completed;
+      current.outputPath = outputPath;
+      current.progress = 1.0;
+    } catch (e) {
+      current.status = _isCancelled ? BatchItemStatus.cancelled : BatchItemStatus.failed;
+      if (!_isCancelled) current.error = e.toString();
+    }
+    notifyListeners();
+  }
+
+  Future<String> _executeBatchItem(int i, BatchVideoItem current, UniquifierProvider config) {
+    return FfmpegService.processVideo(
+      inputPath: current.path,
+      removeMetadata: config.removeMetadata,
+      modifyAudio: config.modifyAudio,
+      modifyVisuals: config.modifyVisuals,
+      upscale1080p: config.upscale1080p,
+      targetResolution: config.targetResolution,
+      upscaleEngine: config.upscaleEngine,
+      videoCodec: config.videoCodec,
+      enableEnhanceAndDenoise: config.enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: config.enableDeepAntiFingerprint,
+      enableHorizontalFlip: config.enableHorizontalFlip,
+      enableAggressiveAudio: config.enableAggressiveAudio,
+      enableAutoTrim: config.enableAutoTrim,
+      isPortrait: null,
+      enableHardwareAcceleration: config.hardwareAcceleration,
+      enableBlurredCanvas: config.enableBlurredCanvas,
+      canvasScalePercent: config.canvasScalePercent,
+      muteOriginalAudio: config.muteOriginalAudio,
+      enableDynamicZoom: config.enableDynamicZoom,
+      enableMicroOverlay: config.enableMicroOverlay,
+      enableFrameSkip: config.enableFrameSkip,
+      enableChromaShift: config.enableChromaShift,
+      suppressCompleteNotification: true,
+      totalDurationMs: 0,
+      onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
+    );
+  }
+
+  void _handleBatchProgress(int i, double p, double speed, int timeMs, BatchVideoItem current, UniquifierProvider config) {
+    if (_isCancelled || !current.isProcessing) return;
+    current.progress = p;
+    config.updateRealtimeStats(p, speed, timeMs);
+    final pct = (p * 100).toInt();
+    NotificationService.showProgressNotification(
+      progress: pct,
+      title: 'Batch [${i + 1}/${_items.length}] ${current.name}',
+      body: '$pct% • Overall ${(overallProgress * 100).toInt()}%',
+    );
     notifyListeners();
   }
 }

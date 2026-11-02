@@ -67,45 +67,19 @@ class RenderDiagnosticService {
       final mediaInfo = session.getMediaInformation();
       if (mediaInfo == null) return null;
 
-      int? width;
-      int? height;
-      String? videoCodec;
-      String? videoProfile;
-      String? videoBitrate;
-
-      String? audioCodec;
-      String? audioSampleRate;
-      int? audioChannels;
-      String? audioBitrate;
-
-      final streams = mediaInfo.getStreams();
-      for (final s in streams) {
-        if (s.getType() == 'video') {
-          width = s.getWidth();
-          height = s.getHeight();
-          videoCodec = s.getCodec()?.toUpperCase();
-          videoProfile = s.getStringProperty('profile');
-          videoBitrate = s.getBitrate() ?? mediaInfo.getBitrate();
-        } else if (s.getType() == 'audio') {
-          audioCodec = s.getCodec()?.toUpperCase();
-          audioSampleRate = s.getSampleRate();
-          audioChannels = s.getNumberProperty('channels')?.toInt();
-          audioBitrate = s.getBitrate();
-        }
-      }
-
+      final parsed = _parseStreams(mediaInfo);
       final durationSec = double.tryParse(mediaInfo.getDuration() ?? '') ?? 0.0;
       final info = RenderDiagnosticInfo(
         path: filePath,
-        width: width,
-        height: height,
-        videoCodec: videoCodec,
-        videoProfile: videoProfile,
-        videoBitrate: videoBitrate,
-        audioCodec: audioCodec,
-        audioSampleRate: audioSampleRate,
-        audioChannels: audioChannels,
-        audioBitrate: audioBitrate,
+        width: parsed.width,
+        height: parsed.height,
+        videoCodec: parsed.videoCodec,
+        videoProfile: parsed.videoProfile,
+        videoBitrate: parsed.videoBitrate,
+        audioCodec: parsed.audioCodec,
+        audioSampleRate: parsed.audioSampleRate,
+        audioChannels: parsed.audioChannels,
+        audioBitrate: parsed.audioBitrate,
         durationMs: (durationSec * 1000).toInt(),
         fileSizeBytes: sizeBytes,
       );
@@ -116,5 +90,32 @@ class RenderDiagnosticService {
       debugPrint('[FFprobe Diagnostic] Failed to inspect $filePath: $e');
       return null;
     }
+  }
+
+  static ({
+    int? width, int? height, String? videoCodec, String? videoProfile, String? videoBitrate,
+    String? audioCodec, String? audioSampleRate, int? audioChannels, String? audioBitrate,
+  }) _parseStreams(dynamic mediaInfo) {
+    int? w, h, aChannels;
+    String? vCodec, vProfile, vBitrate, aCodec, aSampleRate, aBitrate;
+
+    for (final s in mediaInfo.getStreams()) {
+      if (s.getType() == 'video') {
+        w = s.getWidth();
+        h = s.getHeight();
+        vCodec = s.getCodec()?.toUpperCase();
+        vProfile = s.getStringProperty('profile');
+        vBitrate = s.getBitrate() ?? mediaInfo.getBitrate();
+      } else if (s.getType() == 'audio') {
+        aCodec = s.getCodec()?.toUpperCase();
+        aSampleRate = s.getSampleRate();
+        aChannels = s.getNumberProperty('channels')?.toInt();
+        aBitrate = s.getBitrate();
+      }
+    }
+    return (
+      width: w, height: h, videoCodec: vCodec, videoProfile: vProfile, videoBitrate: vBitrate,
+      audioCodec: aCodec, audioSampleRate: aSampleRate, audioChannels: aChannels, audioBitrate: aBitrate,
+    );
   }
 }

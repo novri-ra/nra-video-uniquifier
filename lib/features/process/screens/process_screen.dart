@@ -36,43 +36,27 @@ class _ProcessScreenState extends State<ProcessScreen> {
       if (result != null && result.files.isNotEmpty) {
         if (!context.mounted) return;
         final validFiles = result.files.where((f) => f.path != null).toList();
-        if (validFiles.isEmpty) return;
-
-        if (validFiles.length == 1) {
-          final file = validFiles.first;
-          context.read<BatchQueueProvider>().clear();
-          context.read<UniquifierProvider>().setVideoFile(
-                path: file.path!,
-                name: file.name,
-                sizeBytes: file.size,
-              );
-        } else {
-          final batchItems = validFiles
-              .map((f) => BatchVideoItem(
-                    id: f.path!,
-                    path: f.path!,
-                    name: f.name,
-                    sizeBytes: f.size,
-                  ))
-              .toList();
-          context.read<BatchQueueProvider>().setItems(batchItems);
-          final first = validFiles.first;
-          context.read<UniquifierProvider>().setVideoFile(
-                path: first.path!,
-                name: first.name,
-                sizeBytes: first.size,
-              );
-        }
+        if (validFiles.isNotEmpty) _applyPickedFiles(context, validFiles);
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error selecting file: $e'),
-            backgroundColor: AppColors.errorContainer,
-          ),
+          SnackBar(content: Text('Error selecting file: $e'), backgroundColor: AppColors.errorContainer),
         );
       }
+    }
+  }
+
+  void _applyPickedFiles(BuildContext context, List<PlatformFile> validFiles) {
+    if (validFiles.length == 1) {
+      final file = validFiles.first;
+      context.read<BatchQueueProvider>().clear();
+      context.read<UniquifierProvider>().setVideoFile(path: file.path!, name: file.name, sizeBytes: file.size);
+    } else {
+      final batchItems = validFiles.map((f) => BatchVideoItem(id: f.path!, path: f.path!, name: f.name, sizeBytes: f.size)).toList();
+      context.read<BatchQueueProvider>().setItems(batchItems);
+      final first = validFiles.first;
+      context.read<UniquifierProvider>().setVideoFile(path: first.path!, name: first.name, sizeBytes: first.size);
     }
   }
 
