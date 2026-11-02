@@ -152,6 +152,7 @@ class BatchQueueProvider extends ChangeNotifier {
       suppressCompleteNotification: true,
       totalDurationMs: 0,
       targetFps: config.targetFps,
+      saturationLevel: config.saturationLevel,
       onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
     );
   }
