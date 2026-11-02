@@ -32,6 +32,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 77 | `77-article-reader-and-pipeline-fixes.md` | In-App Microstock Article Reader Modal, Preset Navigation Tab Retention, 2K/4K Hardware Decoder Stutter Safeguard, dan Custom Crop/Trim Sliders |
 | 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader: Artikel Mendalam, Format Terstruktur (Key Takeaways, Specs, Checklist), dan Parser Konten Lengkap |
 | 79 | `79-hybrid-news-and-full-translation.md` | Integrasi Sumber Berita Hibrida (RSS-to-JSON + Reddit Microstock Community Intel) & Mesin Terjemahan Utuh Multi-Paragraf |
+| 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Scripts Google Sheets Webhook, UI Search Bar + Adaptive Learning Chips Carousel (YouTube-Style), dan Telemetri Minat Pengguna & Penanaman Metadata Video |
 
 ---
 

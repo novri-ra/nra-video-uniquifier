@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/connectivity_service.dart';
 import 'package:nra_video_uniquifier/core/services/microstock_news_service.dart';
 import 'package:nra_video_uniquifier/core/services/translation_service.dart';
+import 'package:nra_video_uniquifier/core/services/user_interest_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -14,6 +15,7 @@ void main() {
     TranslationService.customHttpGet = null;
     MicrostockNewsService.mockFetchHandler = null;
     MicrostockNewsService.customHttpGet = null;
+    UserInterestService.mockDispatcher = null;
   });
 
   tearDown(() {
@@ -224,6 +226,53 @@ void main() {
         expect(seed.technicalSpecs, isNotEmpty);
         expect(seed.contributorChecklist, isNotEmpty);
       }
+    });
+  });
+
+  group('Sprint 80: UserInterestService Unit Tests', () {
+    test('Self-learning affinity engine ranks interacted topics higher', () async {
+      await UserInterestService.initialize();
+      final initialKeywords = UserInterestService.getAdaptiveKeywords();
+      expect(initialKeywords.first, equals('All'));
+
+      // Record 3 searches for 'AI Video' (+9 weight)
+      await UserInterestService.recordSearch('AI Video');
+      await UserInterestService.recordSearch('AI Video');
+      await UserInterestService.recordSearch('AI Video');
+
+      // Record 1 chip click for 'Reels Algorithm' (+2 weight)
+      await UserInterestService.recordChipClick('Reels Algorithm');
+
+      final adaptive = UserInterestService.getAdaptiveKeywords();
+      expect(adaptive.first, equals('All'));
+      expect(adaptive[1], equals('AI Video'));
+      expect(adaptive[2], equals('Reels Algorithm'));
+    });
+
+    test('Telemetry dispatcher queues payloads when offline and flushes when online', () async {
+      final dispatched = <Map<String, dynamic>>[];
+      UserInterestService.mockDispatcher = (payload) async {
+        dispatched.add(payload);
+        return true;
+      };
+
+      await UserInterestService.recordSearch('4K Cinematic');
+      expect(dispatched.length, equals(1));
+      expect(dispatched.first['type'], equals('user_interest_telemetry'));
+      expect(dispatched.first['query'], equals('4K Cinematic'));
+
+      await UserInterestService.dispatchVideoMetadataVault(
+        title: 'Cinematic Sunset 4K',
+        description: 'B-roll sunset',
+        keywords: ['sunset', 'golden hour'],
+        platforms: ['Shutterstock', 'Adobe Stock'],
+        techSpecs: '3840x2160 60FPS',
+        category: 'NATURE',
+      );
+
+      expect(dispatched.length, equals(2));
+      expect(dispatched[1]['type'], equals('video_metadata_vault'));
+      expect(dispatched[1]['title'], equals('Cinematic Sunset 4K'));
     });
   });
 }

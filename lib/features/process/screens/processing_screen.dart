@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/ffmpeg_service.dart';
+import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
@@ -71,6 +72,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       if (!mounted || _isCancelled) return;
       HapticFeedback.mediumImpact();
       provider.setLastProcessedResult(outputPath);
+      _dispatchTelemetryVault(provider);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => SuccessScreen(outputPath: outputPath)),
       );
@@ -85,6 +87,20 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   Future<String> _simulateFallback() async {
     await Future.delayed(const Duration(seconds: 3));
     return await FfmpegService.generateOutputPath('video_01.mp4');
+  }
+
+  void _dispatchTelemetryVault(UniquifierProvider provider) {
+    try {
+      UserInterestService.dispatchVideoMetadataVault(
+        title: provider.selectedFileName ?? 'Untitled Video Asset',
+        description: 'Processed via ${provider.activePreset} profile with anti-fingerprint evasion',
+        keywords: [provider.activePreset, provider.targetResolution.label, provider.videoCodec.name],
+        platforms: const ['Shutterstock', 'Adobe Stock', 'Freepik'],
+        techSpecs: '${provider.fileResolution} | ${provider.targetFps} FPS | ${provider.videoCodec.name}',
+        category: provider.isPortrait ? 'VERTICAL_REELS' : 'LANDSCAPE_4K',
+        leadWindow: 'Q4 Commercial Window',
+      );
+    } catch (_) {}
   }
 
   Future<String> _processWithNative(UniquifierProvider provider, String inputPath) {

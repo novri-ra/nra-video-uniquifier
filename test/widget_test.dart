@@ -509,6 +509,30 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('MICROSTOCK INTEL & NEWS'), findsOneWidget);
 
+      // Verify search bar and YouTube-style keyword filter chips render
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text('Cari panduan 4K, tren, kurasi...'), findsOneWidget);
+      expect(find.text('All'), findsOneWidget);
+      expect(find.text('Shutterstock'), findsOneWidget);
+
+      // Test keyword filter chip tap
+      await tester.tap(find.text('Shutterstock'));
+      await tester.pumpAndSettle();
+
+      // Test search filter input
+      await tester.enterText(find.byType(TextField), 'Adobe');
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+
+      // Clear search
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+
+      // Reset chip to All
+      await tester.tap(find.text('All'));
+      await tester.pumpAndSettle();
+
       // Verify article card exists and tap it to open bottom reader sheet
       final firstCard = find.text('Adobe Stock Releases 2026 Visual Trend Forecast');
       expect(firstCard, findsOneWidget);

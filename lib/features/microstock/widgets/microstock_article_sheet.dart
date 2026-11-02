@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
+import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'microstock_article_content_blocks.dart';
 
@@ -17,6 +18,7 @@ class MicrostockArticleSheet extends StatefulWidget {
   });
 
   static void show(BuildContext context, MicrostockNewsArticle article, bool isDark) {
+    UserInterestService.recordArticleRead(article);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -100,6 +102,7 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
         _isTranslated = true;
         _isTranslating = false;
       });
+      UserInterestService.recordTranslateToggle(widget.article, 'id');
     }
   }
 

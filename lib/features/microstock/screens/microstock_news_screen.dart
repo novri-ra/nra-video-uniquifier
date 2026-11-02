@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/connectivity_service.dart';
 import '../../../core/services/microstock_news_service.dart';
+import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/microstock_news_card.dart';
+import '../widgets/news_search_and_filter_bar.dart';
 
 /// Screen presenting real-time & cached microstock intelligence, news, and guidelines.
 class MicrostockNewsScreen extends StatefulWidget {
@@ -16,15 +18,18 @@ class MicrostockNewsScreen extends StatefulWidget {
 
 class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   final ConnectivityService _connectivity = ConnectivityService.instance;
-  List<MicrostockNewsArticle> _articles = [];
+  List<MicrostockNewsArticle> _allArticles = [];
+  String _selectedChip = 'All';
+  String _searchQuery = '';
   bool _isLoading = true;
   String _syncStatusText = 'Syncing...';
 
   @override
   void initState() {
     super.initState();
+    UserInterestService.initialize();
     _connectivity.isOnline.addListener(_onConnectivityChanged);
-    _articles = MicrostockNewsService.getSeedArticles();
+    _allArticles = MicrostockNewsService.getSeedArticles();
     _isLoading = false;
     _updateSyncStatus();
     Future.microtask(() => _loadNewsFeed(forceRefresh: false));
@@ -51,7 +56,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
       final list = await MicrostockNewsService.loadNews(forceRefresh: forceRefresh);
       if (!mounted) return;
       setState(() {
-        _articles = list;
+        _allArticles = list;
         _isLoading = false;
       });
       _updateSyncStatus();
@@ -74,10 +79,28 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     );
   }
 
+  List<MicrostockNewsArticle> get _filteredArticles {
+    return _allArticles.where((article) {
+      final matchesSearch = _searchQuery.isEmpty ||
+          article.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          article.summary.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          article.tags.any((t) => t.toLowerCase().contains(_searchQuery.toLowerCase()));
+
+      final matchesChip = _selectedChip == 'All' ||
+          article.tags.any((t) => t.toLowerCase().contains(_selectedChip.toLowerCase())) ||
+          article.source.toLowerCase().contains(_selectedChip.toLowerCase()) ||
+          article.category.toLowerCase().contains(_selectedChip.toLowerCase()) ||
+          article.title.toLowerCase().contains(_selectedChip.toLowerCase());
+
+      return matchesSearch && matchesChip;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final online = _connectivity.isOnline.value;
+    final displayList = _filteredArticles;
 
     return Scaffold(
       appBar: TopAppBar(
@@ -94,34 +117,66 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                child: _FeedHeader(
-                  syncStatusText: _syncStatusText,
-                  isOnline: online,
-                  isDark: isDark,
-                  onRefresh: () => _loadNewsFeed(forceRefresh: true),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _FeedHeader(
+                      syncStatusText: _syncStatusText,
+                      isOnline: online,
+                      isDark: isDark,
+                      onRefresh: () => _loadNewsFeed(forceRefresh: true),
+                    ),
+                    const SizedBox(height: 12),
+                    NewsSearchAndFilterBar(
+                      selectedChip: _selectedChip,
+                      isDark: isDark,
+                      onSearchChanged: (q) => setState(() => _searchQuery = q),
+                      onChipSelected: (c) => setState(() => _selectedChip = c),
+                    ),
+                  ],
                 ),
               ),
             ),
-            if (_isLoading && _articles.isEmpty)
+            if (_isLoading && _allArticles.isEmpty)
               const SliverFillRemaining(
                 child: Center(
                   child: CircularProgressIndicator(color: Color(0xFF6C5CE7)),
                 ),
               )
+            else if (displayList.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.search_off_rounded, size: 48, color: isDark ? Colors.white24 : Colors.black26),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Tidak ada berita atau panduan sesuai filter',
+                        style: TextStyle(
+                          color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 108),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 108),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       return MicrostockNewsCard(
-                        article: _articles[index],
+                        article: displayList[index],
                         isDark: isDark,
                         isOnline: online,
                       );
                     },
-                    childCount: _articles.length,
+                    childCount: displayList.length,
                   ),
                 ),
               ),
@@ -148,77 +203,56 @@ class _FeedHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final statusColor = isOnline ? const Color(0xFF10B981) : const Color(0xFFF59E0B);
+    final subtitleColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF6B7280);
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: isDark
-              ? AppColors.surfaceContainerHighest
-              : AppColors.lightOutlineVariant,
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Microstock Intel',
+              style: TextStyle(color: titleColor, fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 3),
+            Row(
               children: [
+                _StatusDot(isOnline: isOnline),
+                const SizedBox(width: 6),
                 Text(
-                  'COMMERCIAL PLATFORM FEED',
-                  style: TextStyle(
-                    color: titleColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.5,
-                    fontFamily: 'monospace',
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 3),
-                Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Flexible(
-                      child: Text(
-                        syncStatusText,
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'monospace',
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                  syncStatusText,
+                  style: TextStyle(color: subtitleColor, fontSize: 11, fontFamily: 'monospace'),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            color: const Color(0xFF6C5CE7),
-            tooltip: 'Reload Feed',
-            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            onPressed: onRefresh,
-          ),
-        ],
+          ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.sync_rounded, size: 20),
+          color: const Color(0xFF6C5CE7),
+          tooltip: 'Sync News Feed',
+          onPressed: onRefresh,
+          visualDensity: VisualDensity.compact,
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusDot extends StatelessWidget {
+  final bool isOnline;
+  const _StatusDot({required this.isOnline});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 7,
+      height: 7,
+      decoration: BoxDecoration(
+        color: isOnline ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+        shape: BoxShape.circle,
       ),
     );
   }
