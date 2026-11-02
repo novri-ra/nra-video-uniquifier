@@ -33,6 +33,7 @@ class FilterBuilders {
     TargetResolution targetResolution = TargetResolution.r1080p,
     bool upscale = false,
     UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
+    int targetFps = 30,
   }) {
     final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     final zoomDim = '${targetW}x$targetH';
@@ -40,7 +41,7 @@ class FilterBuilders {
       if (modifyVisuals) 'setpts=${vars.speedFactor.toStringAsFixed(4)}*PTS',
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
-        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
+        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
@@ -117,6 +118,7 @@ class FilterBuilders {
     bool enableFrameSkip = false,
     bool enableChromaShift = false,
     required VideoVariations vars,
+    int targetFps = 30,
   }) {
     final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     final zoomDim = '${targetW}x$targetH';
@@ -125,7 +127,7 @@ class FilterBuilders {
       ..._buildSpatialCrop(vars, modifyVisuals, enableDeepAntiFingerprint),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
-        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=30",
+        "zoompan=z='if(lte(zoom\\,1.0)\\,1.08\\,max(1.001\\,zoom-0.0015))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
       if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
@@ -153,6 +155,7 @@ class FilterBuilders {
     required bool enableEnhanceAndDenoise,
     required bool enableHorizontalFlip,
     required bool isPortrait,
+    int targetFps = 30,
   }) {
     return buildVideoFilter(
       hasVisual: hasVisual,
@@ -172,6 +175,7 @@ class FilterBuilders {
       enableFrameSkip: false,
       enableChromaShift: false,
       variations: VideoVariations.fallback,
+      targetFps: targetFps,
     );
   }
 
@@ -195,17 +199,18 @@ class FilterBuilders {
     bool enableFrameSkip = false,
     bool enableChromaShift = false,
     VideoVariations? variations,
+    int targetFps = 30,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final vfString = enableBlurredCanvas
-          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine).join(',')}'
-          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars).join(',');
+          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps).join(',')}'
+          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars, targetFps: targetFps).join(',');
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {
-      return _fallbackVideoFilter(hasVisual: hasVisual, hasAudio: hasAudio, modifyVisuals: modifyVisuals, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableHorizontalFlip: enableHorizontalFlip, isPortrait: isPortrait);
+      return _fallbackVideoFilter(hasVisual: hasVisual, hasAudio: hasAudio, modifyVisuals: modifyVisuals, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableHorizontalFlip: enableHorizontalFlip, isPortrait: isPortrait, targetFps: targetFps);
     }
   }
 

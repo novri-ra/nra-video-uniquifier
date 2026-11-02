@@ -19,7 +19,7 @@ void main() async {
     await SettingsService.purgeTempCache();
   } catch (_) {}
   try {
-    await NotificationService.init();
+    await NotificationService.initialize();
     await NotificationService.requestPermission();
   } catch (_) {}
   runApp(

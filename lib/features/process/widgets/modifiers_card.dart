@@ -3,6 +3,7 @@ import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/category_accordion_card.dart';
+import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/setting_slider_toggle_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 
@@ -241,6 +242,11 @@ class ModifiersCard extends StatelessWidget {
                   subtitle: 'Decimates cadence periodicity',
                   value: provider.enableFrameSkip,
                   onChanged: provider.toggleFrameSkip,
+                ),
+                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                SettingFpsSelectorRow(
+                  selectedFps: provider.targetFps,
+                  onChanged: provider.setTargetFps,
                 ),
               ],
             ),

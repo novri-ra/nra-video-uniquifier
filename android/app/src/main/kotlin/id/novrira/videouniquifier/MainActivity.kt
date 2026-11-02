@@ -1,6 +1,8 @@
 package id.novrira.videouniquifier
 
 import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -24,10 +26,34 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        registerNotificationChannels()
         setupAiChannel(flutterEngine)
         setupScannerChannel(flutterEngine)
         setupDeviceChannel(flutterEngine)
         setupWakeLockChannel(flutterEngine)
+    }
+
+    private fun registerNotificationChannels() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            val processChannel = NotificationChannel(
+                "nra_video_processing_channel",
+                "Pemrosesan Video NRA",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Menampilkan progres rendering dan status video"
+                setShowBadge(false)
+            }
+            val completeChannel = NotificationChannel(
+                "video_complete_channel",
+                "Video Processing Complete",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Alerts when video processing finishes"
+            }
+            notificationManager?.createNotificationChannel(processChannel)
+            notificationManager?.createNotificationChannel(completeChannel)
+        }
     }
 
     private fun setupAiChannel(flutterEngine: FlutterEngine) {
