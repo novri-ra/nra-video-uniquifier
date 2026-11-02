@@ -113,8 +113,8 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 78,
+            height: 78,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               boxShadow: [
@@ -131,7 +131,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
               children: [
                 CircularProgressIndicator(
                   value: widget.isClean ? 1.0 : 0.0,
-                  strokeWidth: 5.5,
+                  strokeWidth: 4.5,
                   backgroundColor: emerald.withValues(alpha: 0.15),
                   color: emerald,
                 ),
@@ -139,7 +139,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
                   widget.isClean ? '100%' : '0%',
                   style: const TextStyle(
                     color: emerald,
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w900,
                     fontFamily: 'monospace',
                   ),
@@ -147,12 +147,12 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'EXIF CLEAN',
             style: TextStyle(
               color: labelColor,
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.2,
             ),
@@ -271,14 +271,14 @@ class _BentoStorageCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
-            width: 60,
-            height: 60,
+            width: 78,
+            height: 78,
             child: Stack(
               alignment: Alignment.center,
               children: [
                 CircularProgressIndicator(
                   value: freeFraction,
-                  strokeWidth: 5.5,
+                  strokeWidth: 4.5,
                   backgroundColor: ringColor.withValues(alpha: 0.15),
                   color: ringColor,
                 ),
@@ -294,12 +294,12 @@ class _BentoStorageCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             'AVAILABLE',
             style: TextStyle(
               color: labelColor,
-              fontSize: 10,
+              fontSize: 9.5,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
             ),
