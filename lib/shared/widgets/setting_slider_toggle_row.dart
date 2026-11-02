@@ -77,13 +77,19 @@ class _HeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
+    final linkColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: Row(
             children: [
-              Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
+              Icon(icon, color: iconColor, size: 18),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -91,8 +97,8 @@ class _HeaderRow extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: AppColors.onSurface,
+                      style: TextStyle(
+                        color: titleColor,
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                       ),
@@ -104,9 +110,7 @@ class _HeaderRow extends StatelessWidget {
                       child: Text(
                         subtitle,
                         style: TextStyle(
-                          color: onTapSubtitle != null
-                              ? AppColors.primaryContainer
-                              : AppColors.outline,
+                          color: onTapSubtitle != null ? linkColor : subColor,
                           fontSize: 10,
                           fontFamily: 'monospace',
                           decoration: onTapSubtitle != null
@@ -145,6 +149,10 @@ class _SliderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+
     return Padding(
       padding: const EdgeInsets.only(top: 4, left: 28, right: 4),
       child: Row(
@@ -152,12 +160,12 @@ class _SliderRow extends StatelessWidget {
           Expanded(
             child: SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                trackHeight: 2,
-                activeTrackColor: AppColors.primaryContainer,
-                inactiveTrackColor: AppColors.surfaceContainerHighest,
-                thumbColor: AppColors.primaryContainer,
-                overlayColor: AppColors.primaryContainer.withValues(alpha: 0.2),
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
+                trackHeight: 3,
+                activeTrackColor: activeColor,
+                inactiveTrackColor: inactiveColor,
+                thumbColor: activeColor,
+                overlayColor: activeColor.withValues(alpha: 0.16),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
               ),
               child: Slider(
                 value: sliderValue.clamp(min, max),
@@ -170,8 +178,8 @@ class _SliderRow extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             sliderLabel,
-            style: const TextStyle(
-              color: AppColors.primaryContainer,
+            style: TextStyle(
+              color: activeColor,
               fontSize: 10,
               fontFamily: 'monospace',
               fontWeight: FontWeight.w700,

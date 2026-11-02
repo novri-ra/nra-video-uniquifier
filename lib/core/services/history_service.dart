@@ -65,13 +65,16 @@ class HistoryService {
     if (!await dir.exists()) return results;
     try {
       await for (final entry in dir.list(followLinks: false)) {
-        if (entry is File && entry.path.toLowerCase().endsWith('.mp4')) {
-          if (seenPaths.add(entry.path)) {
+        if (entry is File) {
+          final name = entry.path.split(RegExp(r'[/\\]')).last;
+          if (name.startsWith('.') || name.contains('.trashed-')) continue;
+          final lower = name.toLowerCase();
+          if ((lower.endsWith('.mp4') || lower.endsWith('.mov')) && seenPaths.add(entry.path)) {
             final stat = await entry.stat();
             if (stat.size > 0) {
               results.add(VideoExportItem(
                 file: entry,
-                fileName: entry.path.split(RegExp(r'[/\\]')).last,
+                fileName: name,
                 bytes: stat.size,
                 modified: stat.modified,
               ));
@@ -96,11 +99,15 @@ class HistoryService {
   }
 
   static Future<bool> deleteItem(File file) async {
-    if (await file.exists()) {
-      await file.delete();
-      return true;
+    try {
+      if (await file.exists()) {
+        await file.delete();
+        return true;
+      }
+      return true; // Already gone from disk; clean from state gracefully
+    } catch (_) {
+      return false;
     }
-    return false;
   }
 
   static Future<StorageSpace?> getDeviceStorage() async {

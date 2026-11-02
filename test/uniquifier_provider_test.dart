@@ -51,7 +51,7 @@ void main() {
   });
 
   group('UniquifierProvider - Preset Application', () {
-    test('Aggressive preset updates flags and resets tab index to 0', () {
+    test('Aggressive preset updates flags and preserves current tab index', () {
       int notifyCount = 0;
       provider.addListener(() => notifyCount++);
       provider.setTabIndex(2);
@@ -69,7 +69,7 @@ void main() {
       expect(provider.modifyVisuals, isTrue);
       expect(provider.upscale1080p, isTrue);
       expect(provider.selectedUpscaleTarget, equals('2k'));
-      expect(provider.currentTabIndex, equals(0));
+      expect(provider.currentTabIndex, equals(2));
       expect(notifyCount, greaterThan(1));
     });
 

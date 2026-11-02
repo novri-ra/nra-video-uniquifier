@@ -153,6 +153,9 @@ class BatchQueueProvider extends ChangeNotifier {
       totalDurationMs: 0,
       targetFps: config.targetFps,
       saturationLevel: config.saturationLevel,
+      cropZoomScale: config.cropZoomScale,
+      cropAnchor: config.cropAnchor,
+      introTrimOffset: config.introTrimOffset,
       onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
     );
   }

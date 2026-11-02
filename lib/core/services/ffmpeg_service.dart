@@ -32,9 +32,10 @@ class FfmpegService {
     bool enableDynamicZoom = false, bool enableMicroOverlay = false,
     bool enableFrameSkip = false, bool enableChromaShift = false, VideoVariations? variations,
     bool thermalThrottle = false, int? targetFps, double? saturationLevel,
+    double cropZoomScale = 1.0, String cropAnchor = 'center', double introTrimOffset = 0.5,
   }) {
     final buffer = StringBuffer('-y');
-    _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs, thermalThrottle);
+    _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs, thermalThrottle, introTrimOffset);
     if (removeMetadata) _writeMetadataTags(buffer);
     _writeFilterAndCodecOptions(
       buffer: buffer, modifyVisuals: modifyVisuals, shouldUpscale: upscale ?? upscale1080p,
@@ -46,17 +47,21 @@ class FfmpegService {
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, modifyAudio: modifyAudio, variations: variations,
       targetFps: targetFps, saturationLevel: saturationLevel,
+      cropZoomScale: cropZoomScale, cropAnchor: cropAnchor,
     );
     buffer.write(' "${_escapePath(outputPath)}"');
     return buffer.toString();
   }
 
-  static void _writeInputOptions(StringBuffer buffer, String inputPath, bool hwAccel, bool autoTrim, int durationMs, bool thermalThrottle) {
+  static void _writeInputOptions(StringBuffer buffer, String inputPath, bool hwAccel, bool autoTrim, int durationMs, bool thermalThrottle, [double introTrimOffset = 0.5]) {
     if (hwAccel) buffer.write(' -hwaccel auto');
     buffer.write(thermalThrottle ? ' -threads 4' : ' -threads 0');
     if (autoTrim) {
-      buffer.write(' -ss 0.5');
-      if (durationMs > 1500) buffer.write(' -t ${((durationMs - 1000) / 1000).toStringAsFixed(2)}');
+      final ss = introTrimOffset.clamp(0.0, 3.0);
+      final ssFormatted = ss == 0.5 ? '0.5' : ss.toStringAsFixed(2);
+      buffer.write(' -ss $ssFormatted');
+      final trimTotalMs = ((ss + 0.5) * 1000).toInt();
+      if (durationMs > trimTotalMs) buffer.write(' -t ${((durationMs - trimTotalMs) / 1000).toStringAsFixed(2)}');
     }
     buffer.write(' -i "${_escapePath(inputPath)}"');
   }
@@ -75,6 +80,7 @@ class FfmpegService {
     required double canvasScalePercent, required bool muteOriginalAudio, required bool enableDynamicZoom,
     required bool enableMicroOverlay, required bool enableFrameSkip, required bool enableChromaShift,
     required bool modifyAudio, VideoVariations? variations, int? targetFps, double? saturationLevel,
+    double cropZoomScale = 1.0, String cropAnchor = 'center',
   }) {
     VideoVariations vars;
     try {
@@ -86,6 +92,9 @@ class FfmpegService {
         enableDynamicZoom || enableMicroOverlay || enableFrameSkip || enableChromaShift;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
 
+    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    final effectiveFps = isHighRes ? 30 : (targetFps ?? 30);
+
     buffer.write(FilterBuilders.buildVideoFilter(
       hasVisual: hasVisual, hasAudio: hasAudioProcess, modifyVisuals: modifyVisuals,
       upscale: shouldUpscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine,
@@ -95,14 +104,15 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, variations: vars,
-      targetFps: targetFps ?? 30, saturationLevel: saturationLevel,
+      targetFps: effectiveFps, saturationLevel: saturationLevel,
+      cropZoomScale: cropZoomScale, cropAnchor: cropAnchor,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
       hasAudio: hasAudioProcess, hasVisual: hasVisual,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableAggressiveAudio: enableAggressiveAudio,
       muteOriginalAudio: muteOriginalAudio, variations: vars,
     ));
-    final fpsStr = targetFps != null ? '$targetFps' : vars.outputFps.toStringAsFixed(2);
+    final fpsStr = isHighRes ? '30' : (targetFps != null ? '$targetFps' : vars.outputFps.toStringAsFixed(2));
     if (hasVisual) buffer.write(' -fps_mode cfr -r $fpsStr');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
   }
@@ -230,6 +240,7 @@ class FfmpegService {
     bool enableChromaShift = false, bool suppressCompleteNotification = false, String? customOutputPath,
     bool thermalThrottle = false, void Function(double progress, double speed, int timeMs)? onProgress,
     void Function(String log)? onLog, int totalDurationMs = 0, int targetFps = 30, double? saturationLevel,
+    double cropZoomScale = 1.0, String cropAnchor = 'center', double introTrimOffset = 0.5,
   }) async {
     if (!await StorageService.hasEnoughSpace()) throw Exception('Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.');
     final meta = await _resolveInputMeta(inputPath, isPortrait, totalDurationMs);
@@ -250,6 +261,7 @@ class FfmpegService {
       enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay,
       enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
       thermalThrottle: thermalThrottle, targetFps: targetFps, saturationLevel: saturationLevel,
+      cropZoomScale: cropZoomScale, cropAnchor: cropAnchor, introTrimOffset: introTrimOffset,
     );
 
     _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);

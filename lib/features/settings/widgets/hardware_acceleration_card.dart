@@ -15,15 +15,19 @@ class HardwareAccelerationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return ValueListenableBuilder<bool>(
       valueListenable: SettingsService.hardwareAccelerationNotifier,
       builder: (context, hwAccel, _) {
         final active = enabled ?? hwAccel;
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLow,
+            color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: AppColors.surfaceContainerHighest),
+            border: Border.all(
+              color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+            ),
           ),
           child: SettingToggleRow(
             icon: Icons.memory,

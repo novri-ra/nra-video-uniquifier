@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../l10n/app_localizations.dart';
+import '../helpers/seasonal_event_helper.dart';
 
-/// Hero Bento Card highlighting seasonal microstock event upload windows.
+/// Hero Bento Card highlighting dynamic seasonal microstock event upload windows.
 class SeasonalHeroCard extends StatelessWidget {
   final VoidCallback onLaunchStudio;
 
@@ -10,116 +9,106 @@ class SeasonalHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final info = SeasonalEventHelper.getSeasonalWindowInfo();
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-        gradient: LinearGradient(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.surfaceContainerLow,
-            AppColors.primaryContainer.withValues(alpha: 0.05),
+            Color(0xFF6C5CE7),
+            Color(0xFF4834D4),
           ],
         ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6C5CE7).withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryContainer.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(Icons.calendar_month_rounded, color: AppColors.primaryContainer, size: 16),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'SEASONAL WINDOW',
-                    style: const TextStyle(
-                      color: AppColors.primaryContainer,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  '60-90 DAYS LEAD',
-                  style: TextStyle(color: AppColors.outline, fontSize: 9, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
-                ),
-              ),
-            ],
-          ),
+          const _HeroBadgeRow(),
           const SizedBox(height: 12),
           Text(
-            l10n?.seasonalWindowTitle ?? 'Seasonal Upload Window (60-90 Days Lead Time)',
-            style: const TextStyle(color: AppColors.onSurface, fontSize: 14, fontWeight: FontWeight.w700),
+            info.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.2,
+            ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Q1 Global Campaigns: Valentine\'s Day • Ramadan & Eid al-Fitr • Lunar New Year',
-            style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, height: 1.3),
-          ),
-          const SizedBox(height: 12),
-          const Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              _SpecBadge(label: '4K / 60FPS'),
-              _SpecBadge(label: 'ProRes / H.264'),
-              _SpecBadge(label: 'Alpha Channel'),
-              _SpecBadge(label: 'CFR Locked'),
-            ],
+          Text(
+            info.campaignDescription,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.88),
+              fontSize: 12,
+              height: 1.35,
+            ),
           ),
           const SizedBox(height: 14),
-          InkWell(
-            onTap: onLaunchStudio,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primaryContainer,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.auto_fix_high_rounded, color: AppColors.onPrimary, size: 16),
-                  SizedBox(width: 8),
-                  Text(
-                    'LAUNCH STUDIO DEDUPLICATION',
-                    style: TextStyle(
-                      color: AppColors.onPrimary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                ],
-              ),
+          const _SpecBadgeRow(),
+          const SizedBox(height: 16),
+          _LaunchButton(onLaunchStudio: onLaunchStudio),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroBadgeRow extends StatelessWidget {
+  const _HeroBadgeRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.20),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.30)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '🔥 SEASONAL WINDOW • 60-90 DAYS LEAD',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              fontFamily: 'monospace',
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _SpecBadgeRow extends StatelessWidget {
+  const _SpecBadgeRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        _SpecBadge(label: '4K / 60FPS'),
+        _SpecBadge(label: 'ProRes / H.264'),
+        _SpecBadge(label: 'Alpha Channel'),
+        _SpecBadge(label: 'CFR Locked'),
+      ],
     );
   }
 }
@@ -131,19 +120,60 @@ class _SpecBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        color: Colors.white.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.25),
+        ),
       ),
       child: Text(
         label,
         style: const TextStyle(
-          color: AppColors.onSurfaceVariant,
-          fontSize: 9.5,
+          color: Colors.white,
+          fontSize: 10,
           fontWeight: FontWeight.w600,
           fontFamily: 'monospace',
+        ),
+      ),
+    );
+  }
+}
+
+class _LaunchButton extends StatelessWidget {
+  final VoidCallback onLaunchStudio;
+
+  const _LaunchButton({required this.onLaunchStudio});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(10),
+      elevation: 0,
+      child: InkWell(
+        onTap: onLaunchStudio,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.auto_fix_high_rounded, color: Color(0xFF6C5CE7), size: 18),
+              SizedBox(width: 8),
+              Text(
+                'LAUNCH STUDIO DEDUPLICATION',
+                style: TextStyle(
+                  color: Color(0xFF6C5CE7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

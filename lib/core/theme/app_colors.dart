@@ -30,23 +30,24 @@ class AppColors {
   static const Color errorContainer = Color(0xFF93000A);
   static const Color onErrorContainer = Color(0xFFFFDAD6);
 
-  // Light Palette Tokens (Surface lembut #F8F9FA, Container putih #FFFFFF, Teks charcoal #1E1E24)
-  static const Color lightSurface = Color(0xFFF8F9FA);
-  static const Color lightSurfaceContainerLowest = Color(0xFFF0F2F5);
-  static const Color lightSurfaceContainerLow = Color(0xFFF4F6F8);
-  static const Color lightSurfaceContainer = Color(0xFFFFFFFF);
-  static const Color lightSurfaceContainerHigh = Color(0xFFE9ECEF);
-  static const Color lightSurfaceContainerHighest = Color(0xFFDEE2E6);
+  // Light Palette Tokens (High Contrast WCAG AA Compliant)
+  static const Color lightScaffoldBackground = Color(0xFFF9FAFB);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceContainerLowest = Color(0xFFFFFFFF);
+  static const Color lightSurfaceContainerLow = Color(0xFFF9FAFB);
+  static const Color lightSurfaceContainer = Color(0xFFF3F4F6);
+  static const Color lightSurfaceContainerHigh = Color(0xFFE5E7EB);
+  static const Color lightSurfaceContainerHighest = Color(0xFFD1D5DB);
 
-  static const Color lightPrimary = Color(0xFF00A86B);
+  static const Color lightPrimary = Color(0xFF6C5CE7);
   static const Color lightOnPrimary = Color(0xFFFFFFFF);
-  static const Color lightPrimaryContainer = Color(0xFF007AFF);
+  static const Color lightPrimaryContainer = Color(0xFF6C5CE7);
   static const Color lightOnPrimaryContainer = Color(0xFFFFFFFF);
-  static const Color lightSecondary = Color(0xFF00A86B);
+  static const Color lightSecondary = Color(0xFF10B981);
   static const Color lightOnSecondary = Color(0xFFFFFFFF);
 
-  static const Color lightOnSurface = Color(0xFF1E1E24);
-  static const Color lightOnSurfaceVariant = Color(0xFF495057);
-  static const Color lightOutline = Color(0xFFADB5BD);
-  static const Color lightOutlineVariant = Color(0xFFCED4DA);
+  static const Color lightOnSurface = Color(0xFF111827);
+  static const Color lightOnSurfaceVariant = Color(0xFF4B5563);
+  static const Color lightOutline = Color(0xFFD1D5DB);
+  static const Color lightOutlineVariant = Color(0xFFE5E7EB);
 }

@@ -6,6 +6,7 @@ import 'core/providers/batch_queue_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/uniquifier_provider.dart';
+import 'core/services/connectivity_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/settings_service.dart';
 import 'core/services/storage_service.dart';
@@ -25,6 +26,7 @@ void main() async {
   try {
     await NotificationService.initialize();
     await NotificationService.requestPermission();
+    ConnectivityService.instance.initialize();
   } catch (_) {}
   runApp(
     MultiProvider(

@@ -14,6 +14,8 @@ class UpscaleEngineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         _EngineOptionTile(
@@ -22,6 +24,7 @@ class UpscaleEngineCard extends StatelessWidget {
           badgeText: 'FAST & STABLE',
           engine: UpscaleEngine.lanczos,
           selectedEngine: selectedEngine,
+          isDark: isDark,
           onTap: () => onSelect(UpscaleEngine.lanczos),
         ),
         const SizedBox(height: 8),
@@ -31,6 +34,7 @@ class UpscaleEngineCard extends StatelessWidget {
           badgeText: 'VULKAN NEURAL',
           engine: UpscaleEngine.neuralAi,
           selectedEngine: selectedEngine,
+          isDark: isDark,
           onTap: () => onSelect(UpscaleEngine.neuralAi),
           isNeural: true,
         ),
@@ -40,13 +44,10 @@ class UpscaleEngineCard extends StatelessWidget {
 }
 
 class _EngineOptionTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String badgeText;
-  final UpscaleEngine engine;
-  final UpscaleEngine selectedEngine;
+  final String title, subtitle, badgeText;
+  final UpscaleEngine engine, selectedEngine;
   final VoidCallback onTap;
-  final bool isNeural;
+  final bool isNeural, isDark;
 
   const _EngineOptionTile({
     required this.title,
@@ -54,6 +55,7 @@ class _EngineOptionTile extends StatelessWidget {
     required this.badgeText,
     required this.engine,
     required this.selectedEngine,
+    required this.isDark,
     required this.onTap,
     this.isNeural = false,
   });
@@ -61,19 +63,33 @@ class _EngineOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = engine == selectedEngine;
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final textColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final descColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(4),
+          color: isSelected ? activeBg : inactiveBg,
+          borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,
+            color: isSelected ? activeBorder : inactiveBorder,
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: [
+            if (!isDark && !isSelected)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
         child: Row(
           children: [
@@ -86,48 +102,46 @@ class _EngineOptionTile extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? AppColors.primaryContainer : AppColors.onSurface,
+                          color: isSelected ? activeBorder : textColor,
                         ),
                       ),
                       if (isNeural) ...[
                         const SizedBox(width: 6),
-                        const Icon(Icons.bolt, size: 14, color: AppColors.primaryContainer),
+                        Icon(Icons.bolt, size: 14, color: activeBorder),
                       ],
                     ],
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.onSurfaceVariant,
-                    ),
+                    style: TextStyle(fontSize: 11, color: descColor),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primaryContainer.withAlpha(50)
-                    : AppColors.surfaceContainerHighest,
+                    ? activeBorder.withValues(alpha: 0.15)
+                    : (isDark ? AppColors.surfaceContainerHighest : AppColors.lightSurfaceContainerHigh),
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: isSelected ? AppColors.primaryContainer : Colors.transparent,
+                  color: isSelected ? activeBorder.withValues(alpha: 0.5) : Colors.transparent,
                   width: 1,
                 ),
               ),
               child: Text(
                 badgeText,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
-                  color: isSelected ? AppColors.primaryContainer : AppColors.onSurfaceVariant,
+                  fontFamily: 'monospace',
+                  color: isSelected ? activeBorder : descColor,
                 ),
               ),
             ),

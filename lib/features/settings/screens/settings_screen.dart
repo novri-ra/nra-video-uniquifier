@@ -93,10 +93,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: TopAppBar(title: (l10n?.settingsTitle ?? 'SETTINGS').toUpperCase()),
+      appBar: TopAppBar(
+        title: (l10n?.settingsTitle ?? 'SETTINGS').toUpperCase(),
+        showSettingsAction: false,
+        showBackButton: true,
+      ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 108),
           children: [
             ..._buildPreferencesSection(localeProvider, themeProvider, l10n),
             ..._buildPresetsAndCodecSection(provider),
@@ -148,14 +152,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       const SizedBox(height: 8),
       Container(
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
+          color: Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceContainerLow : Colors.white,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.surfaceContainerHighest),
+          border: Border.all(
+            color: Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          ),
+          boxShadow: [
+            if (Theme.of(context).brightness == Brightness.light)
+              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          ],
         ),
-        child: SettingFpsSelectorRow(
-          selectedFps: provider.targetFps,
-          onChanged: provider.setTargetFps,
-        ),
+        child: SettingFpsSelectorRow(selectedFps: provider.targetFps, onChanged: provider.setTargetFps),
       ),
       const SizedBox(height: 16),
     ];
@@ -209,12 +216,30 @@ class _SettingsSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: AppColors.onSurface, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+        Text(
+          title,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+        ),
         const SizedBox(height: 2),
-        Text(subtitle, style: TextStyle(color: AppColors.onSurfaceVariant.withValues(alpha: 0.8), fontSize: 10.5)),
+        Text(
+          subtitle,
+          style: TextStyle(
+            color: subColor,
+            fontSize: 11,
+          ),
+        ),
       ],
     );
   }
@@ -233,11 +258,15 @@ class _AlertsSettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
+        boxShadow: [
+          if (!isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
       ),
       child: Column(
         children: [
@@ -248,7 +277,7 @@ class _AlertsSettingsCard extends StatelessWidget {
             value: backgroundProcessing,
             onChanged: onToggleBackground,
           ),
-          const Divider(height: 1, color: AppColors.surfaceContainerHighest),
+          Divider(height: 1, color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
           SettingToggleRow(
             icon: Icons.volume_up_outlined,
             title: 'Notification Sound',
@@ -270,13 +299,21 @@ class _CacheMaintenanceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final mb = (cacheBytes / (1024 * 1024)).toStringAsFixed(1);
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final btnColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
+        boxShadow: [
+          if (!isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
       ),
       child: Wrap(
         spacing: 12,
@@ -287,15 +324,15 @@ class _CacheMaintenanceCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Temporary Cache', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text('Temporary Cache', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(height: 2),
-              Text('$mb MB staged files & thumbnails', style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace')),
+              Text('$mb MB staged files & thumbnails', style: TextStyle(color: subColor, fontSize: 11, fontFamily: 'monospace')),
             ],
           ),
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primaryContainer,
-              side: const BorderSide(color: AppColors.primaryContainer),
+              foregroundColor: btnColor,
+              side: BorderSide(color: btnColor),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
@@ -314,37 +351,53 @@ class _AppInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLowest : Colors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final badgeBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
+    final badgeColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: cardBg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('NRA Video Uniquifier v1.4.0', style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w700)),
-              SizedBox(height: 2),
-              Text('Anti-Fingerprint Evasion Engine', style: TextStyle(color: AppColors.outline, fontSize: 10, fontFamily: 'monospace')),
+              Text('NRA Video Uniquifier v1.4.0', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('Anti-Fingerprint Evasion Engine', style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace')),
             ],
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainer,
+              color: badgeBg,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: AppColors.surfaceContainerHighest),
+              border: Border.all(color: borderColor),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.verified_user, color: AppColors.primaryContainer, size: 14),
-                SizedBox(width: 4),
-                Text('OFFLINE PRIVACY', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
+                Icon(Icons.verified_user, color: badgeColor, size: 14),
+                const SizedBox(width: 4),
+                Text('OFFLINE PRIVACY', style: TextStyle(color: badgeColor, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
               ],
             ),
           ),

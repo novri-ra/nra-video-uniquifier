@@ -1,47 +1,43 @@
-# Sprint 71 Report: Modern UI/UX Overhaul — Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Dynamic ThemeMode
+# Sprint 71-72 Report: Modern UI/UX Overhaul — Bento Grid Dashboard, 4-Tab Floating Navbar, TopAppBar Settings Gear, & High-Contrast Light Mode
 
 ## 1. Executive Summary
-- **Sprint**: 71
-- **Focus**: Complete modern UI/UX overhaul featuring Bento Grid Dashboard, detached Floating Capsule Navbar (5 indexed tabs), iOS/macOS Grouped Inset Settings, and dynamic ThemeMode (System, Light, Dark).
+- **Sprint**: 71-72
+- **Focus**: Complete modern UI/UX overhaul, ANR elimination via lazy tab mounting, 4-tab Floating Capsule Navbar, moving Settings to TopAppBar gear button, and comprehensive Light Mode contrast resolution.
 - **Quality Gates**:
   - `flutter analyze --fatal-infos`: 0 issues.
-  - `flutter test`: 148/148 tests passing (100%).
+  - `flutter test`: 149/149 tests passing (100%).
   - LOC Governance: All hand-written files in `lib/` <= 400 LOC and all functions <= 40 lines.
-  - Brand Preservation: "NRA Video Uniquifier" static across app bars, dialogs, and ARB localizations.
+  - Architecture: Feature-first structure preserved, zero regressions across 18 test suites.
 
 ## 2. Key Architectural Deliverables
-1. **Dynamic Theme System (System, Light, Dark)**:
-   - Added `SettingsService.keyAppTheme = 'app_theme_mode'`, `getThemeMode()`, and `setThemeMode()`.
-   - Created `ThemeProvider` (`lib/core/providers/theme_provider.dart`) managing reactive `ThemeMode` state with instant persistence.
-   - Defined dual token palettes in `lib/core/theme/app_colors.dart` and ThemeData in `lib/core/theme/app_theme.dart` (`AppTheme.lightTheme` & `AppTheme.darkTheme`).
-   - Wired `ThemeProvider` into `lib/main.dart` supporting light, dark, and system themes.
-2. **Floating Capsule Navigation Bar**:
-   - Implemented detached pill navbar (`lib/shared/widgets/floating_capsule_nav_bar.dart`) with 32dp border radius, blurred backdrop filter, and squircle active highlights.
-   - Wired 5 core destinations in `lib/features/navigation/screens/root_navigation_screen.dart` via `Stack` and `IndexedStack` to preserve state:
-     1. Dashboard (Bento Grid Home)
-     2. Studio (Process Screen)
-     3. Microstock AI (Workspace Keyframe & Metadata Extraction)
-     4. Batch Queue (Dedicated Batch Queue Management Screen)
-     5. Settings (Grouped Inset Settings Screen)
-3. **Bento Grid Dashboard**:
-   - `lib/features/dashboard/screens/dashboard_screen.dart`:
-     - Greeting Header with dynamic NRA badge and Vulkan NCNN status.
-     - Seasonal Upload Window Hero Card (60-90 Days Lead Time recommendation for Valentine's Day, Ramadan & Eid, Lunar New Year).
-     - 2x2 Bento Metric Grid (`Metadata Hygiene`, `Technical Specs Guard`, `Storage Safe Buffer`, `Asset Staging`).
-     - Microstock Inspiration Feed with commercial holiday and tech trend cards.
-4. **Grouped Inset Settings Overhaul**:
-   - Implemented `SettingsGroupCard` and `ThemeSelectorCard` (`lib/features/settings/widgets/`).
-   - Refactored `SettingsScreen` adopting inset grouped cards for Preferences, Hardware & Engine, Storage & Cache Maintenance, and Brand info.
+1. **ANR Elimination (Lazy Tab Mounting & Async IO)**:
+   - `lib/features/navigation/screens/root_navigation_screen.dart`: Converted to `StatefulWidget` tracking `_initializedTabs = [true, false, false, false]`. Unselected tabs mount as `const SizedBox.shrink()` until first accessed, eliminating startup ANR.
+   - `lib/features/dashboard/widgets/bento_metric_grid.dart`: Converted to `StatefulWidget` with fast fallback ("40+ GB FREE") and async `Future.microtask()` storage inspection in `initState()`.
+2. **4-Tab Navbar & TopAppBar Settings Gear Action**:
+   - `lib/shared/widgets/floating_capsule_nav_bar.dart`: Reduced navbar destinations to 4 core tabs:
+     0. Dashboard (Bento Grid Home)
+     1. Studio (Process Screen)
+     2. Microstock AI (Workspace Keyframe & Metadata Extraction)
+     3. Batch Queue (Dedicated Batch Queue Screen)
+   - `lib/shared/widgets/top_app_bar.dart`: Integrated gear icon (`Icons.settings_outlined`) with 48x48dp touch target that pushes `SettingsScreen()` onto navigator stack. Suppressed on `SettingsScreen` itself (`showSettingsAction: false`) to avoid recursion.
+3. **High-Contrast Light Mode Color System**:
+   - `lib/core/theme/app_colors.dart` & `lib/core/theme/app_theme.dart`:
+     - `scaffoldBackgroundColor`: `#F5F7FA`
+     - `surface` / card background: `#FFFFFF`
+     - `surfaceContainer` / tile background: `#EDF0F5`
+     - `onSurface` (Primary text): `#1A1D21` (Charcoal)
+     - `onSurfaceVariant` (Subtitle / Description): `#5F6672` (Slate gray)
+     - `outline` / border: `#E2E8F0` / `#CBD5E1`
+   - Replaced all hardcoded dark containers across settings and dashboard widgets:
+     - `language_selector_card.dart`, `theme_selector_card.dart`, `settings_group_card.dart`, `preset_profile_card.dart`, `codec_selector_card.dart`, `hardware_acceleration_card.dart`, `upscale_engine_card.dart`, `upscale_resolution_card.dart`, `setting_toggle_row.dart`, `batch_queue_tab_screen.dart`.
+     - `FloatingCapsuleNavBar` light background: pure white (`#FFFFFF`) with 0.08 alpha shadow and crisp active squircle.
 
 ## 3. Verification & Test Metrics
 - Static Analysis: `flutter analyze --fatal-infos` -> 0 issues.
-- Automated Test Suite: `flutter test` -> 148 passed across 18 test files.
+- Automated Test Suite: `flutter test` -> 149 passed across 18 test files (including new test `Sprint 72: 4-tab navbar lazy mounts tabs and TopAppBar gear opens Settings`).
 - Responsive Behavior: Verified across Small Phone (320x480), Standard FHD (1080x1920), and Tablet / Landscape (1280x800).
 
 ## 4. MCP Evidence Appendix
 - Tool: `codebase-memory-mcp.index_status`
   - Query: `project: "C:/Users/Administrator/Saved Games/_Project/nra_video_uniquifier"`
   - Result: 2271 nodes, 5756 edges, status: ready.
-- Tool: `codebase-memory-mcp.index_repository`
-  - Query: `mode: "full"`
-  - Result: Complete repository reindexed cleanly.

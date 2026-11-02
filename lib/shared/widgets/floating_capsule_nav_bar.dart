@@ -1,9 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Floating capsule navigation bar with blurred backdrop and squircle active highlights.
+/// Floating capsule navigation bar with balanced 5-slot layout.
 class FloatingCapsuleNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -14,63 +15,73 @@ class FloatingCapsuleNavBar extends StatelessWidget {
     required this.onTap,
   });
 
+  static const Color primaryPurple = Color(0xFF6C5CE7);
+
+  static List<_NavItemData> _navItems(AppLocalizations? l10n) {
+    return [
+      _NavItemData(
+        svgAsset: 'assets/home-icon.svg',
+        fallbackIcon: Icons.home_rounded,
+        label: 'Home',
+        index: 0,
+      ),
+      const _NavItemData(
+        svgAsset: 'assets/analytics-icon.svg',
+        fallbackIcon: Icons.analytics_outlined,
+        label: 'Intel',
+        index: 1,
+      ),
+      _NavItemData(
+        svgAsset: 'assets/plus-icon.svg',
+        fallbackIcon: Icons.add_rounded,
+        label: 'Studio',
+        isHeroAction: true,
+        index: 2,
+      ),
+      const _NavItemData(
+        svgAsset: 'assets/bell-icon.svg',
+        fallbackIcon: Icons.notifications_none_rounded,
+        label: 'History',
+        index: 3,
+      ),
+      const _NavItemData(
+        svgAsset: 'assets/people-icon.svg',
+        fallbackIcon: Icons.person_outline_rounded,
+        label: 'Profile',
+        index: 4,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
-
-    final items = [
-      _NavItemData(icon: Icons.dashboard_rounded, label: l10n?.navDashboard ?? 'Home'),
-      _NavItemData(icon: Icons.auto_fix_high_rounded, label: l10n?.navStudio ?? 'Studio'),
-      _NavItemData(icon: Icons.auto_awesome_rounded, label: l10n?.navMicrostock ?? 'AI Stock'),
-      _NavItemData(icon: Icons.layers_rounded, label: l10n?.navBatch ?? 'Batch'),
-      _NavItemData(icon: Icons.tune_rounded, label: l10n?.navSettings ?? 'Settings'),
-    ];
-
-    final capsuleBg = isDark
-        ? AppColors.surfaceContainer.withValues(alpha: 0.82)
-        : AppColors.lightSurfaceContainer.withValues(alpha: 0.88);
-
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
-        : Colors.black.withValues(alpha: 0.08);
+    final items = _navItems(l10n);
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Container(
-              height: 64,
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              decoration: BoxDecoration(
-                color: capsuleBg,
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: borderColor, width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(items.length, (i) {
-                  return Expanded(
-                    child: _NavBarItemTile(
-                      data: items[i],
-                      isSelected: currentIndex == i,
-                      isDark: isDark,
-                      onTap: () => onTap(i),
-                    ),
-                  );
-                }),
-              ),
-            ),
+        child: _CapsuleContainer(
+          isDark: isDark,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: items.map((data) {
+              return Expanded(
+                child: data.isHeroAction
+                    ? _CenterHeroButton(
+                        data: data,
+                        isSelected: currentIndex == data.index,
+                        onTap: () => onTap(data.index),
+                      )
+                    : _NavBarItemTile(
+                        data: data,
+                        isSelected: currentIndex == data.index,
+                        isDark: isDark,
+                        onTap: () => onTap(data.index),
+                      ),
+              );
+            }).toList(),
           ),
         ),
       ),
@@ -78,10 +89,124 @@ class FloatingCapsuleNavBar extends StatelessWidget {
   }
 }
 
+class _CapsuleContainer extends StatelessWidget {
+  final bool isDark;
+  final Widget child;
+
+  const _CapsuleContainer({required this.isDark, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final capsuleBg = isDark
+        ? AppColors.surfaceContainer.withValues(alpha: 0.88)
+        : const Color(0xFFFFFFFF).withValues(alpha: 0.95);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : AppColors.lightOutlineVariant;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(32),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+          decoration: BoxDecoration(
+            color: capsuleBg,
+            borderRadius: BorderRadius.circular(32),
+            border: Border.all(color: borderColor, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 class _NavItemData {
-  final IconData icon;
+  final String? svgAsset;
+  final IconData? fallbackIcon;
   final String label;
-  const _NavItemData({required this.icon, required this.label});
+  final bool isHeroAction;
+  final int index;
+
+  const _NavItemData({
+    this.svgAsset,
+    this.fallbackIcon,
+    required this.label,
+    this.isHeroAction = false,
+    required this.index,
+  });
+}
+
+class _CenterHeroButton extends StatelessWidget {
+  final _NavItemData data;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _CenterHeroButton({
+    required this.data,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: data.label,
+      button: true,
+      selected: isSelected,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Center(
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: FloatingCapsuleNavBar.primaryPurple,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: FloatingCapsuleNavBar.primaryPurple.withValues(alpha: 0.40),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: data.svgAsset != null
+                    ? SvgPicture.asset(
+                        data.svgAsset!,
+                        width: 22,
+                        height: 22,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                      )
+                    : Icon(
+                        data.fallbackIcon,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _NavBarItemTile extends StatelessWidget {
@@ -99,48 +224,50 @@ class _NavBarItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeAccent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final inactiveColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final activeColor = isDark
+        ? AppColors.primaryContainer
+        : FloatingCapsuleNavBar.primaryPurple;
+    final inactiveColor = isDark
+        ? const Color(0xFF6B7280)
+        : const Color(0xFF9CA3AF);
+    final iconColor = isSelected ? activeColor : inactiveColor;
 
     return Semantics(
+      container: true,
+      label: data.label,
       button: true,
       selected: isSelected,
-      label: data.label,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? activeAccent.withValues(alpha: isDark ? 0.16 : 0.12)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                data.icon,
-                size: 20,
-                color: isSelected ? activeAccent : inactiveColor,
-              ),
-              const SizedBox(height: 2),
-              Text(
-                data.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected ? activeAccent : inactiveColor,
-                  fontFamily: 'monospace',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (data.svgAsset != null)
+                  SvgPicture.asset(
+                    data.svgAsset!,
+                    width: 20,
+                    height: 20,
+                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                  )
+                else
+                  Icon(data.fallbackIcon, size: 20, color: iconColor),
+                const SizedBox(height: 3),
+                Text(
+                  data.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: iconColor,
+                    fontSize: 9.5,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

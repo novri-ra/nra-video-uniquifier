@@ -27,6 +27,14 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
 | 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
 | 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
+| 75 | `75-dynamic-bento-dashboard.md` | Visual Overhaul Bento Dashboard: Full Dynamic Reactive Binding (Storage Disk Space, Live Batch Counter, Target Specs Sync, Auto-Calendar 60-90 Days Lead Time, & Interactive Keyword Chips) |
+| 76 | `76-microstock-news-and-auto-translate.md` | Tab Microstock Intel & News: Real-Time Network Status (Online/Offline), Local Offline Cache Persistence, Auto-Reload on Reconnect, dan Fitur Auto-Translate ID/EN |
+| 77 | `77-article-reader-and-pipeline-fixes.md` | In-App Microstock Article Reader Modal, Preset Navigation Tab Retention, 2K/4K Hardware Decoder Stutter Safeguard, dan Custom Crop/Trim Sliders |
+| 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader: Artikel Mendalam, Format Terstruktur (Key Takeaways, Specs, Checklist), dan Parser Konten Lengkap |
+| 79 | `79-hybrid-news-and-full-translation.md` | Integrasi Sumber Berita Hibrida (RSS-to-JSON + Reddit Microstock Community Intel) & Mesin Terjemahan Utuh Multi-Paragraf |
+| 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Scripts Google Sheets Webhook, UI Search Bar + Adaptive Learning Chips Carousel (YouTube-Style), dan Telemetri Minat Pengguna & Penanaman Metadata Video |
+| 81 | `81-dashboard-redesign-and-history-cleanup.md` | Relokasi Script 0ai_context, Engine Terjemahan Natural Berglosarium, Pembersihan Berkas Trashed/Delete Error di History, dan Redesain UI Modern Dashboard |
+| 82 | `82-live-sheets-and-bento-visuals.md` | Live Google Sheets Webhook Integration, Dynamic Bento Visual Gauges, Instant History Deletion State Eviction, and Production Release Merge |
 
 ---
 

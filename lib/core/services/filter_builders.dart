@@ -39,6 +39,8 @@ class FilterBuilders {
     final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     final zoomDim = '${targetW}x$targetH';
     final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(4);
+    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    final allowFrameSkip = enableFrameSkip && !isHighRes;
     return <String>[
       if (modifyVisuals) 'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
       if (enableHorizontalFlip) 'hflip',
@@ -50,11 +52,12 @@ class FilterBuilders {
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
-      if (enableFrameSkip) 'decimate=cycle=25',
+      if (allowFrameSkip) 'decimate=cycle=25',
       if (upscale)
         buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'setpts=PTS-STARTPTS',
       'format=yuv420p',
     ];
   }
@@ -82,27 +85,49 @@ class FilterBuilders {
   }
 
   static String _resolveCodecArgs(VideoCodec videoCodec, TargetResolution targetResolution) {
-    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
-    if (isHighRes) {
+    if (targetResolution == TargetResolution.r4k) {
       return videoCodec == VideoCodec.h265
-          ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film'
-          : '-c:v libx264 -preset faster -crf 17 -tune film';
+          ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 25M -bufsize 50M'
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M';
+    }
+    if (targetResolution == TargetResolution.r2k) {
+      return videoCodec == VideoCodec.h265
+          ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 20M -bufsize 40M'
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M';
     }
     return videoCodec == VideoCodec.h265
         ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
         : '-c:v libx264 -preset fast -crf 22';
   }
 
-  static List<String> _buildSpatialCrop(VideoVariations vars, bool modifyVisuals, bool deep) {
+  static List<String> _buildSpatialCrop(
+    VideoVariations vars,
+    bool modifyVisuals,
+    bool deep, {
+    double cropZoomScale = 1.0,
+    String cropAnchor = 'center',
+  }) {
     if (!modifyVisuals) return const [];
-    if (!deep) return ['crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2'];
+    final List<String> list = [];
+    if (cropZoomScale > 1.01) {
+      final z = cropZoomScale.toStringAsFixed(2);
+      final yExpr = cropAnchor == 'top'
+          ? '0'
+          : (cropAnchor == 'bottom' ? '(ih-oh)' : '(ih-oh)/2');
+      list.add('crop=w=trunc(iw/$z/2)*2:h=trunc(ih/$z/2)*2:x=trunc((iw-ow)/4)*2:y=trunc($yExpr/2)*2');
+    }
+    if (!deep) {
+      if (list.isEmpty) list.add('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2');
+      return list;
+    }
     final keep = (1.0 - vars.cropPercent).toStringAsFixed(4);
     final off = (vars.cropPercent / 2.0).toStringAsFixed(4);
     final rot = '${vars.rotateAngle.toStringAsFixed(3)}*PI/180';
-    return [
+    list.addAll([
       'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
       'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
-    ];
+    ]);
+    return list;
   }
 
   static List<String> _buildFiltersList({
@@ -121,13 +146,17 @@ class FilterBuilders {
     required VideoVariations vars,
     int targetFps = 30,
     double? saturationLevel,
+    double cropZoomScale = 1.0,
+    String cropAnchor = 'center',
   }) {
     final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
     final zoomDim = '${targetW}x$targetH';
     final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(4);
+    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    final allowFrameSkip = enableFrameSkip && !isHighRes;
     return <String>[
       if (modifyVisuals) 'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
-      ..._buildSpatialCrop(vars, modifyVisuals, enableDeepAntiFingerprint),
+      ..._buildSpatialCrop(vars, modifyVisuals, enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=$zoomDim:fps=$targetFps",
@@ -137,11 +166,12 @@ class FilterBuilders {
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
-      if (enableFrameSkip) 'decimate=cycle=25',
+      if (allowFrameSkip) 'decimate=cycle=25',
       if (upscale)
         buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'setpts=PTS-STARTPTS',
       'format=yuv420p',
     ];
   }
@@ -205,13 +235,15 @@ class FilterBuilders {
     VideoVariations? variations,
     int targetFps = 30,
     double? saturationLevel,
+    double cropZoomScale = 1.0,
+    String cropAnchor = 'center',
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final vfString = enableBlurredCanvas
           ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel).join(',')}'
-          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars, targetFps: targetFps, saturationLevel: saturationLevel).join(',');
+          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars, targetFps: targetFps, saturationLevel: saturationLevel, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor).join(',');
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {

@@ -16,6 +16,7 @@ class UpscaleResolutionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final warn2k = DeviceCapabilityService.getResolutionWarning(targetKey: '2k', tier: tier);
     final warn4k = DeviceCapabilityService.getResolutionWarning(targetKey: '4k', tier: tier);
 
@@ -27,6 +28,7 @@ class UpscaleResolutionCard extends StatelessWidget {
           resolution: '1920×1080',
           value: '1080p',
           selectedValue: selectedValue,
+          isDark: isDark,
           onTap: () => onSelect('1080p'),
         ),
         const SizedBox(height: 8),
@@ -36,6 +38,7 @@ class UpscaleResolutionCard extends StatelessWidget {
           resolution: '2560×1440',
           value: '2k',
           selectedValue: selectedValue,
+          isDark: isDark,
           onTap: () => onSelect('2k'),
           warningTag: warn2k,
         ),
@@ -46,6 +49,7 @@ class UpscaleResolutionCard extends StatelessWidget {
           resolution: '3840×2160',
           value: '4k',
           selectedValue: selectedValue,
+          isDark: isDark,
           onTap: () => onSelect('4k'),
           warningTag: warn4k,
         ),
@@ -55,13 +59,10 @@ class UpscaleResolutionCard extends StatelessWidget {
 }
 
 class _ResolutionOptionTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String resolution;
-  final String value;
-  final String selectedValue;
+  final String title, subtitle, resolution, value, selectedValue;
   final VoidCallback onTap;
   final String? warningTag;
+  final bool isDark;
 
   const _ResolutionOptionTile({
     required this.title,
@@ -69,6 +70,7 @@ class _ResolutionOptionTile extends StatelessWidget {
     required this.resolution,
     required this.value,
     required this.selectedValue,
+    required this.isDark,
     required this.onTap,
     this.warningTag,
   });
@@ -76,19 +78,31 @@ class _ResolutionOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = value == selectedValue;
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(4),
+          color: isSelected ? activeBg : inactiveBg,
+          borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,
+            color: isSelected ? activeBorder : inactiveBorder,
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: [
+            if (!isDark && !isSelected)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,12 +110,13 @@ class _ResolutionOptionTile extends StatelessWidget {
             Expanded(
               child: _OptionRowContent(
                 isSelected: isSelected,
+                isDark: isDark,
                 title: title,
                 subtitle: subtitle,
                 warningTag: warningTag,
               ),
             ),
-            _ResolutionBadge(resolution: resolution, isSelected: isSelected),
+            _ResolutionBadge(resolution: resolution, isSelected: isSelected, isDark: isDark),
           ],
         ),
       ),
@@ -110,13 +125,13 @@ class _ResolutionOptionTile extends StatelessWidget {
 }
 
 class _OptionRowContent extends StatelessWidget {
-  final bool isSelected;
-  final String title;
-  final String subtitle;
+  final bool isSelected, isDark;
+  final String title, subtitle;
   final String? warningTag;
 
   const _OptionRowContent({
     required this.isSelected,
+    required this.isDark,
     required this.title,
     required this.subtitle,
     this.warningTag,
@@ -124,9 +139,12 @@ class _OptionRowContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+
     return Row(
       children: [
-        _RadioIndicator(isSelected: isSelected),
+        _RadioIndicator(isSelected: isSelected, isDark: isDark),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -137,7 +155,7 @@ class _OptionRowContent extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: AppColors.onSurface,
+                      color: textColor,
                       fontSize: 13,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     ),
@@ -149,7 +167,7 @@ class _OptionRowContent extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11)),
+              Text(subtitle, style: TextStyle(color: descColor, fontSize: 11)),
             ],
           ),
         ),
@@ -159,28 +177,33 @@ class _OptionRowContent extends StatelessWidget {
 }
 
 class _RadioIndicator extends StatelessWidget {
-  final bool isSelected;
-  const _RadioIndicator({required this.isSelected});
+  final bool isSelected, isDark;
+  const _RadioIndicator({required this.isSelected, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final accent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final outline = isDark ? AppColors.outline : AppColors.lightOutline;
+
     return Container(
       width: 16,
       height: 16,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: isSelected ? AppColors.primaryContainer : AppColors.outline,
+          color: isSelected ? accent : outline,
           width: isSelected ? 2 : 1,
         ),
-        color: isSelected ? AppColors.surfaceContainerLowest : Colors.transparent,
+        color: isSelected
+            ? (isDark ? AppColors.surfaceContainerLowest : Colors.white)
+            : Colors.transparent,
       ),
       child: isSelected
           ? Center(
               child: Container(
                 width: 6,
                 height: 6,
-                decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.primaryContainer),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: accent),
               ),
             )
           : null,
@@ -215,25 +238,34 @@ class _WarningBadge extends StatelessWidget {
 
 class _ResolutionBadge extends StatelessWidget {
   final String resolution;
-  final bool isSelected;
+  final bool isSelected, isDark;
 
-  const _ResolutionBadge({required this.resolution, required this.isSelected});
+  const _ResolutionBadge({
+    required this.resolution,
+    required this.isSelected,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final accent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : AppColors.lightSurfaceContainerLow;
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: isSelected ? AppColors.primaryContainer.withValues(alpha: 0.12) : AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(2),
+        color: isSelected ? accent.withValues(alpha: 0.12) : inactiveBg,
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: isSelected ? AppColors.primaryContainer.withValues(alpha: 0.4) : AppColors.surfaceContainerHighest,
+          color: isSelected ? accent.withValues(alpha: 0.4) : inactiveBorder,
         ),
       ),
       child: Text(
         resolution,
         style: TextStyle(
-          color: isSelected ? AppColors.primaryContainer : AppColors.outline,
+          color: isSelected ? accent : descColor,
           fontSize: 10,
           fontWeight: FontWeight.w600,
           fontFamily: 'monospace',

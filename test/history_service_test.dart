@@ -48,11 +48,13 @@ void main() {
       expect(HistoryService.formatTotalSize(items), equals('10.0 MB'));
     });
 
-    test('scanDirectory finds and sorts .mp4 files while skipping others', () async {
+    test('scanDirectory finds and sorts .mp4 and .mov files while skipping trashed and others', () async {
       final tempDir = await Directory.systemTemp.createTemp('uniquifier_test_');
       try {
         File('${tempDir.path}/video1.mp4').writeAsStringSync('dummy content 1');
-        File('${tempDir.path}/video2.MP4').writeAsStringSync('dummy content 2');
+        File('${tempDir.path}/video2.mov').writeAsStringSync('dummy content 2');
+        File('${tempDir.path}/.trashed-12345-video3.mp4').writeAsStringSync('trashed content');
+        File('${tempDir.path}/.hidden_video.mp4').writeAsStringSync('hidden content');
         File('${tempDir.path}/notes.txt').writeAsStringSync('text content');
 
         final seen = <String>{};
@@ -61,14 +63,16 @@ void main() {
         expect(results.length, equals(2));
         final names = results.map((e) => e.fileName).toList();
         expect(names, contains('video1.mp4'));
-        expect(names, contains('video2.MP4'));
+        expect(names, contains('video2.mov'));
+        expect(names, isNot(contains('.trashed-12345-video3.mp4')));
+        expect(names, isNot(contains('.hidden_video.mp4')));
         expect(names, isNot(contains('notes.txt')));
       } finally {
         if (await tempDir.exists()) await tempDir.delete(recursive: true);
       }
     });
 
-    test('deleteItem deletes existing file and returns true; false for missing', () async {
+    test('deleteItem deletes existing file and returns true; graceful true for missing', () async {
       final tempFile = File('${Directory.systemTemp.path}/uniquifier_delete_test.tmp')
         ..writeAsStringSync('temp');
       expect(await tempFile.exists(), isTrue);
@@ -77,8 +81,9 @@ void main() {
       expect(deleted, isTrue);
       expect(await tempFile.exists(), isFalse);
 
+      // Graceful return true so history state cleans missing file without exception
       final missingDeleted = await HistoryService.deleteItem(tempFile);
-      expect(missingDeleted, isFalse);
+      expect(missingDeleted, isTrue);
     });
   });
 }

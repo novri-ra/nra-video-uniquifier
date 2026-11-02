@@ -7,6 +7,7 @@ import '../../../../shared/widgets/category_accordion_card.dart';
 import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/setting_slider_toggle_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
+import 'studio_custom_sliders_card.dart';
 
 class PresetChipRow extends StatelessWidget {
   final UniquifierProvider provider;
@@ -70,14 +71,28 @@ class _PresetChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeBg = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : const Color(0xFFF3F4F6);
+    final activeText = isDark ? AppColors.onPrimary : Colors.white;
+    final inactiveText = isDark ? AppColors.onSurfaceVariant : const Color(0xFF374151);
+    final borderColor = isSelected
+        ? activeBg
+        : (isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant);
+
     return ActionChip(
-      label: Text(label, style: TextStyle(
-        color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
-        fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'monospace',
-      )),
-      backgroundColor: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerLow,
-      side: BorderSide(color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? activeText : inactiveText,
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'monospace',
+        ),
+      ),
+      backgroundColor: isSelected ? activeBg : inactiveBg,
+      side: BorderSide(color: borderColor),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       onPressed: onTap,
     );
   }
@@ -88,14 +103,17 @@ class ModifiersHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
           child: Text(
             'PROCESSING SETTINGS',
             style: TextStyle(
-              color: AppColors.onSurfaceVariant,
+              color: textColor,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.8,
@@ -104,11 +122,11 @@ class ModifiersHeader extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Text(
           '15 MODIFIERS',
           style: TextStyle(
-            color: AppColors.onSurfaceVariant,
+            color: textColor,
             fontSize: 10,
             fontFamily: 'monospace',
           ),
@@ -186,6 +204,8 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableAutoTrim,
                   onChanged: provider.toggleAutoTrim,
                 ),
+                if (provider.enableDeepAntiFingerprint || provider.enableAutoTrim)
+                  StudioCustomSlidersCard(provider: provider),
               ],
             ),
             const SizedBox(height: 8),

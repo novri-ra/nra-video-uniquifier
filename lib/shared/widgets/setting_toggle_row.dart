@@ -22,6 +22,12 @@ class SettingToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final linkColor = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final outlineColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
@@ -30,7 +36,7 @@ class SettingToggleRow extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Icon(icon, color: AppColors.onSurfaceVariant, size: 18),
+                Icon(icon, color: iconColor, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -38,8 +44,8 @@ class SettingToggleRow extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          color: AppColors.onSurface,
+                        style: TextStyle(
+                          color: textColor,
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                         ),
@@ -51,9 +57,7 @@ class SettingToggleRow extends StatelessWidget {
                         child: Text(
                           subtitle,
                           style: TextStyle(
-                            color: onTapSubtitle != null
-                                ? AppColors.primaryContainer
-                                : AppColors.outline,
+                            color: onTapSubtitle != null ? linkColor : outlineColor,
                             fontSize: 10,
                             fontFamily: 'monospace',
                             decoration: onTapSubtitle != null

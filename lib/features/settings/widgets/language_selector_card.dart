@@ -11,14 +11,16 @@ class LanguageSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final currentCode = localeProvider.languageCode;
+    final border = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: border),
       ),
       child: Column(
         children: [
@@ -26,13 +28,15 @@ class LanguageSelectorCard extends StatelessWidget {
             title: l10n?.languageId ?? 'Bahasa Indonesia (ID)',
             subtitle: 'Bahasa Indonesia',
             isSelected: currentCode == 'id',
+            isDark: isDark,
             onTap: () => localeProvider.changeLanguage('id'),
           ),
-          const Divider(height: 1, color: AppColors.surfaceContainerHighest),
+          Divider(height: 1, color: border),
           _LanguageOptionTile(
             title: l10n?.languageEn ?? 'English (EN)',
             subtitle: 'English',
             isSelected: currentCode == 'en',
+            isDark: isDark,
             onTap: () => localeProvider.changeLanguage('en'),
           ),
         ],
@@ -43,18 +47,25 @@ class LanguageSelectorCard extends StatelessWidget {
 
 class _LanguageOptionTile extends StatelessWidget {
   final String title, subtitle;
-  final bool isSelected;
+  final bool isSelected, isDark;
   final VoidCallback onTap;
 
   const _LanguageOptionTile({
     required this.title,
     required this.subtitle,
     required this.isSelected,
+    required this.isDark,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    const radioActiveGreen = Color(0xFF10B981);
+    final radioInactive = isDark ? AppColors.outline : const Color(0xFF9CA3AF);
+    final activeTextColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveTextColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -62,8 +73,8 @@ class _LanguageOptionTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(
-              isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? AppColors.primaryContainer : AppColors.outline,
+              isSelected ? Icons.check_circle_rounded : Icons.radio_button_off,
+              color: isSelected ? radioActiveGreen : radioInactive,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -74,13 +85,13 @@ class _LanguageOptionTile extends StatelessWidget {
                   Text(
                     title,
                     style: TextStyle(
-                      color: isSelected ? AppColors.primaryContainer : AppColors.onSurface,
+                      color: isSelected ? activeTextColor : inactiveTextColor,
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 1),
-                  Text(subtitle, style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11)),
+                  Text(subtitle, style: TextStyle(color: subColor, fontSize: 11)),
                 ],
               ),
             ),

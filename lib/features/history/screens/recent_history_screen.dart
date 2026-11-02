@@ -69,12 +69,32 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   Future<void> _deleteItem(VideoExportItem item) async {
     if (!await _confirmDelete(item)) return;
     try {
+      final targetPath = item.file.path;
+      final existed = await item.file.exists();
       await HistoryService.deleteItem(item.file);
-      _loadHistory();
-    } catch (e) {
       if (mounted) {
+        setState(() {
+          _items.removeWhere((i) => i.file.path == targetPath);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Delete failed: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(existed ? 'Video berhasil dihapus' : 'Berkas dibersihkan dari riwayat'),
+            backgroundColor: AppColors.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _items.removeWhere((i) => i.file.path == item.file.path);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berkas dibersihkan dari riwayat'),
+            backgroundColor: AppColors.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -117,14 +137,14 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
     final totalSize = HistoryService.formatTotalSize(_items);
 
     return Scaffold(
-      appBar: const TopAppBar(),
+      appBar: const TopAppBar(title: 'RECENT EXPORTS'),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadHistory,
           color: AppColors.primaryContainer,
           backgroundColor: AppColors.surface,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 108),
             children: [
               HistoryHeader(itemCount: _items.length, totalSize: totalSize, onRefresh: _loadHistory),
               const SizedBox(height: 12),

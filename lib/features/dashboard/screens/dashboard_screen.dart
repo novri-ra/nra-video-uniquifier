@@ -4,7 +4,9 @@ import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
+import '../../settings/screens/settings_screen.dart';
 import '../widgets/bento_metric_grid.dart';
+import '../widgets/live_intel_ticker_card.dart';
 import '../widgets/microstock_inspiration_feed.dart';
 import '../widgets/seasonal_hero_card.dart';
 
@@ -12,18 +14,20 @@ import '../widgets/seasonal_hero_card.dart';
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
-  void _openSettingsTab(BuildContext context) {
-    context.read<UniquifierProvider>().setTabIndex(4);
+  void _openSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
   }
 
   void _openStudioTab(BuildContext context) {
-    context.read<UniquifierProvider>().setTabIndex(1);
+    context.read<UniquifierProvider>().setTabIndex(2);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: TopAppBar(onSettingsTap: () => _openSettingsTab(context)),
+      appBar: TopAppBar(onSettingsTap: () => _openSettings(context)),
       body: SafeArea(
         child: ListView(
           physics: const BouncingScrollPhysics(),
@@ -32,6 +36,8 @@ class DashboardScreen extends StatelessWidget {
             const _GreetingHeaderSection(),
             const SizedBox(height: 14),
             SeasonalHeroCard(onLaunchStudio: () => _openStudioTab(context)),
+            const SizedBox(height: 12),
+            const LiveIntelTickerCard(),
             const SizedBox(height: 14),
             const BentoMetricGrid(),
             const SizedBox(height: 16),
@@ -48,14 +54,18 @@ class _GreetingHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(
+          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+        ),
       ),
       child: Row(
         children: [
@@ -63,8 +73,10 @@ class _GreetingHeaderSection extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.primaryContainer, Color(0xFF00B074)],
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [AppColors.primaryContainer, const Color(0xFF00B074)]
+                    : [AppColors.lightPrimary, const Color(0xFF007AFF)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -74,7 +86,7 @@ class _GreetingHeaderSection extends StatelessWidget {
               child: Text(
                 'NRA',
                 style: TextStyle(
-                  color: AppColors.onPrimary,
+                  color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'monospace',
@@ -89,8 +101,8 @@ class _GreetingHeaderSection extends StatelessWidget {
               children: [
                 Text(
                   l10n?.greetingTitle ?? 'Welcome, Creator',
-                  style: const TextStyle(
-                    color: AppColors.onSurface,
+                  style: TextStyle(
+                    color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),
@@ -101,16 +113,16 @@ class _GreetingHeaderSection extends StatelessWidget {
                     Container(
                       width: 6,
                       height: 6,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryContainer,
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.primaryContainer : AppColors.lightPrimary,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 5),
                     Text(
                       l10n?.gpuStatusReady ?? 'Vulkan NCNN Ready',
-                      style: const TextStyle(
-                        color: AppColors.primaryContainer,
+                      style: TextStyle(
+                        color: isDark ? AppColors.primaryContainer : AppColors.lightPrimary,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'monospace',
