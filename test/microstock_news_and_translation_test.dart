@@ -110,7 +110,7 @@ void main() {
       expect(syncTime!.contains('202'), isTrue);
     });
 
-    test('MicrostockNewsArticle fullContent roundtrip serialization', () {
+    test('MicrostockNewsArticle rich fields roundtrip serialization', () {
       const article = MicrostockNewsArticle(
         id: 'test-id',
         title: 'Title Test',
@@ -120,14 +120,46 @@ void main() {
         publishedDate: '2026-11-03',
         sourceUrl: 'https://test.com',
         tags: ['#Test'],
-        fullContent: 'Full article body content here.',
+        fullContent: 'Full article body content here.\n\nParagraph 2 here.',
+        readTime: '5 min read',
+        keyTakeaways: 'Key points to remember',
+        technicalSpecs: ['4K UHD', 'Rec.709'],
+        contributorChecklist: ['Check lighting', 'Strip GPS'],
       );
       final json = article.toJson();
-      expect(json['fullContent'], equals('Full article body content here.'));
+      expect(json['fullContent'], equals('Full article body content here.\n\nParagraph 2 here.'));
+      expect(json['readTime'], equals('5 min read'));
+      expect(json['keyTakeaways'], equals('Key points to remember'));
+      expect(json['technicalSpecs'], equals(['4K UHD', 'Rec.709']));
+      expect(json['contributorChecklist'], equals(['Check lighting', 'Strip GPS']));
 
       final parsed = MicrostockNewsArticle.fromJson(json);
-      expect(parsed.fullContent, equals('Full article body content here.'));
-      expect(parsed.title, equals('Title Test'));
+      expect(parsed.fullContent, equals(article.fullContent));
+      expect(parsed.readTime, equals('5 min read'));
+      expect(parsed.keyTakeaways, equals('Key points to remember'));
+      expect(parsed.technicalSpecs, equals(['4K UHD', 'Rec.709']));
+      expect(parsed.contributorChecklist, equals(['Check lighting', 'Strip GPS']));
+    });
+
+    test('parseRssContent strips HTML tags and decodes entities properly', () {
+      const xmlWithCdata = '<item><title>Foo</title><content:encoded><![CDATA[<p>Paragraph 1</p><p>Paragraph 2 with <b>bold</b> and &amp; &quot;quotes&quot;</p>]]></content:encoded></item>';
+      final parsed = MicrostockNewsService.parseRssContent(xmlWithCdata);
+      expect(parsed, contains('Paragraph 1'));
+      expect(parsed, contains('Paragraph 2 with bold and & "quotes"'));
+      expect(parsed.contains('<p>'), isFalse);
+      expect(parsed.contains('<b>'), isFalse);
+    });
+
+    test('Seed articles contain comprehensive in-depth structured content', () {
+      final seeds = MicrostockNewsService.getSeedArticles();
+      expect(seeds.length, greaterThanOrEqualTo(5));
+      for (final seed in seeds) {
+        expect(seed.fullContent.split(RegExp(r'\n{1,2}')).length, greaterThanOrEqualTo(3));
+        expect(seed.readTime, isNotEmpty);
+        expect(seed.keyTakeaways, isNotEmpty);
+        expect(seed.technicalSpecs, isNotEmpty);
+        expect(seed.contributorChecklist, isNotEmpty);
+      }
     });
   });
 }

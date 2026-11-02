@@ -29,6 +29,8 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
 | 75 | `75-dynamic-bento-dashboard.md` | Visual Overhaul Bento Dashboard: Full Dynamic Reactive Binding (Storage Disk Space, Live Batch Counter, Target Specs Sync, Auto-Calendar 60-90 Days Lead Time, & Interactive Keyword Chips) |
 | 76 | `76-microstock-news-and-auto-translate.md` | Tab Microstock Intel & News: Real-Time Network Status (Online/Offline), Local Offline Cache Persistence, Auto-Reload on Reconnect, dan Fitur Auto-Translate ID/EN |
+| 77 | `77-article-reader-and-pipeline-fixes.md` | In-App Microstock Article Reader Modal, Preset Navigation Tab Retention, 2K/4K Hardware Decoder Stutter Safeguard, dan Custom Crop/Trim Sliders |
+| 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader: Artikel Mendalam, Format Terstruktur (Key Takeaways, Specs, Checklist), dan Parser Konten Lengkap |
 
 ---
 

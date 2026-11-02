@@ -517,7 +517,10 @@ void main() {
 
       // Article reader modal sheet is shown
       expect(find.text('MICROSTOCK INTEL READER'), findsOneWidget);
-      expect(find.textContaining('Adobe Stock has officially published its 2026 Visual Trend Forecast'), findsOneWidget);
+      expect(find.textContaining('Adobe Stock has officially'), findsOneWidget);
+      expect(find.text('KEY TAKEAWAYS / REKOMENDASI CEPAT'), findsOneWidget);
+      expect(find.text('PARAMETER TEKNIS REKOMENDASI'), findsOneWidget);
+      expect(find.text('CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)'), findsOneWidget);
       expect(find.text('Buka Sumber'), findsOneWidget);
 
       // Close reader sheet

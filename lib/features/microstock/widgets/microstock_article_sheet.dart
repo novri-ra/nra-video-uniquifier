@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
+import 'microstock_article_content_blocks.dart';
 
 /// Full article reader modal bottom sheet for Microstock Intel & Trends.
 class MicrostockArticleSheet extends StatefulWidget {
@@ -34,6 +35,14 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   String? _translatedTitle;
   String? _translatedContent;
 
+  String get _displayTitle =>
+      (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
+
+  String get _displayContent =>
+      (_isTranslated && _translatedContent != null)
+          ? _translatedContent!
+          : (widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary);
+
   Future<void> _toggleTranslation() async {
     if (_isTranslated) {
       setState(() => _isTranslated = false);
@@ -46,10 +55,8 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
 
     setState(() => _isTranslating = true);
     final tTitle = await TranslationService.translateText(widget.article.title, targetLang: 'id');
-    final contentToTranslate = widget.article.fullContent.isNotEmpty
-        ? widget.article.fullContent
-        : widget.article.summary;
-    final tContent = await TranslationService.translateText(contentToTranslate, targetLang: 'id');
+    final rawContent = widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary;
+    final tContent = await TranslationService.translateText(rawContent, targetLang: 'id');
 
     if (mounted) {
       setState(() {
@@ -74,18 +81,7 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
     final bgColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final bodyColor = isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151);
-
-    final displayTitle = (_isTranslated && _translatedTitle != null)
-        ? _translatedTitle!
-        : widget.article.title;
-    final rawContent = widget.article.fullContent.isNotEmpty
-        ? widget.article.fullContent
-        : widget.article.summary;
-    final displayContent = (_isTranslated && _translatedContent != null)
-        ? _translatedContent!
-        : rawContent;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.88,
@@ -95,65 +91,111 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(
-            color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
-            width: 1,
-          ),
+          border: Border.all(color: borderColor),
         ),
         child: Column(
           children: [
             const SizedBox(height: 12),
-            Container(
-              width: 44,
-              height: 4,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.white24 : Colors.black12,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            _DragHandle(isDark: isDark),
             _HeaderBar(isDark: isDark, onClose: () => Navigator.of(ctx).pop()),
             const Divider(height: 1, thickness: 0.5),
             Expanded(
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-                children: [
-                  _MetaTagsRow(article: widget.article, isDark: isDark),
-                  const SizedBox(height: 14),
-                  Text(
-                    displayTitle,
-                    style: TextStyle(
-                      color: titleColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      height: 1.35,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _ActionToolbar(
-                    isTranslated: _isTranslated,
-                    isTranslating: _isTranslating,
-                    onTranslateToggle: _toggleTranslation,
-                    onOpenBrowser: _launchUrl,
-                    isDark: isDark,
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    displayContent,
-                    style: TextStyle(
-                      color: bodyColor,
-                      fontSize: 14,
-                      height: 1.65,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  _FooterSourceBox(article: widget.article, isDark: isDark),
-                ],
+              child: _ArticleContentList(
+                scrollController: scrollController,
+                article: widget.article,
+                displayTitle: _displayTitle,
+                displayContent: _displayContent,
+                isTranslated: _isTranslated,
+                isTranslating: _isTranslating,
+                isDark: isDark,
+                onTranslateToggle: _toggleTranslation,
+                onOpenBrowser: _launchUrl,
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DragHandle extends StatelessWidget {
+  final bool isDark;
+  const _DragHandle({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 44,
+      height: 4,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white24 : Colors.black12,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+}
+
+class _ArticleContentList extends StatelessWidget {
+  final ScrollController scrollController;
+  final MicrostockNewsArticle article;
+  final String displayTitle;
+  final String displayContent;
+  final bool isTranslated;
+  final bool isTranslating;
+  final bool isDark;
+  final VoidCallback onTranslateToggle;
+  final VoidCallback onOpenBrowser;
+
+  const _ArticleContentList({
+    required this.scrollController,
+    required this.article,
+    required this.displayTitle,
+    required this.displayContent,
+    required this.isTranslated,
+    required this.isTranslating,
+    required this.isDark,
+    required this.onTranslateToggle,
+    required this.onOpenBrowser,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final bodyColor = isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151);
+
+    return ListView(
+      controller: scrollController,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+      children: [
+        ArticleMetaTagsRow(article: article, isDark: isDark),
+        const SizedBox(height: 14),
+        Text(displayTitle, style: TextStyle(color: titleColor, fontSize: 18, fontWeight: FontWeight.w700, height: 1.35)),
+        const SizedBox(height: 12),
+        _ActionToolbar(
+          isTranslated: isTranslated,
+          isTranslating: isTranslating,
+          onTranslateToggle: onTranslateToggle,
+          onOpenBrowser: onOpenBrowser,
+          isDark: isDark,
+        ),
+        const SizedBox(height: 16),
+        if (article.keyTakeaways.isNotEmpty) ...[
+          ArticleKeyTakeawaysBox(text: article.keyTakeaways, isDark: isDark),
+          const SizedBox(height: 18),
+        ],
+        Text(displayContent, style: TextStyle(color: bodyColor, fontSize: 15, height: 1.6)),
+        if (article.technicalSpecs.isNotEmpty) ...[
+          const SizedBox(height: 22),
+          ArticleTechnicalSpecsBox(specs: article.technicalSpecs, isDark: isDark),
+        ],
+        if (article.contributorChecklist.isNotEmpty) ...[
+          const SizedBox(height: 18),
+          ArticleContributorChecklistBox(items: article.contributorChecklist, isDark: isDark),
+        ],
+        const SizedBox(height: 24),
+        _FooterSourceBox(article: article, isDark: isDark),
+      ],
     );
   }
 }
@@ -197,54 +239,6 @@ class _HeaderBar extends StatelessWidget {
   }
 }
 
-class _MetaTagsRow extends StatelessWidget {
-  final MicrostockNewsArticle article;
-  final bool isDark;
-  const _MetaTagsRow({required this.article, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 6,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: const Color(0xFF6C5CE7).withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(6),
-          ),
-          child: Text(
-            article.category,
-            style: const TextStyle(
-              color: Color(0xFF9D8DF1),
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-        Text(
-          '•  ${article.publishedDate}',
-          style: TextStyle(
-            color: isDark ? AppColors.outline : const Color(0xFF9CA3AF),
-            fontSize: 11,
-          ),
-        ),
-        Text(
-          '•  ${article.source}',
-          style: TextStyle(
-            color: isDark ? AppColors.outline : const Color(0xFF6B7280),
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _ActionToolbar extends StatelessWidget {
   final bool isTranslated;
   final bool isTranslating;
@@ -262,49 +256,13 @@ class _ActionToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnBg = isDark ? const Color(0xFF2A2A3C) : const Color(0xFFF3F4F6);
     return Row(
       children: [
-        InkWell(
-          onTap: isTranslating ? null : onTranslateToggle,
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: isTranslated ? const Color(0xFF6C5CE7).withValues(alpha: 0.2) : btnBg,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isTranslated ? const Color(0xFF6C5CE7) : Colors.transparent,
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (isTranslating)
-                  const SizedBox(
-                    width: 12,
-                    height: 12,
-                    child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFF6C5CE7)),
-                  )
-                else
-                  Icon(
-                    Icons.translate_rounded,
-                    size: 14,
-                    color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
-                  ),
-                const SizedBox(width: 6),
-                Text(
-                  isTranslated ? 'Bahasa Asli (EN)' : 'Terjemahkan (ID)',
-                  style: TextStyle(
-                    color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
+        _TranslateButton(
+          isTranslated: isTranslated,
+          isTranslating: isTranslating,
+          onTap: onTranslateToggle,
+          isDark: isDark,
         ),
         const Spacer(),
         TextButton.icon(
@@ -317,6 +275,65 @@ class _ActionToolbar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TranslateButton extends StatelessWidget {
+  final bool isTranslated;
+  final bool isTranslating;
+  final VoidCallback onTap;
+  final bool isDark;
+
+  const _TranslateButton({
+    required this.isTranslated,
+    required this.isTranslating,
+    required this.onTap,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final btnBg = isDark ? const Color(0xFF2A2A3C) : const Color(0xFFF3F4F6);
+    return InkWell(
+      onTap: isTranslating ? null : onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isTranslated ? const Color(0xFF6C5CE7).withValues(alpha: 0.2) : btnBg,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isTranslated ? const Color(0xFF6C5CE7) : Colors.transparent,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isTranslating)
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFF6C5CE7)),
+              )
+            else
+              Icon(
+                Icons.translate_rounded,
+                size: 14,
+                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
+              ),
+            const SizedBox(width: 6),
+            Text(
+              isTranslated ? 'Bahasa Asli (EN)' : 'Terjemahkan (ID)',
+              style: TextStyle(
+                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
