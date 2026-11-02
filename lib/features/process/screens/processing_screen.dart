@@ -113,17 +113,18 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       thermalThrottle: provider.thermalThrottle,
       totalDurationMs: provider.totalDurationMs,
       onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
-      onLog: (log) {
-        if (mounted && !_isCancelled) {
-          setState(() {
-            _liveTerminalLogs = _liveTerminalLogs.isEmpty ? log : '$_liveTerminalLogs\n$log';
-            if (_liveTerminalLogs.length > 5000) {
-              _liveTerminalLogs = _liveTerminalLogs.substring(_liveTerminalLogs.length - 4000);
-            }
-          });
-        }
-      },
+      onLog: _handleEngineLog,
     );
+  }
+
+  void _handleEngineLog(String log) {
+    if (!mounted || _isCancelled) return;
+    setState(() {
+      _liveTerminalLogs = _liveTerminalLogs.isEmpty ? log : '$_liveTerminalLogs\n$log';
+      if (_liveTerminalLogs.length > 5000) {
+        _liveTerminalLogs = _liveTerminalLogs.substring(_liveTerminalLogs.length - 4000);
+      }
+    });
   }
 
   void _handleProgress(double p, double speed, int timeMs, UniquifierProvider provider) {
@@ -147,62 +148,55 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
     });
   }
 
+  Future<bool> _confirmCancel() async {
+    final shouldCancel = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Batalkan proses?'),
+        content: const Text('Video yang sedang dirender akan dihapus.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Lanjut')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Batalkan')),
+        ],
+      ),
+    );
+    return shouldCancel == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     final fileName = provider.selectedFileName ?? 'video_01.mp4';
-    final fileDuration = provider.duration;
 
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
-        if (didPop) return;
-        final shouldCancel = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Batalkan proses?'),
-            content: const Text('Video yang sedang dirender akan dihapus.'),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Lanjut')),
-              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Batalkan')),
-            ],
-          ),
-        );
-        if (shouldCancel == true) _handleCancel();
+        if (!didPop && await _confirmCancel()) _handleCancel();
       },
       child: Scaffold(
         appBar: const TopAppBar(),
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          _CentralModuleCard(progress: _progress, step: _step),
-                          const SizedBox(height: 16),
-                          ProcessingLogViewer(
-                            fileName: fileName,
-                            duration: fileDuration,
-                            executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
-                            estimatedRemaining: provider.eta,
-                            terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _ActionSection(onCancel: _handleCancel),
-                    ],
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _CentralModuleCard(progress: _progress, step: _step),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ProcessingLogViewer(
+                    fileName: fileName,
+                    duration: provider.duration,
+                    executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
+                    estimatedRemaining: provider.eta,
+                    terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
                   ),
                 ),
-              );
-            },
+                const SizedBox(height: 12),
+                _ActionSection(onCancel: _handleCancel),
+              ],
+            ),
           ),
         ),
       ),

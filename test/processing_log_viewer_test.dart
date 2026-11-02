@@ -64,5 +64,60 @@ void main() {
       expect(find.text('SOURCE'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('Fills bounded vertical space dynamically when wrapped in Expanded', (tester) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Column(
+              children: [
+                SizedBox(height: 100),
+                Expanded(
+                  child: ProcessingLogViewer(
+                    fileName: 'sample.mp4',
+                    duration: '00:10',
+                    terminalLogs: 'Line 1\nLine 2\nLine 3',
+                  ),
+                ),
+                SizedBox(height: 50),
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final logViewerFinder = find.byType(ProcessingLogViewer);
+      expect(logViewerFinder, findsOneWidget);
+      final size = tester.getSize(logViewerFinder);
+      expect(size.height, equals(650.0));
+      expect(find.textContaining('Line 1'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Displays fallback initialization logs when terminalLogs is null', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 300,
+              height: 400,
+              child: ProcessingLogViewer(
+                fileName: 'sample.mp4',
+                duration: '00:10',
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Initializing media engine'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
   });
 }
