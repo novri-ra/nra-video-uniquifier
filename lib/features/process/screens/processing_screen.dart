@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/ffmpeg_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/processing_log_viewer.dart';
 import '../widgets/processing_radar_indicator.dart';
@@ -151,14 +152,15 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   }
 
   Future<bool> _confirmCancel() async {
+    final l10n = AppLocalizations.of(context);
     final shouldCancel = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Batalkan proses?'),
-        content: const Text('Video yang sedang dirender akan dihapus.'),
+        title: Text(l10n?.confirmCancelTitle ?? 'Cancel Processing?'),
+        content: Text(l10n?.confirmCancelBody ?? 'Process will be terminated and temporary files will be cleaned.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Lanjut')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Batalkan')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n?.continueProcess ?? 'Continue')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n?.yesCancel ?? 'Yes, Cancel')),
         ],
       ),
     );
@@ -236,9 +238,9 @@ class _CentralModuleCard extends StatelessWidget {
           const Divider(color: AppColors.surfaceContainerHighest, height: 20),
           ProcessingRadarIndicator(progress: progress),
           const SizedBox(height: 16),
-          const Text(
-            'Processing video...',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)?.processingVideo ?? 'Processing video...',
+            style: const TextStyle(
               color: AppColors.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -308,6 +310,7 @@ class _ActionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.outline,
@@ -317,7 +320,7 @@ class _ActionSection extends StatelessWidget {
       ),
       onPressed: onCancel,
       icon: const Icon(Icons.close, size: 16),
-      label: const Text('Cancel Processing', style: TextStyle(fontFamily: 'monospace', fontSize: 13)),
+      label: Text(l10n?.cancelProcessing ?? 'Cancel Processing', style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
     );
   }
 }

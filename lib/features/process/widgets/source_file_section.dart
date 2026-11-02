@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/providers/batch_queue_provider.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class SourceFileSection extends StatelessWidget {
   final bool hasFile;
@@ -232,18 +233,19 @@ class _VideoReplaceFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return InkWell(
       onTap: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.refresh, color: AppColors.outline, size: 12),
-              SizedBox(width: 4),
+              const Icon(Icons.refresh, color: AppColors.outline, size: 12),
+              const SizedBox(width: 4),
               Text(
-                'Tap to replace source file',
-                style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
+                l10n?.changeVideo ?? 'Tap to replace source file',
+                style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
               ),
             ],
           ),
@@ -263,6 +265,7 @@ class _EmptyPickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(4),
@@ -273,17 +276,17 @@ class _EmptyPickerCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: AppColors.surfaceContainerHighest),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.video_file, color: AppColors.outline, size: 32),
-            SizedBox(height: 8),
+            const Icon(Icons.video_file, color: AppColors.outline, size: 32),
+            const SizedBox(height: 8),
             Text(
-              'Select Video File to Uniquify',
-              style: TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600),
+              l10n?.selectVideo ?? 'Select Video File to Uniquify',
+              style: const TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 2),
-            Text(
+            const SizedBox(height: 2),
+            const Text(
               'Supports MP4, MOV, MKV • Zero Network Transmission',
               style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
             ),

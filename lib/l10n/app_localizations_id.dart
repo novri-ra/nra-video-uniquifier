@@ -1,0 +1,103 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Indonesian (`id`).
+class AppLocalizationsId extends AppLocalizations {
+  AppLocalizationsId([String locale = 'id']) : super(locale);
+
+  @override
+  String get appTitle => 'NRA Video Uniquifier';
+
+  @override
+  String get navProcess => 'Proses';
+
+  @override
+  String get navHistory => 'Riwayat';
+
+  @override
+  String get navSettings => 'Pengaturan';
+
+  @override
+  String get selectVideo => 'Pilih Video';
+
+  @override
+  String get changeVideo => 'Ganti Video';
+
+  @override
+  String get startProcess => 'Mulai Proses';
+
+  @override
+  String get processingVideo => 'Memproses video...';
+
+  @override
+  String get cancelProcessing => 'Batalkan Pemrosesan';
+
+  @override
+  String get confirmCancelTitle => 'Batalkan Pemrosesan?';
+
+  @override
+  String get confirmCancelBody =>
+      'Proses akan dihentikan dan file sementara akan dibersihkan.';
+
+  @override
+  String get yesCancel => 'Ya, Batalkan';
+
+  @override
+  String get continueProcess => 'Lanjutkan';
+
+  @override
+  String get exportSuccess => 'Ekspor Berhasil';
+
+  @override
+  String get videoReadyGallery => 'Video siap di galeri';
+
+  @override
+  String get exportFailed => 'Ekspor Gagal';
+
+  @override
+  String get storageWarning =>
+      'Sisa penyimpanan internal kurang dari 2 GB. Harap bersihkan ruang penyimpanan.';
+
+  @override
+  String get settingsTitle => 'Pengaturan';
+
+  @override
+  String get languageLabel => 'Bahasa';
+
+  @override
+  String get languageId => 'Bahasa Indonesia (ID)';
+
+  @override
+  String get languageEn => 'English (EN)';
+
+  @override
+  String get thermalThrottleTitle => 'Mode Hemat Suhu';
+
+  @override
+  String get thermalThrottleSubtitle =>
+      'Batasi FFmpeg ke 4 thread untuk mencegah perangkat panas berlebih';
+
+  @override
+  String get framerateLabel => 'Target Framerate';
+
+  @override
+  String get sharpeningLabel => 'Tingkat Ketajaman';
+
+  @override
+  String get saturationLabel => 'Tingkat Saturasi';
+
+  @override
+  String get modifiersTitle => 'Pengubah & Filter';
+
+  @override
+  String get presetTikTok => 'TikTok / Reels';
+
+  @override
+  String get presetCinematic => 'Cinematic 2K/4K';
+
+  @override
+  String get presetExtreme => 'Evasif Ekstrem';
+}

@@ -8,7 +8,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const TopAppBar({
     super.key,
-    this.title = 'VIDEO UNIQUIFIER',
+    this.title = 'NRA VIDEO UNIQUIFIER',
     this.isOffline = true,
     this.onSettingsTap,
   });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/category_accordion_card.dart';
 import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/setting_slider_toggle_row.dart';
@@ -289,7 +290,7 @@ class ModifiersCard extends StatelessWidget {
                 const Divider(color: AppColors.surfaceContainerHighest, height: 1),
                 SettingSliderToggleRow(
                   icon: Icons.deblur,
-                  title: 'Sharpening Level',
+                  title: AppLocalizations.of(context)?.sharpeningLabel ?? 'Sharpening Level',
                   subtitle: 'Adjust unsharp mask intensity',
                   value: true,
                   onChanged: (_) {},
@@ -302,7 +303,7 @@ class ModifiersCard extends StatelessWidget {
                 const Divider(color: AppColors.surfaceContainerHighest, height: 1),
                 SettingSliderToggleRow(
                   icon: Icons.color_lens_outlined,
-                  title: 'Saturation Level',
+                  title: AppLocalizations.of(context)?.saturationLabel ?? 'Saturation Level',
                   subtitle: 'Color intensity control',
                   value: true,
                   onChanged: (_) {},

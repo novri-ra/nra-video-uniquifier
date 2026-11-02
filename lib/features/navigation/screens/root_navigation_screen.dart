@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../process/screens/process_screen.dart';
 import '../../history/screens/recent_history_screen.dart';
 import '../../settings/screens/settings_screen.dart';
@@ -39,6 +40,7 @@ class _AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -49,18 +51,18 @@ class _AppBottomNavBar extends StatelessWidget {
       child: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTap,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.auto_fix_high),
-            label: 'Process',
+            icon: const Icon(Icons.auto_fix_high),
+            label: l10n?.navProcess ?? 'Process',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: const Icon(Icons.history),
+            label: l10n?.navHistory ?? 'History',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.tune_rounded),
-            label: 'Settings',
+            icon: const Icon(Icons.tune_rounded),
+            label: l10n?.navSettings ?? 'Settings',
           ),
         ],
       ),

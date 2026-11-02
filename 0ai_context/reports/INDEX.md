@@ -1,4 +1,4 @@
-# Index of Technical Reports (Sprint 01 – Sprint 69)
+# Index of Technical Reports (Sprint 01 – Sprint 70)
 
 Index of sprint technical reports for `nra_video_uniquifier`.
 
@@ -10,6 +10,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
   - `67-responsive-terminal-log-layout.md`: Dynamic flex height for terminal log viewer, auto-scroll stream, main branch merge, and ADB release deployment.
   - `68-notification-dispatch-and-fps-slider.md`: Android notification channel registration, live progress dispatch, and target framerate control (24/30/60 FPS).
   - `69-advanced-anti-detection-pipeline.md`: Audio spectral shift, dynamic micro-speed warp, Ken Burns micro-zoom, non-linear gamma curve, and aggressive preset integration.
+  - `70-language-selection-and-localization.md`: Reactive and persistent i18n & localization (ID & EN) with static brand name "NRA Video Uniquifier".
 - **Archived Reports (`0ai_context/reports/archive/`)**: Historical reports for Sprint 01 through Sprint 63.
 
 ---
@@ -24,6 +25,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 67 | `67-responsive-terminal-log-layout.md` | Layout Responsif Terminal Log (Dynamic Flex-Fill ke Tombol Cancel) & Deployment APK |
 | 68 | `68-notification-dispatch-and-fps-slider.md` | Root Cause Fix Notifikasi Sistem Android & Slider Pengaturan FPS Manual (24/30/60 FPS) |
 | 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
+| 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
 
 ---
 
