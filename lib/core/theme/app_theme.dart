@@ -1,34 +1,7 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
-class AppColors {
-  // Obsidian Surfaces
-  static const Color surface = Color(0xFF131315);
-  static const Color surfaceContainerLowest = Color(0xFF0E0E10);
-  static const Color surfaceContainerLow = Color(0xFF1C1B1D);
-  static const Color surfaceContainer = Color(0xFF201F21);
-  static const Color surfaceContainerHigh = Color(0xFF2A2A2C);
-  static const Color surfaceContainerHighest = Color(0xFF353437);
-
-  // Mint Accents
-  static const Color primary = Color(0xFFB7FFD9);
-  static const Color onPrimary = Color(0xFF003824);
-  static const Color primaryContainer = Color(0xFF00F0A8);
-  static const Color onPrimaryContainer = Color(0xFF006847);
-  static const Color secondary = Color(0xFF4DFFB2);
-  static const Color onSecondary = Color(0xFF003822);
-
-  // Text & Outlines
-  static const Color onSurface = Color(0xFFE5E1E4);
-  static const Color onSurfaceVariant = Color(0xFFB9CBBF);
-  static const Color outline = Color(0xFF84958A);
-  static const Color outlineVariant = Color(0xFF3B4A41);
-
-  // Status & Error
-  static const Color error = Color(0xFFFFB4AB);
-  static const Color onError = Color(0xFF690005);
-  static const Color errorContainer = Color(0xFF93000A);
-  static const Color onErrorContainer = Color(0xFFFFDAD6);
-}
+export 'app_colors.dart';
 
 class AppTheme {
   static ThemeData get darkTheme {
@@ -112,6 +85,72 @@ class AppTheme {
           fontWeight: FontWeight.w500,
           fontFamily: 'monospace',
         ),
+      ),
+    );
+  }
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: AppColors.lightSurface,
+      canvasColor: AppColors.lightSurface,
+      primaryColor: AppColors.lightPrimary,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.lightPrimary,
+        onPrimary: AppColors.lightOnPrimary,
+        primaryContainer: AppColors.lightPrimaryContainer,
+        onPrimaryContainer: AppColors.lightOnPrimaryContainer,
+        secondary: AppColors.lightSecondary,
+        onSecondary: AppColors.lightOnSecondary,
+        surface: AppColors.lightSurfaceContainer,
+        onSurface: AppColors.lightOnSurface,
+        onSurfaceVariant: AppColors.lightOnSurfaceVariant,
+        outline: AppColors.lightOutline,
+        outlineVariant: AppColors.lightOutlineVariant,
+        error: AppColors.errorContainer,
+        onError: Colors.white,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.lightSurfaceContainer,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: AppColors.lightOnSurface,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.5,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.lightSurfaceContainer,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppColors.lightSurfaceContainerHighest, width: 1),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        margin: EdgeInsets.zero,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.white;
+          }
+          return AppColors.lightOnSurfaceVariant;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.lightPrimary;
+          }
+          return AppColors.lightSurfaceContainerHigh;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          return AppColors.lightSurfaceContainerHighest;
+        }),
       ),
     );
   }

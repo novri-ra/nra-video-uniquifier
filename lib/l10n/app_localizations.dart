@@ -104,6 +104,30 @@ abstract class AppLocalizations {
   /// **'NRA Video Uniquifier'**
   String get appTitle;
 
+  /// No description provided for @navDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navDashboard;
+
+  /// No description provided for @navStudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Studio'**
+  String get navStudio;
+
+  /// No description provided for @navMicrostock.
+  ///
+  /// In en, this message translates to:
+  /// **'Microstock AI'**
+  String get navMicrostock;
+
+  /// No description provided for @navBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch'**
+  String get navBatch;
+
   /// No description provided for @navProcess.
   ///
   /// In en, this message translates to:
@@ -223,6 +247,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English (EN)'**
   String get languageEn;
+
+  /// No description provided for @themeModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get themeModeLabel;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @greetingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, Creator'**
+  String get greetingTitle;
+
+  /// No description provided for @gpuStatusReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Vulkan NCNN Ready'**
+  String get gpuStatusReady;
+
+  /// No description provided for @seasonalWindowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Seasonal Upload Window (60-90 Days Lead Time)'**
+  String get seasonalWindowTitle;
+
+  /// No description provided for @storageBuffer.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage Buffer'**
+  String get storageBuffer;
+
+  /// No description provided for @metadataHygiene.
+  ///
+  /// In en, this message translates to:
+  /// **'Metadata Hygiene'**
+  String get metadataHygiene;
+
+  /// No description provided for @techSpecsGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Specs Guard'**
+  String get techSpecsGuard;
+
+  /// No description provided for @assetStaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Staging Pipeline'**
+  String get assetStaging;
+
+  /// No description provided for @inspirationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Microstock Trends'**
+  String get inspirationTitle;
+
+  /// No description provided for @groupPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'PREFERENCES'**
+  String get groupPreferences;
+
+  /// No description provided for @groupHardware.
+  ///
+  /// In en, this message translates to:
+  /// **'HARDWARE & ENGINE'**
+  String get groupHardware;
+
+  /// No description provided for @groupStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'STORAGE & CACHE'**
+  String get groupStorage;
+
+  /// No description provided for @groupAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'ABOUT & BRAND'**
+  String get groupAbout;
 
   /// No description provided for @thermalThrottleTitle.
   ///

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/theme_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
@@ -22,11 +23,13 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
-  Widget createTestWidget({required Size surfaceSize}) {
+  Widget createTestWidget({required Size surfaceSize, int tabIndex = 1}) {
+    final provider = UniquifierProvider()..setTabIndex(tabIndex);
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => UniquifierProvider()),
+        ChangeNotifierProvider.value(value: provider),
         ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
       ],
       child: MaterialApp(
@@ -155,7 +158,7 @@ void main() {
     });
 
     testWidgets('D2-01: Double-tap on start action button triggers exactly one route push', (tester) async {
-      final uniquifierProvider = UniquifierProvider();
+      final uniquifierProvider = UniquifierProvider()..setTabIndex(1);
       final batchQueueProvider = BatchQueueProvider();
 
       uniquifierProvider.setVideoFile(
@@ -170,6 +173,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: uniquifierProvider),
             ChangeNotifierProvider.value(value: batchQueueProvider),
@@ -200,6 +204,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
@@ -239,10 +244,15 @@ void main() {
     });
 
     testWidgets('D4-02: Purge cache confirmation dialog cancels or confirms purge', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
       final provider = UniquifierProvider();
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
@@ -325,6 +335,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],

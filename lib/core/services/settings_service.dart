@@ -114,6 +114,7 @@ class SettingsService {
   static const String keySaturationLevel = 'app_saturation_level';
   static const String keyTargetFps = 'app_target_fps';
   static const String keyAppLocale = 'app_language_code';
+  static const String keyAppTheme = 'app_theme_mode';
 
   static Future<bool> _getBool(String key, bool fallback) async =>
       (await SharedPreferences.getInstance()).getBool(key) ?? fallback;
@@ -240,6 +241,16 @@ class SettingsService {
   static Future<void> setAppLanguageCode(String code) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyAppLocale, code);
+  }
+
+  static Future<String> getThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(keyAppTheme) ?? 'system';
+  }
+
+  static Future<void> setThemeMode(String mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyAppTheme, mode);
   }
 
   static Future<bool> getEnhanceAndDenoise() => _getBool(keyEnhanceAndDenoise, true);

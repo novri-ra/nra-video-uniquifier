@@ -12,6 +12,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'NRA Video Uniquifier';
 
   @override
+  String get navDashboard => 'Home';
+
+  @override
+  String get navStudio => 'Studio';
+
+  @override
+  String get navMicrostock => 'Microstock AI';
+
+  @override
+  String get navBatch => 'Batch';
+
+  @override
   String get navProcess => 'Process';
 
   @override
@@ -72,6 +84,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEn => 'English (EN)';
+
+  @override
+  String get themeModeLabel => 'Theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get greetingTitle => 'Welcome, Creator';
+
+  @override
+  String get gpuStatusReady => 'Vulkan NCNN Ready';
+
+  @override
+  String get seasonalWindowTitle =>
+      'Seasonal Upload Window (60-90 Days Lead Time)';
+
+  @override
+  String get storageBuffer => 'Storage Buffer';
+
+  @override
+  String get metadataHygiene => 'Metadata Hygiene';
+
+  @override
+  String get techSpecsGuard => 'Technical Specs Guard';
+
+  @override
+  String get assetStaging => 'Asset Staging Pipeline';
+
+  @override
+  String get inspirationTitle => 'Upcoming Microstock Trends';
+
+  @override
+  String get groupPreferences => 'PREFERENCES';
+
+  @override
+  String get groupHardware => 'HARDWARE & ENGINE';
+
+  @override
+  String get groupStorage => 'STORAGE & CACHE';
+
+  @override
+  String get groupAbout => 'ABOUT & BRAND';
 
   @override
   String get thermalThrottleTitle => 'Thermal Throttle Mode';

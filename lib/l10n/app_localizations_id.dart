@@ -12,6 +12,18 @@ class AppLocalizationsId extends AppLocalizations {
   String get appTitle => 'NRA Video Uniquifier';
 
   @override
+  String get navDashboard => 'Beranda';
+
+  @override
+  String get navStudio => 'Studio';
+
+  @override
+  String get navMicrostock => 'Microstock AI';
+
+  @override
+  String get navBatch => 'Antrean';
+
+  @override
   String get navProcess => 'Proses';
 
   @override
@@ -72,6 +84,55 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get languageEn => 'English (EN)';
+
+  @override
+  String get themeModeLabel => 'Tema';
+
+  @override
+  String get themeSystem => 'Sistem';
+
+  @override
+  String get themeLight => 'Terang';
+
+  @override
+  String get themeDark => 'Gelap';
+
+  @override
+  String get greetingTitle => 'Selamat Datang, Kreator';
+
+  @override
+  String get gpuStatusReady => 'Vulkan NCNN Siap';
+
+  @override
+  String get seasonalWindowTitle =>
+      'Jendela Unggah Musiman (Lead Time 60-90 Hari)';
+
+  @override
+  String get storageBuffer => 'Penyimpanan Aman';
+
+  @override
+  String get metadataHygiene => 'Higienitas Metadata';
+
+  @override
+  String get techSpecsGuard => 'Penjaga Spesifikasi Teknis';
+
+  @override
+  String get assetStaging => 'Pipeline Antrean Aset';
+
+  @override
+  String get inspirationTitle => 'Tren Microstock Mendatang';
+
+  @override
+  String get groupPreferences => 'PREFERENSI';
+
+  @override
+  String get groupHardware => 'HARDWARE & ENGINE';
+
+  @override
+  String get groupStorage => 'PENYIMPANAN & CACHE';
+
+  @override
+  String get groupAbout => 'TENTANG & BRAND';
 
   @override
   String get thermalThrottleTitle => 'Mode Hemat Suhu';

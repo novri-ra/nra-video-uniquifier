@@ -26,6 +26,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 68 | `68-notification-dispatch-and-fps-slider.md` | Root Cause Fix Notifikasi Sistem Android & Slider Pengaturan FPS Manual (24/30/60 FPS) |
 | 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
 | 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
+| 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
 
 ---
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/settings_service.dart';
-import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../shared/widgets/setting_toggle_row.dart';
@@ -12,6 +13,8 @@ import '../widgets/codec_selector_card.dart';
 import '../widgets/hardware_acceleration_card.dart';
 import '../widgets/language_selector_card.dart';
 import '../widgets/preset_profile_card.dart';
+import '../widgets/settings_group_card.dart';
+import '../widgets/theme_selector_card.dart';
 import '../widgets/upscale_engine_card.dart';
 import '../widgets/upscale_resolution_card.dart';
 
@@ -34,12 +37,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    final cache = await SettingsService.getTempCacheSize();
+    final bytes = await SettingsService.getTempCacheSize();
     final sound = await SettingsService.getNotificationSound();
     final bg = await SettingsService.getBackgroundProcessing();
     if (mounted) {
       setState(() {
-        _cacheSizeBytes = cache;
+        _cacheSizeBytes = bytes;
         _notificationSound = sound;
         _backgroundProcessing = bg;
       });
@@ -51,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceContainerLow,
         title: const Text('Purge cache?'),
         content: Text('Delete $mb MB of temporary files and thumbnails?'),
         actions: [
@@ -85,78 +89,117 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     final localeProvider = context.watch<LocaleProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: TopAppBar(title: (l10n?.settingsTitle ?? 'SETTINGS').toUpperCase()),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
           children: [
-            _SettingsSectionHeader(
-              title: (l10n?.languageLabel ?? 'LANGUAGE').toUpperCase(),
-              subtitle: 'Select interface language (Bahasa Indonesia / English)',
-            ),
-            const SizedBox(height: 8),
-            LanguageSelectorCard(localeProvider: localeProvider),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
-            const SizedBox(height: 8),
-            PresetProfileCard(provider: provider),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
-            const SizedBox(height: 8),
-            CodecSelectorCard(currentCodec: provider.videoCodec, onSelect: provider.setVideoCodec),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'TARGET FRAMERATE (FPS)', subtitle: 'Output framerate control (-fps_mode cfr -r)'),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLow,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.surfaceContainerHighest),
-              ),
-              child: SettingFpsSelectorRow(
-                selectedFps: provider.targetFps,
-                onChanged: provider.setTargetFps,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
-            const SizedBox(height: 8),
-            UpscaleResolutionCard(
-              selectedValue: provider.selectedUpscaleTarget,
-              onSelect: provider.setUpscaleTarget,
-              tier: provider.deviceTier,
-            ),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'SUPER-RESOLUTION ENGINE', subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3'),
-            const SizedBox(height: 8),
-            UpscaleEngineCard(selectedEngine: provider.upscaleEngine, onSelect: provider.setUpscaleEngine),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'HARDWARE ACCELERATION', subtitle: 'MediaCodec / OpenGL shader pipeline'),
-            const SizedBox(height: 8),
-            HardwareAccelerationCard(enabled: provider.hardwareAcceleration, onToggle: provider.toggleHardwareAcceleration),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'BACKGROUND & ALERTS', subtitle: 'Background processing & notification chime'),
-            const SizedBox(height: 8),
-            _AlertsSettingsCard(
-              backgroundProcessing: _backgroundProcessing,
-              notificationSound: _notificationSound,
-              onToggleBackground: _toggleBackground,
-              onToggleSound: _toggleSound,
-            ),
-            const SizedBox(height: 16),
-            const _SettingsSectionHeader(title: 'STORAGE & CACHE MAINTENANCE', subtitle: 'Staged input buffers and generated thumbnails'),
-            const SizedBox(height: 8),
-            _CacheMaintenanceCard(cacheBytes: _cacheSizeBytes, onPurge: _purgeCache),
-            const SizedBox(height: 16),
-            const _AppInfoCard(),
-            const SizedBox(height: 24),
+            ..._buildPreferencesSection(localeProvider, themeProvider, l10n),
+            ..._buildPresetsAndCodecSection(provider),
+            ..._buildEngineSection(provider),
+            ..._buildMaintenanceSection(),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildPreferencesSection(
+    LocaleProvider localeProvider,
+    ThemeProvider themeProvider,
+    AppLocalizations? l10n,
+  ) {
+    return [
+      _SettingsSectionHeader(
+        title: (l10n?.languageLabel ?? 'LANGUAGE').toUpperCase(),
+        subtitle: 'Select interface language (Bahasa Indonesia / English)',
+      ),
+      const SizedBox(height: 8),
+      LanguageSelectorCard(localeProvider: localeProvider),
+      const SizedBox(height: 16),
+      _SettingsSectionHeader(
+        title: (l10n?.themeModeLabel ?? 'APPEARANCE & THEME').toUpperCase(),
+        subtitle: 'Select application visual theme mode',
+      ),
+      const SizedBox(height: 8),
+      SettingsGroupCard(
+        title: 'THEME MODE',
+        child: ThemeSelectorCard(themeProvider: themeProvider),
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  List<Widget> _buildPresetsAndCodecSection(UniquifierProvider provider) {
+    return [
+      const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
+      const SizedBox(height: 8),
+      PresetProfileCard(provider: provider),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
+      const SizedBox(height: 8),
+      CodecSelectorCard(currentCodec: provider.videoCodec, onSelect: provider.setVideoCodec),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(title: 'TARGET FRAMERATE (FPS)', subtitle: 'Output framerate control (-fps_mode cfr -r)'),
+      const SizedBox(height: 8),
+      Container(
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.surfaceContainerHighest),
+        ),
+        child: SettingFpsSelectorRow(
+          selectedFps: provider.targetFps,
+          onChanged: provider.setTargetFps,
+        ),
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  List<Widget> _buildEngineSection(UniquifierProvider provider) {
+    return [
+      const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
+      const SizedBox(height: 8),
+      UpscaleResolutionCard(
+        selectedValue: provider.selectedUpscaleTarget,
+        onSelect: provider.setUpscaleTarget,
+        tier: provider.deviceTier,
+      ),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(title: 'SUPER-RESOLUTION ENGINE', subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3'),
+      const SizedBox(height: 8),
+      UpscaleEngineCard(selectedEngine: provider.upscaleEngine, onSelect: provider.setUpscaleEngine),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(title: 'HARDWARE ACCELERATION', subtitle: 'MediaCodec / OpenGL shader pipeline'),
+      const SizedBox(height: 8),
+      HardwareAccelerationCard(enabled: provider.hardwareAcceleration, onToggle: provider.toggleHardwareAcceleration),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(title: 'BACKGROUND & ALERTS', subtitle: 'Background processing & notification chime'),
+      const SizedBox(height: 8),
+      _AlertsSettingsCard(
+        backgroundProcessing: _backgroundProcessing,
+        notificationSound: _notificationSound,
+        onToggleBackground: _toggleBackground,
+        onToggleSound: _toggleSound,
+      ),
+      const SizedBox(height: 16),
+    ];
+  }
+
+  List<Widget> _buildMaintenanceSection() {
+    return [
+      const _SettingsSectionHeader(title: 'STORAGE & CACHE MAINTENANCE', subtitle: 'Staged input buffers and generated thumbnails'),
+      const SizedBox(height: 8),
+      _CacheMaintenanceCard(cacheBytes: _cacheSizeBytes, onPurge: _purgeCache),
+      const SizedBox(height: 16),
+      const _AppInfoCard(),
+      const SizedBox(height: 24),
+    ];
   }
 }
 
@@ -169,9 +212,9 @@ class _SettingsSectionHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+        Text(title, style: const TextStyle(color: AppColors.onSurface, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 0.5)),
         const SizedBox(height: 2),
-        Text(subtitle, style: TextStyle(color: AppColors.onSurfaceVariant.withValues(alpha: 0.8), fontSize: 11)),
+        Text(subtitle, style: TextStyle(color: AppColors.onSurfaceVariant.withValues(alpha: 0.8), fontSize: 10.5)),
       ],
     );
   }
@@ -193,7 +236,7 @@ class _AlertsSettingsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
       child: Column(
@@ -232,7 +275,7 @@ class _CacheMaintenanceCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
       child: Wrap(
@@ -254,7 +297,7 @@ class _CacheMaintenanceCard extends StatelessWidget {
               foregroundColor: AppColors.primaryContainer,
               side: const BorderSide(color: AppColors.primaryContainer),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
             ),
             onPressed: onPurge,
             icon: const Icon(Icons.delete_sweep, size: 16),
@@ -273,7 +316,11 @@ class _AppInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: AppColors.surfaceContainerLowest, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.surfaceContainerHighest),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -287,7 +334,11 @@ class _AppInfoCard extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: AppColors.surfaceContainer, borderRadius: BorderRadius.circular(4), border: Border.all(color: AppColors.surfaceContainerHighest)),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceContainer,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: AppColors.surfaceContainerHighest),
+            ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
