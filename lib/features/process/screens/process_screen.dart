@@ -24,7 +24,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
   bool _isNavigating = false;
 
   void _openSettingsTab(BuildContext context) {
-    context.read<UniquifierProvider>().setTabIndex(2);
+    context.read<UniquifierProvider>().setTabIndex(4);
   }
 
   Future<void> _pickVideo(BuildContext context) async {
@@ -97,7 +97,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
           child: _ProcessBody(
             hasFile: hasFile,
             batchCount: batchCount,

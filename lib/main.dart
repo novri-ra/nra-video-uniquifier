@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'core/providers/batch_queue_provider.dart';
 import 'core/providers/locale_provider.dart';
+import 'core/providers/theme_provider.dart';
 import 'core/providers/uniquifier_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/settings_service.dart';
@@ -28,6 +29,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => UniquifierProvider()),
         ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
@@ -43,10 +45,13 @@ class VideoUniquifierApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
     return MaterialApp(
       title: 'NRA Video Uniquifier',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
       locale: localeProvider.currentLocale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

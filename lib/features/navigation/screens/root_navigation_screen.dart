@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/floating_capsule_nav_bar.dart';
+import '../../batch/screens/batch_queue_tab_screen.dart';
+import '../../dashboard/screens/dashboard_screen.dart';
+import '../../microstock/screens/microstock_ai_screen.dart';
 import '../../process/screens/process_screen.dart';
-import '../../history/screens/recent_history_screen.dart';
 import '../../settings/screens/settings_screen.dart';
 
+/// Root navigation screen housing the 5 core application destinations and floating pill navbar.
 class RootNavigationScreen extends StatelessWidget {
   const RootNavigationScreen({super.key});
 
@@ -14,55 +16,31 @@ class RootNavigationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     const pages = [
+      DashboardScreen(),
       ProcessScreen(),
-      RecentHistoryScreen(),
+      MicrostockAiScreen(),
+      BatchQueueTabScreen(),
       SettingsScreen(),
     ];
 
+    final safeIndex = provider.currentTabIndex.clamp(0, pages.length - 1);
+
     return Scaffold(
-      body: IndexedStack(
-        index: provider.currentTabIndex,
-        children: pages,
-      ),
-      bottomNavigationBar: _AppBottomNavBar(
-        currentIndex: provider.currentTabIndex,
-        onTap: provider.setTabIndex,
-      ),
-    );
-  }
-}
-
-class _AppBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final ValueChanged<int> onTap;
-
-  const _AppBottomNavBar({required this.currentIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        border: Border(
-          top: BorderSide(color: AppColors.surfaceContainerHighest, width: 1),
-        ),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: onTap,
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.auto_fix_high),
-            label: l10n?.navProcess ?? 'Process',
+      extendBody: true,
+      body: Stack(
+        children: [
+          IndexedStack(
+            index: safeIndex,
+            children: pages,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.history),
-            label: l10n?.navHistory ?? 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.tune_rounded),
-            label: l10n?.navSettings ?? 'Settings',
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: FloatingCapsuleNavBar(
+              currentIndex: safeIndex,
+              onTap: provider.setTabIndex,
+            ),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/theme_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
@@ -53,6 +55,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
