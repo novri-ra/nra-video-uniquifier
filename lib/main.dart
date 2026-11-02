@@ -5,6 +5,7 @@ import 'core/providers/batch_queue_provider.dart';
 import 'core/providers/uniquifier_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/settings_service.dart';
+import 'core/services/storage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/navigation/screens/root_navigation_screen.dart';
 
@@ -14,6 +15,7 @@ void main() async {
     FFmpegKitConfig.setSessionHistorySize(3);
   } catch (_) {}
   try {
+    await StorageService.pruneStaleFiles();
     await SettingsService.purgeTempCache();
   } catch (_) {}
   try {

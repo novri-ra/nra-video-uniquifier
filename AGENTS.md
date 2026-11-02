@@ -64,8 +64,8 @@ Canvas Scale/Blur -> Spatial Crop/Tilt (inner-box) -> Dynamic Zoompan -> Color/C
 - No Direct Source Modification without verification; preserve test coverage (118/118 tests passing).
 
 ## 7. Report Policy
-- Location: Active reports in `0ai_context/reports/NN-[task-slug].md`, historical in `archive_sprints_01_to_50/`.
-- Central Index: Maintained at `0ai_context/reports/REPORTS_INDEX.md`.
+- Location: Active reports in `0ai_context/reports/NN-[task-slug].md`, historical in `archive/`.
+- Central Index: Maintained at `0ai_context/reports/INDEX.md`.
 - Mandatory Section: Include MCP Evidence appendix with tool name, query, and result counts.
 
 ## 8. MCP Evidence Index

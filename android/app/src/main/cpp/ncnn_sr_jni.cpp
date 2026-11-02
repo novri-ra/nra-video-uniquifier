@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <thread>
+#include <algorithm>
 #include <android/log.h>
 
 #define TAG "NcnnSuperResolution"
@@ -17,17 +19,20 @@
  */
 class RealEsrganNcnnVulkan {
 public:
-    RealEsrganNcnnVulkan() : is_initialized(false), gpu_device(0), scale(2), tilesize(200), prepadding(10) {}
+    RealEsrganNcnnVulkan() : is_initialized(false), gpu_device(0), scale(2), tilesize(200), prepadding(10), num_threads(4) {}
     ~RealEsrganNcnnVulkan() { cleanup(); }
 
     bool init(int scale_factor, int gpu_id, bool tta_mode) {
         scale = scale_factor;
         gpu_device = gpu_id;
+        unsigned int hw_threads = std::thread::hardware_concurrency();
+        num_threads = hw_threads > 0 ? std::max(4u, std::min(hw_threads, 8u)) : 4;
         // In real NCNN runtime:
         // ncnn::create_gpu_instance();
+        // net.opt.num_threads = num_threads;
         // net.opt.use_vulkan_compute = (gpu_device >= 0);
         is_initialized = true;
-        LOGI("Real-ESRGAN NCNN Vulkan initialized: scale=%d, gpu=%d, tilesize=%d", scale, gpu_device, tilesize);
+        LOGI("Real-ESRGAN NCNN Vulkan initialized: scale=%d, gpu=%d, tilesize=%d, threads=%d", scale, gpu_device, tilesize, num_threads);
         return true;
     }
 
@@ -63,6 +68,7 @@ private:
     int scale;
     int tilesize;
     int prepadding;
+    int num_threads;
 };
 
 static RealEsrganNcnnVulkan* g_realesrgan = nullptr;

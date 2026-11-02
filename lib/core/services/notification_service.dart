@@ -18,7 +18,7 @@ class NotificationService {
   static const int progressNotificationId = 8801;
   static const int completeNotificationId = 8802;
 
-  static const String processChannelId = 'video_process_channel';
+  static const String processChannelId = 'nra_video_processing_channel';
   static const String completeChannelId = 'video_complete_channel';
 
   static int _lastProgressPercent = -1;
@@ -38,7 +38,7 @@ class NotificationService {
         await androidPlugin.createNotificationChannel(
           const AndroidNotificationChannel(
             processChannelId,
-            'Video Processing',
+            'Pemrosesan Video NRA',
             description: 'Ongoing video processing progress',
             importance: Importance.low,
             playSound: false,
@@ -104,7 +104,7 @@ class NotificationService {
 
     final androidDetails = AndroidNotificationDetails(
       processChannelId,
-      'Video Processing',
+      'Pemrosesan Video NRA',
       channelDescription: 'Ongoing video processing progress',
       importance: Importance.low,
       priority: Priority.low,

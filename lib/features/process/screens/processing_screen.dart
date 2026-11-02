@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/ffmpeg_service.dart';
@@ -67,6 +68,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
           ? await _simulateFallback()
           : await _processWithNative(provider, inputPath);
       if (!mounted || _isCancelled) return;
+      HapticFeedback.mediumImpact();
       provider.setLastProcessedResult(outputPath);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => SuccessScreen(outputPath: outputPath)),
@@ -108,6 +110,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       enableMicroOverlay: provider.enableMicroOverlay,
       enableFrameSkip: provider.enableFrameSkip,
       enableChromaShift: provider.enableChromaShift,
+      thermalThrottle: provider.thermalThrottle,
       totalDurationMs: provider.totalDurationMs,
       onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
       onLog: (log) {
@@ -144,61 +147,63 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
     });
   }
 
-  void _finishSuccess() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const SuccessScreen()),
-    );
-  }
-
-  void _finishError() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const ErrorScreen()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     final fileName = provider.selectedFileName ?? 'video_01.mp4';
     final fileDuration = provider.duration;
 
-    return Scaffold(
-      appBar: const TopAppBar(),
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        _CentralModuleCard(progress: _progress, step: _step),
-                        const SizedBox(height: 16),
-                        ProcessingLogViewer(
-                          fileName: fileName,
-                          duration: fileDuration,
-                          executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
-                          estimatedRemaining: provider.eta,
-                          terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    _ActionSection(
-                      onCancel: _handleCancel,
-                      onSuccessTest: _finishSuccess,
-                      onErrorTest: _finishError,
-                    ),
-                  ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final shouldCancel = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Batalkan proses?'),
+            content: const Text('Video yang sedang dirender akan dihapus.'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Lanjut')),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Batalkan')),
+            ],
+          ),
+        );
+        if (shouldCancel == true) _handleCancel();
+      },
+      child: Scaffold(
+        appBar: const TopAppBar(),
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        children: [
+                          _CentralModuleCard(progress: _progress, step: _step),
+                          const SizedBox(height: 16),
+                          ProcessingLogViewer(
+                            fileName: fileName,
+                            duration: fileDuration,
+                            executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
+                            estimatedRemaining: provider.eta,
+                            terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _ActionSection(onCancel: _handleCancel),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -303,48 +308,20 @@ class _ModuleHeaderTag extends StatelessWidget {
 
 class _ActionSection extends StatelessWidget {
   final VoidCallback onCancel;
-  final VoidCallback onSuccessTest;
-  final VoidCallback onErrorTest;
-
-  const _ActionSection({
-    required this.onCancel,
-    required this.onSuccessTest,
-    required this.onErrorTest,
-  });
+  const _ActionSection({required this.onCancel});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.outline,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
-            minimumSize: const Size.fromHeight(44),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          ),
-          onPressed: onCancel,
-          icon: const Icon(Icons.close, size: 16),
-          label: const Text('Cancel Processing', style: TextStyle(fontFamily: 'monospace', fontSize: 13)),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextButton(
-              onPressed: onSuccessTest,
-              child: const Text('Simulate Success', style: TextStyle(color: AppColors.outline, fontSize: 11)),
-            ),
-            const SizedBox(width: 8),
-            const Text('•', style: TextStyle(color: AppColors.outline, fontSize: 11)),
-            const SizedBox(width: 8),
-            TextButton(
-              onPressed: onErrorTest,
-              child: const Text('Simulate Error', style: TextStyle(color: AppColors.outline, fontSize: 11)),
-            ),
-          ],
-        ),
-      ],
+    return OutlinedButton.icon(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.outline,
+        side: const BorderSide(color: AppColors.surfaceContainerHighest),
+        minimumSize: const Size.fromHeight(44),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
+      onPressed: onCancel,
+      icon: const Icon(Icons.close, size: 16),
+      label: const Text('Cancel Processing', style: TextStyle(fontFamily: 'monospace', fontSize: 13)),
     );
   }
 }

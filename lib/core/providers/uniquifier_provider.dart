@@ -70,43 +70,36 @@ class UniquifierProvider extends ChangeNotifier {
       _enableBlurredCanvas = await SettingsService.getBlurredCanvas();
       _muteOriginalAudio = await SettingsService.getMuteOriginalAudio();
       _canvasScalePercent = await SettingsService.getCanvasScalePercent();
+      _thermalThrottle = await SettingsService.getThermalThrottle();
+      _sharpeningLevel = await SettingsService.getSharpeningLevel();
+      _saturationLevel = await SettingsService.getSaturationLevel();
       notifyListeners();
     } catch (_) {}
   }
-  // Source Video State (initial is null / empty)
   String? _selectedFileName, _selectedFilePath, _thumbnailPath;
   String _fileResolution = '1080×1920', _fileSize = '0 B', _fileCodec = 'H.264', _fps = '30 FPS', _audioInfo = 'AAC 48kHz', _duration = '0:00', _sha256 = '';
   bool _isPortrait = true;
   int _totalDurationMs = 0;
-
-  // Real-time Telemetry
   double _realtimeProgress = 0.0, _renderingSpeed = 1.0;
   String _eta = 'Calculating...';
-
-  // Last processed output & Output thumbnail
   String? _lastProcessedOutputPath, _outputThumbnailPath;
   RenderDiagnosticInfo? _lastDiagnosticInfo;
-
-  // Toggle Settings
   bool _removeMetadata = true, _modifyAudio = true, _modifyVisuals = true;
   bool _upscale1080p = false, _enableEnhanceAndDenoise = true, _enableDeepAntiFingerprint = true;
   bool _enableHorizontalFlip = false, _enableAggressiveAudio = false, _enableAutoTrim = false;
   bool _enableBlurredCanvas = false, _muteOriginalAudio = false, _enableDynamicZoom = false;
   bool _enableMicroOverlay = false, _enableFrameSkip = false, _enableChromaShift = false;
   double _canvasScalePercent = 95.0;
+  bool _thermalThrottle = false;
+  double _sharpeningLevel = 1.0;
+  double _saturationLevel = 1.0;
   String _activePreset = 'TikTok Fast';
-
-  // Advanced Settings
   TargetResolution _targetResolution = TargetResolution.r1080p;
   UpscaleEngine _upscaleEngine = UpscaleEngine.lanczos;
   VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
   DeviceSpecs _deviceSpecs = DeviceSpecs.defaultFallback();
-
-  // Navigation
   int _currentTabIndex = 0;
-
-  // Getters
   String? get selectedFileName => _selectedFileName;
   String? get selectedFilePath => _selectedFilePath;
   String? get thumbnailPath => _thumbnailPath;
@@ -144,6 +137,9 @@ class UniquifierProvider extends ChangeNotifier {
   bool get enableFrameSkip => _enableFrameSkip;
   bool get enableChromaShift => _enableChromaShift;
   double get canvasScalePercent => _canvasScalePercent;
+  bool get thermalThrottle => _thermalThrottle;
+  double get sharpeningLevel => _sharpeningLevel;
+  double get saturationLevel => _saturationLevel;
   String get activePreset => _activePreset;
   bool get isPortrait => _isPortrait;
 
@@ -158,7 +154,6 @@ class UniquifierProvider extends ChangeNotifier {
   DeviceTier get deviceTier => _deviceSpecs.tier;
   int get currentTabIndex => _currentTabIndex;
 
-  // Actions
   void setVideoCodec(VideoCodec codec) {
     _videoCodec = codec;
     try { SettingsService.setVideoCodec(codec); } catch (_) {}
@@ -186,6 +181,17 @@ class UniquifierProvider extends ChangeNotifier {
   void setCanvasScalePercent(double val) {
     _canvasScalePercent = val.clamp(0.0, 100.0);
     try { SettingsService.setCanvasScalePercent(_canvasScalePercent); } catch (_) {}
+    notifyListeners();
+  }
+  void toggleThermalThrottle(bool val) { _thermalThrottle = val; try { SettingsService.setThermalThrottle(val); } catch (_) {} notifyListeners(); }
+  void setSharpeningLevel(double val) {
+    _sharpeningLevel = val.clamp(0.2, 2.0);
+    try { SettingsService.setSharpeningLevel(_sharpeningLevel); } catch (_) {}
+    notifyListeners();
+  }
+  void setSaturationLevel(double val) {
+    _saturationLevel = val.clamp(0.8, 1.3);
+    try { SettingsService.setSaturationLevel(_saturationLevel); } catch (_) {}
     notifyListeners();
   }
 
@@ -234,6 +240,9 @@ class UniquifierProvider extends ChangeNotifier {
     bool enableMicroOverlay = false,
     bool enableFrameSkip = false,
     bool enableChromaShift = false,
+    bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0,
+    bool muteOriginalAudio = false,
     String? presetName,
   }) {
     if (presetName != null) {
@@ -254,6 +263,9 @@ class UniquifierProvider extends ChangeNotifier {
     _enableMicroOverlay = enableMicroOverlay;
     _enableFrameSkip = enableFrameSkip;
     _enableChromaShift = enableChromaShift;
+    _enableBlurredCanvas = enableBlurredCanvas;
+    _canvasScalePercent = canvasScalePercent;
+    _muteOriginalAudio = muteOriginalAudio;
     try {
       SettingsService.setRemoveMetadata(_removeMetadata);
       SettingsService.setModifyVisuals(_modifyVisuals);
@@ -269,6 +281,9 @@ class UniquifierProvider extends ChangeNotifier {
       SettingsService.setMicroOverlay(_enableMicroOverlay);
       SettingsService.setFrameSkip(_enableFrameSkip);
       SettingsService.setChromaShift(_enableChromaShift);
+      SettingsService.setBlurredCanvas(_enableBlurredCanvas);
+      SettingsService.setCanvasScalePercent(_canvasScalePercent);
+      SettingsService.setMuteOriginalAudio(_muteOriginalAudio);
     } catch (_) {}
     _currentTabIndex = 0;
     notifyListeners();

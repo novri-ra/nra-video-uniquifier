@@ -9,16 +9,15 @@ import 'media_scanner_service.dart';
 import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
+import 'storage_service.dart';
 import 'wakelock_service.dart';
 import 'filter_builders.dart';
 import '../utils/variation_generator.dart';
-
 export 'render_diagnostic_service.dart';
 export '../utils/variation_generator.dart';
 
 class FfmpegService {
   static String _escapePath(String path) => path.replaceAll('"', r'\"');
-
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
   static String buildCommand({
     required String inputPath, required String outputPath,
@@ -32,9 +31,10 @@ class FfmpegService {
     bool enableBlurredCanvas = false, double canvasScalePercent = 95.0, bool muteOriginalAudio = false,
     bool enableDynamicZoom = false, bool enableMicroOverlay = false,
     bool enableFrameSkip = false, bool enableChromaShift = false, VideoVariations? variations,
+    bool thermalThrottle = false,
   }) {
     final buffer = StringBuffer('-y');
-    _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs);
+    _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs, thermalThrottle);
     if (removeMetadata) _writeMetadataTags(buffer);
     _writeFilterAndCodecOptions(
       buffer: buffer, modifyVisuals: modifyVisuals, shouldUpscale: upscale ?? upscale1080p,
@@ -50,8 +50,9 @@ class FfmpegService {
     return buffer.toString();
   }
 
-  static void _writeInputOptions(StringBuffer buffer, String inputPath, bool hwAccel, bool autoTrim, int durationMs) {
+  static void _writeInputOptions(StringBuffer buffer, String inputPath, bool hwAccel, bool autoTrim, int durationMs, bool thermalThrottle) {
     if (hwAccel) buffer.write(' -hwaccel auto');
+    buffer.write(thermalThrottle ? ' -threads 4' : ' -threads 0');
     if (autoTrim) {
       buffer.write(' -ss 0.5');
       if (durationMs > 1500) {
@@ -115,7 +116,7 @@ class FfmpegService {
       enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableAggressiveAudio: enableAggressiveAudio,
       muteOriginalAudio: muteOriginalAudio, variations: vars,
     ));
-    if (hasVisual) buffer.write(' -r ${vars.outputFps.toStringAsFixed(2)}');
+    if (hasVisual) buffer.write(' -fps_mode cfr -r ${vars.outputFps.toStringAsFixed(2)}');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
   }
 
@@ -245,9 +246,13 @@ class FfmpegService {
     double canvasScalePercent = 95.0, bool muteOriginalAudio = false, bool enableDynamicZoom = false,
     bool enableMicroOverlay = false, bool enableFrameSkip = false, bool enableChromaShift = false,
     bool suppressCompleteNotification = false, String? customOutputPath,
+    bool thermalThrottle = false,
     void Function(double progress, double speed, int timeMs)? onProgress,
     void Function(String log)? onLog, int totalDurationMs = 0,
   }) async {
+    if (!await StorageService.hasEnoughSpace()) {
+      throw Exception('Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.');
+    }
     final meta = await _resolveInputMeta(inputPath, isPortrait, totalDurationMs);
     final finalDestPath = customOutputPath ?? await generateOutputPath(inputPath);
     final tempDir = await getTemporaryDirectory();
@@ -265,6 +270,7 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, muteOriginalAudio: muteOriginalAudio,
       enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay,
       enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
+      thermalThrottle: thermalThrottle,
     );
 
     _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);
