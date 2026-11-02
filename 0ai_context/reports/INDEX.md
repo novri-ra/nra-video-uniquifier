@@ -1,11 +1,12 @@
-# Index of Technical Reports (Sprint 01 – Sprint 65)
+# Index of Technical Reports (Sprint 01 – Sprint 66)
 
 Index of sprint technical reports for `nra_video_uniquifier`.
 
 ## Structure Overview
-- **Active Reports (`0ai_context/reports/`)**: The two most recent active reports.
+- **Active Reports (`0ai_context/reports/`)**: The active sprint reports.
   - `64-hardware-profiler-background-resilience-and-icons.md`: Dynamic hardware profiling, background wakelock resilience, and icon branding.
   - `65-master-engine-and-ux-optimization.md`: 100% engine load, FastStart, even dimension guard, CFR mode, studio audio 192k, PopScope, batch queue resilience, storage health guard.
+  - `66-workspace-cleanup-and-release-deployment.md`: Workspace cleanup, report archiving, main branch merge, obfuscated release APK build, and ADB device installation.
 - **Archived Reports (`0ai_context/reports/archive/`)**: Historical reports for Sprint 01 through Sprint 63.
 
 ---
@@ -16,6 +17,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 |---|---|---|
 | 64 | `64-hardware-profiler-background-resilience-and-icons.md` | Profiling Hardware Dinamis, Resiliensi Background WakeLock, Persistensi Settings, dan Integrasi Ikon |
 | 65 | `65-master-engine-and-ux-optimization.md` | Master Engine Optimization (100% Load, FastStart, Even-Dim Guard, VFR/CFR, AAC 192k, PopScope, Batch Queue, Storage Health, Preset Chips) |
+| 66 | `66-workspace-cleanup-and-release-deployment.md` | Workspace Hygiene, Arsip Laporan Historis, Merge Main, Build Release APK & Deployment ADB |
 
 ---
 
