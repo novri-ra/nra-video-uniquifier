@@ -54,8 +54,9 @@ Thumbs.db
 __pycache__/
 *.bak
 *.swp
+# Staged temporary test files
+staged_*.mp4
 Movies/
-0ai_context[0-9]*/
 *.mp4
 *.aac
 *.ts
