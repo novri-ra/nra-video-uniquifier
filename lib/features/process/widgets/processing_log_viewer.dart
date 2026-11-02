@@ -19,28 +19,40 @@ class ProcessingLogViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _TelemetryRow(label: 'SOURCE', value: '$fileName ($duration)'),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 16),
-          _TelemetryRow(label: 'EXECUTION TIME', value: '$executionTime / Est. $estimatedRemaining'),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 16),
-          const _SandboxStateRow(),
-          if (terminalLogs != null && terminalLogs!.isNotEmpty) ...[
-            const Divider(color: AppColors.surfaceContainerHighest, height: 16),
-            _TerminalLogBox(logs: terminalLogs!),
-          ],
-        ],
-      ),
+    final displayLogs = (terminalLogs != null && terminalLogs!.trim().isNotEmpty)
+        ? terminalLogs!
+        : '[SANDBOX] Initializing media engine & filtergraph pipeline...\n[SANDBOX] Awaiting stdout/stderr stream...';
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isBounded = constraints.hasBoundedHeight;
+        final logBox = _TerminalLogBox(logs: displayLogs);
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.surfaceContainerHighest),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _TelemetryRow(label: 'SOURCE', value: '$fileName ($duration)'),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              _TelemetryRow(label: 'EXECUTION TIME', value: '$executionTime / Est. $estimatedRemaining'),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              const _SandboxStateRow(),
+              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              if (isBounded)
+                Expanded(child: logBox)
+              else
+                SizedBox(height: 120, child: logBox),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -129,15 +141,50 @@ class _SandboxStateRow extends StatelessWidget {
   }
 }
 
-class _TerminalLogBox extends StatelessWidget {
+class _TerminalLogBox extends StatefulWidget {
   final String logs;
 
   const _TerminalLogBox({required this.logs});
 
   @override
+  State<_TerminalLogBox> createState() => _TerminalLogBoxState();
+}
+
+class _TerminalLogBoxState extends State<_TerminalLogBox> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollToBottom();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TerminalLogBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.logs != oldWidget.logs) {
+      _scrollToBottom();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      height: 120,
+      width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -145,9 +192,10 @@ class _TerminalLogBox extends StatelessWidget {
         border: Border.all(color: AppColors.surfaceContainerHighest),
       ),
       child: SingleChildScrollView(
-        reverse: true,
+        controller: _scrollController,
+        physics: const ClampingScrollPhysics(),
         child: Text(
-          logs,
+          widget.logs,
           style: const TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 9,
