@@ -69,12 +69,27 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   Future<void> _deleteItem(VideoExportItem item) async {
     if (!await _confirmDelete(item)) return;
     try {
+      final existed = await item.file.exists();
       await HistoryService.deleteItem(item.file);
       _loadHistory();
-    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Delete failed: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(existed ? 'Video berhasil dihapus' : 'Berkas dibersihkan dari riwayat'),
+            backgroundColor: AppColors.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (_) {
+      _loadHistory();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berkas dibersihkan dari riwayat'),
+            backgroundColor: AppColors.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }

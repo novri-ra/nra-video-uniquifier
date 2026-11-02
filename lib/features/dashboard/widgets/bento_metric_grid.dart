@@ -7,8 +7,9 @@ import '../../../core/services/history_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../batch/screens/batch_queue_tab_screen.dart';
+import 'bento_cards.dart';
 
-/// 2x2 Bento Metric Grid with reactive live providers & dynamic circular progress storage ring.
+/// 2x2 Bento Metric Grid with reactive live gauges, glassmorphic touch cards, and system vital telemetry.
 class BentoMetricGrid extends StatefulWidget {
   const BentoMetricGrid({super.key});
 
@@ -71,41 +72,31 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
-        _BentoCard(
-          icon: isClean ? Icons.shield_rounded : Icons.shield_outlined,
+        BentoCards.buildHygieneCard(
           title: l10n?.metadataHygiene ?? 'Metadata Hygiene',
-          status: isClean ? '100% CLEAN' : 'PASSTHROUGH',
-          detail: isClean
-              ? 'GPS & EXIF Scrubbed • Zero Fingerprint'
-              : 'Original Metadata Intact • Unscrubbed',
+          isClean: isClean,
           accentColor: metadataColor,
           isDark: isDark,
           onTap: () => provider.toggleRemoveMetadata(!isClean),
         ),
-        _BentoCard(
-          icon: Icons.speed_rounded,
-          title: l10n?.techSpecsGuard ?? 'Technical Specs Guard',
-          status: '${provider.targetFps} FPS CFR',
-          detail: 'BT.709 Primaries • ${provider.videoCodec.key.toUpperCase()} Tagged',
-          accentColor: isDark ? const Color(0xFF4DFFB2) : const Color(0xFF6C5CE7),
+        BentoCards.buildEngineCard(
+          title: l10n?.techSpecsGuard ?? 'Production Engine',
+          fps: provider.targetFps,
+          codec: provider.videoCodec.key.toUpperCase(),
+          hardwareAcc: provider.hardwareAcceleration,
           isDark: isDark,
           onTap: () => context.read<UniquifierProvider>().setTabIndex(2),
         ),
-        _BentoStorageCard(
+        BentoCards.buildStorageCard(
           title: l10n?.storageBuffer ?? 'Storage Safe Buffer',
           freeGbText: _storageSpace?.freeSize ?? '${_freeGigabytes.toStringAsFixed(1)} GB FREE',
           freeFraction: _freeFraction,
           ringColor: ringColor,
           isDark: isDark,
         ),
-        _BentoCard(
-          icon: Icons.layers_outlined,
+        _BentoQueueCard(
           title: l10n?.assetStaging ?? 'Asset Staging',
-          status: queue.hasItems ? '${queue.totalCount} QUEUED' : '0 QUEUED',
-          detail: queue.hasItems
-              ? '${queue.completedCount} completed • Tap to view'
-              : 'Staging queue ready • Tap to batch',
-          accentColor: isDark ? const Color(0xFFFFB74D) : const Color(0xFFF59E0B),
+          queue: queue,
           isDark: isDark,
           onTap: () {
             Navigator.of(context).push(
@@ -118,209 +109,108 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
   }
 }
 
-class _BentoCard extends StatelessWidget {
-  final IconData icon;
-  final String title, status, detail;
-  final Color accentColor;
+class _BentoQueueCard extends StatefulWidget {
+  final String title;
+  final BatchQueueProvider queue;
   final bool isDark;
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
-  const _BentoCard({
-    required this.icon,
+  const _BentoQueueCard({
     required this.title,
-    required this.status,
-    required this.detail,
-    required this.accentColor,
+    required this.queue,
     required this.isDark,
-    this.onTap,
+    required this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final detailColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+  State<_BentoQueueCard> createState() => _BentoQueueCardState();
+}
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: borderColor),
-          boxShadow: [
-            if (!isDark)
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: accentColor, size: 20),
-                Flexible(
-                  child: Container(
+class _BentoQueueCardState extends State<_BentoQueueCard> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    const queueColor = Color(0xFFFF9F1C);
+    final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final detailColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) {
+        setState(() => _pressed = false);
+        widget.onTap();
+      },
+      onTapCancel: () => setState(() => _pressed = false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor),
+            boxShadow: [
+              if (!widget.isDark)
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Icon(Icons.layers_rounded, color: queueColor, size: 20),
+                  Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: accentColor.withValues(alpha: 0.15),
+                      color: queueColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      status,
-                      style: TextStyle(
-                        color: accentColor,
+                      widget.queue.hasItems ? '${widget.queue.totalCount} QUEUED' : '0 QUEUED',
+                      style: const TextStyle(
+                        color: queueColor,
                         fontSize: 8.5,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'monospace',
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: titleColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: titleColor, fontSize: 12, fontWeight: FontWeight.w700),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  detail,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: detailColor,
-                    fontSize: 9.5,
-                    height: 1.25,
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.queue.hasItems
+                        ? '${widget.queue.completedCount} selesai • Ketuk buka'
+                        : 'Antrean siap • Ketuk kelola',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: detailColor, fontSize: 9.5, height: 1.25),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-class _BentoStorageCard extends StatelessWidget {
-  final String title, freeGbText;
-  final double freeFraction;
-  final Color ringColor;
-  final bool isDark;
-
-  const _BentoStorageCard({
-    required this.title,
-    required this.freeGbText,
-    required this.freeFraction,
-    required this.ringColor,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final detailColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          if (!isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(Icons.storage_rounded, color: ringColor, size: 20),
-              SizedBox(
-                width: 32,
-                height: 32,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      value: freeFraction,
-                      strokeWidth: 3.5,
-                      backgroundColor: ringColor.withValues(alpha: 0.20),
-                      color: ringColor,
-                    ),
-                    Text(
-                      '${(freeFraction * 100).toInt()}%',
-                      style: TextStyle(
-                        color: ringColor,
-                        fontSize: 8,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: titleColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                freeGbText,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: detailColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'monospace',
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

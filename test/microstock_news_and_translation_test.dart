@@ -92,6 +92,15 @@ void main() {
       final cached = await TranslationService.translateLongText(multiPara, targetLang: 'id');
       expect(cached, equals(result));
     });
+
+    test('protectGlossary preserves technical microstock terminology and cleans html entities', () async {
+      TranslationService.mockTranslator = (text, lang) async => 'Hasil &quot;Stock Footage&quot; dengan 60 FPS CFR dan Rec.709.';
+      final res = await TranslationService.translateText('Test Footage query');
+      expect(res, contains('"Footage Video Stok"'));
+      expect(res, contains('CFR'));
+      expect(res, contains('Rec.709'));
+      expect(res, isNot(contains('&quot;')));
+    });
   });
 
   group('Sprint 79: Hybrid Feed Integration (RSS2JSON + Reddit Intel)', () {

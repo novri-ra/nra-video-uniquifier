@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/bento_metric_grid.dart';
+import '../widgets/live_intel_ticker_card.dart';
 import '../widgets/microstock_inspiration_feed.dart';
 import '../widgets/seasonal_hero_card.dart';
 
@@ -35,6 +36,8 @@ class DashboardScreen extends StatelessWidget {
             const _GreetingHeaderSection(),
             const SizedBox(height: 14),
             SeasonalHeroCard(onLaunchStudio: () => _openStudioTab(context)),
+            const SizedBox(height: 12),
+            const LiveIntelTickerCard(),
             const SizedBox(height: 14),
             const BentoMetricGrid(),
             const SizedBox(height: 16),

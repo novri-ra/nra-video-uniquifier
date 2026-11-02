@@ -33,6 +33,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader: Artikel Mendalam, Format Terstruktur (Key Takeaways, Specs, Checklist), dan Parser Konten Lengkap |
 | 79 | `79-hybrid-news-and-full-translation.md` | Integrasi Sumber Berita Hibrida (RSS-to-JSON + Reddit Microstock Community Intel) & Mesin Terjemahan Utuh Multi-Paragraf |
 | 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Scripts Google Sheets Webhook, UI Search Bar + Adaptive Learning Chips Carousel (YouTube-Style), dan Telemetri Minat Pengguna & Penanaman Metadata Video |
+| 81 | `81-dashboard-redesign-and-history-cleanup.md` | Relokasi Script 0ai_context, Engine Terjemahan Natural Berglosarium, Pembersihan Berkas Trashed/Delete Error di History, dan Redesain UI Modern Dashboard |
 
 ---
 

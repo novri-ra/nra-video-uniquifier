@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Translation service with persistent multi-paragraph chunking and offline resilience.
+/// Natural paragraph-level translation service with preserved microstock glossary and sanitized entities.
 class TranslationService {
-  static const String _cacheKeyPrefix = 'nra_trans_cache_';
+  static const String _cacheKeyPrefix = 'nra_trans_natural_v5_';
   static final Map<String, String> _memoryCache = {};
 
   @visibleForTesting
@@ -14,55 +14,54 @@ class TranslationService {
   @visibleForTesting
   static Future<String> Function(Uri uri)? customHttpGet;
 
-  /// Translates short text with cache fallback and offline dictionary support.
+  /// Translates short text with cache fallback, glossary enforcement, and entity cleanup.
   static Future<String> translateText(
     String text, {
     String targetLang = 'id',
     bool isOnline = true,
   }) async {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return trimmed;
+    final sanitized = _cleanHtmlArtifacts(text.trim());
+    if (sanitized.isEmpty) return sanitized;
 
-    final cacheKey = '${targetLang}_${trimmed.hashCode}';
+    final cacheKey = '${targetLang}_${sanitized.hashCode}';
     final cached = await _getCached(cacheKey);
     if (cached != null) return cached;
 
-    final dictMatch = _translateFromOfflineDictionary(trimmed, targetLang);
+    final dictMatch = _translateFromOfflineDictionary(sanitized, targetLang);
     if (dictMatch != null) {
-      await _cacheTranslation(cacheKey, dictMatch);
-      return dictMatch;
+      final protected = _protectGlossary(dictMatch);
+      await _cacheTranslation(cacheKey, protected);
+      return protected;
     }
 
     if (!isOnline) {
       throw const TranslationOfflineException('Koneksi internet diperlukan untuk menerjemahkan');
     }
 
-    if (mockTranslator != null) {
-      final res = await mockTranslator!(trimmed, targetLang);
-      await _cacheTranslation(cacheKey, res);
-      return res;
-    }
+    final raw = mockTranslator != null
+        ? await mockTranslator!(sanitized, targetLang)
+        : await _fetchGtxChunk(sanitized, targetLang);
 
-    final fetched = await _fetchGtxChunk(trimmed, targetLang);
-    final result = fetched.isNotEmpty ? fetched : _performRuleBasedTranslation(trimmed, targetLang);
-    await _cacheTranslation(cacheKey, result);
-    return result;
+    final res = raw.isNotEmpty ? raw : _performRuleBasedTranslation(sanitized, targetLang);
+    final finalResult = _protectGlossary(_cleanHtmlArtifacts(res));
+    await _cacheTranslation(cacheKey, finalResult);
+    return finalResult;
   }
 
-  /// Translates long multi-paragraph articles by chunking paragraphs and reassembling.
+  /// Translates complete multi-paragraph articles preserving paragraph bounds and glossary terms.
   static Future<String> translateLongText(
     String fullText, {
     String targetLang = 'id',
     bool isOnline = true,
   }) async {
-    final trimmed = fullText.trim();
-    if (trimmed.isEmpty) return trimmed;
+    final sanitized = _cleanHtmlArtifacts(fullText.trim());
+    if (sanitized.isEmpty) return sanitized;
 
-    final cacheKey = '${targetLang}_long_${trimmed.hashCode}';
+    final cacheKey = '${targetLang}_long_${sanitized.hashCode}';
     final cached = await _getCached(cacheKey);
     if (cached != null) return cached;
 
-    final paragraphs = trimmed.split('\n\n');
+    final paragraphs = sanitized.split(RegExp(r'\n{2,}'));
     final translatedChunks = <String>[];
 
     for (final p in paragraphs) {
@@ -77,7 +76,7 @@ class TranslationService {
     return combined;
   }
 
-  /// Helper to fetch one translated chunk from Google Translate public endpoint.
+  /// Fetches translated paragraph chunk from Google Translate GTX public endpoint.
   static Future<String> _fetchGtxChunk(String chunk, String targetLang) async {
     try {
       final uri = Uri.parse(
@@ -110,6 +109,39 @@ class TranslationService {
       client.close();
     }
     return '';
+  }
+
+  static String _cleanHtmlArtifacts(String text) {
+    return text
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&nbsp;', ' ');
+  }
+
+  /// Preserves authentic technical microstock terminology.
+  static String _protectGlossary(String text) {
+    var result = text;
+    const technicalGlossary = {
+      r'\bStock Footage\b': 'Footage Video Stok',
+      r'\bFootage\b': 'Footage',
+      r'\bLead Time\b': 'Masa Persiapan (Lead Time)',
+      r'\bCFR\b': 'CFR',
+      r'\bVFR\b': 'VFR',
+      r'\bFrame Rate\b': 'Frame Rate',
+      r'\bBitrate\b': 'Bitrate',
+      r'\bBT\.709\b': 'BT.709',
+      r'\bRec\.709\b': 'Rec.709',
+      r'\bCuration\b': 'Kurasi',
+      r'\bCurator\b': 'Kurator',
+      r'\bCommercial Rights\b': 'Lisensi Komersial',
+    };
+    technicalGlossary.forEach((pattern, replacement) {
+      result = result.replaceAll(RegExp(pattern, caseSensitive: false), replacement);
+    });
+    return result;
   }
 
   static Future<String?> _getCached(String key) async {
@@ -146,7 +178,7 @@ class TranslationService {
       'Freepik Announces Enhanced Contributor Royalty Program':
           'Freepik Mengumumkan Peningkatan Program Royalti Kontributor',
       'High-converting microstock deduplication and cinematic footage unlock bonus revenue tiers.':
-          'Deduplikasi microstock berkonversi tinggi dan rekaman sinematik membuka bonus tingkatan pendapatan.',
+          'Deduplikasi microstock berkonversi tinggi dan footage sinematik membuka bonus tingkatan pendapatan.',
       'Microstock AI Inspection Guidelines 2026': 'Panduan Inspeksi Microstock AI 2026',
       'Metadata stripping and sensor fingerprint variation prevent automated duplicate rejections.':
           'Pembersihan metadata dan variasi sidik jari sensor mencegah penolakan duplikat otomatis.',
@@ -165,7 +197,7 @@ class TranslationService {
     final dictMatch = _translateFromOfflineDictionary(text, 'id');
     if (dictMatch != null) return dictMatch;
 
-    String result = text;
+    var result = text;
     const terms = {
       'Autonomous robotics': 'Robotika otonom',
       'clean energy': 'energi bersih',
@@ -176,7 +208,7 @@ class TranslationService {
       'Metadata stripping': 'Pembersihan metadata',
       'sensor fingerprint': 'sidik jari sensor',
       'duplicate rejections': 'penolakan duplikat',
-      'commercial footage': 'rekaman komersial',
+      'commercial footage': 'footage komersial',
       'buyer acquisition': 'akuisisi pembeli',
       'authentic': 'autentik',
       'demands': 'permintaan',
