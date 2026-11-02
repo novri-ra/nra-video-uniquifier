@@ -109,6 +109,9 @@ class SettingsService {
   static const String keyUpscale1080p = 'app_upscale_1080p';
   static const String keyBlurredCanvas = 'app_blurred_canvas';
   static const String keyMuteOriginalAudio = 'app_mute_original_audio';
+  static const String keyThermalThrottle = 'app_thermal_throttle';
+  static const String keySharpeningLevel = 'app_sharpening_level';
+  static const String keySaturationLevel = 'app_saturation_level';
 
   static Future<bool> _getBool(String key, bool fallback) async =>
       (await SharedPreferences.getInstance()).getBool(key) ?? fallback;
@@ -193,6 +196,29 @@ class SettingsService {
 
   static Future<bool> getMuteOriginalAudio() => _getBool(keyMuteOriginalAudio, false);
   static Future<void> setMuteOriginalAudio(bool enabled) => _setBool(keyMuteOriginalAudio, enabled);
+
+  static Future<bool> getThermalThrottle() => _getBool(keyThermalThrottle, false);
+  static Future<void> setThermalThrottle(bool enabled) => _setBool(keyThermalThrottle, enabled);
+
+  static Future<double> getSharpeningLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keySharpeningLevel) ?? 1.0;
+  }
+
+  static Future<void> setSharpeningLevel(double val) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(keySharpeningLevel, val);
+  }
+
+  static Future<double> getSaturationLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keySaturationLevel) ?? 1.0;
+  }
+
+  static Future<void> setSaturationLevel(double val) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(keySaturationLevel, val);
+  }
 
   static Future<bool> getEnhanceAndDenoise() => _getBool(keyEnhanceAndDenoise, true);
   static Future<void> setEnhanceAndDenoise(bool enabled) => _setBool(keyEnhanceAndDenoise, enabled);

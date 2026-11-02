@@ -35,7 +35,7 @@ void main() {
         modifyVisuals: false,
         upscale1080p: false,
       );
-      expect(cmd, contains('-y -i "/path/input.mp4"'));
+      expect(cmd, contains('-y -threads 0 -i "/path/input.mp4"'));
       expect(cmd, contains('-map_metadata -1 -map_chapters -1 -bitexact'));
       expect(cmd, contains('-c copy'));
       expect(cmd, contains('"/path/output.mp4"'));
@@ -68,7 +68,8 @@ void main() {
         upscale1080p: false,
         enableDeepAntiFingerprint: false,
       );
-      expect(cmd, contains('equalizer=f=1000:t=q:w=1:g=0.5'));
+      expect(cmd, contains('aresample=async=1'));
+      expect(cmd, contains('loudnorm=I=-16'));
       expect(cmd, contains('atempo='));
     });
 
@@ -550,7 +551,7 @@ void main() {
       );
       expect(cmd, contains('volume=0.01'));
       expect(cmd, contains('atempo='));
-      expect(cmd, contains('-c:a aac -b:a 128k'));
+      expect(cmd, contains('-c:a aac -b:a 192k -ar 44100 -ac 2'));
       expect(cmd, isNot(contains('anoisesrc=')));
     });
 
@@ -698,7 +699,7 @@ void main() {
         outputPath: '/output.mp4',
         enableHardwareAcceleration: true,
       );
-      expect(cmd, contains('-y -hwaccel auto -i "/input.mp4"'));
+      expect(cmd, contains('-y -hwaccel auto -threads 0 -i "/input.mp4"'));
     });
 
     test('D5-01: RenderDiagnosticInfo flags 1216x2160 as truncated portrait and throws RenderIntegrityException', () {

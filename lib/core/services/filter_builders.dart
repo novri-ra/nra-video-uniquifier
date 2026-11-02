@@ -83,8 +83,8 @@ class FilterBuilders {
     final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
     if (isHighRes) {
       return videoCodec == VideoCodec.h265
-          ? '-c:v libx265 -preset medium -crf 17 -tag:v hvc1 -tune film'
-          : '-c:v libx264 -preset medium -crf 17 -tune film';
+          ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film'
+          : '-c:v libx264 -preset faster -crf 17 -tune film';
     }
     return videoCodec == VideoCodec.h265
         ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
@@ -223,17 +223,17 @@ class FilterBuilders {
       final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
       final tempo = vars.audioTempo.toStringAsFixed(6);
       if (muteOriginalAudio) {
-        return ' -af "volume=0.01,atempo=$tempo" -c:a aac -b:a 128k';
+        return ' -af "volume=0.01,atempo=$tempo" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableAggressiveAudio) {
-        return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
+        return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k';
+        return ' -af "[in]atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
-      return ' -af "atempo=$tempo,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
+      return ' -af "atempo=$tempo,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     } catch (_) {
-      return ' -af "atempo=1.025641,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k';
+      return ' -af "atempo=1.025641,equalizer=f=1000:t=q:w=1:g=0.5" -c:a aac -b:a 192k -ar 44100 -ac 2';
     }
   }
 }

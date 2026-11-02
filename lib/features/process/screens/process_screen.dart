@@ -137,6 +137,8 @@ class _ProcessBody extends StatelessWidget {
         const SizedBox(height: 16),
         const ModifiersHeader(),
         const SizedBox(height: 6),
+        PresetChipRow(provider: provider),
+        const SizedBox(height: 8),
         ModifiersCard(provider: provider, onOpenAdvanced: onOpenAdvanced),
         const SizedBox(height: 12),
         EngineStateStrip(provider: provider, onTap: onOpenAdvanced),

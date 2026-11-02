@@ -2,8 +2,82 @@ import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/category_accordion_card.dart';
 import '../../../../shared/widgets/setting_slider_toggle_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
+
+class PresetChipRow extends StatelessWidget {
+  final UniquifierProvider provider;
+  const PresetChipRow({super.key, required this.provider});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _PresetChip(
+            label: 'TikTok / Reels',
+            isSelected: provider.activePreset == 'TikTok / Reels',
+            onTap: () => provider.applyPreset(
+              removeMetadata: true, modifyAudio: true, modifyVisuals: true,
+              upscale1080p: false, upscaleTarget: '1080p',
+              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: true,
+              enableHorizontalFlip: true, enableAutoTrim: true,
+              enableBlurredCanvas: true, canvasScalePercent: 95.0,
+              presetName: 'TikTok / Reels',
+            ),
+          ),
+          const SizedBox(width: 6),
+          _PresetChip(
+            label: 'Cinematic 2K/4K',
+            isSelected: provider.activePreset == 'Cinematic 2K/4K',
+            onTap: () => provider.applyPreset(
+              removeMetadata: true, modifyAudio: true, modifyVisuals: true,
+              upscale1080p: true, upscaleTarget: '2k',
+              enableEnhanceAndDenoise: true, enableDeepAntiFingerprint: false,
+              enableHorizontalFlip: false, enableBlurredCanvas: false,
+              presetName: 'Cinematic 2K/4K',
+            ),
+          ),
+          const SizedBox(width: 6),
+          _PresetChip(
+            label: 'Quick Export',
+            isSelected: provider.activePreset == 'Quick Export',
+            onTap: () => provider.applyPreset(
+              removeMetadata: true, modifyAudio: false, modifyVisuals: false,
+              upscale1080p: false, upscaleTarget: '1080p',
+              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: false,
+              enableHorizontalFlip: false, enableBlurredCanvas: false,
+              presetName: 'Quick Export',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PresetChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+  const _PresetChip({required this.label, required this.isSelected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      label: Text(label, style: TextStyle(
+        color: isSelected ? AppColors.onPrimary : AppColors.onSurfaceVariant,
+        fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'monospace',
+      )),
+      backgroundColor: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerLow,
+      side: BorderSide(color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      onPressed: onTap,
+    );
+  }
+}
 
 class ModifiersHeader extends StatelessWidget {
   const ModifiersHeader({super.key});
@@ -68,7 +142,9 @@ class ModifiersCard extends StatelessWidget {
 
         final textureActive = (provider.enableBlurredCanvas ? 1 : 0) +
             (provider.enableChromaShift ? 1 : 0) +
-            (provider.enableMicroOverlay ? 1 : 0);
+            (provider.enableMicroOverlay ? 1 : 0) +
+            (provider.sharpeningLevel != 1.0 ? 1 : 0) +
+            (provider.saturationLevel != 1.0 ? 1 : 0);
 
         final audioActive = (provider.modifyAudio ? 1 : 0) +
             (provider.enableAggressiveAudio ? 1 : 0) +
@@ -76,7 +152,7 @@ class ModifiersCard extends StatelessWidget {
 
         return Column(
           children: [
-            _CategoryAccordionCard(
+            CategoryAccordionCard(
               title: 'CORE PROTECTION',
               icon: Icons.security,
               activeCount: coreActive,
@@ -109,7 +185,7 @@ class ModifiersCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            _CategoryAccordionCard(
+            CategoryAccordionCard(
               title: 'VISUAL & MOTION',
               icon: Icons.motion_photos_on,
               activeCount: visualActive,
@@ -169,11 +245,11 @@ class ModifiersCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            _CategoryAccordionCard(
+            CategoryAccordionCard(
               title: 'FRAMING & TEXTURE',
               icon: Icons.auto_awesome_mosaic,
               activeCount: textureActive,
-              totalCount: 3,
+              totalCount: 5,
               initiallyExpanded: true,
               children: [
                 SettingSliderToggleRow(
@@ -202,10 +278,36 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableMicroOverlay,
                   onChanged: provider.toggleMicroOverlay,
                 ),
+                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                SettingSliderToggleRow(
+                  icon: Icons.deblur,
+                  title: 'Sharpening Level',
+                  subtitle: 'Adjust unsharp mask intensity',
+                  value: true,
+                  onChanged: (_) {},
+                  sliderValue: provider.sharpeningLevel * 100,
+                  min: 20.0,
+                  max: 200.0,
+                  sliderLabel: '${provider.sharpeningLevel.toStringAsFixed(1)}x',
+                  onSliderChanged: (v) => provider.setSharpeningLevel(v / 100),
+                ),
+                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                SettingSliderToggleRow(
+                  icon: Icons.color_lens_outlined,
+                  title: 'Saturation Level',
+                  subtitle: 'Color intensity control',
+                  value: true,
+                  onChanged: (_) {},
+                  sliderValue: provider.saturationLevel * 100,
+                  min: 80.0,
+                  max: 130.0,
+                  sliderLabel: '${provider.saturationLevel.toStringAsFixed(2)}x',
+                  onSliderChanged: (v) => provider.setSaturationLevel(v / 100),
+                ),
               ],
             ),
             const SizedBox(height: 8),
-            _CategoryAccordionCard(
+            CategoryAccordionCard(
               title: 'AUDIO MASKING',
               icon: Icons.graphic_eq,
               activeCount: audioActive,
@@ -240,126 +342,6 @@ class ModifiersCard extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _CategoryAccordionCard extends StatefulWidget {
-  final String title;
-  final IconData icon;
-  final int activeCount;
-  final int totalCount;
-  final bool initiallyExpanded;
-  final List<Widget> children;
-
-  const _CategoryAccordionCard({
-    required this.title,
-    required this.icon,
-    required this.activeCount,
-    required this.totalCount,
-    this.initiallyExpanded = false,
-    required this.children,
-  });
-
-  @override
-  State<_CategoryAccordionCard> createState() => _CategoryAccordionCardState();
-}
-
-class _CategoryAccordionCardState extends State<_CategoryAccordionCard> {
-  late bool _expanded;
-
-  @override
-  void initState() {
-    super.initState();
-    _expanded = widget.initiallyExpanded;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-      ),
-      child: Column(
-        children: [
-          InkWell(
-            onTap: () => setState(() => _expanded = !_expanded),
-            borderRadius: BorderRadius.circular(4),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(widget.icon, color: AppColors.primaryContainer, size: 16),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            widget.title,
-                            style: const TextStyle(
-                              color: AppColors.onSurface,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              fontFamily: 'monospace',
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: widget.activeCount > 0
-                              ? AppColors.primaryContainer.withValues(alpha: 0.15)
-                              : AppColors.surfaceContainer,
-                          borderRadius: BorderRadius.circular(2),
-                          border: Border.all(
-                            color: widget.activeCount > 0
-                                ? AppColors.primaryContainer.withValues(alpha: 0.4)
-                                : AppColors.surfaceContainerHighest,
-                          ),
-                        ),
-                        child: Text(
-                          '${widget.activeCount}/${widget.totalCount} ACTIVE',
-                          style: TextStyle(
-                            color: widget.activeCount > 0
-                                ? AppColors.primaryContainer
-                                : AppColors.outline,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Icon(
-                        _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: AppColors.onSurfaceVariant,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          if (_expanded) ...[
-            const Divider(color: AppColors.surfaceContainerHighest, height: 1),
-            ...widget.children,
-          ],
-        ],
-      ),
     );
   }
 }

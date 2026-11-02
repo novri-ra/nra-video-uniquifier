@@ -73,6 +73,14 @@ class BatchQueueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void cancelItem(int index) {
+    if (index < 0 || index >= _items.length) return;
+    if (_items[index].isPending) {
+      _items[index].status = BatchItemStatus.cancelled;
+      notifyListeners();
+    }
+  }
+
   Future<void> runBatch(UniquifierProvider config) async {
     if (_isProcessing || _items.isEmpty) return;
     _isProcessing = true;
@@ -82,6 +90,8 @@ class BatchQueueProvider extends ChangeNotifier {
     for (int i = 0; i < _items.length; i++) {
       if (_isCancelled) break;
       await _processSingleItem(i, _items[i], config);
+      // Inter-item memory purge to prevent OOM
+      if (i < _items.length - 1) await _interItemCleanup();
     }
 
     _isProcessing = false;
@@ -138,6 +148,7 @@ class BatchQueueProvider extends ChangeNotifier {
       enableMicroOverlay: config.enableMicroOverlay,
       enableFrameSkip: config.enableFrameSkip,
       enableChromaShift: config.enableChromaShift,
+      thermalThrottle: config.thermalThrottle,
       suppressCompleteNotification: true,
       totalDurationMs: 0,
       onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
@@ -155,5 +166,10 @@ class BatchQueueProvider extends ChangeNotifier {
       body: '$pct% • Overall ${(overallProgress * 100).toInt()}%',
     );
     notifyListeners();
+  }
+
+  Future<void> _interItemCleanup() async {
+    // Yield to event loop between items to release memory
+    await Future<void>.value();
   }
 }

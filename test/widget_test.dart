@@ -204,8 +204,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap TikTok Fast
-      final tikTokChip = find.text('TikTok Fast');
+      // Tap TikTok / Reels Aggressive
+      final tikTokChip = find.text('TikTok / Reels Aggressive');
       expect(tikTokChip, findsOneWidget);
       await tester.tap(tikTokChip);
       await tester.pumpAndSettle();
@@ -213,18 +213,17 @@ void main() {
       expect(provider.enableEnhanceAndDenoise, isFalse);
       expect(provider.enableAutoTrim, isTrue);
 
-      // Tap Maximum Anti-Fingerprint
-      final maxChip = find.text('Maximum Anti-Fingerprint');
+      // Tap Cinematic 2K / 4K Clean
+      final maxChip = find.text('Cinematic 2K / 4K Clean');
       expect(maxChip, findsOneWidget);
       await tester.tap(maxChip);
       await tester.pumpAndSettle();
       expect(provider.upscale1080p, isTrue);
       expect(provider.selectedUpscaleTarget, equals('2k'));
-      expect(provider.enableHorizontalFlip, isTrue);
-      expect(provider.enableAggressiveAudio, isTrue);
+      expect(provider.enableHorizontalFlip, isFalse);
 
-      // Tap Lossless Stealth
-      final stealthChip = find.text('Lossless Stealth');
+      // Tap Ultra-Light / Quick Export
+      final stealthChip = find.text('Ultra-Light / Quick Export');
       expect(stealthChip, findsOneWidget);
       await tester.tap(stealthChip);
       await tester.pumpAndSettle();
