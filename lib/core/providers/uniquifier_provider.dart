@@ -24,27 +24,28 @@ class UniquifierProvider extends ChangeNotifier {
   }
 
   void _onResolutionNotifierChanged() {
-    if (_targetResolution == SettingsService.upscaleResolutionNotifier.value) return;
-    _targetResolution = SettingsService.upscaleResolutionNotifier.value;
-    notifyListeners();
+    if (_targetResolution != SettingsService.upscaleResolutionNotifier.value) {
+      _targetResolution = SettingsService.upscaleResolutionNotifier.value;
+      notifyListeners();
+    }
   }
-
   void _onUpscaleEngineNotifierChanged() {
-    if (_upscaleEngine == SettingsService.upscaleEngineNotifier.value) return;
-    _upscaleEngine = SettingsService.upscaleEngineNotifier.value;
-    notifyListeners();
+    if (_upscaleEngine != SettingsService.upscaleEngineNotifier.value) {
+      _upscaleEngine = SettingsService.upscaleEngineNotifier.value;
+      notifyListeners();
+    }
   }
-
   void _onCodecNotifierChanged() {
-    if (_videoCodec == SettingsService.videoCodecNotifier.value) return;
-    _videoCodec = SettingsService.videoCodecNotifier.value;
-    notifyListeners();
+    if (_videoCodec != SettingsService.videoCodecNotifier.value) {
+      _videoCodec = SettingsService.videoCodecNotifier.value;
+      notifyListeners();
+    }
   }
-
   void _onHardwareAccelerationNotifierChanged() {
-    if (_hardwareAcceleration == SettingsService.hardwareAccelerationNotifier.value) return;
-    _hardwareAcceleration = SettingsService.hardwareAccelerationNotifier.value;
-    notifyListeners();
+    if (_hardwareAcceleration != SettingsService.hardwareAccelerationNotifier.value) {
+      _hardwareAcceleration = SettingsService.hardwareAccelerationNotifier.value;
+      notifyListeners();
+    }
   }
 
   Future<void> _initResolution() async {
@@ -102,60 +103,32 @@ class UniquifierProvider extends ChangeNotifier {
   bool _hardwareAcceleration = true;
   DeviceSpecs _deviceSpecs = DeviceSpecs.defaultFallback();
   int _currentTabIndex = 0;
-  String? get selectedFileName => _selectedFileName;
-  String? get selectedFilePath => _selectedFilePath;
-  String? get thumbnailPath => _thumbnailPath;
-  String? get lastProcessedOutputPath => _lastProcessedOutputPath;
-  String? get outputThumbnailPath => _outputThumbnailPath;
-  RenderDiagnosticInfo? get lastDiagnosticInfo => _lastDiagnosticInfo;
-  String get fileResolution => _fileResolution;
-  String get fileSize => _fileSize;
-  String get fileCodec => _fileCodec;
-  String get fps => _fps;
-  String get audioInfo => _audioInfo;
-  String get duration => _duration;
-  String get sha256 => _sha256;
-  int get totalDurationMs => _totalDurationMs;
-
-  double get realtimeProgress => _realtimeProgress;
-  double get renderingSpeed => _renderingSpeed;
-  String get eta => _eta;
-
-  bool get removeMetadata => _removeMetadata;
-  bool get modifyAudio => _modifyAudio;
-  bool get modifyVisuals => _modifyVisuals;
-  bool get upscale1080p => _upscale1080p;
-  bool get enableEnhanceAndDenoise => _enableEnhanceAndDenoise;
-  bool get enableDeepAntiFingerprint => _enableDeepAntiFingerprint;
-  bool get enableHorizontalFlip => _enableHorizontalFlip;
-  bool get enableAggressiveAudio => _enableAggressiveAudio;
-  bool get enableAutoTrim => _enableAutoTrim;
-  bool get enableMicroTrim => _enableAutoTrim;
-  bool get enableHFlip => _enableHorizontalFlip;
-  bool get enableBlurredCanvas => _enableBlurredCanvas;
-  bool get muteOriginalAudio => _muteOriginalAudio;
-  bool get enableDynamicZoom => _enableDynamicZoom;
-  bool get enableMicroOverlay => _enableMicroOverlay;
-  bool get enableFrameSkip => _enableFrameSkip;
-  bool get enableChromaShift => _enableChromaShift;
-  double get canvasScalePercent => _canvasScalePercent;
-  bool get thermalThrottle => _thermalThrottle;
-  double get sharpeningLevel => _sharpeningLevel;
-  double get saturationLevel => _saturationLevel;
-  int get targetFps => _targetFps;
+  String? get selectedFileName => _selectedFileName; String? get selectedFilePath => _selectedFilePath;
+  String? get thumbnailPath => _thumbnailPath; String? get lastProcessedOutputPath => _lastProcessedOutputPath;
+  String? get outputThumbnailPath => _outputThumbnailPath; RenderDiagnosticInfo? get lastDiagnosticInfo => _lastDiagnosticInfo;
+  String get fileResolution => _fileResolution; String get fileSize => _fileSize;
+  String get fileCodec => _fileCodec; String get fps => _fps;
+  String get audioInfo => _audioInfo; String get duration => _duration;
+  String get sha256 => _sha256; int get totalDurationMs => _totalDurationMs;
+  double get realtimeProgress => _realtimeProgress; double get renderingSpeed => _renderingSpeed;
+  String get eta => _eta; bool get isPortrait => _isPortrait;
+  bool get removeMetadata => _removeMetadata; bool get modifyAudio => _modifyAudio;
+  bool get modifyVisuals => _modifyVisuals; bool get upscale1080p => _upscale1080p;
+  bool get enableEnhanceAndDenoise => _enableEnhanceAndDenoise; bool get enableDeepAntiFingerprint => _enableDeepAntiFingerprint;
+  bool get enableHorizontalFlip => _enableHorizontalFlip; bool get enableAggressiveAudio => _enableAggressiveAudio;
+  bool get enableAutoTrim => _enableAutoTrim; bool get enableMicroTrim => _enableAutoTrim;
+  bool get enableHFlip => _enableHorizontalFlip; bool get enableBlurredCanvas => _enableBlurredCanvas;
+  bool get muteOriginalAudio => _muteOriginalAudio; bool get enableDynamicZoom => _enableDynamicZoom;
+  bool get enableMicroOverlay => _enableMicroOverlay; bool get enableFrameSkip => _enableFrameSkip;
+  bool get enableChromaShift => _enableChromaShift; double get canvasScalePercent => _canvasScalePercent;
+  bool get thermalThrottle => _thermalThrottle; double get sharpeningLevel => _sharpeningLevel;
+  double get saturationLevel => _saturationLevel; int get targetFps => _targetFps;
   String get activePreset => _activePreset;
-  bool get isPortrait => _isPortrait;
-
-  TargetResolution get targetResolution => _targetResolution;
-  UpscaleEngine get upscaleEngine => _upscaleEngine;
-  VideoCodec get videoCodec => _videoCodec;
-  String get selectedUpscaleTarget => _targetResolution.key;
-  String get targetResolutionLabel => _targetResolution.label;
-  String get targetResolutionDetails => _targetResolution.details;
-  bool get hardwareAcceleration => _hardwareAcceleration;
-  DeviceSpecs get deviceSpecs => _deviceSpecs;
-  DeviceTier get deviceTier => _deviceSpecs.tier;
-  int get currentTabIndex => _currentTabIndex;
+  TargetResolution get targetResolution => _targetResolution; UpscaleEngine get upscaleEngine => _upscaleEngine;
+  VideoCodec get videoCodec => _videoCodec; String get selectedUpscaleTarget => _targetResolution.key;
+  String get targetResolutionLabel => _targetResolution.label; String get targetResolutionDetails => _targetResolution.details;
+  bool get hardwareAcceleration => _hardwareAcceleration; DeviceSpecs get deviceSpecs => _deviceSpecs;
+  DeviceTier get deviceTier => _deviceSpecs.tier; int get currentTabIndex => _currentTabIndex;
 
   void setVideoCodec(VideoCodec codec) {
     _videoCodec = codec;
@@ -251,11 +224,16 @@ class UniquifierProvider extends ChangeNotifier {
     bool enableBlurredCanvas = false,
     double canvasScalePercent = 95.0,
     bool muteOriginalAudio = false,
+    int? targetFps,
     String? presetName,
   }) {
     if (presetName != null) {
       _activePreset = presetName;
       try { SettingsService.setDefaultPreset(presetName); } catch (_) {}
+    }
+    if (targetFps != null) {
+      _targetFps = targetFps;
+      try { SettingsService.setTargetFps(targetFps); } catch (_) {}
     }
     _removeMetadata = removeMetadata;
     _modifyAudio = modifyAudio;
@@ -378,11 +356,8 @@ class UniquifierProvider extends ChangeNotifier {
 
   void _applyMediaStreams(dynamic streams) {
     for (final s in streams) {
-      if (s.getType() == 'video') {
-        _applyVideoStream(s);
-      } else if (s.getType() == 'audio') {
-        _applyAudioStream(s);
-      }
+      if (s.getType() == 'video') _applyVideoStream(s);
+      if (s.getType() == 'audio') _audioInfo = Formatters.formatAudioInfo(s.getCodec(), s.getSampleRate());
     }
   }
 
@@ -398,10 +373,6 @@ class UniquifierProvider extends ChangeNotifier {
     if (rFrameRate != null && rFrameRate.isNotEmpty) _fps = '$rFrameRate FPS';
   }
 
-  void _applyAudioStream(dynamic s) {
-    _audioInfo = Formatters.formatAudioInfo(s.getCodec(), s.getSampleRate());
-  }
-
   void _applyMediaDuration(String? durationStr) {
     if (durationStr == null) return;
     final sec = double.tryParse(durationStr) ?? 0.0;
@@ -409,9 +380,6 @@ class UniquifierProvider extends ChangeNotifier {
     _duration = formatDuration(durationStr);
   }
 
-  /// Formats raw seconds or duration strings to mm:ss or hh:mm:ss display.
   static String formatDuration(String? durationStr) => Formatters.formatDuration(durationStr);
-
-  /// Formats byte count into human-readable string (B, KB, MB, GB).
   static String formatFileSize(int bytes) => Formatters.formatFileSize(bytes);
 }

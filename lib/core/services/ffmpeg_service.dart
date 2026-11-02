@@ -31,7 +31,7 @@ class FfmpegService {
     bool enableBlurredCanvas = false, double canvasScalePercent = 95.0, bool muteOriginalAudio = false,
     bool enableDynamicZoom = false, bool enableMicroOverlay = false,
     bool enableFrameSkip = false, bool enableChromaShift = false, VideoVariations? variations,
-    bool thermalThrottle = false, int? targetFps,
+    bool thermalThrottle = false, int? targetFps, double? saturationLevel,
   }) {
     final buffer = StringBuffer('-y');
     _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs, thermalThrottle);
@@ -45,7 +45,7 @@ class FfmpegService {
       muteOriginalAudio: muteOriginalAudio, enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, modifyAudio: modifyAudio, variations: variations,
-      targetFps: targetFps,
+      targetFps: targetFps, saturationLevel: saturationLevel,
     );
     buffer.write(' "${_escapePath(outputPath)}"');
     return buffer.toString();
@@ -56,10 +56,7 @@ class FfmpegService {
     buffer.write(thermalThrottle ? ' -threads 4' : ' -threads 0');
     if (autoTrim) {
       buffer.write(' -ss 0.5');
-      if (durationMs > 1500) {
-        final trimDur = ((durationMs - 1000) / 1000).toStringAsFixed(2);
-        buffer.write(' -t $trimDur');
-      }
+      if (durationMs > 1500) buffer.write(' -t ${((durationMs - 1000) / 1000).toStringAsFixed(2)}');
     }
     buffer.write(' -i "${_escapePath(inputPath)}"');
   }
@@ -71,27 +68,13 @@ class FfmpegService {
   }
 
   static void _writeFilterAndCodecOptions({
-    required StringBuffer buffer,
-    required bool modifyVisuals,
-    required bool shouldUpscale,
-    required TargetResolution targetResolution,
-    required UpscaleEngine upscaleEngine,
-    required VideoCodec videoCodec,
-    required bool enableEnhanceAndDenoise,
-    required bool enableDeepAntiFingerprint,
-    required bool enableHorizontalFlip,
-    required bool enableAggressiveAudio,
-    required bool isPortrait,
-    required bool enableBlurredCanvas,
-    required double canvasScalePercent,
-    required bool muteOriginalAudio,
-    required bool enableDynamicZoom,
-    required bool enableMicroOverlay,
-    required bool enableFrameSkip,
-    required bool enableChromaShift,
-    required bool modifyAudio,
-    VideoVariations? variations,
-    int? targetFps,
+    required StringBuffer buffer, required bool modifyVisuals, required bool shouldUpscale,
+    required TargetResolution targetResolution, required UpscaleEngine upscaleEngine, required VideoCodec videoCodec,
+    required bool enableEnhanceAndDenoise, required bool enableDeepAntiFingerprint, required bool enableHorizontalFlip,
+    required bool enableAggressiveAudio, required bool isPortrait, required bool enableBlurredCanvas,
+    required double canvasScalePercent, required bool muteOriginalAudio, required bool enableDynamicZoom,
+    required bool enableMicroOverlay, required bool enableFrameSkip, required bool enableChromaShift,
+    required bool modifyAudio, VideoVariations? variations, int? targetFps, double? saturationLevel,
   }) {
     VideoVariations vars;
     try {
@@ -112,7 +95,7 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, variations: vars,
-      targetFps: targetFps ?? 30,
+      targetFps: targetFps ?? 30, saturationLevel: saturationLevel,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
       hasAudio: hasAudioProcess, hasVisual: hasVisual,
@@ -211,9 +194,7 @@ class FfmpegService {
     final dotIndex = fileName.lastIndexOf('.');
     final baseName = dotIndex != -1 ? fileName.substring(0, dotIndex) : fileName;
     final targetDir = await _resolveTargetDir();
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return '${targetDir.path}/UQ_${baseName}_$timestamp.mp4';
+    return '${targetDir.path}/UQ_${baseName}_${DateTime.now().millisecondsSinceEpoch}.mp4';
   }
 
   static Future<({int durationMs, int width, int height})> _probeMediaMeta(String path) async {
@@ -248,7 +229,7 @@ class FfmpegService {
     bool enableDynamicZoom = false, bool enableMicroOverlay = false, bool enableFrameSkip = false,
     bool enableChromaShift = false, bool suppressCompleteNotification = false, String? customOutputPath,
     bool thermalThrottle = false, void Function(double progress, double speed, int timeMs)? onProgress,
-    void Function(String log)? onLog, int totalDurationMs = 0, int targetFps = 30,
+    void Function(String log)? onLog, int totalDurationMs = 0, int targetFps = 30, double? saturationLevel,
   }) async {
     if (!await StorageService.hasEnoughSpace()) throw Exception('Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.');
     final meta = await _resolveInputMeta(inputPath, isPortrait, totalDurationMs);
@@ -268,7 +249,7 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, muteOriginalAudio: muteOriginalAudio,
       enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay,
       enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
-      thermalThrottle: thermalThrottle, targetFps: targetFps,
+      thermalThrottle: thermalThrottle, targetFps: targetFps, saturationLevel: saturationLevel,
     );
 
     _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);
@@ -357,10 +338,8 @@ class FfmpegService {
   }
 
   static Future<String> _executeAndExport({
-    required String command,
-    required String stagedOutputPath,
-    required String effectiveInput,
-    required String finalDestPath,
+    required String command, required String stagedOutputPath,
+    required String effectiveInput, required String finalDestPath,
     required bool suppressCompleteNotification,
   }) async {
     final stagedRenderedPath = await _executeFFmpeg(command, stagedOutputPath, sourcePath: effectiveInput);
@@ -373,11 +352,8 @@ class FfmpegService {
     await MediaScannerService.scanFile(exportedPath);
     _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
     if (!suppressCompleteNotification) {
-      await NotificationService.showCompleteNotification(
-        title: 'Ekspor Berhasil',
-        body: 'Video siap di galeri (${exportedPath.split(RegExp(r"[/\\]")).last})',
-        success: true,
-      );
+      final name = exportedPath.split(RegExp(r"[/\\]")).last;
+      await NotificationService.showCompleteNotification(title: 'Ekspor Berhasil', body: 'Video siap di galeri ($name)', success: true);
     }
     return exportedPath;
   }

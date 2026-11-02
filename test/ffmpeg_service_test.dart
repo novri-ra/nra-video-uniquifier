@@ -95,7 +95,7 @@ void main() {
       expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
       expect(cmd, isNot(contains('curves=preset=vintage')));
-      expect(cmd, contains('eq=brightness='));
+      expect(cmd, contains('eq=gamma=1.015:contrast=1.02:saturation='));
       expect(cmd, contains('noise=alls='));
       expect(cmd, isNot(contains('scale=trunc(iw/2)*2:trunc(ih/2)*2')));
       expect(cmd, contains('format=yuv420p'));
@@ -356,7 +356,7 @@ void main() {
       expect(cmd, isNot(contains('fillcolor=black')));
     });
 
-    test('Audio-Visual timing alignment: tempo is pure reciprocal of speedFactor matching PTS without compound drift', () {
+    test('Audio-Visual timing alignment: tempo and pitch shift match PTS without compound drift', () {
       final cmd = FfmpegService.buildCommand(
         inputPath: '/path/input.mp4',
         outputPath: '/path/output.mp4',
@@ -366,8 +366,7 @@ void main() {
       );
       expect(cmd, contains('setpts='));
       expect(cmd, contains('atempo='));
-      expect(cmd, isNot(contains('asetrate=')));
-      expect(cmd, isNot(contains('aresample=')));
+      expect(cmd, contains('asetrate=44100*'));
     });
 
     test('TikTok Evasion Test 1: 10 calls produce 10 different filter strings', () {
@@ -387,13 +386,13 @@ void main() {
     test('TikTok Evasion Test 2: A/V sync is exact (Video speed * Audio tempo = 1.0)', () {
       for (var i = 0; i < 20; i++) {
         final vars = VariationGenerator.generate();
-        final product = vars.speedFactor * vars.audioTempo;
+        final product = (1.0 / vars.speedFactor) * vars.audioTempo;
         expect((product - 1.0).abs(), lessThan(1e-9));
       }
     });
 
-    test('TikTok Evasion Test 3: Color parameters never exceed +-0.01', () {
-      final eqRegex = RegExp(r'eq=brightness=([-0-9.]+):contrast=([0-9.]+):saturation=([0-9.]+)');
+    test('TikTok Evasion Test 3: Color parameters adhere to gamma, contrast, and saturation bounds', () {
+      final eqRegex = RegExp(r'eq=gamma=([0-9.]+):contrast=([0-9.]+):saturation=([0-9.]+)');
       for (var i = 0; i < 20; i++) {
         final cmd = FfmpegService.buildCommand(
           inputPath: '/path/input.mp4',
@@ -403,22 +402,21 @@ void main() {
         );
         final match = eqRegex.firstMatch(cmd);
         expect(match, isNotNull);
-        final brightness = double.parse(match!.group(1)!);
+        final gamma = double.parse(match!.group(1)!);
         final contrast = double.parse(match.group(2)!);
         final saturation = double.parse(match.group(3)!);
 
-        expect(brightness, greaterThanOrEqualTo(-0.0101));
-        expect(brightness, lessThanOrEqualTo(0.0101));
-        expect((contrast - 1.0).abs(), lessThanOrEqualTo(0.0101));
-        expect((saturation - 1.0).abs(), lessThanOrEqualTo(0.0101));
+        expect((gamma - 1.015).abs(), lessThan(1e-4));
+        expect((contrast - 1.02).abs(), lessThan(1e-4));
+        expect((saturation - 1.0).abs(), lessThan(0.02));
       }
     });
 
-    test('TikTok Hardened Evasion Validation: crop >= 7%, rotation >= 0.6 deg, noise >= 3, speed factor <= 0.975, smartphone metadata', () {
+    test('TikTok Hardened Evasion Validation: crop >= 7%, rotation >= 0.6 deg, noise >= 3, speed warp 1.01-1.025x, smartphone metadata', () {
       final cropRegex = RegExp(r'crop=trunc\(iw\*([0-9.]+)/2\)\*2:trunc\(ih\*([0-9.]+)/2\)\*2');
       final rotRegex = RegExp(r'rotate=([0-9.]+)\*PI/180');
       final noiseRegex = RegExp(r'noise=alls=([0-9]+):allf=t\+u');
-      final ptsRegex = RegExp(r'setpts=([0-9.]+)\*PTS');
+      final ptsRegex = RegExp(r'setpts=\(1/([0-9.]+)\)\*PTS');
 
       for (var i = 0; i < 20; i++) {
         final vars = VariationGenerator.generate();
@@ -428,8 +426,10 @@ void main() {
         expect(vars.rotateAngle, lessThanOrEqualTo(0.901));
         expect(vars.noiseStrength, greaterThanOrEqualTo(3));
         expect(vars.noiseStrength, lessThanOrEqualTo(4));
-        expect(vars.speedFactor, greaterThanOrEqualTo(0.9699));
-        expect(vars.speedFactor, lessThanOrEqualTo(0.9751));
+        expect(vars.speedFactor, greaterThanOrEqualTo(1.0099));
+        expect(vars.speedFactor, lessThanOrEqualTo(1.0251));
+        expect(vars.pitchFactor, greaterThanOrEqualTo(0.9849));
+        expect(vars.pitchFactor, lessThanOrEqualTo(1.0151));
         expect(vars.outputFps, greaterThanOrEqualTo(29.79));
         expect(vars.outputFps, lessThanOrEqualTo(29.91));
 
@@ -461,7 +461,8 @@ void main() {
         final ptsMatch = ptsRegex.firstMatch(cmd);
         expect(ptsMatch, isNotNull);
         final ptsVal = double.parse(ptsMatch!.group(1)!);
-        expect(ptsVal, lessThanOrEqualTo(0.9751));
+        expect(ptsVal, greaterThanOrEqualTo(1.0099));
+        expect(ptsVal, lessThanOrEqualTo(1.0251));
 
         expect(cmd, contains('-metadata make="Apple"'));
         expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
@@ -565,7 +566,7 @@ void main() {
         enableMicroOverlay: true,
         isPortrait: true,
       );
-      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'"));
+      expect(cmd, contains(r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"));
       expect(cmd, contains('s=1080x1920:fps=30'));
       expect(cmd, contains('decimate=cycle=25'));
       expect(cmd, contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"));
@@ -601,7 +602,7 @@ void main() {
       expect(cmd, contains('-map_metadata -1')); // 1. removeMetadata
       expect(cmd, contains('-ss 0.5 -t 4.00')); // 2. autoTrim
       expect(cmd, contains(r'[0:v]split=2[bg][fg];')); // 3. blurredCanvas
-      expect(cmd, contains(r"zoompan=z='if(lte(zoom\,1.0)\,1.08\,max(1.001\,zoom-0.0015))'")); // 4. dynamicZoom
+      expect(cmd, contains(r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'")); // 4. dynamicZoom
       expect(cmd, contains('hflip')); // 5. horizontalFlip
       expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
       // 7. upscale active, so hqdn3d is bypassed to retain crisp textures
@@ -774,6 +775,32 @@ void main() {
       );
       expect(cmd60, contains('-fps_mode cfr -r 60'));
       expect(cmd60, contains(':fps=60'));
+    });
+
+    test('Sprint 69: Advanced anti-detection pipeline validates audio spectral shift, speed warp, Ken Burns zoom, and saturation binding', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: '/sample.mp4',
+        outputPath: '/out.mp4',
+        modifyVisuals: true,
+        modifyAudio: true,
+        enableDeepAntiFingerprint: true,
+        enableDynamicZoom: true,
+        saturationLevel: 1.15,
+      );
+      // Audio spectral pitch shift
+      expect(cmd, contains('asetrate=44100*'));
+      expect(cmd, contains('atempo=1/'));
+      expect(cmd, contains('-c:a aac -b:a 192k -ar 44100 -ac 2'));
+      // Dynamic speed warp
+      expect(cmd, contains('setpts=(1/'));
+      // Ken Burns micro-zoom
+      expect(cmd, contains(r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"));
+      // Gamma & dynamic saturation slider binding
+      expect(cmd, contains('eq=gamma=1.015:contrast=1.02:saturation='));
+      final satMatch = RegExp(r'saturation=([0-9.]+)').firstMatch(cmd);
+      expect(satMatch, isNotNull);
+      final satVal = double.parse(satMatch!.group(1)!);
+      expect((satVal - 1.15).abs(), lessThan(0.03));
     });
   });
 }

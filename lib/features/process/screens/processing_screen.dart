@@ -113,6 +113,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       thermalThrottle: provider.thermalThrottle,
       totalDurationMs: provider.totalDurationMs,
       targetFps: provider.targetFps,
+      saturationLevel: provider.saturationLevel,
       onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
     );

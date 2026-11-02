@@ -11,6 +11,7 @@ class VideoVariations {
   final double rotateAngle;
   final double audioTempo;
   final double outputFps;
+  final double pitchFactor;
 
   const VideoVariations({
     required this.cropPercent,
@@ -22,19 +23,21 @@ class VideoVariations {
     required this.rotateAngle,
     required this.audioTempo,
     required this.outputFps,
+    this.pitchFactor = 1.012,
   });
 
-  /// Hardened static fallback matching Report 30/41 proven baseline.
+  /// Hardened static fallback matching Sprint 69 anti-detection baseline.
   static const VideoVariations fallback = VideoVariations(
     cropPercent: 0.08,
     brightness: 0.0,
     contrast: 1.0,
     saturation: 1.0,
     noiseStrength: 4,
-    speedFactor: 0.975,
+    speedFactor: 1.015,
     rotateAngle: 0.8,
-    audioTempo: 1.0 / 0.975,
+    audioTempo: 1.015,
     outputFps: 29.85,
+    pitchFactor: 1.012,
   );
 }
 
@@ -48,10 +51,11 @@ class VariationGenerator {
   /// - contrast: 0.99 to 1.01
   /// - saturation: 0.99 to 1.01
   /// - noiseStrength: 3 to 4 (survives mobile transcoder compression)
-  /// - speedFactor: 0.970 to 0.975 (2.5% to 3.0% speedup, exceeds DTW threshold)
+  /// - speedFactor: 1.010 to 1.025 (micro-speed shift / speed warp)
   /// - rotateAngle: 0.6 to 0.9 degrees
-  /// - audioTempo: 1.0 / speedFactor (exact A/V lip-sync)
+  /// - audioTempo: matches speedFactor for exact A/V sync
   /// - outputFps: 29.80 to 29.90 (breaks uniform frame-cadence indexing)
+  /// - pitchFactor: 0.985 to 1.015 (audio spectral modulation)
   static VideoVariations generate({math.Random? random}) {
     try {
       final rng = random ?? _random;
@@ -60,10 +64,11 @@ class VariationGenerator {
       final cont = 0.99 + rng.nextDouble() * 0.02;
       final sat = 0.99 + rng.nextDouble() * 0.02;
       final noise = rng.nextBool() ? 3 : 4;
-      final speed = 0.970 + rng.nextDouble() * 0.005;
+      final speed = 1.010 + rng.nextDouble() * 0.015;
       final rot = 0.6 + rng.nextDouble() * 0.3;
-      final tempo = 1.0 / speed;
+      final tempo = speed;
       final fps = 29.80 + rng.nextDouble() * 0.10;
+      final pitch = 0.985 + rng.nextDouble() * 0.030;
 
       return VideoVariations(
         cropPercent: crop,
@@ -75,6 +80,7 @@ class VariationGenerator {
         rotateAngle: rot,
         audioTempo: tempo,
         outputFps: fps,
+        pitchFactor: pitch,
       );
     } catch (_) {
       return VideoVariations.fallback;
