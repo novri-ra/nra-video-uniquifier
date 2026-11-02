@@ -18,22 +18,34 @@ class HistoryItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: AppColors.surfaceContainerHighest),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
         child: Row(
           children: [
-            const _ThumbnailBadge(),
+            _ThumbnailBadge(isDark: isDark),
             const SizedBox(width: 12),
-            Expanded(child: _ItemInfoColumn(item: item)),
-            _ItemActionButtons(onShare: onShare, onDelete: onDelete),
+            Expanded(child: _ItemInfoColumn(item: item, isDark: isDark)),
+            _ItemActionButtons(onShare: onShare, onDelete: onDelete, isDark: isDark),
           ],
         ),
       ),
@@ -42,29 +54,31 @@ class HistoryItemCard extends StatelessWidget {
 }
 
 class _ThumbnailBadge extends StatelessWidget {
-  const _ThumbnailBadge();
+  final bool isDark;
+  const _ThumbnailBadge({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final thumbBg = isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF3F4F6);
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+    final checkColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+
     return Container(
       width: 72,
       height: 52,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        border: Border.all(color: AppColors.surfaceContainerHighest),
-        borderRadius: BorderRadius.circular(2),
+        color: thumbBg,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Stack(
         children: [
-          const Center(child: Icon(Icons.videocam, color: AppColors.outline, size: 24)),
+          Center(child: Icon(Icons.videocam, color: iconColor, size: 24)),
           Positioned(
             top: 3,
             left: 3,
-            child: Icon(
-              Icons.check_circle,
-              color: AppColors.primaryContainer.withValues(alpha: 0.9),
-              size: 13,
-            ),
+            child: Icon(Icons.check_circle, color: checkColor, size: 13),
           ),
           Positioned(
             bottom: 3,
@@ -72,10 +86,10 @@ class _ThumbnailBadge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLowest.withValues(alpha: 0.9),
-                border: Border.all(color: AppColors.surfaceContainerHighest),
+                color: (isDark ? AppColors.surfaceContainerLowest : const Color(0xFF111827)).withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(2),
               ),
-              child: const Text('MP4', style: TextStyle(color: AppColors.onSurface, fontSize: 8, fontFamily: 'monospace')),
+              child: const Text('MP4', style: TextStyle(color: Colors.white, fontSize: 8, fontFamily: 'monospace')),
             ),
           ),
         ],
@@ -86,23 +100,32 @@ class _ThumbnailBadge extends StatelessWidget {
 
 class _ItemInfoColumn extends StatelessWidget {
   final VideoExportItem item;
-  const _ItemInfoColumn({required this.item});
+  final bool isDark;
+  const _ItemInfoColumn({required this.item, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final dateColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final readyBg = isDark
+        ? AppColors.primaryContainer.withValues(alpha: 0.12)
+        : const Color(0xFF10B981).withValues(alpha: 0.12);
+    final readyColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
+    final readyBorder = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           item.fileName,
-          style: const TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600),
+          style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
           '${item.formattedDate} • ${item.formattedSize}',
-          style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace'),
+          style: TextStyle(color: dateColor, fontSize: 10, fontFamily: 'monospace'),
         ),
         const SizedBox(height: 6),
         Row(
@@ -110,14 +133,14 @@ class _ItemInfoColumn extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
               decoration: BoxDecoration(
-                color: AppColors.primaryContainer.withValues(alpha: 0.12),
-                border: Border.all(color: AppColors.primaryContainer),
-                borderRadius: BorderRadius.circular(2),
+                color: readyBg,
+                border: Border.all(color: readyBorder),
+                borderRadius: BorderRadius.circular(3),
               ),
-              child: const Text(
+              child: Text(
                 'READY',
                 style: TextStyle(
-                  color: AppColors.primaryContainer,
+                  color: readyColor,
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace',
@@ -125,9 +148,9 @@ class _ItemInfoColumn extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 6),
-            const Text(
+            Text(
               'H.264 • MODIFIED',
-              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 9, fontFamily: 'monospace'),
+              style: TextStyle(color: dateColor, fontSize: 9, fontFamily: 'monospace'),
             ),
           ],
         ),
@@ -139,23 +162,33 @@ class _ItemInfoColumn extends StatelessWidget {
 class _ItemActionButtons extends StatelessWidget {
   final VoidCallback onShare;
   final VoidCallback onDelete;
+  final bool isDark;
 
-  const _ItemActionButtons({required this.onShare, required this.onDelete});
+  const _ItemActionButtons({
+    required this.onShare,
+    required this.onDelete,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final btnBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
+    final btnBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final shareColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final deleteColor = isDark ? AppColors.error : const Color(0xFFDC2626);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
           icon: const Icon(Icons.share, size: 16),
-          color: AppColors.onSurface,
+          color: shareColor,
           tooltip: 'Share',
           style: IconButton.styleFrom(
-            backgroundColor: AppColors.surfaceContainer,
+            backgroundColor: btnBg,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-              side: const BorderSide(color: AppColors.surfaceContainerHighest),
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: btnBorder),
             ),
             minimumSize: const Size(48, 48),
             fixedSize: const Size(48, 48),
@@ -165,13 +198,13 @@ class _ItemActionButtons extends StatelessWidget {
         const SizedBox(width: 8),
         IconButton(
           icon: const Icon(Icons.delete_outline, size: 16),
-          color: AppColors.error,
+          color: deleteColor,
           tooltip: 'Delete',
           style: IconButton.styleFrom(
-            backgroundColor: AppColors.surfaceContainer,
+            backgroundColor: btnBg,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
-              side: const BorderSide(color: AppColors.surfaceContainerHighest),
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: btnBorder),
             ),
             minimumSize: const Size(48, 48),
             fixedSize: const Size(48, 48),

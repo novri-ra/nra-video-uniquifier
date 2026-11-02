@@ -27,6 +27,8 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
 | 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
 | 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
+| 75 | `75-dynamic-bento-dashboard.md` | Visual Overhaul Bento Dashboard: Full Dynamic Reactive Binding (Storage Disk Space, Live Batch Counter, Target Specs Sync, Auto-Calendar 60-90 Days Lead Time, & Interactive Keyword Chips) |
+| 76 | `76-microstock-news-and-auto-translate.md` | Tab Microstock Intel & News: Real-Time Network Status (Online/Offline), Local Offline Cache Persistence, Auto-Reload on Reconnect, dan Fitur Auto-Translate ID/EN |
 
 ---
 

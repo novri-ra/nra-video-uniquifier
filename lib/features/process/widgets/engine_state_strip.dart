@@ -14,22 +14,26 @@ class EngineStateStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF8FAFC);
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : const Color(0xFFE2E8F0);
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: AppColors.surfaceContainerHighest),
+          color: cardBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: _EngineStatusLabel(isHardware: provider.hardwareAcceleration)),
+            Expanded(child: _EngineStatusLabel(isHardware: provider.hardwareAcceleration, isDark: isDark)),
             const SizedBox(width: 8),
-            const _RenderEstimateLabel(),
+            _RenderEstimateLabel(isDark: isDark),
           ],
         ),
       ),
@@ -38,20 +42,23 @@ class EngineStateStrip extends StatelessWidget {
 }
 
 class _EngineStatusLabel extends StatelessWidget {
-  final bool isHardware;
-  const _EngineStatusLabel({required this.isHardware});
+  final bool isHardware, isDark;
+  const _EngineStatusLabel({required this.isHardware, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF0F172A);
+
     return Row(
       children: [
-        const Icon(Icons.memory, color: AppColors.primaryContainer, size: 14),
+        Icon(Icons.memory, color: iconColor, size: 14),
         const SizedBox(width: 6),
         Expanded(
           child: Text(
             isHardware ? 'GPU Accel: Metal / GLES (Active)' : 'Software CPU Fallback',
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace'),
+            style: TextStyle(color: textColor, fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w500),
           ),
         ),
       ],
@@ -60,18 +67,22 @@ class _EngineStatusLabel extends StatelessWidget {
 }
 
 class _RenderEstimateLabel extends StatelessWidget {
-  const _RenderEstimateLabel();
+  final bool isDark;
+  const _RenderEstimateLabel({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final iconColor = isDark ? AppColors.outline : const Color(0xFF6B7280);
+
+    return Row(
       children: [
         Text(
           'Est. Render: ~2.4s',
-          style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace'),
+          style: TextStyle(color: textColor, fontSize: 11, fontFamily: 'monospace'),
         ),
-        SizedBox(width: 4),
-        Icon(Icons.tune, color: AppColors.outline, size: 12),
+        const SizedBox(width: 4),
+        Icon(Icons.tune, color: iconColor, size: 12),
       ],
     );
   }

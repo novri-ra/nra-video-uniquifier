@@ -48,12 +48,25 @@ class _HeroWorkspaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(
+          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,23 +76,30 @@ class _HeroWorkspaceCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                  color: primary.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.auto_awesome, color: AppColors.primaryContainer, size: 20),
+                child: Icon(Icons.auto_awesome, color: primary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'AI Microstock Suite',
-                      style: TextStyle(color: AppColors.onSurface, fontSize: 15, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     Text(
                       'Automated Tagging & Keyframe Studio',
-                      style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11),
+                      style: TextStyle(
+                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -89,7 +109,11 @@ class _HeroWorkspaceCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             'Extract pristine keyframes, generate high-converting commercial tags, and burn QuickTime metadata directly into rendered outputs for instant stock marketplace approval.',
-            style: TextStyle(color: AppColors.onSurfaceVariant.withValues(alpha: 0.9), fontSize: 12, height: 1.4),
+            style: TextStyle(
+              color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+              fontSize: 12,
+              height: 1.4,
+            ),
           ),
         ],
       ),
@@ -112,17 +136,22 @@ class _FeatureRowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primary = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(
+          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.primaryContainer, size: 20),
+          Icon(icon, color: primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -134,18 +163,27 @@ class _FeatureRowCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(color: AppColors.onSurface, fontSize: 13, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceContainerHigh,
+                        color: isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainerLow,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         badge,
-                        style: const TextStyle(color: AppColors.primaryContainer, fontSize: 9, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+                        style: TextStyle(
+                          color: primary,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     ),
                   ],
@@ -153,7 +191,11 @@ class _FeatureRowCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, height: 1.3),
+                  style: TextStyle(
+                    color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                    fontSize: 11,
+                    height: 1.3,
+                  ),
                 ),
               ],
             ),

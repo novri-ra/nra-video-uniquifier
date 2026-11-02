@@ -16,6 +16,8 @@ class SettingsGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -26,8 +28,8 @@ class SettingsGroupCard extends StatelessWidget {
             children: [
               Text(
                 title.toUpperCase(),
-                style: const TextStyle(
-                  color: AppColors.onSurface,
+                style: TextStyle(
+                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
@@ -39,7 +41,7 @@ class SettingsGroupCard extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: TextStyle(
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.8),
+                    color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
                     fontSize: 10.5,
                   ),
                 ),
@@ -49,9 +51,19 @@ class SettingsGroupCard extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: AppColors.surfaceContainerLow,
+            color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.surfaceContainerHighest),
+            border: Border.all(
+              color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+            ),
+            boxShadow: [
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+            ],
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),

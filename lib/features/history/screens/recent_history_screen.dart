@@ -117,14 +117,14 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
     final totalSize = HistoryService.formatTotalSize(_items);
 
     return Scaffold(
-      appBar: const TopAppBar(),
+      appBar: const TopAppBar(title: 'RECENT EXPORTS'),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadHistory,
           color: AppColors.primaryContainer,
           backgroundColor: AppColors.surface,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 108),
             children: [
               HistoryHeader(itemCount: _items.length, totalSize: totalSize, onRefresh: _loadHistory),
               const SizedBox(height: 12),

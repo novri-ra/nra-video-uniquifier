@@ -115,6 +115,9 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       totalDurationMs: provider.totalDurationMs,
       targetFps: provider.targetFps,
       saturationLevel: provider.saturationLevel,
+      cropZoomScale: provider.cropZoomScale,
+      cropAnchor: provider.cropAnchor,
+      introTrimOffset: provider.introTrimOffset,
       onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
     );

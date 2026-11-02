@@ -581,7 +581,7 @@ void main() {
         modifyAudio: true,
         modifyVisuals: true,
         upscale1080p: true,
-        targetResolution: TargetResolution.r2k,
+        targetResolution: TargetResolution.r1080p,
         videoCodec: VideoCodec.h265,
         enableEnhanceAndDenoise: true,
         enableDeepAntiFingerprint: true,
@@ -604,7 +604,7 @@ void main() {
       expect(cmd, contains(r'[0:v]split=2[bg][fg];')); // 3. blurredCanvas
       expect(cmd, contains(r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'")); // 4. dynamicZoom
       expect(cmd, contains('hflip')); // 5. horizontalFlip
-      expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip
+      expect(cmd, contains('decimate=cycle=25')); // 6. frameSkip on 1080p (disabled on 2K/4K)
       // 7. upscale active, so hqdn3d is bypassed to retain crisp textures
       expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
       expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0')); // pre-scale edge sharpness

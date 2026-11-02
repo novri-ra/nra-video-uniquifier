@@ -10,6 +10,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
+import '../../settings/screens/settings_screen.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,9 @@ class _ProcessScreenState extends State<ProcessScreen> {
   bool _isNavigating = false;
 
   void _openSettingsTab(BuildContext context) {
-    context.read<UniquifierProvider>().setTabIndex(4);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SettingsScreen()),
+    );
   }
 
   Future<void> _pickVideo(BuildContext context) async {
@@ -97,7 +100,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 108),
           child: _ProcessBody(
             hasFile: hasFile,
             batchCount: batchCount,

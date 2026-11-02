@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// Redesigned selectable obsidian preset profile cards matching video codec and upscale cards.
+/// Redesigned selectable preset profile cards matching video codec and upscale cards.
 class PresetProfileCard extends StatelessWidget {
   final UniquifierProvider provider;
 
@@ -10,15 +10,19 @@ class PresetProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       children: [
         _PresetTile(
           icon: Icons.bolt,
+          iconAccent: const Color(0xFF6C5CE7),
           title: 'TikTok / Reels Aggressive',
           description: 'Spectral Shift, Speed Warp 1.015x, Ken Burns Zoom, HFlip, Noise',
           badge: 'FAST',
-          badgeColor: AppColors.primaryContainer,
+          badgeColor: const Color(0xFF6C5CE7),
           isSelected: provider.activePreset == 'TikTok / Reels',
+          isDark: isDark,
           onTap: () => provider.applyPreset(
             removeMetadata: true,
             modifyAudio: true,
@@ -38,11 +42,13 @@ class PresetProfileCard extends StatelessWidget {
         const SizedBox(height: 8),
         _PresetTile(
           icon: Icons.movie_filter,
+          iconAccent: const Color(0xFF007AFF),
           title: 'Cinematic 2K / 4K Clean',
           description: 'No HFlip, No Canvas Blur, AI Upscale + Unsharp, Target 2K',
           badge: 'CINEMA',
-          badgeColor: AppColors.secondary,
+          badgeColor: const Color(0xFF007AFF),
           isSelected: provider.activePreset == 'Cinematic 2K/4K',
+          isDark: isDark,
           onTap: () => provider.applyPreset(
             removeMetadata: true,
             modifyAudio: true,
@@ -59,11 +65,13 @@ class PresetProfileCard extends StatelessWidget {
         const SizedBox(height: 8),
         _PresetTile(
           icon: Icons.flash_on,
+          iconAccent: const Color(0xFF10B981),
           title: 'Ultra-Light / Quick Export',
           description: 'Minimal filters, CRF 22, no AI upscale, metadata scrub only',
           badge: 'QUICK',
-          badgeColor: AppColors.outline,
+          badgeColor: const Color(0xFF10B981),
           isSelected: provider.activePreset == 'Quick Export',
+          isDark: isDark,
           onTap: () => provider.applyPreset(
             removeMetadata: true,
             modifyAudio: false,
@@ -85,43 +93,58 @@ class PresetProfileCard extends StatelessWidget {
 
 class _PresetTile extends StatelessWidget {
   final IconData icon;
+  final Color iconAccent;
   final String title, description, badge;
   final Color badgeColor;
-  final bool isSelected;
+  final bool isSelected, isDark;
   final VoidCallback onTap;
 
   const _PresetTile({
     required this.icon,
+    required this.iconAccent,
     required this.title,
     required this.description,
     required this.badge,
     required this.badgeColor,
     required this.isSelected,
+    required this.isDark,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    const activeBorder = Color(0xFF6C5CE7);
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final iconColor = isSelected ? activeBorder : iconAccent;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(4),
+          color: isSelected ? activeBg : inactiveBg,
+          borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,
+            color: isSelected ? activeBorder : inactiveBorder,
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: [
+            if (!isDark && !isSelected)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? AppColors.primaryContainer : AppColors.outline,
-              size: 20,
-            ),
+            Icon(icon, color: iconColor, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -132,8 +155,8 @@ class _PresetTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           title,
-                          style: const TextStyle(
-                            color: AppColors.onSurface,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -143,11 +166,11 @@ class _PresetTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: badgeColor.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(2),
-                          border: Border.all(color: badgeColor.withValues(alpha: 0.5)),
+                          color: badgeColor.withValues(alpha: isDark ? 0.15 : 0.12),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: badgeColor.withValues(alpha: isDark ? 0.4 : 0.3)),
                         ),
                         child: Text(
                           badge,
@@ -164,8 +187,8 @@ class _PresetTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
-                      color: AppColors.onSurfaceVariant,
+                    style: TextStyle(
+                      color: descColor,
                       fontSize: 11,
                       fontFamily: 'monospace',
                     ),

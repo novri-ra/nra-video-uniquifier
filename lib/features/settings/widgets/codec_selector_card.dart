@@ -15,14 +15,18 @@ class CodecSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryBadge = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+
     return Column(
       children: [
         _CodecTile(
           title: 'H.264 / AVC (TikTok Universal)',
           description: 'CRF 22 • Maximum compatibility across TikTok, Reels, & MediaCodec',
           badge: 'TIKTOK UNIVERSAL',
-          badgeColor: AppColors.primaryContainer,
+          badgeColor: primaryBadge,
           isSelected: currentCodec == VideoCodec.h264,
+          isDark: isDark,
           onTap: () => onSelect(VideoCodec.h264),
         ),
         const SizedBox(height: 8),
@@ -30,8 +34,9 @@ class CodecSelectorCard extends StatelessWidget {
           title: 'H.265 / HEVC (High Efficiency)',
           description: 'CRF 26 • ~40% higher compression efficiency with -tag:v hvc1',
           badge: 'HIGH EFFICIENCY',
-          badgeColor: AppColors.secondary,
+          badgeColor: isDark ? AppColors.secondary : const Color(0xFF007AFF),
           isSelected: currentCodec == VideoCodec.h265,
+          isDark: isDark,
           onTap: () => onSelect(VideoCodec.h265),
         ),
       ],
@@ -42,7 +47,7 @@ class CodecSelectorCard extends StatelessWidget {
 class _CodecTile extends StatelessWidget {
   final String title, description, badge;
   final Color badgeColor;
-  final bool isSelected;
+  final bool isSelected, isDark;
   final VoidCallback onTap;
 
   const _CodecTile({
@@ -51,29 +56,46 @@ class _CodecTile extends StatelessWidget {
     required this.badge,
     required this.badgeColor,
     required this.isSelected,
+    required this.isDark,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    const activeBorder = Color(0xFF6C5CE7);
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final iconColor = isSelected ? const Color(0xFF10B981) : (isDark ? AppColors.outline : const Color(0xFF9CA3AF));
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.surfaceContainerHigh : AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(4),
+          color: isSelected ? activeBg : inactiveBg,
+          borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isSelected ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,
+            color: isSelected ? activeBorder : inactiveBorder,
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: [
+            if (!isDark && !isSelected)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
         ),
         child: Row(
           children: [
             Icon(
               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-              color: isSelected ? AppColors.primaryContainer : AppColors.outline,
+              color: iconColor,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -86,8 +108,8 @@ class _CodecTile extends StatelessWidget {
                       Flexible(
                         child: Text(
                           title,
-                          style: const TextStyle(
-                            color: AppColors.onSurface,
+                          style: TextStyle(
+                            color: textColor,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -100,7 +122,7 @@ class _CodecTile extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                         decoration: BoxDecoration(
                           color: badgeColor.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(2),
+                          borderRadius: BorderRadius.circular(3),
                           border: Border.all(color: badgeColor.withValues(alpha: 0.5)),
                         ),
                         child: Text(
@@ -118,7 +140,7 @@ class _CodecTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11),
+                    style: TextStyle(color: descColor, fontSize: 11),
                   ),
                 ],
               ),

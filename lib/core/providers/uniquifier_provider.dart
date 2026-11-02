@@ -92,6 +92,9 @@ class UniquifierProvider extends ChangeNotifier {
   bool _enableBlurredCanvas = false, _muteOriginalAudio = false, _enableDynamicZoom = false;
   bool _enableMicroOverlay = false, _enableFrameSkip = false, _enableChromaShift = false;
   double _canvasScalePercent = 95.0;
+  double _cropZoomScale = 1.08;
+  String _cropAnchor = 'top';
+  double _introTrimOffset = 0.5;
   bool _thermalThrottle = false;
   double _sharpeningLevel = 1.0;
   double _saturationLevel = 1.0;
@@ -121,6 +124,8 @@ class UniquifierProvider extends ChangeNotifier {
   bool get muteOriginalAudio => _muteOriginalAudio; bool get enableDynamicZoom => _enableDynamicZoom;
   bool get enableMicroOverlay => _enableMicroOverlay; bool get enableFrameSkip => _enableFrameSkip;
   bool get enableChromaShift => _enableChromaShift; double get canvasScalePercent => _canvasScalePercent;
+  double get cropZoomScale => _cropZoomScale; String get cropAnchor => _cropAnchor;
+  double get introTrimOffset => _introTrimOffset;
   bool get thermalThrottle => _thermalThrottle; double get sharpeningLevel => _sharpeningLevel;
   double get saturationLevel => _saturationLevel; int get targetFps => _targetFps;
   String get activePreset => _activePreset;
@@ -176,6 +181,20 @@ class UniquifierProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCropZoomScale(double val) {
+    _cropZoomScale = double.parse(val.clamp(1.0, 1.5).toStringAsFixed(2));
+    notifyListeners();
+  }
+  void setCropAnchor(String anchor) {
+    if (['top', 'center', 'bottom'].contains(anchor)) {
+      _cropAnchor = anchor;
+      notifyListeners();
+    }
+  }
+  void setIntroTrimOffset(double val) {
+    _introTrimOffset = double.parse(val.clamp(0.0, 3.0).toStringAsFixed(1));
+    notifyListeners();
+  }
   void setUpscaleTarget(String target) {
     _targetResolution = TargetResolution.fromString(target);
     try { SettingsService.setUpscaleResolution(_targetResolution); } catch (_) {}
@@ -271,7 +290,6 @@ class UniquifierProvider extends ChangeNotifier {
       SettingsService.setCanvasScalePercent(_canvasScalePercent);
       SettingsService.setMuteOriginalAudio(_muteOriginalAudio);
     } catch (_) {}
-    _currentTabIndex = 0;
     notifyListeners();
   }
 
