@@ -129,15 +129,17 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
     if (_controller.isAnimating) _controller.stop();
     provider.updateRealtimeStats(p, speed, timeMs);
     setState(() {
-      _progress = p.clamp(0.05, 0.98);
-      if (_progress < 0.25) {
+      _progress = p.clamp(0.05, 0.99);
+      if (_progress < 0.10) {
         _step = 1;
-      } else if (_progress < 0.55) {
+      } else if (_progress < 0.30) {
         _step = 2;
-      } else if (_progress < 0.85) {
+      } else if (_progress < 0.75) {
         _step = 3;
-      } else {
+      } else if (_progress < 0.95) {
         _step = 4;
+      } else {
+        _step = 5;
       }
     });
   }
@@ -209,6 +211,14 @@ class _CentralModuleCard extends StatelessWidget {
 
   const _CentralModuleCard({required this.progress, required this.step});
 
+  String _getStageDescription(double p) {
+    if (p < 0.10) return 'Menyiapkan staging environment & membaca metadata...';
+    if (p < 0.30) return 'Menerapkan transformasi spasial, micro-trim & rotasi...';
+    if (p < 0.75) return 'Memproses rendering filtergraph & penajaman kanonikal...';
+    if (p < 0.95) return 'Mengompresi video fidelitas tinggi (CRF 17) & enkoding audio...';
+    return 'Menyinkronkan ke galeri publik (MediaStore) & membersihkan cache...';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -235,7 +245,7 @@ class _CentralModuleCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Applying micro-crop & shifting audio pitch\n(Step $step of 4)',
+            _getStageDescription(progress),
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.outline, fontSize: 12),
           ),

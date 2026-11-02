@@ -14,12 +14,14 @@ class ProcessingStageTracker extends StatelessWidget {
     return Row(
       children: [
         _StageStep(label: 'METADATA', isCompleted: currentStep >= 1),
-        const SizedBox(width: 6),
-        _StageStep(label: 'AUDIO/CROP', isCompleted: currentStep >= 2),
-        const SizedBox(width: 6),
-        _StageStep(label: 'HASH_GEN', isCompleted: currentStep >= 3),
-        const SizedBox(width: 6),
-        _StageStep(label: 'RENDER', isCompleted: currentStep >= 4),
+        const SizedBox(width: 4),
+        _StageStep(label: 'TRANSFORM', isCompleted: currentStep >= 2),
+        const SizedBox(width: 4),
+        _StageStep(label: 'FILTERGRAPH', isCompleted: currentStep >= 3),
+        const SizedBox(width: 4),
+        _StageStep(label: 'ENCODE', isCompleted: currentStep >= 4),
+        const SizedBox(width: 4),
+        _StageStep(label: 'EXPORT', isCompleted: currentStep >= 5),
       ],
     );
   }
@@ -52,7 +54,7 @@ class _StageStep extends StatelessWidget {
             label,
             style: TextStyle(
               color: isCompleted ? AppColors.onSurface : AppColors.outline,
-              fontSize: 8,
+              fontSize: 7.5,
               fontWeight: FontWeight.w600,
               fontFamily: 'monospace',
             ),

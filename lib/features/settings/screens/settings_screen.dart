@@ -97,7 +97,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
             const SizedBox(height: 8),
-            UpscaleResolutionCard(selectedValue: provider.selectedUpscaleTarget, onSelect: provider.setUpscaleTarget),
+            UpscaleResolutionCard(
+              selectedValue: provider.selectedUpscaleTarget,
+              onSelect: provider.setUpscaleTarget,
+              tier: provider.deviceTier,
+            ),
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'SUPER-RESOLUTION ENGINE', subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3'),
             const SizedBox(height: 8),

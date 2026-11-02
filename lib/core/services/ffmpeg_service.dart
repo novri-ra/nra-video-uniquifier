@@ -9,6 +9,7 @@ import 'media_scanner_service.dart';
 import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
+import 'wakelock_service.dart';
 import 'filter_builders.dart';
 import '../utils/variation_generator.dart';
 
@@ -267,12 +268,14 @@ class FfmpegService {
     );
 
     _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);
+    await WakeLockService.acquire();
     try {
       return await _executeAndExport(
         command: command, stagedOutputPath: stagedOutputPath, effectiveInput: meta.effectiveInput,
         finalDestPath: finalDestPath, suppressCompleteNotification: suppressCompleteNotification,
       );
     } finally {
+      await WakeLockService.release();
       if (onProgress != null) FFmpegKitConfig.enableStatisticsCallback(null);
       if (onLog != null) FFmpegKitConfig.enableLogCallback(null);
       await NotificationService.cancelProgressNotification();
@@ -312,11 +315,13 @@ class FfmpegService {
     required String baseName,
   }) {
     if (onProgress != null) {
+      double maxProgress = 0.0;
       FFmpegKitConfig.enableStatisticsCallback((statistics) {
         final timeMs = statistics.getTime(), speed = statistics.getSpeed();
-        final progress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
-        onProgress(progress, speed, timeMs);
-        final percent = (progress * 100).toInt();
+        final rawProgress = resolvedDurationMs > 0 ? (timeMs / resolvedDurationMs).clamp(0.0, 1.0) : 0.0;
+        if (rawProgress > maxProgress) maxProgress = rawProgress;
+        onProgress(maxProgress, speed, timeMs);
+        final percent = (maxProgress * 100).toInt();
         NotificationService.showProgressNotification(
           progress: percent,
           title: 'Uniquifying $baseName',

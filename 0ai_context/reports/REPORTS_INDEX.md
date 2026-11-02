@@ -25,6 +25,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 61 | `61-anti-vdna-evasion-enhancement.md` | Anti-vDNA Visual Fingerprint Hardening & TikTok Detection Evasion Pipeline | `0ai_context/reports/` |
 | 62 | `62-real-ncnn-vulkan-ai-upscale-and-lossless-clarity.md` | Real Bundled Real-ESRGAN NCNN Vulkan Weights & Crystal-Clear 2K/4K Upscale Pipeline | `0ai_context/reports/` |
 | 63 | `63-deep-ui-sync-and-pipeline-optimization-audit.md` | Deep UI Synchronization, Two-Way Binding & Engine Pipeline Optimization Audit | `0ai_context/reports/` |
+| 64 | `64-hardware-profiler-background-resilience-and-icons.md` | Profiling Hardware Dinamis, Resiliensi Background WakeLock, Persistensi Settings, dan Integrasi Ikon | `0ai_context/reports/` |
 
 ---
 

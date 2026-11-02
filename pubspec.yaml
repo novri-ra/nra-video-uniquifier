@@ -69,6 +69,9 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/warna.svg
+    - assets/putih.svg
+    - assets/hitam.svg
     - assets/models/realesr-animevideov3-x2.bin
     - assets/models/realesr-animevideov3-x2.param
     - assets/models/realesr-animevideov3-x4.bin

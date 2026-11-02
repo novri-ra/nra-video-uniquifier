@@ -1,5 +1,6 @@
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:flutter/material.dart';
+import '../services/device_capability_service.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
 import '../utils/formatters.dart';
@@ -48,6 +49,7 @@ class UniquifierProvider extends ChangeNotifier {
 
   Future<void> _initResolution() async {
     try {
+      _deviceSpecs = await DeviceCapabilityService.getSpecs();
       _targetResolution = await SettingsService.getUpscaleResolution();
       _upscaleEngine = await SettingsService.getUpscaleEngine();
       _videoCodec = await SettingsService.getVideoCodec();
@@ -99,6 +101,7 @@ class UniquifierProvider extends ChangeNotifier {
   UpscaleEngine _upscaleEngine = UpscaleEngine.lanczos;
   VideoCodec _videoCodec = VideoCodec.h264;
   bool _hardwareAcceleration = true;
+  DeviceSpecs _deviceSpecs = DeviceSpecs.defaultFallback();
 
   // Navigation
   int _currentTabIndex = 0;
@@ -151,6 +154,8 @@ class UniquifierProvider extends ChangeNotifier {
   String get targetResolutionLabel => _targetResolution.label;
   String get targetResolutionDetails => _targetResolution.details;
   bool get hardwareAcceleration => _hardwareAcceleration;
+  DeviceSpecs get deviceSpecs => _deviceSpecs;
+  DeviceTier get deviceTier => _deviceSpecs.tier;
   int get currentTabIndex => _currentTabIndex;
 
   // Actions
