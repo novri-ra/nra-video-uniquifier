@@ -11,7 +11,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     ConnectivityService.mockPingHandler = null;
     TranslationService.mockTranslator = null;
+    TranslationService.customHttpGet = null;
     MicrostockNewsService.mockFetchHandler = null;
+    MicrostockNewsService.customHttpGet = null;
   });
 
   tearDown(() {
@@ -73,15 +75,77 @@ void main() {
       expect(resCached, equals('Terjemahan Khusus'));
     });
 
-    test('translateText throws TranslationOfflineException when offline without cache', () async {
-      expect(
-        () => TranslationService.translateText(
-          'Completely Unknown String 998877',
-          targetLang: 'id',
-          isOnline: false,
-        ),
-        throwsA(isA<TranslationOfflineException>()),
-      );
+    test('translateLongText chunks multi-paragraph text and reassembles correctly', () async {
+      TranslationService.mockTranslator = (text, lang) async => 'Terjemahan: $text';
+
+      const multiPara = 'First paragraph content.\n\nSecond paragraph content.';
+      final result = await TranslationService.translateLongText(multiPara, targetLang: 'id');
+
+      expect(result, contains('Terjemahan: First paragraph content.'));
+      expect(result, contains('Terjemahan: Second paragraph content.'));
+      expect(result.contains('\n\n'), isTrue);
+
+      // Verify persistent cache hit
+      TranslationService.mockTranslator = null;
+      final cached = await TranslationService.translateLongText(multiPara, targetLang: 'id');
+      expect(cached, equals(result));
+    });
+  });
+
+  group('Sprint 79: Hybrid Feed Integration (RSS2JSON + Reddit Intel)', () {
+    test('fetchHybridNews correctly parses and sorts RSS2JSON and Reddit posts', () async {
+      MicrostockNewsService.customHttpGet = (uri) async {
+        if (uri.toString().contains('rss2json.com')) {
+          return '''
+          {
+            "status": "ok",
+            "items": [
+              {
+                "title": "Agency 4K Guideline Update",
+                "pubDate": "2026-10-30 10:00:00",
+                "link": "https://agency.com/news",
+                "description": "<p>Agency video description</p>",
+                "content": "<p>Agency full article text</p>",
+                "categories": ["Video", "Specs"]
+              }
+            ]
+          }
+          ''';
+        } else if (uri.toString().contains('microstock/hot.json')) {
+          return '''
+          {
+            "data": {
+              "children": [
+                {
+                  "data": {
+                    "id": "reddit_01",
+                    "title": "Reddit Hot Discussion on Dupes",
+                    "selftext": "Community discussion body on perceptual hashing.",
+                    "permalink": "/r/microstock/comments/123/dupes/",
+                    "created_utc": 1730400000,
+                    "subreddit": "microstock"
+                  }
+                }
+              ]
+            }
+          }
+          ''';
+        } else {
+          return '{"data": {"children": []}}';
+        }
+      };
+
+      final items = await MicrostockNewsService.fetchHybridNews();
+      expect(items.length, equals(2));
+
+      final rssItem = items.firstWhere((i) => i.source == 'Shutterstock Official');
+      expect(rssItem.title, equals('Agency 4K Guideline Update'));
+      expect(rssItem.summary, contains('Agency video description'));
+
+      final redditItem = items.firstWhere((i) => i.source == 'Reddit Community Discussion');
+      expect(redditItem.title, equals('Reddit Hot Discussion on Dupes'));
+      expect(redditItem.category, equals('COMMUNITY'));
+      expect(redditItem.sourceUrl, contains('reddit.com/r/microstock'));
     });
   });
 

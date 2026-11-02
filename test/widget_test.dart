@@ -523,6 +523,18 @@ void main() {
       expect(find.text('CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)'), findsOneWidget);
       expect(find.text('Buka Sumber'), findsOneWidget);
 
+      // Verify translation toggle in reader sheet
+      final translateBtn = find.text('Terjemahkan Artikel (ID)');
+      expect(translateBtn, findsOneWidget);
+      await tester.tap(translateBtn);
+      await tester.pumpAndSettle();
+      expect(find.text('Tampilkan Asli'), findsOneWidget);
+
+      // Revert back
+      await tester.tap(find.text('Tampilkan Asli'));
+      await tester.pumpAndSettle();
+      expect(find.text('Terjemahkan Artikel (ID)'), findsOneWidget);
+
       // Close reader sheet
       await tester.tap(find.byTooltip('Close reader'));
       await tester.pumpAndSettle();

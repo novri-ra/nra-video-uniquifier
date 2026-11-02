@@ -4,7 +4,7 @@ import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'microstock_article_sheet.dart';
 
-/// News article card with inline auto-translation and tag chips.
+/// News article card with inline auto-translation, source badges, and tag chips.
 class MicrostockNewsCard extends StatefulWidget {
   final MicrostockNewsArticle article;
   final bool isDark;
@@ -64,9 +64,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e is TranslationOfflineException
-                ? e.message
-                : 'Gagal menerjemahkan berita',
+            e is TranslationOfflineException ? e.message : 'Gagal menerjemahkan berita',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -77,21 +75,13 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = widget.isDark
-        ? AppColors.surfaceContainerHighest
-        : AppColors.lightOutlineVariant;
+    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
     final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final summaryColor = widget.isDark
-        ? AppColors.onSurfaceVariant
-        : const Color(0xFF4B5563);
+    final summaryColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
     const purpleAccent = Color(0xFF6C5CE7);
 
-    final displayTitle = (_isTranslated && _translatedTitle != null)
-        ? _translatedTitle!
-        : widget.article.title;
-    final displaySummary = (_isTranslated && _translatedSummary != null)
-        ? _translatedSummary!
-        : widget.article.summary;
+    final displayTitle = (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
+    final displaySummary = (_isTranslated && _translatedSummary != null) ? _translatedSummary! : widget.article.summary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -119,18 +109,15 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _CategoryBadge(
-                      category: widget.article.category,
-                      isDark: widget.isDark,
-                    ),
+                    _CategoryBadge(category: widget.article.category, isDark: widget.isDark),
+                    const SizedBox(width: 6),
+                    _SourceBadge(source: widget.article.source, isDark: widget.isDark),
+                    const Spacer(),
                     Text(
                       widget.article.publishedDate,
                       style: TextStyle(
-                        color: widget.isDark
-                            ? const Color(0xFF9CA3AF)
-                            : const Color(0xFF6B7280),
+                        color: widget.isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                         fontSize: 10,
                         fontFamily: 'monospace',
                       ),
@@ -140,21 +127,12 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                 const SizedBox(height: 10),
                 Text(
                   displayTitle,
-                  style: TextStyle(
-                    color: titleColor,
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w700,
-                    height: 1.3,
-                  ),
+                  style: TextStyle(color: titleColor, fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   displaySummary,
-                  style: TextStyle(
-                    color: summaryColor,
-                    fontSize: 12,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: summaryColor, fontSize: 12, height: 1.4),
                 ),
                 const SizedBox(height: 12),
                 _TagsRow(tags: widget.article.tags, isDark: widget.isDark),
@@ -219,6 +197,55 @@ class _CategoryBadge extends StatelessWidget {
           fontWeight: FontWeight.w700,
           fontFamily: 'monospace',
         ),
+      ),
+    );
+  }
+}
+
+class _SourceBadge extends StatelessWidget {
+  final String source;
+  final bool isDark;
+
+  const _SourceBadge({required this.source, required this.isDark});
+
+  Color _getSourceColor() {
+    if (source.contains('Reddit')) return const Color(0xFFFF5722);
+    if (source.contains('Shutterstock')) return const Color(0xFF00ADB5);
+    if (source.contains('Adobe')) return const Color(0xFFE11D48);
+    return const Color(0xFF10B981);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _getSourceColor();
+    final isReddit = source.contains('Reddit');
+    final label = isReddit ? 'Reddit Community' : (source.length > 18 ? '${source.substring(0, 16)}..' : source);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.25), width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isReddit ? Icons.forum_rounded : Icons.verified_rounded,
+            size: 9,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 8.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

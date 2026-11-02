@@ -34,6 +34,9 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   bool _isTranslating = false;
   String? _translatedTitle;
   String? _translatedContent;
+  String? _translatedTakeaways;
+  List<String>? _translatedSpecs;
+  List<String>? _translatedChecklist;
 
   String get _displayTitle =>
       (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
@@ -42,6 +45,15 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
       (_isTranslated && _translatedContent != null)
           ? _translatedContent!
           : (widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary);
+
+  String get _displayTakeaways =>
+      (_isTranslated && _translatedTakeaways != null) ? _translatedTakeaways! : widget.article.keyTakeaways;
+
+  List<String> get _displaySpecs =>
+      (_isTranslated && _translatedSpecs != null) ? _translatedSpecs! : widget.article.technicalSpecs;
+
+  List<String> get _displayChecklist =>
+      (_isTranslated && _translatedChecklist != null) ? _translatedChecklist! : widget.article.contributorChecklist;
 
   Future<void> _toggleTranslation() async {
     if (_isTranslated) {
@@ -54,14 +66,37 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
     }
 
     setState(() => _isTranslating = true);
+    try {
+      await _executeTranslation();
+    } catch (_) {
+      if (mounted) setState(() => _isTranslating = false);
+    }
+  }
+
+  Future<void> _executeTranslation() async {
     final tTitle = await TranslationService.translateText(widget.article.title, targetLang: 'id');
-    final rawContent = widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary;
-    final tContent = await TranslationService.translateText(rawContent, targetLang: 'id');
+    final raw = widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary;
+    final tContent = await TranslationService.translateLongText(raw, targetLang: 'id');
+
+    final tTakeaways = widget.article.keyTakeaways.isNotEmpty
+        ? await TranslationService.translateText(widget.article.keyTakeaways, targetLang: 'id')
+        : null;
+
+    final tSpecs = widget.article.technicalSpecs.isNotEmpty
+        ? await Future.wait(widget.article.technicalSpecs.map((s) => TranslationService.translateText(s, targetLang: 'id')))
+        : <String>[];
+
+    final tCheck = widget.article.contributorChecklist.isNotEmpty
+        ? await Future.wait(widget.article.contributorChecklist.map((c) => TranslationService.translateText(c, targetLang: 'id')))
+        : <String>[];
 
     if (mounted) {
       setState(() {
         _translatedTitle = tTitle;
         _translatedContent = tContent;
+        _translatedTakeaways = tTakeaways;
+        _translatedSpecs = tSpecs;
+        _translatedChecklist = tCheck;
         _isTranslated = true;
         _isTranslating = false;
       });
@@ -105,6 +140,9 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
                 article: widget.article,
                 displayTitle: _displayTitle,
                 displayContent: _displayContent,
+                displayTakeaways: _displayTakeaways,
+                displaySpecs: _displaySpecs,
+                displayChecklist: _displayChecklist,
                 isTranslated: _isTranslated,
                 isTranslating: _isTranslating,
                 isDark: isDark,
@@ -141,6 +179,9 @@ class _ArticleContentList extends StatelessWidget {
   final MicrostockNewsArticle article;
   final String displayTitle;
   final String displayContent;
+  final String displayTakeaways;
+  final List<String> displaySpecs;
+  final List<String> displayChecklist;
   final bool isTranslated;
   final bool isTranslating;
   final bool isDark;
@@ -152,6 +193,9 @@ class _ArticleContentList extends StatelessWidget {
     required this.article,
     required this.displayTitle,
     required this.displayContent,
+    required this.displayTakeaways,
+    required this.displaySpecs,
+    required this.displayChecklist,
     required this.isTranslated,
     required this.isTranslating,
     required this.isDark,
@@ -180,18 +224,18 @@ class _ArticleContentList extends StatelessWidget {
           isDark: isDark,
         ),
         const SizedBox(height: 16),
-        if (article.keyTakeaways.isNotEmpty) ...[
-          ArticleKeyTakeawaysBox(text: article.keyTakeaways, isDark: isDark),
+        if (displayTakeaways.isNotEmpty) ...[
+          ArticleKeyTakeawaysBox(text: displayTakeaways, isDark: isDark),
           const SizedBox(height: 18),
         ],
         Text(displayContent, style: TextStyle(color: bodyColor, fontSize: 15, height: 1.6)),
-        if (article.technicalSpecs.isNotEmpty) ...[
+        if (displaySpecs.isNotEmpty) ...[
           const SizedBox(height: 22),
-          ArticleTechnicalSpecsBox(specs: article.technicalSpecs, isDark: isDark),
+          ArticleTechnicalSpecsBox(specs: displaySpecs, isDark: isDark),
         ],
-        if (article.contributorChecklist.isNotEmpty) ...[
+        if (displayChecklist.isNotEmpty) ...[
           const SizedBox(height: 18),
-          ArticleContributorChecklistBox(items: article.contributorChecklist, isDark: isDark),
+          ArticleContributorChecklistBox(items: displayChecklist, isDark: isDark),
         ],
         const SizedBox(height: 24),
         _FooterSourceBox(article: article, isDark: isDark),
@@ -324,7 +368,9 @@ class _TranslateButton extends StatelessWidget {
               ),
             const SizedBox(width: 6),
             Text(
-              isTranslated ? 'Bahasa Asli (EN)' : 'Terjemahkan (ID)',
+              isTranslating
+                  ? 'Menerjemahkan...'
+                  : (isTranslated ? 'Tampilkan Asli' : 'Terjemahkan Artikel (ID)'),
               style: TextStyle(
                 color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
                 fontSize: 11,
