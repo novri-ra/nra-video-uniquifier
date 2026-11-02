@@ -283,5 +283,10 @@ void main() {
       expect(dispatched[1]['type'], equals('video_metadata_vault'));
       expect(dispatched[1]['title'], equals('Cinematic Sunset 4K'));
     });
+
+    test('Sprint 82: UserInterestService binds live Google Apps Script webhook URL as default', () async {
+      final webhook = await UserInterestService.getWebhookUrl();
+      expect(webhook, contains('script.google.com/macros/s/AKfycbzy4jEhfXCqt2XJnYETH2UXF5vMo26AguljNl0a20PDDXXKsfX5EOPTUcwadlXCoya-/exec'));
+    });
   });
 }

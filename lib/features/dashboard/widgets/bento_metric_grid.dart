@@ -131,11 +131,10 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
 
   @override
   Widget build(BuildContext context) {
-    const queueColor = Color(0xFFFF9F1C);
+    const queueColor = Color(0xFFF59E0B);
     final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
     final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
     final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final detailColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -164,49 +163,112 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Icon(Icons.layers_rounded, color: queueColor, size: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: queueColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      widget.queue.hasItems ? '${widget.queue.totalCount} QUEUED' : '0 QUEUED',
-                      style: const TextStyle(
-                        color: queueColor,
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
+                  GestureDetector(
+                    onTap: widget.onTap,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: queueColor.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: queueColor.withValues(alpha: 0.4)),
                       ),
+                      child: const Icon(Icons.add, size: 12, color: queueColor),
                     ),
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: titleColor, fontSize: 12, fontWeight: FontWeight.w700),
+              const Spacer(),
+              Center(
+                child: SizedBox(
+                  width: 76,
+                  height: 48,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned(
+                        top: 2,
+                        child: Container(
+                          width: 52,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: queueColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: queueColor.withValues(alpha: 0.25)),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 6,
+                        child: Container(
+                          width: 60,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            color: queueColor.withValues(alpha: 0.28),
+                            borderRadius: BorderRadius.circular(7),
+                            border: Border.all(color: queueColor.withValues(alpha: 0.4)),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 10,
+                        child: Container(
+                          width: 68,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: widget.isDark ? const Color(0xFF261D12) : const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: queueColor, width: 1.2),
+                            boxShadow: [
+                              BoxShadow(color: queueColor.withValues(alpha: 0.25), blurRadius: 6),
+                            ],
+                          ),
+                          child: Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.movie_filter_rounded, size: 12, color: queueColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${widget.queue.totalCount}',
+                                  style: const TextStyle(
+                                    color: queueColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'monospace',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    widget.queue.hasItems
-                        ? '${widget.queue.completedCount} selesai • Ketuk buka'
-                        : 'Antrean siap • Ketuk kelola',
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: detailColor, fontSize: 9.5, height: 1.25),
-                  ),
-                ],
+                ),
+              ),
+              const Spacer(),
+              Text(
+                widget.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+              ),
+              Text(
+                widget.queue.hasItems
+                    ? '${widget.queue.completedCount}/${widget.queue.totalCount} Selesai • Buka'
+                    : 'Siap Unggah • Ketuk +',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: queueColor,
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),

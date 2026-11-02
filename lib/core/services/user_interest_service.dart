@@ -23,6 +23,9 @@ class UserInterestService {
     'Commercial Rights',
   ];
 
+  static const String defaultWebhookUrl =
+      'https://script.google.com/macros/s/AKfycbzy4jEhfXCqt2XJnYETH2UXF5vMo26AguljNl0a20PDDXXKsfX5EOPTUcwadlXCoya-/exec';
+
   static final Map<String, int> _affinityMap = {};
   static bool _initialized = false;
   static String? _configuredWebhookUrl;
@@ -52,13 +55,15 @@ class UserInterestService {
   }
 
   /// Retrieves active webhook URL from memory or preferences.
-  static Future<String?> getWebhookUrl() async {
-    if (_configuredWebhookUrl != null) return _configuredWebhookUrl;
+  static Future<String> getWebhookUrl() async {
+    if (_configuredWebhookUrl != null) return _configuredWebhookUrl!;
     try {
       final prefs = await SharedPreferences.getInstance();
-      _configuredWebhookUrl = prefs.getString(_webhookKey);
-    } catch (_) {}
-    return _configuredWebhookUrl;
+      _configuredWebhookUrl = prefs.getString(_webhookKey) ?? defaultWebhookUrl;
+    } catch (_) {
+      _configuredWebhookUrl = defaultWebhookUrl;
+    }
+    return _configuredWebhookUrl ?? defaultWebhookUrl;
   }
 
   /// Returns adaptive keywords with 'All' first, followed by dynamically ranked topics.
@@ -174,7 +179,7 @@ class UserInterestService {
 
     final isOnline = ConnectivityService.instance.isOnline.value;
     final url = await getWebhookUrl();
-    if (!isOnline || url == null || url.isEmpty) {
+    if (!isOnline || url.isEmpty) {
       await _enqueuePayload(payload);
       return;
     }
@@ -184,14 +189,16 @@ class UserInterestService {
   }
 
   static Future<bool> _postPayload(String url, Map<String, dynamic> payload) async {
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 4);
+    final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
     try {
       final uri = Uri.parse(url);
       final req = await client.postUrl(uri);
+      req.followRedirects = true;
       req.headers.set('Content-Type', 'application/json; charset=UTF-8');
       req.write(jsonEncode(payload));
-      final res = await req.close().timeout(const Duration(seconds: 4));
-      return res.statusCode == 200;
+      final res = await req.close().timeout(const Duration(seconds: 5));
+      // Google Apps Script Web App responds with 200 OK or 302 Found redirect on success
+      return res.statusCode >= 200 && res.statusCode <= 302;
     } catch (_) {
       return false;
     } finally {
@@ -212,7 +219,7 @@ class UserInterestService {
   /// Flushes buffered telemetry queue when connection is restored.
   static Future<void> flushQueue() async {
     final url = await getWebhookUrl();
-    if (url == null || url.isEmpty) return;
+    if (url.isEmpty) return;
 
     try {
       final prefs = await SharedPreferences.getInstance();

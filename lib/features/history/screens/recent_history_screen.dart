@@ -69,10 +69,13 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   Future<void> _deleteItem(VideoExportItem item) async {
     if (!await _confirmDelete(item)) return;
     try {
+      final targetPath = item.file.path;
       final existed = await item.file.exists();
       await HistoryService.deleteItem(item.file);
-      _loadHistory();
       if (mounted) {
+        setState(() {
+          _items.removeWhere((i) => i.file.path == targetPath);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(existed ? 'Video berhasil dihapus' : 'Berkas dibersihkan dari riwayat'),
@@ -82,8 +85,10 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
         );
       }
     } catch (_) {
-      _loadHistory();
       if (mounted) {
+        setState(() {
+          _items.removeWhere((i) => i.file.path == item.file.path);
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Berkas dibersihkan dari riwayat'),

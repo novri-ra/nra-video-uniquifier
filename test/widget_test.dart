@@ -19,6 +19,7 @@ import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
 import 'package:nra_video_uniquifier/shared/widgets/floating_capsule_nav_bar.dart';
 import 'package:nra_video_uniquifier/features/history/widgets/history_item_card.dart';
 import 'package:nra_video_uniquifier/features/history/screens/recent_history_screen.dart';
+import 'package:nra_video_uniquifier/features/dashboard/widgets/bento_metric_grid.dart';
 import 'package:nra_video_uniquifier/core/services/history_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -590,6 +591,58 @@ void main() {
       expect(find.text('Top (Face)'), findsOneWidget);
       expect(find.text('Center'), findsOneWidget);
       expect(find.text('Bottom'), findsOneWidget);
+    });
+
+    testWidgets('Sprint 82: Bento metric grid renders animated visual gauges cleanly', (tester) async {
+      final provider = UniquifierProvider()..setTargetFps(60);
+      final queue = BatchQueueProvider();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => ThemeProvider()),
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+            ChangeNotifierProvider.value(value: queue),
+          ],
+          child: const MaterialApp(
+            home: Scaffold(
+              body: SingleChildScrollView(
+                child: BentoMetricGrid(),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Card 1: 100% EXIF Clean
+      expect(find.text('100%'), findsOneWidget);
+      expect(find.text('EXIF CLEAN'), findsOneWidget);
+
+      // Card 2: 60 FPS CFR & Codec lock
+      expect(find.text('60 FPS CFR'), findsOneWidget);
+      expect(find.textContaining('LOCKED'), findsOneWidget);
+
+      // Card 3: Storage Safe Buffer radial meter
+      expect(find.text('SANDBOX'), findsOneWidget);
+      expect(find.text('AVAILABLE'), findsOneWidget);
+
+      // Card 4: Asset Staging queue stacked cards & + button
+      expect(find.text('0'), findsOneWidget);
+      expect(find.byIcon(Icons.add), findsOneWidget);
+    });
+
+    testWidgets('Sprint 82: RecentHistoryScreen mounts and renders header cleanly', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: RecentHistoryScreen(),
+        ),
+      );
+      await tester.pump();
+      expect(find.text('RECENT EXPORTS'), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
     });
   });
 }
