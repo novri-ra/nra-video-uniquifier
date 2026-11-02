@@ -353,7 +353,10 @@ class FfmpegService {
     _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
     if (!suppressCompleteNotification) {
       final name = exportedPath.split(RegExp(r"[/\\]")).last;
-      await NotificationService.showCompleteNotification(title: 'Ekspor Berhasil', body: 'Video siap di galeri ($name)', success: true);
+      final lang = await SettingsService.getAppLanguageCode();
+      final title = lang == 'en' ? 'Export Successful' : 'Ekspor Berhasil';
+      final body = lang == 'en' ? 'Video ready in gallery ($name)' : 'Video siap di galeri ($name)';
+      await NotificationService.showCompleteNotification(title: title, body: body, success: true);
     }
     return exportedPath;
   }

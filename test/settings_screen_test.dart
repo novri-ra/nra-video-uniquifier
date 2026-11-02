@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +21,11 @@ void main() {
 
       final provider = UniquifierProvider();
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: provider,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+          ],
           child: const MaterialApp(
             home: SettingsScreen(),
           ),
@@ -30,6 +34,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('SETTINGS'), findsOneWidget);
+      expect(find.text('LANGUAGE'), findsOneWidget);
       expect(find.text('PRESET PROFILES'), findsOneWidget);
       expect(find.text('VIDEO ENCODING CODEC'), findsOneWidget);
       expect(find.text('DEFAULT RESOLUTION UPSCALE'), findsOneWidget);
@@ -46,8 +51,11 @@ void main() {
 
       final provider = UniquifierProvider();
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: provider,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+          ],
           child: const MaterialApp(
             home: SettingsScreen(),
           ),

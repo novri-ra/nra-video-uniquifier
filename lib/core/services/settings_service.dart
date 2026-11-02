@@ -113,6 +113,7 @@ class SettingsService {
   static const String keySharpeningLevel = 'app_sharpening_level';
   static const String keySaturationLevel = 'app_saturation_level';
   static const String keyTargetFps = 'app_target_fps';
+  static const String keyAppLocale = 'app_language_code';
 
   static Future<bool> _getBool(String key, bool fallback) async =>
       (await SharedPreferences.getInstance()).getBool(key) ?? fallback;
@@ -229,6 +230,16 @@ class SettingsService {
   static Future<void> setTargetFps(int fps) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(keyTargetFps, fps);
+  }
+
+  static Future<String> getAppLanguageCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(keyAppLocale) ?? 'id';
+  }
+
+  static Future<void> setAppLanguageCode(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyAppLocale, code);
   }
 
   static Future<bool> getEnhanceAndDenoise() => _getBool(keyEnhanceAndDenoise, true);

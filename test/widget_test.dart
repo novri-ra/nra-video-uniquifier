@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
@@ -24,6 +25,7 @@ void main() {
   Widget createTestWidget({required Size surfaceSize}) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => UniquifierProvider()),
         ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
       ],
@@ -46,7 +48,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('VIDEO UNIQUIFIER'), findsOneWidget);
+      expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
       expect(find.text('SOURCE FILE'), findsOneWidget);
       expect(find.byIcon(Icons.bolt), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -61,7 +63,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('VIDEO UNIQUIFIER'), findsOneWidget);
+      expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
       expect(find.text('SOURCE FILE'), findsOneWidget);
       expect(find.byIcon(Icons.bolt), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -76,7 +78,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.text('VIDEO UNIQUIFIER'), findsOneWidget);
+      expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
       expect(find.text('SOURCE FILE'), findsOneWidget);
       expect(find.byIcon(Icons.bolt), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -168,6 +170,7 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: uniquifierProvider),
             ChangeNotifierProvider.value(value: batchQueueProvider),
           ],
@@ -195,8 +198,11 @@ void main() {
     testWidgets('D3-02: Preset profile chips update provider toggles per preset definition', (tester) async {
       final provider = UniquifierProvider();
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: provider,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+          ],
           child: const MaterialApp(
             home: SettingsScreen(),
           ),
@@ -235,8 +241,11 @@ void main() {
     testWidgets('D4-02: Purge cache confirmation dialog cancels or confirms purge', (tester) async {
       final provider = UniquifierProvider();
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: provider,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+          ],
           child: const MaterialApp(
             home: SettingsScreen(),
           ),
@@ -314,8 +323,11 @@ void main() {
 
       final provider = UniquifierProvider();
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: provider,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LocaleProvider()),
+            ChangeNotifierProvider.value(value: provider),
+          ],
           child: const MaterialApp(
             home: MediaQuery(
               data: MediaQueryData(size: Size(320, 480), textScaler: TextScaler.linear(2.0)),

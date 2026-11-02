@@ -8,6 +8,7 @@ import '../../../core/models/batch_video_item.dart';
 import '../../../core/providers/batch_queue_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/uniquifier_provider.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
@@ -190,7 +191,9 @@ class _ProcessActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelText = batchCount > 1 ? 'START BATCH ($batchCount VIDEOS)' : 'START UNIQUIFYING';
+    final l10n = AppLocalizations.of(context);
+    final singleLabel = (l10n?.startProcess ?? 'START UNIQUIFYING').toUpperCase();
+    final labelText = batchCount > 1 ? 'START BATCH ($batchCount VIDEOS)' : singleLabel;
 
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(

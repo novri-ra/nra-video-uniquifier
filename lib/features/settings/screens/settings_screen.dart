@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/providers/locale_provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
-import '../widgets/hardware_acceleration_card.dart';
-import '../widgets/preset_profile_card.dart';
-import '../widgets/upscale_resolution_card.dart';
-import '../widgets/upscale_engine_card.dart';
 import '../widgets/codec_selector_card.dart';
+import '../widgets/hardware_acceleration_card.dart';
+import '../widgets/language_selector_card.dart';
+import '../widgets/preset_profile_card.dart';
+import '../widgets/upscale_engine_card.dart';
+import '../widgets/upscale_resolution_card.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -81,13 +84,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: const TopAppBar(title: 'SETTINGS'),
+      appBar: TopAppBar(title: (l10n?.settingsTitle ?? 'SETTINGS').toUpperCase()),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            _SettingsSectionHeader(
+              title: (l10n?.languageLabel ?? 'LANGUAGE').toUpperCase(),
+              subtitle: 'Select interface language (Bahasa Indonesia / English)',
+            ),
+            const SizedBox(height: 8),
+            LanguageSelectorCard(localeProvider: localeProvider),
+            const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
             const SizedBox(height: 8),
             PresetProfileCard(provider: provider),
