@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/hardware_acceleration_card.dart';
@@ -94,6 +95,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
             const SizedBox(height: 8),
             CodecSelectorCard(currentCodec: provider.videoCodec, onSelect: provider.setVideoCodec),
+            const SizedBox(height: 16),
+            const _SettingsSectionHeader(title: 'TARGET FRAMERATE (FPS)', subtitle: 'Output framerate control (-fps_mode cfr -r)'),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: AppColors.surfaceContainerHighest),
+              ),
+              child: SettingFpsSelectorRow(
+                selectedFps: provider.targetFps,
+                onChanged: provider.setTargetFps,
+              ),
+            ),
             const SizedBox(height: 16),
             const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
             const SizedBox(height: 8),

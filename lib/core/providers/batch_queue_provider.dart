@@ -151,6 +151,7 @@ class BatchQueueProvider extends ChangeNotifier {
       thermalThrottle: config.thermalThrottle,
       suppressCompleteNotification: true,
       totalDurationMs: 0,
+      targetFps: config.targetFps,
       onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
     );
   }

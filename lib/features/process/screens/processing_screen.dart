@@ -112,6 +112,7 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       enableChromaShift: provider.enableChromaShift,
       thermalThrottle: provider.thermalThrottle,
       totalDurationMs: provider.totalDurationMs,
+      targetFps: provider.targetFps,
       onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
     );

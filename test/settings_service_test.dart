@@ -187,6 +187,14 @@ void main() {
       expect(await SettingsService.getBackgroundProcessing(), isFalse);
     });
 
+    test('Target FPS persistence defaults to 30 and persists 24, 60', () async {
+      expect(await SettingsService.getTargetFps(), equals(30));
+      await SettingsService.setTargetFps(60);
+      expect(await SettingsService.getTargetFps(), equals(60));
+      await SettingsService.setTargetFps(24);
+      expect(await SettingsService.getTargetFps(), equals(24));
+    });
+
     test('UpscaleEngine enum parsing and persistence', () async {
       expect(UpscaleEngine.fromString('lanczos'), equals(UpscaleEngine.lanczos));
       expect(UpscaleEngine.fromString('neural_ai'), equals(UpscaleEngine.neuralAi));

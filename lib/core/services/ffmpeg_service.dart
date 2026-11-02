@@ -31,7 +31,7 @@ class FfmpegService {
     bool enableBlurredCanvas = false, double canvasScalePercent = 95.0, bool muteOriginalAudio = false,
     bool enableDynamicZoom = false, bool enableMicroOverlay = false,
     bool enableFrameSkip = false, bool enableChromaShift = false, VideoVariations? variations,
-    bool thermalThrottle = false,
+    bool thermalThrottle = false, int? targetFps,
   }) {
     final buffer = StringBuffer('-y');
     _writeInputOptions(buffer, inputPath, enableHardwareAcceleration, enableAutoTrim, totalDurationMs, thermalThrottle);
@@ -45,6 +45,7 @@ class FfmpegService {
       muteOriginalAudio: muteOriginalAudio, enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, modifyAudio: modifyAudio, variations: variations,
+      targetFps: targetFps,
     );
     buffer.write(' "${_escapePath(outputPath)}"');
     return buffer.toString();
@@ -90,6 +91,7 @@ class FfmpegService {
     required bool enableChromaShift,
     required bool modifyAudio,
     VideoVariations? variations,
+    int? targetFps,
   }) {
     VideoVariations vars;
     try {
@@ -110,13 +112,15 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift, variations: vars,
+      targetFps: targetFps ?? 30,
     ));
     buffer.write(FilterBuilders.buildAudioFilter(
       hasAudio: hasAudioProcess, hasVisual: hasVisual,
       enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableAggressiveAudio: enableAggressiveAudio,
       muteOriginalAudio: muteOriginalAudio, variations: vars,
     ));
-    if (hasVisual) buffer.write(' -fps_mode cfr -r ${vars.outputFps.toStringAsFixed(2)}');
+    final fpsStr = targetFps != null ? '$targetFps' : vars.outputFps.toStringAsFixed(2);
+    if (hasVisual) buffer.write(' -fps_mode cfr -r $fpsStr');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
   }
 
@@ -235,31 +239,25 @@ class FfmpegService {
 
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({
-    required String inputPath,
-    bool removeMetadata = true, bool modifyAudio = true, bool modifyVisuals = true,
-    bool upscale1080p = false, bool? upscale,
-    TargetResolution targetResolution = TargetResolution.r1080p,
+    required String inputPath, bool removeMetadata = true, bool modifyAudio = true, bool modifyVisuals = true,
+    bool upscale1080p = false, bool? upscale, TargetResolution targetResolution = TargetResolution.r1080p,
     UpscaleEngine upscaleEngine = UpscaleEngine.lanczos, VideoCodec videoCodec = VideoCodec.h264,
-    bool enableEnhanceAndDenoise = true, bool enableDeepAntiFingerprint = true,
-    bool enableHorizontalFlip = false, bool enableAggressiveAudio = false, bool enableAutoTrim = false,
-    bool? isPortrait, bool enableHardwareAcceleration = false, bool enableBlurredCanvas = false,
-    double canvasScalePercent = 95.0, bool muteOriginalAudio = false, bool enableDynamicZoom = false,
-    bool enableMicroOverlay = false, bool enableFrameSkip = false, bool enableChromaShift = false,
-    bool suppressCompleteNotification = false, String? customOutputPath,
-    bool thermalThrottle = false,
-    void Function(double progress, double speed, int timeMs)? onProgress,
-    void Function(String log)? onLog, int totalDurationMs = 0,
+    bool enableEnhanceAndDenoise = true, bool enableDeepAntiFingerprint = true, bool enableHorizontalFlip = false,
+    bool enableAggressiveAudio = false, bool enableAutoTrim = false, bool? isPortrait, bool enableHardwareAcceleration = false,
+    bool enableBlurredCanvas = false, double canvasScalePercent = 95.0, bool muteOriginalAudio = false,
+    bool enableDynamicZoom = false, bool enableMicroOverlay = false, bool enableFrameSkip = false,
+    bool enableChromaShift = false, bool suppressCompleteNotification = false, String? customOutputPath,
+    bool thermalThrottle = false, void Function(double progress, double speed, int timeMs)? onProgress,
+    void Function(String log)? onLog, int totalDurationMs = 0, int targetFps = 30,
   }) async {
-    if (!await StorageService.hasEnoughSpace()) {
-      throw Exception('Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.');
-    }
+    if (!await StorageService.hasEnoughSpace()) throw Exception('Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.');
     final meta = await _resolveInputMeta(inputPath, isPortrait, totalDurationMs);
-    final finalDestPath = customOutputPath ?? await generateOutputPath(inputPath);
+    final finalDest = customOutputPath ?? await generateOutputPath(inputPath);
     final tempDir = await getTemporaryDirectory();
-    final stagedOutputPath = '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
+    final stagedOut = '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
 
     final command = buildCommand(
-      inputPath: meta.effectiveInput, outputPath: stagedOutputPath,
+      inputPath: meta.effectiveInput, outputPath: stagedOut,
       removeMetadata: removeMetadata, modifyAudio: modifyAudio, modifyVisuals: modifyVisuals,
       upscale1080p: upscale1080p, upscale: upscale, targetResolution: targetResolution,
       upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise,
@@ -270,27 +268,33 @@ class FfmpegService {
       canvasScalePercent: canvasScalePercent, muteOriginalAudio: muteOriginalAudio,
       enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay,
       enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
-      thermalThrottle: thermalThrottle,
+      thermalThrottle: thermalThrottle, targetFps: targetFps,
     );
 
     _setupCallbacks(onProgress: onProgress, onLog: onLog, resolvedDurationMs: meta.durationMs, baseName: inputPath.split(RegExp(r'[/\\]')).last);
+    await NotificationService.showProgressNotification(id: 101, progress: 0, title: 'Memproses Video', body: 'Memulai rendering...', force: true);
     await WakeLockService.acquire();
     try {
-      return await _executeAndExport(
-        command: command, stagedOutputPath: stagedOutputPath, effectiveInput: meta.effectiveInput,
-        finalDestPath: finalDestPath, suppressCompleteNotification: suppressCompleteNotification,
-      );
+      return await _executeAndExport(command: command, stagedOutputPath: stagedOut, effectiveInput: meta.effectiveInput, finalDestPath: finalDest, suppressCompleteNotification: suppressCompleteNotification);
     } finally {
-      await WakeLockService.release();
-      if (onProgress != null) FFmpegKitConfig.enableStatisticsCallback(null);
-      if (onLog != null) FFmpegKitConfig.enableLogCallback(null);
-      await NotificationService.cancelProgressNotification();
-      _deletePartialFile(stagedOutputPath, sourcePath: meta.effectiveInput);
-      if (meta.stagedFile != null && meta.stagedFile!.existsSync()) {
-        try {
-          if (meta.stagedFile!.path != finalDestPath && meta.stagedFile!.path != inputPath) meta.stagedFile!.deleteSync();
-        } catch (_) {}
-      }
+      await _cleanupAfterProcess(meta: meta, stagedOut: stagedOut, finalDest: finalDest, inputPath: inputPath, onProgress: onProgress != null, onLog: onLog != null);
+    }
+  }
+
+  static Future<void> _cleanupAfterProcess({
+    required ({String effectiveInput, File? stagedFile, bool isPortrait, int durationMs}) meta,
+    required String stagedOut, required String finalDest, required String inputPath,
+    required bool onProgress, required bool onLog,
+  }) async {
+    await WakeLockService.release();
+    if (onProgress) FFmpegKitConfig.enableStatisticsCallback(null);
+    if (onLog) FFmpegKitConfig.enableLogCallback(null);
+    await NotificationService.cancelProgressNotification(101);
+    _deletePartialFile(stagedOut, sourcePath: meta.effectiveInput);
+    if (meta.stagedFile != null && meta.stagedFile!.existsSync()) {
+      try {
+        if (meta.stagedFile!.path != finalDest && meta.stagedFile!.path != inputPath) meta.stagedFile!.deleteSync();
+      } catch (_) {}
     }
   }
 
@@ -314,6 +318,14 @@ class FfmpegService {
     return (effectiveInput: effectiveInput, stagedFile: stagedFile, isPortrait: resolvedPortrait, durationMs: resolvedDuration);
   }
 
+  static String _stageDescription(int percent) {
+    if (percent < 15) return 'Inisialisasi & filter awal...';
+    if (percent < 40) return 'Transformasi visual & anti-fingerprint...';
+    if (percent < 80) return 'Encoding video stream & scaling...';
+    if (percent < 95) return 'Muxing audio & normalisasi...';
+    return 'Finalisasi ekspor & galeri...';
+  }
+
   static void _setupCallbacks({
     void Function(double progress, double speed, int timeMs)? onProgress,
     void Function(String log)? onLog,
@@ -329,9 +341,10 @@ class FfmpegService {
         onProgress(maxProgress, speed, timeMs);
         final percent = (maxProgress * 100).toInt();
         NotificationService.showProgressNotification(
+          id: 101,
           progress: percent,
-          title: 'Uniquifying $baseName',
-          body: '$percent% complete (${speed > 0 ? speed.toStringAsFixed(1) : "1.0"}x)',
+          title: 'Memproses Video ($percent%)',
+          body: _stageDescription(percent),
         );
       });
     }
@@ -361,8 +374,8 @@ class FfmpegService {
     _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
     if (!suppressCompleteNotification) {
       await NotificationService.showCompleteNotification(
-        title: 'Video Processing Complete',
-        body: 'Saved to ${exportedPath.split(RegExp(r"[/\\]")).last}',
+        title: 'Ekspor Berhasil',
+        body: 'Video siap di galeri (${exportedPath.split(RegExp(r"[/\\]")).last})',
         success: true,
       );
     }

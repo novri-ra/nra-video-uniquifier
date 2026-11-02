@@ -15,7 +15,7 @@ class NotificationService {
   static set initialized(bool value) => _initialized = value;
   static bool get _canRun => _testOverride ?? Platform.isAndroid;
 
-  static const int progressNotificationId = 8801;
+  static const int progressNotificationId = 101;
   static const int completeNotificationId = 8802;
 
   static const String processChannelId = 'nra_video_processing_channel';
@@ -23,6 +23,38 @@ class NotificationService {
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
+
+  /// Explicit initialization entry point required on application bootstrap.
+  static Future<void> initialize() async {
+    await init();
+    if (_canRun && _testOverride != true) {
+      await _registerSystemChannelPing();
+    }
+  }
+
+  /// Forces Android OS to register the channel in system settings.
+  static Future<void> _registerSystemChannelPing() async {
+    try {
+      await _plugin.show(
+        id: 999,
+        title: 'NRA Video Uniquifier',
+        body: 'NRA Video Uniquifier siap',
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            processChannelId,
+            'Pemrosesan Video NRA',
+            channelDescription: 'Menampilkan progres rendering dan status video',
+            importance: Importance.low,
+            priority: Priority.low,
+            icon: '@drawable/notification_icon',
+            ongoing: false,
+            autoCancel: true,
+          ),
+        ),
+      );
+      await _plugin.cancel(id: 999);
+    } catch (_) {}
+  }
 
   /// Initializes notification plugin and sets up platform notification channels.
   static Future<void> init() async {
@@ -39,7 +71,7 @@ class NotificationService {
           const AndroidNotificationChannel(
             processChannelId,
             'Pemrosesan Video NRA',
-            description: 'Ongoing video processing progress',
+            description: 'Menampilkan progres rendering dan status video',
             importance: Importance.low,
             playSound: false,
             enableVibration: false,
@@ -78,48 +110,54 @@ class NotificationService {
     return true;
   }
 
+  static AndroidNotificationDetails _buildProgressDetails({
+    required int progress,
+    required int maxProgress,
+  }) {
+    return AndroidNotificationDetails(
+      processChannelId,
+      'Pemrosesan Video NRA',
+      channelDescription: 'Menampilkan progres rendering dan status video',
+      importance: Importance.low,
+      priority: Priority.low,
+      icon: '@drawable/notification_icon',
+      showProgress: true,
+      maxProgress: maxProgress,
+      progress: progress,
+      ongoing: true,
+      autoCancel: false,
+      onlyAlertOnce: true,
+    );
+  }
+
   /// Shows or updates ongoing progress notification with progress bar.
   static Future<void> showProgressNotification({
+    int id = progressNotificationId,
     required int progress,
     required String title,
     required String body,
+    int maxProgress = 100,
     bool force = false,
   }) async {
     if (!_canRun) return;
     await init();
 
     final now = DateTime.now();
-    final clamped = progress.clamp(0, 100);
+    final clamped = progress.clamp(0, maxProgress);
 
-    if (!force && clamped != 0 && clamped != 100) {
+    if (!force && clamped != 0 && clamped != maxProgress) {
       final percentDiff = (clamped - _lastProgressPercent).abs();
       final timeDiff = now.difference(_lastProgressTime).inMilliseconds;
-      if (percentDiff < 5 && timeDiff < 1000) {
-        return;
-      }
+      if (percentDiff < 2 && timeDiff < 1000) return;
     }
 
     _lastProgressPercent = clamped;
     _lastProgressTime = now;
 
-    final androidDetails = AndroidNotificationDetails(
-      processChannelId,
-      'Pemrosesan Video NRA',
-      channelDescription: 'Ongoing video processing progress',
-      importance: Importance.low,
-      priority: Priority.low,
-      icon: '@drawable/notification_icon',
-      showProgress: true,
-      maxProgress: 100,
-      progress: clamped,
-      ongoing: true,
-      autoCancel: false,
-      onlyAlertOnce: true,
-    );
-
+    final androidDetails = _buildProgressDetails(progress: clamped, maxProgress: maxProgress);
     try {
       await _plugin.show(
-        id: progressNotificationId,
+        id: id,
         title: title,
         body: body,
         notificationDetails: NotificationDetails(android: androidDetails),
@@ -128,24 +166,25 @@ class NotificationService {
   }
 
   /// Cancels ongoing progress notification.
-  static Future<void> cancelProgressNotification() async {
+  static Future<void> cancelProgressNotification([int id = progressNotificationId]) async {
     _lastProgressPercent = -1;
     _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
     if (!_canRun) return;
     try {
-      await _plugin.cancel(id: progressNotificationId);
+      await _plugin.cancel(id: id);
     } catch (_) {}
   }
 
   /// Shows high-priority completion notification with sound and vibration alert.
   static Future<void> showCompleteNotification({
+    int id = completeNotificationId,
     required String title,
     required String body,
     bool success = true,
   }) async {
     if (!_canRun) return;
     await init();
-    await cancelProgressNotification();
+    await cancelProgressNotification(id == completeNotificationId ? progressNotificationId : id);
 
     bool playSound = true;
     try {
@@ -162,11 +201,12 @@ class NotificationService {
       playSound: playSound,
       enableVibration: true,
       autoCancel: true,
+      ongoing: false,
     );
 
     try {
       await _plugin.show(
-        id: completeNotificationId,
+        id: id,
         title: title,
         body: body,
         notificationDetails: NotificationDetails(android: androidDetails),

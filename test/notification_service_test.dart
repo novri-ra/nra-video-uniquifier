@@ -106,6 +106,12 @@ void main() {
       expect(capturedNotificationsCalls.where((call) => call.method == 'show').length, equals(2));
     });
 
+    test('progressNotificationId is 101 and initialize initializes channel', () async {
+      expect(NotificationService.progressNotificationId, equals(101));
+      await NotificationService.initialize();
+      expect(capturedNotificationsCalls.any((call) => call.method == 'initialize'), isTrue);
+    });
+
     test('cancelProgressNotification invokes cancel with progressNotificationId', () async {
       await NotificationService.cancelProgressNotification();
 

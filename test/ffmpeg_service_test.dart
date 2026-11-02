@@ -743,5 +743,37 @@ void main() {
       expect(cmd, contains('scale=w=1080:h=1920:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5'));
       expect(cmd, contains('format=yuv420p'));
     });
+
+    test('buildCommand binds targetFps 24, 30, and 60 to -fps_mode cfr -r and zoompan fps', () {
+      final cmd24 = FfmpegService.buildCommand(
+        inputPath: '/sample.mp4',
+        outputPath: '/out.mp4',
+        modifyVisuals: true,
+        enableDynamicZoom: true,
+        targetFps: 24,
+      );
+      expect(cmd24, contains('-fps_mode cfr -r 24'));
+      expect(cmd24, contains(':fps=24'));
+
+      final cmd30 = FfmpegService.buildCommand(
+        inputPath: '/sample.mp4',
+        outputPath: '/out.mp4',
+        modifyVisuals: true,
+        enableDynamicZoom: true,
+        targetFps: 30,
+      );
+      expect(cmd30, contains('-fps_mode cfr -r 30'));
+      expect(cmd30, contains(':fps=30'));
+
+      final cmd60 = FfmpegService.buildCommand(
+        inputPath: '/sample.mp4',
+        outputPath: '/out.mp4',
+        modifyVisuals: true,
+        enableDynamicZoom: true,
+        targetFps: 60,
+      );
+      expect(cmd60, contains('-fps_mode cfr -r 60'));
+      expect(cmd60, contains(':fps=60'));
+    });
   });
 }

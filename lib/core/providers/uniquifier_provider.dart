@@ -73,6 +73,7 @@ class UniquifierProvider extends ChangeNotifier {
       _thermalThrottle = await SettingsService.getThermalThrottle();
       _sharpeningLevel = await SettingsService.getSharpeningLevel();
       _saturationLevel = await SettingsService.getSaturationLevel();
+      _targetFps = await SettingsService.getTargetFps();
       notifyListeners();
     } catch (_) {}
   }
@@ -93,6 +94,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool _thermalThrottle = false;
   double _sharpeningLevel = 1.0;
   double _saturationLevel = 1.0;
+  int _targetFps = 30;
   String _activePreset = 'TikTok Fast';
   TargetResolution _targetResolution = TargetResolution.r1080p;
   UpscaleEngine _upscaleEngine = UpscaleEngine.lanczos;
@@ -140,6 +142,7 @@ class UniquifierProvider extends ChangeNotifier {
   bool get thermalThrottle => _thermalThrottle;
   double get sharpeningLevel => _sharpeningLevel;
   double get saturationLevel => _saturationLevel;
+  int get targetFps => _targetFps;
   String get activePreset => _activePreset;
   bool get isPortrait => _isPortrait;
 
@@ -192,6 +195,11 @@ class UniquifierProvider extends ChangeNotifier {
   void setSaturationLevel(double val) {
     _saturationLevel = val.clamp(0.8, 1.3);
     try { SettingsService.setSaturationLevel(_saturationLevel); } catch (_) {}
+    notifyListeners();
+  }
+  void setTargetFps(int fps) {
+    _targetFps = fps;
+    try { SettingsService.setTargetFps(fps); } catch (_) {}
     notifyListeners();
   }
 
