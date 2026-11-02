@@ -82,7 +82,7 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
         BentoCards.buildEngineCard(
           title: l10n?.techSpecsGuard ?? 'Production Engine',
           fps: provider.targetFps,
-          codec: provider.videoCodec.key.toUpperCase(),
+          codec: provider.videoCodec.key == 'h265' ? 'H.265' : 'H.264',
           hardwareAcc: provider.hardwareAcceleration,
           isDark: isDark,
           onTap: () => context.read<UniquifierProvider>().setTabIndex(2),
@@ -129,6 +129,105 @@ class _BentoQueueCard extends StatefulWidget {
 class _BentoQueueCardState extends State<_BentoQueueCard> {
   bool _pressed = false;
 
+  Widget _buildTopRow() {
+    const queueColor = Color(0xFFF59E0B);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Icon(Icons.layers_rounded, color: queueColor, size: 20),
+        GestureDetector(
+          onTap: widget.onTap,
+          child: Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: queueColor.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+              border: Border.all(color: queueColor.withValues(alpha: 0.4)),
+            ),
+            child: const Icon(Icons.add, size: 12, color: queueColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCenterVisual() {
+    const queueColor = Color(0xFFF59E0B);
+    final labelColor = widget.isDark ? Colors.white60 : const Color(0xFF6B7280);
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 86,
+            height: 38,
+            decoration: BoxDecoration(
+              color: queueColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: queueColor.withValues(alpha: 0.4)),
+              boxShadow: [
+                BoxShadow(color: queueColor.withValues(alpha: 0.2), blurRadius: 6),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.layers_rounded, color: queueColor, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  '${widget.queue.totalCount}',
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                    color: queueColor,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'SIAP ANTREAN',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+              color: labelColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter(Color titleColor, Color queueColor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+        ),
+        Text(
+          widget.queue.hasItems
+              ? '${widget.queue.completedCount}/${widget.queue.totalCount} Selesai • Buka'
+              : 'Siap Unggah • Ketuk +',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: queueColor,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const queueColor = Color(0xFFF59E0B);
@@ -147,7 +246,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(16),
@@ -164,112 +263,11 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Icon(Icons.layers_rounded, color: queueColor, size: 20),
-                  GestureDetector(
-                    onTap: widget.onTap,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        color: queueColor.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: queueColor.withValues(alpha: 0.4)),
-                      ),
-                      child: const Icon(Icons.add, size: 12, color: queueColor),
-                    ),
-                  ),
-                ],
-              ),
+              _buildTopRow(),
               const Spacer(),
-              Center(
-                child: SizedBox(
-                  width: 76,
-                  height: 48,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                        top: 2,
-                        child: Container(
-                          width: 52,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: queueColor.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: queueColor.withValues(alpha: 0.25)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 6,
-                        child: Container(
-                          width: 60,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: queueColor.withValues(alpha: 0.28),
-                            borderRadius: BorderRadius.circular(7),
-                            border: Border.all(color: queueColor.withValues(alpha: 0.4)),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 10,
-                        child: Container(
-                          width: 68,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: widget.isDark ? const Color(0xFF261D12) : const Color(0xFFFEF3C7),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: queueColor, width: 1.2),
-                            boxShadow: [
-                              BoxShadow(color: queueColor.withValues(alpha: 0.25), blurRadius: 6),
-                            ],
-                          ),
-                          child: Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.movie_filter_rounded, size: 12, color: queueColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${widget.queue.totalCount}',
-                                  style: const TextStyle(
-                                    color: queueColor,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w800,
-                                    fontFamily: 'monospace',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              _buildCenterVisual(),
               const Spacer(),
-              Text(
-                widget.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
-              ),
-              Text(
-                widget.queue.hasItems
-                    ? '${widget.queue.completedCount}/${widget.queue.totalCount} Selesai • Buka'
-                    : 'Siap Unggah • Ketuk +',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: queueColor,
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              _buildFooter(titleColor, queueColor),
             ],
           ),
         ),

@@ -616,12 +616,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Card 1: 100% EXIF Clean
+      // Card 1: 100% EXIF Clean non-overlapping
       expect(find.text('100%'), findsOneWidget);
       expect(find.text('EXIF CLEAN'), findsOneWidget);
 
-      // Card 2: 60 FPS CFR & Codec lock
+      // Card 2: 60 FPS CFR equalizer & Codec lock
       expect(find.text('60 FPS CFR'), findsOneWidget);
+      expect(find.text('60 FPS CFR • H.264'), findsOneWidget);
       expect(find.textContaining('LOCKED'), findsOneWidget);
 
       // Card 3: Storage Safe Buffer radial meter
@@ -630,6 +631,7 @@ void main() {
 
       // Card 4: Asset Staging queue stacked cards & + button
       expect(find.text('0'), findsOneWidget);
+      expect(find.text('SIAP ANTREAN'), findsOneWidget);
       expect(find.byIcon(Icons.add), findsOneWidget);
     });
 

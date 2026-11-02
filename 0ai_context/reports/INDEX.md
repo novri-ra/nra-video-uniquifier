@@ -35,6 +35,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Scripts Google Sheets Webhook, UI Search Bar + Adaptive Learning Chips Carousel (YouTube-Style), dan Telemetri Minat Pengguna & Penanaman Metadata Video |
 | 81 | `81-dashboard-redesign-and-history-cleanup.md` | Relokasi Script 0ai_context, Engine Terjemahan Natural Berglosarium, Pembersihan Berkas Trashed/Delete Error di History, dan Redesain UI Modern Dashboard |
 | 82 | `82-live-sheets-and-bento-visuals.md` | Live Google Sheets Webhook Integration, Dynamic Bento Visual Gauges, Instant History Deletion State Eviction, and Production Release Merge |
+| 83 | `83-bento-cards-layout-fix.md` | Perbaikan Total Tata Letak Bento Cards: Eliminasi Teks Bertumpuk, Perbesar Elemen Tengah, dan Rapikan Hierarki Visual |
 
 ---
 
