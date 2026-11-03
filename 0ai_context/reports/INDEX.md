@@ -44,6 +44,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 88 | `88-notification-audit-and-bento-110dp.md` | Forensic Audit Notifikasi Android 13+ (POST_NOTIFICATIONS & Channel v2) dan Skala Elemen Visual Bento 110dp |
 | 89 | `89-editorial-craft-theme-redesign.md` | Anti-AI-Slop Editorial Design System, Forest Emerald & Obsidian Palette, Bento Header Relax, & Micro-Interactions |
 | 90 | `90-strict-color-lockdown.md` | Strict Color System Lockdown: Eliminasi Total Inline Hex/Material Colors & Penegakan 11 Token Kanonikal Editorial |
+| 91 | `91-home-sync-and-device-deployment.md` | Workspace Sync di Rumah, Verifikasi Kunci Warna Editorial, Quality Gates, Rebuild Release APK & Install ke Fisik Realme 3 Pro via ADB |
 
 ---
 
