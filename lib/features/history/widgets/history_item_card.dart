@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../../../core/services/ffmpeg_service.dart';
 import '../../../../core/services/history_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -42,7 +45,7 @@ class HistoryItemCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _ThumbnailBadge(isDark: isDark),
+            _ThumbnailBadge(item: item, isDark: isDark),
             const SizedBox(width: 12),
             Expanded(child: _ItemInfoColumn(item: item, isDark: isDark)),
             _ItemActionButtons(onShare: onShare, onDelete: onDelete, isDark: isDark),
@@ -53,28 +56,101 @@ class HistoryItemCard extends StatelessWidget {
   }
 }
 
-class _ThumbnailBadge extends StatelessWidget {
+class _ThumbnailBadge extends StatefulWidget {
+  final VideoExportItem item;
   final bool isDark;
-  const _ThumbnailBadge({required this.isDark});
+  const _ThumbnailBadge({required this.item, required this.isDark});
+
+  @override
+  State<_ThumbnailBadge> createState() => _ThumbnailBadgeState();
+}
+
+class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
+  String? _thumbPath;
+  bool _isExtracting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveThumbnail();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ThumbnailBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item.file.path != widget.item.file.path) {
+      _resolveThumbnail();
+    }
+  }
+
+  Future<void> _resolveThumbnail() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final thumbDir = Directory('${tempDir.path}/thumbnails');
+      if (!await thumbDir.exists()) await thumbDir.create(recursive: true);
+
+      final baseName = widget.item.fileName.replaceAll(RegExp(r'[^\w\.-]'), '_');
+      final expectedPath = '${thumbDir.path}/thumb_$baseName.jpg';
+
+      if (await File(expectedPath).exists()) {
+        if (mounted) setState(() => _thumbPath = expectedPath);
+        return;
+      }
+
+      if (_isExtracting) return;
+      _isExtracting = true;
+      final extracted = await FfmpegService.extractThumbnail(
+        widget.item.file.path,
+        targetPath: expectedPath,
+      );
+      if (mounted && extracted != null && await File(extracted).exists()) {
+        setState(() => _thumbPath = extracted);
+      }
+    } catch (_) {
+    } finally {
+      _isExtracting = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final thumbBg = isDark ? AppColors.obsidianBase : AppColors.hairlineBorder;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final checkColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final thumbBg = widget.isDark ? AppColors.obsidianDark : AppColors.offWhiteCanvas;
+    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final iconColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final checkColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+
+    final hasThumb = _thumbPath != null && File(_thumbPath!).existsSync();
 
     return Container(
       width: 72,
       height: 52,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: thumbBg,
         border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          Center(child: Icon(Icons.videocam, color: iconColor, size: 24)),
+          if (hasThumb)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Image.file(
+                File(_thumbPath!),
+                key: ValueKey(_thumbPath),
+                cacheWidth: 200,
+                cacheHeight: 150,
+                fit: BoxFit.cover,
+                width: 72,
+                height: 52,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Icon(Icons.videocam, color: iconColor, size: 24),
+                ),
+              ),
+            )
+          else
+            Center(child: Icon(Icons.videocam, color: iconColor, size: 24)),
           Positioned(
             top: 3,
             left: 3,
@@ -86,7 +162,7 @@ class _ThumbnailBadge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               decoration: BoxDecoration(
-                color: (isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9),
+                color: (widget.isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(2),
               ),
               child: const Text('MP4', style: TextStyle(color: Colors.white, fontSize: 8, fontFamily: 'monospace')),
