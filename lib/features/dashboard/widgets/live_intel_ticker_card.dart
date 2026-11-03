@@ -54,6 +54,74 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
     context.read<UniquifierProvider>().setTabIndex(1);
   }
 
+  BoxDecoration _cardDecoration(bool isDark, Color bgColor, Color borderColor) {
+    return BoxDecoration(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: borderColor),
+      boxShadow: [
+        if (!isDark)
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildContent(String source, String title, Color accentColor, Color titleColor, bool isDark) {
+    return Row(
+      children: [
+        _PulsingLiveBadge(controller: _pulseController, isDark: isDark),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    source.toUpperCase(),
+                    style: TextStyle(
+                      color: accentColor,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '• REKOMENDASI TERKINI',
+                    style: TextStyle(
+                      color: isDark ? AppColors.outline : const Color(0xFF9CA3AF),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+        Icon(Icons.arrow_forward_ios_rounded, size: 12, color: accentColor),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -61,77 +129,18 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
     final title = article?.title ?? 'Adobe Stock Releases 2026 Visual Trend Forecast';
     final source = article?.source ?? 'Adobe Stock Brief';
 
-    final bgColor = isDark ? const Color(0xFF1B1B2A) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF2C2C42) : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final bgColor = isDark ? AppColors.obsidianDark : Colors.white;
+    final borderColor = isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return InkWell(
       onTap: () => _navigateToIntelTab(context),
       borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: borderColor),
-          boxShadow: [
-            if (!isDark)
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
-        child: Row(
-          children: [
-            _PulsingLiveBadge(controller: _pulseController),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        source.toUpperCase(),
-                        style: const TextStyle(
-                          color: Color(0xFF6C5CE7),
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '• REKOMENDASI TERKINI',
-                        style: TextStyle(
-                          color: isDark ? AppColors.outline : const Color(0xFF9CA3AF),
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: titleColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: Color(0xFF6C5CE7)),
-          ],
-        ),
+        decoration: _cardDecoration(isDark, bgColor, borderColor),
+        child: _buildContent(source, title, accentColor, titleColor, isDark),
       ),
     );
   }
@@ -139,26 +148,27 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
 
 class _PulsingLiveBadge extends StatelessWidget {
   final AnimationController? controller;
-  const _PulsingLiveBadge({required this.controller});
+  final bool isDark;
+  const _PulsingLiveBadge({required this.controller, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withValues(alpha: 0.15),
+        color: AppColors.mintSage.withValues(alpha: isDark ? 0.15 : 0.22),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.mintSage.withValues(alpha: 0.50)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.circle, size: 6, color: Color(0xFF10B981)),
-          SizedBox(width: 4),
+          const Icon(Icons.circle, size: 6, color: AppColors.mintSage),
+          const SizedBox(width: 4),
           Text(
             'LIVE',
             style: TextStyle(
-              color: Color(0xFF10B981),
+              color: isDark ? AppColors.mintSage : AppColors.forestDeep,
               fontSize: 8.5,
               fontWeight: FontWeight.w900,
               fontFamily: 'monospace',

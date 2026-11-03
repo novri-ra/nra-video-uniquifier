@@ -31,17 +31,17 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Icon(Icons.bolt_rounded, color: Color(0xFF06B6D4), size: 20),
+        const Icon(Icons.bolt_rounded, color: AppColors.electricIce, size: 20),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+            color: AppColors.electricIce.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             '${widget.fps} FPS CFR',
             style: const TextStyle(
-              color: Color(0xFF3B82F6),
+              color: AppColors.electricIce,
               fontSize: 8,
               fontWeight: FontWeight.w700,
               fontFamily: 'monospace',
@@ -107,7 +107,7 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-            color: Color(0xFF06B6D4),
+            color: AppColors.electricIce,
             fontSize: 9.5,
             fontWeight: FontWeight.w600,
             fontFamily: 'monospace',
@@ -129,9 +129,9 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final bgColor = widget.isDark ? AppColors.obsidianDark : Colors.white;
+    final borderColor = widget.isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -144,7 +144,7 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
           decoration: _cardDecoration(bgColor, borderColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,12 +174,12 @@ class _WaveBar extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         gradient: const LinearGradient(
-          colors: [Color(0xFF06B6D4), Color(0xFF3B82F6)],
+          colors: [AppColors.electricIce, AppColors.skyPastel],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
         ),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF06B6D4).withValues(alpha: 0.3), blurRadius: 4),
+          BoxShadow(color: AppColors.electricIce.withValues(alpha: 0.35), blurRadius: 4),
         ],
       ),
     );

@@ -2,27 +2,40 @@ import 'package:flutter/material.dart';
 
 /// Central color tokens for dark and light themes.
 class AppColors {
-  // Dark Palette (Charcoal pekat & Container abu terangkat)
-  static const Color surface = Color(0xFF121214);
-  static const Color surfaceContainerLowest = Color(0xFF0E0E10);
-  static const Color surfaceContainerLow = Color(0xFF1C1B1D);
-  static const Color surfaceContainer = Color(0xFF1E1E22);
-  static const Color surfaceContainerHigh = Color(0xFF2A2A2C);
-  static const Color surfaceContainerHighest = Color(0xFF353437);
+  // Editorial Architecture Tokens (Sprint 89)
+  static const Color forestDeep = Color(0xFF0E5535);      // Deep Forest Emerald (Hero Light, Accent Kontras Tinggi)
+  static const Color mintSage = Color(0xFFA3EFD5);        // Soft Mint Sage (Status Active / Glow Halus Dark)
+  static const Color skyPastel = Color(0xFF7DDCF0);       // Sky Cyan Pastel (Secondary Data)
+  static const Color butterYellow = Color(0xFFFFE98C);    // Cream Butter Yellow (Warm Highlight)
+  static const Color persimmonOrange = Color(0xFFFF8E3E); // Warm Persimmon (CTA Secondary)
+  static const Color obsidianBase = Color(0xFF111817);    // Dark Obsidian Deep Canvas
+  static const Color obsidianDark = Color(0xFF1A2523);    // Dark Obsidian Surface Card
+  static const Color mustardOchre = Color(0xFFC2A500);    // Vintage Mustard Ochre (Storage / Warning)
+  static const Color electricIce = Color(0xFF7BD6F3);     // Electric Ice Blue (CFR 60 Engine)
+  static const Color peachCream = Color(0xFFFEC7A0);      // Soft Peach (Pipeline Queue Container)
+  static const Color vividCoral = Color(0xFFFF4431);      // Vivid Coral (High-Impact Action)
+
+  // Dark Palette (Obsidian Editorial & Container terangkat)
+  static const Color surface = Color(0xFF1A2523);
+  static const Color surfaceContainerLowest = Color(0xFF111817);
+  static const Color surfaceContainerLow = Color(0xFF1A2523);
+  static const Color surfaceContainer = Color(0xFF22302D);
+  static const Color surfaceContainerHigh = Color(0xFF2D3E3A);
+  static const Color surfaceContainerHighest = Color(0xFF3B4E4A);
 
   // Mint / Emerald Accents
-  static const Color primary = Color(0xFFB7FFD9);
+  static const Color primary = Color(0xFFA3EFD5);
   static const Color onPrimary = Color(0xFF003824);
-  static const Color primaryContainer = Color(0xFF00F0A8);
-  static const Color onPrimaryContainer = Color(0xFF006847);
+  static const Color primaryContainer = Color(0xFF0E5535);
+  static const Color onPrimaryContainer = Color(0xFFA3EFD5);
   static const Color secondary = Color(0xFF4DFFB2);
   static const Color onSecondary = Color(0xFF003822);
 
   // Dark Text & Outlines
-  static const Color onSurface = Color(0xFFE5E1E4);
+  static const Color onSurface = Color(0xFFF2F6F4);
   static const Color onSurfaceVariant = Color(0xFFB9CBBF);
   static const Color outline = Color(0xFF84958A);
-  static const Color outlineVariant = Color(0xFF3B4A41);
+  static const Color outlineVariant = Color(0x1FA3EFD5);
 
   // Status & Error
   static const Color error = Color(0xFFFFB4AB);
@@ -30,24 +43,24 @@ class AppColors {
   static const Color errorContainer = Color(0xFF93000A);
   static const Color onErrorContainer = Color(0xFFFFDAD6);
 
-  // Light Palette Tokens (High Contrast WCAG AA Compliant)
-  static const Color lightScaffoldBackground = Color(0xFFF9FAFB);
+  // Light Palette Tokens (High Contrast Editorial Sage & Ivory)
+  static const Color lightScaffoldBackground = Color(0xFFF4F7F5);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightSurfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color lightSurfaceContainerLow = Color(0xFFF9FAFB);
-  static const Color lightSurfaceContainer = Color(0xFFF3F4F6);
-  static const Color lightSurfaceContainerHigh = Color(0xFFE5E7EB);
-  static const Color lightSurfaceContainerHighest = Color(0xFFD1D5DB);
+  static const Color lightSurfaceContainerLow = Color(0xFFF4F7F5);
+  static const Color lightSurfaceContainer = Color(0xFFEAF0EC);
+  static const Color lightSurfaceContainerHigh = Color(0xFFE2ECE7);
+  static const Color lightSurfaceContainerHighest = Color(0xFFD6E3DD);
 
-  static const Color lightPrimary = Color(0xFF6C5CE7);
+  static const Color lightPrimary = Color(0xFF0E5535);
   static const Color lightOnPrimary = Color(0xFFFFFFFF);
-  static const Color lightPrimaryContainer = Color(0xFF6C5CE7);
+  static const Color lightPrimaryContainer = Color(0xFF0E5535);
   static const Color lightOnPrimaryContainer = Color(0xFFFFFFFF);
   static const Color lightSecondary = Color(0xFF10B981);
   static const Color lightOnSecondary = Color(0xFFFFFFFF);
 
-  static const Color lightOnSurface = Color(0xFF111827);
+  static const Color lightOnSurface = Color(0xFF121E1B);
   static const Color lightOnSurfaceVariant = Color(0xFF4B5563);
   static const Color lightOutline = Color(0xFFD1D5DB);
-  static const Color lightOutlineVariant = Color(0xFFE5E7EB);
+  static const Color lightOutlineVariant = Color(0xFFE2ECE7);
 }
