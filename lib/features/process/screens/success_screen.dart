@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/media_scanner_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 
 class SuccessScreen extends StatelessWidget {
@@ -93,6 +94,10 @@ class _SuccessHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final title = l10n?.videoSavedTitle ?? 'Video Saved!';
+    final desc = l10n?.videoSavedDesc ?? 'Exported to public Movies/Uniquifier gallery';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -114,9 +119,9 @@ class _SuccessHeroCard extends StatelessWidget {
             child: const Icon(Icons.check_circle, color: AppColors.primaryContainer, size: 32),
           ),
           const SizedBox(height: 12),
-          const Text('Video Saved!', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
+          Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          const Text('Exported to public Movies/Uniquifier gallery.', style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 12)),
+          Text(desc, style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 12)),
           const SizedBox(height: 12),
           const Divider(color: AppColors.surfaceContainerHighest, height: 1),
           const SizedBox(height: 8),
@@ -266,6 +271,11 @@ class _SuccessActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final exportShareText = l10n?.exportShareVideo ?? 'Export & Share Video';
+    final openGalleryText = l10n?.openGallery ?? 'Open Gallery';
+    final uniquifyAnotherText = l10n?.uniquifyAnother ?? 'Uniquify Another Video';
+
     return Column(
       children: [
         ElevatedButton.icon(
@@ -278,7 +288,7 @@ class _SuccessActionButtons extends StatelessWidget {
           ),
           onPressed: outputPath != null ? onShare : null,
           icon: const Icon(Icons.share_rounded, size: 18, color: AppColors.white),
-          label: const Text('Export & Share Video', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+          label: Text(exportShareText, style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
@@ -291,7 +301,7 @@ class _SuccessActionButtons extends StatelessWidget {
           ),
           onPressed: outputPath != null ? onOpen : null,
           icon: const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.forestDeep),
-          label: const Text('Open Gallery', style: TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w700)),
+          label: Text(openGalleryText, style: const TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
         TextButton.icon(
@@ -301,7 +311,7 @@ class _SuccessActionButtons extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.restart_alt, size: 18),
-          label: const Text('Uniquify Another Video'),
+          label: Text(uniquifyAnotherText),
         ),
       ],
     );

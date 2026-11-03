@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/bento_metric_grid.dart';
@@ -51,25 +52,28 @@ class DashboardScreen extends StatelessWidget {
 class _GreetingHeaderSection extends StatelessWidget {
   const _GreetingHeaderSection();
 
-  String _getTimeGreeting(int hour) {
-    if (hour >= 5 && hour < 12) return 'Good Morning, Creator';
-    if (hour >= 12 && hour < 17) return 'Good Afternoon, Creator';
-    if (hour >= 17 && hour < 21) return 'Good Evening, Creator';
-    return 'Good Night, Creator';
+  String _getTimeGreeting(int hour, AppLocalizations? l10n) {
+    if (hour >= 5 && hour < 12) return l10n?.greetingMorning ?? 'Good Morning, Creator';
+    if (hour >= 12 && hour < 17) return l10n?.greetingAfternoon ?? 'Good Afternoon, Creator';
+    if (hour >= 17 && hour < 21) return l10n?.greetingEvening ?? 'Good Evening, Creator';
+    return l10n?.greetingNight ?? 'Good Night, Creator';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     final hour = DateTime.now().hour;
-    final greeting = _getTimeGreeting(hour);
+    final greeting = _getTimeGreeting(hour, l10n);
     final isHw = context.select<UniquifierProvider, bool>((p) => p.hardwareAcceleration);
 
     final statusColor = isHw
         ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
         : (isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant);
-    final statusText = isHw ? 'Hardware Engine Active' : 'CPU Efficiency Engine';
+    final statusText = isHw
+        ? (l10n?.engineHardwareActive ?? 'Hardware Engine Active')
+        : (l10n?.engineCpuEfficiency ?? 'CPU Efficiency Engine');
 
     return Container(
       padding: const EdgeInsets.all(14),

@@ -161,4 +161,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get presetExtreme => 'Extreme Evasion';
+
+  @override
+  String get greetingMorning => 'Good Morning, Creator';
+
+  @override
+  String get greetingAfternoon => 'Good Afternoon, Creator';
+
+  @override
+  String get greetingEvening => 'Good Evening, Creator';
+
+  @override
+  String get greetingNight => 'Good Night, Creator';
+
+  @override
+  String get engineHardwareActive => 'Hardware Engine Active';
+
+  @override
+  String get engineCpuEfficiency => 'CPU Efficiency Engine';
+
+  @override
+  String get seasonalWindowLead => 'SEASONAL WINDOW • 60-90 DAYS LEAD';
+
+  @override
+  String get launchStudioBtn => 'LAUNCH STUDIO DEDUPLICATION';
+
+  @override
+  String get exifClean => 'EXIF CLEAN';
+
+  @override
+  String get zeroFingerprint => 'Zero Digital Fingerprint';
+
+  @override
+  String get storageAvailable => 'AVAILABLE';
+
+  @override
+  String get queueReady => 'SIAP ANTREAN';
+
+  @override
+  String get readyToUpload => 'Ready to Upload • Tap +';
+
+  @override
+  String get exportShareVideo => 'Export & Share Video';
+
+  @override
+  String get openGallery => 'Open Gallery';
+
+  @override
+  String get uniquifyAnother => 'Uniquify Another Video';
+
+  @override
+  String get videoSavedTitle => 'Video Saved!';
+
+  @override
+  String get videoSavedDesc => 'Exported to public Movies/Uniquifier gallery';
+
+  @override
+  String get processingVideoTitle => 'Processing video...';
+
+  @override
+  String get highComputeWarning => 'Extreme computation load';
+
+  @override
+  String get recommendedTag => 'Recommended';
+
+  @override
+  String get hardwareAccelerationDesc => 'Force OpenGLES/Vulkan pipeline';
+
+  @override
+  String get trendMicrostockTitle => 'Upcoming Microstock Trends';
+
+  @override
+  String get tapChipCopy => 'Tap chip to copy tag';
 }

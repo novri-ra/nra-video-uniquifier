@@ -397,6 +397,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Extreme Evasion'**
   String get presetExtreme;
+
+  /// No description provided for @greetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning, Creator'**
+  String get greetingMorning;
+
+  /// No description provided for @greetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon, Creator'**
+  String get greetingAfternoon;
+
+  /// No description provided for @greetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening, Creator'**
+  String get greetingEvening;
+
+  /// No description provided for @greetingNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Night, Creator'**
+  String get greetingNight;
+
+  /// No description provided for @engineHardwareActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Hardware Engine Active'**
+  String get engineHardwareActive;
+
+  /// No description provided for @engineCpuEfficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'CPU Efficiency Engine'**
+  String get engineCpuEfficiency;
+
+  /// No description provided for @seasonalWindowLead.
+  ///
+  /// In en, this message translates to:
+  /// **'SEASONAL WINDOW • 60-90 DAYS LEAD'**
+  String get seasonalWindowLead;
+
+  /// No description provided for @launchStudioBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'LAUNCH STUDIO DEDUPLICATION'**
+  String get launchStudioBtn;
+
+  /// No description provided for @exifClean.
+  ///
+  /// In en, this message translates to:
+  /// **'EXIF CLEAN'**
+  String get exifClean;
+
+  /// No description provided for @zeroFingerprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Zero Digital Fingerprint'**
+  String get zeroFingerprint;
+
+  /// No description provided for @storageAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'AVAILABLE'**
+  String get storageAvailable;
+
+  /// No description provided for @queueReady.
+  ///
+  /// In en, this message translates to:
+  /// **'SIAP ANTREAN'**
+  String get queueReady;
+
+  /// No description provided for @readyToUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to Upload • Tap +'**
+  String get readyToUpload;
+
+  /// No description provided for @exportShareVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Export & Share Video'**
+  String get exportShareVideo;
+
+  /// No description provided for @openGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Gallery'**
+  String get openGallery;
+
+  /// No description provided for @uniquifyAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Uniquify Another Video'**
+  String get uniquifyAnother;
+
+  /// No description provided for @videoSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Saved!'**
+  String get videoSavedTitle;
+
+  /// No description provided for @videoSavedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported to public Movies/Uniquifier gallery'**
+  String get videoSavedDesc;
+
+  /// No description provided for @processingVideoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing video...'**
+  String get processingVideoTitle;
+
+  /// No description provided for @highComputeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Extreme computation load'**
+  String get highComputeWarning;
+
+  /// No description provided for @recommendedTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommendedTag;
+
+  /// No description provided for @hardwareAccelerationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Force OpenGLES/Vulkan pipeline'**
+  String get hardwareAccelerationDesc;
+
+  /// No description provided for @trendMicrostockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Microstock Trends'**
+  String get trendMicrostockTitle;
+
+  /// No description provided for @tapChipCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap chip to copy tag'**
+  String get tapChipCopy;
 }
 
 class _AppLocalizationsDelegate

@@ -61,6 +61,13 @@ void main() {
                           Text(l10n.appTitle, key: const Key('app_title')),
                           Text(l10n.navProcess, key: const Key('nav_process')),
                           Text(l10n.settingsTitle, key: const Key('settings_title')),
+                          Text(l10n.greetingMorning, key: const Key('greeting_morning')),
+                          Text(l10n.engineHardwareActive, key: const Key('engine_hw')),
+                          Text(l10n.exportShareVideo, key: const Key('export_share')),
+                          Text(l10n.openGallery, key: const Key('open_gallery')),
+                          Text(l10n.uniquifyAnother, key: const Key('uniquify_another')),
+                          Text(l10n.storageAvailable, key: const Key('storage_available')),
+                          Text(l10n.exifClean, key: const Key('exif_clean')),
                         ],
                       ),
                     );
@@ -84,6 +91,13 @@ void main() {
       expect(tester.widget<Text>(find.byKey(const Key('app_title'))).data, equals('NRA Video Uniquifier'));
       expect(tester.widget<Text>(find.byKey(const Key('nav_process'))).data, equals('Proses'));
       expect(tester.widget<Text>(find.byKey(const Key('settings_title'))).data, equals('Pengaturan'));
+      expect(tester.widget<Text>(find.byKey(const Key('greeting_morning'))).data, equals('Selamat Pagi, Kreator'));
+      expect(tester.widget<Text>(find.byKey(const Key('engine_hw'))).data, equals('Akselerasi Perangkat Aktif'));
+      expect(tester.widget<Text>(find.byKey(const Key('export_share'))).data, equals('Ekspor & Bagikan Video'));
+      expect(tester.widget<Text>(find.byKey(const Key('open_gallery'))).data, equals('Buka Galeri'));
+      expect(tester.widget<Text>(find.byKey(const Key('uniquify_another'))).data, equals('Proses Video Lainnya'));
+      expect(tester.widget<Text>(find.byKey(const Key('storage_available'))).data, equals('TERSEDIA'));
+      expect(tester.widget<Text>(find.byKey(const Key('exif_clean'))).data, equals('BERSIH DARI EXIF'));
 
       // Switch to EN
       await localeProvider.changeLanguage('en');
@@ -93,6 +107,13 @@ void main() {
       expect(tester.widget<Text>(find.byKey(const Key('app_title'))).data, equals('NRA Video Uniquifier'));
       expect(tester.widget<Text>(find.byKey(const Key('nav_process'))).data, equals('Process'));
       expect(tester.widget<Text>(find.byKey(const Key('settings_title'))).data, equals('Settings'));
+      expect(tester.widget<Text>(find.byKey(const Key('greeting_morning'))).data, equals('Good Morning, Creator'));
+      expect(tester.widget<Text>(find.byKey(const Key('engine_hw'))).data, equals('Hardware Engine Active'));
+      expect(tester.widget<Text>(find.byKey(const Key('export_share'))).data, equals('Export & Share Video'));
+      expect(tester.widget<Text>(find.byKey(const Key('open_gallery'))).data, equals('Open Gallery'));
+      expect(tester.widget<Text>(find.byKey(const Key('uniquify_another'))).data, equals('Uniquify Another Video'));
+      expect(tester.widget<Text>(find.byKey(const Key('storage_available'))).data, equals('AVAILABLE'));
+      expect(tester.widget<Text>(find.byKey(const Key('exif_clean'))).data, equals('EXIF CLEAN'));
     });
   });
 }

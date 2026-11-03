@@ -208,9 +208,11 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
     );
   }
 
-  Widget _buildCenterVisual() {
+  Widget _buildCenterVisual(BuildContext context) {
     final labelColor = widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
     const countColor = AppColors.persimmonOrange;
+    final l10n = AppLocalizations.of(context);
+    final queueLabel = l10n?.queueReady ?? 'SIAP ANTREAN';
 
     return Center(
       child: Column(
@@ -219,7 +221,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
           _buildPillContainer(countColor),
           const SizedBox(height: 6),
           Text(
-            'SIAP ANTREAN',
+            queueLabel,
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
@@ -232,7 +234,10 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
     );
   }
 
-  Widget _buildFooter(Color titleColor, Color queueColor) {
+  Widget _buildFooter(Color titleColor, Color queueColor, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final emptyText = l10n?.readyToUpload ?? 'Ready to Upload • Tap +';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,7 +250,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         Text(
           widget.queue.hasItems
               ? '${widget.queue.completedCount}/${widget.queue.totalCount} Selesai • Buka'
-              : 'Siap Unggah • Ketuk +',
+              : emptyText,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -297,9 +302,9 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
             children: [
               _buildTopRow(),
               const Spacer(),
-              _buildCenterVisual(),
+              _buildCenterVisual(context),
               const Spacer(),
-              _buildFooter(titleColor, queueColor),
+              _buildFooter(titleColor, queueColor, context),
             ],
           ),
         ),
