@@ -224,7 +224,11 @@ class FfmpegService {
     try {
       await NotificationService.cancelProgressNotification();
       await FFmpegKit.cancel();
-    } catch (_) {}
+    } catch (e, stackTrace) {
+      debugPrint(
+        '[FfmpegService] Failed to cancel operations: $e\n$stackTrace',
+      );
+    }
   }
 
   /// Safely copies an input video to app temp cache before feeding to native FFmpeg.

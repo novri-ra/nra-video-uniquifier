@@ -20,8 +20,11 @@ class UniquifierProvider extends ChangeNotifier {
     _initResolution();
   }
 
+  bool _isDisposed = false;
+
   @override
   void dispose() {
+    _isDisposed = true;
     SettingsService.upscaleResolutionNotifier.removeListener(
       _onResolutionNotifierChanged,
     );
@@ -93,8 +96,14 @@ class UniquifierProvider extends ChangeNotifier {
       _sharpeningLevel = await SettingsService.getSharpeningLevel();
       _saturationLevel = await SettingsService.getSaturationLevel();
       _targetFps = await SettingsService.getTargetFps();
-      notifyListeners();
-    } catch (_) {}
+      if (!_isDisposed) {
+        notifyListeners();
+      }
+    } catch (e, stackTrace) {
+      if (!_isDisposed) {
+        debugPrint('[UniquifierProvider] Inisialisasi gagal: $e\n$stackTrace');
+      }
+    }
   }
 
   String? _selectedFileName, _selectedFilePath, _thumbnailPath;
