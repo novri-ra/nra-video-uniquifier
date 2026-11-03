@@ -69,6 +69,7 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
+      childAspectRatio: 0.88,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [

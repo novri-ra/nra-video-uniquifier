@@ -25,14 +25,17 @@ class StorageService {
       final cutoff = DateTime.now().subtract(const Duration(hours: 24));
       for (final entry in tempDir.listSync(followLinks: false)) {
         if (entry is File) {
-          final name = entry.path.split(RegExp(r'[/\\]')).last;
-          if (name.startsWith('staged_') || name.startsWith('thumb_')) {
-            final modified = entry.lastModifiedSync();
-            if (modified.isBefore(cutoff)) {
-              freed += entry.lengthSync();
-              entry.deleteSync();
+          try {
+            final name = entry.path.split(RegExp(r'[/\\]')).last;
+            if (name.startsWith('staged_') || name.startsWith('thumb_')) {
+              final modified = entry.lastModifiedSync();
+              if (modified.isBefore(cutoff)) {
+                final len = entry.lengthSync();
+                entry.deleteSync();
+                freed += len;
+              }
             }
-          }
+          } catch (_) {}
         }
       }
     } catch (_) {}

@@ -61,21 +61,15 @@ class _SourceFileHeader extends StatelessWidget {
       children: [
         Text(
           'SOURCE FILE',
-          style: TextStyle(
-            color: headerColor,
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8,
-            fontFamily: 'monospace',
-          ),
+          style: TextStyle(color: headerColor, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.8, fontFamily: 'monospace'),
         ),
-        Text(
-          statusText,
-          style: TextStyle(
-            color: hasFile ? activeStatusColor : (isDark ? AppColors.outline : const Color(0xFF9CA3AF)),
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'monospace',
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            statusText,
+            style: TextStyle(color: hasFile ? activeStatusColor : (isDark ? AppColors.outline : const Color(0xFF9CA3AF)), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
@@ -156,11 +150,7 @@ class _VideoThumbnail extends StatelessWidget {
       width: 64,
       height: 80,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: thumbBg,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-      ),
+      decoration: BoxDecoration(color: thumbBg, borderRadius: BorderRadius.circular(4), border: Border.all(color: borderColor)),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -171,20 +161,26 @@ class _VideoThumbnail extends StatelessWidget {
           Positioned(
             bottom: 4,
             right: 4,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              decoration: BoxDecoration(
-                color: (isDark ? AppColors.surfaceContainerLowest : const Color(0xFF111827)).withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(2),
-              ),
-              child: Text(
-                duration,
-                style: const TextStyle(color: Colors.white, fontSize: 9, fontFamily: 'monospace'),
-              ),
-            ),
+            child: _ThumbnailDurationBadge(duration: duration, isDark: isDark),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ThumbnailDurationBadge extends StatelessWidget {
+  final String duration;
+  final bool isDark;
+  const _ThumbnailDurationBadge({required this.duration, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final bg = (isDark ? AppColors.surfaceContainerLowest : const Color(0xFF111827)).withValues(alpha: 0.9);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(2)),
+      child: Text(duration, style: const TextStyle(color: Colors.white, fontSize: 9, fontFamily: 'monospace')),
     );
   }
 }
@@ -212,6 +208,8 @@ class _VideoMetaColumn extends StatelessWidget {
         Text(
           '${provider.fileResolution} • ${provider.fileSize} • ${provider.fileCodec}',
           style: TextStyle(color: subColor, fontSize: 11, fontFamily: 'monospace'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 8),
         Row(
@@ -266,19 +264,31 @@ class _VideoReplaceFooter extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.refresh, color: isDark ? AppColors.outline : const Color(0xFF6B7280), size: 12),
-              const SizedBox(width: 4),
-              Text(
-                l10n?.changeVideo ?? 'Tap to replace source file',
-                style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
-              ),
-            ],
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.refresh, color: isDark ? AppColors.outline : const Color(0xFF6B7280), size: 12),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    l10n?.changeVideo ?? 'Tap to replace source file',
+                    style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
-          Text(
-            'SHA-256: $sha256',
-            style: TextStyle(color: shaColor, fontSize: 10, fontFamily: 'monospace'),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              'SHA-256: $sha256',
+              style: TextStyle(color: shaColor, fontSize: 10, fontFamily: 'monospace'),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
@@ -293,12 +303,8 @@ class _EmptyPickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context);
     final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
     final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
 
     return InkWell(
       onTap: onTap,
@@ -318,23 +324,38 @@ class _EmptyPickerCard extends StatelessWidget {
               ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.video_file_outlined, color: iconColor, size: 32),
-            const SizedBox(height: 8),
-            Text(
-              l10n?.selectVideo ?? 'Select Video File to Uniquify',
-              style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              'Supports MP4, MOV, MKV • Zero Network Transmission',
-              style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
-            ),
-          ],
-        ),
+        child: _EmptyPickerContent(isDark: isDark),
       ),
+    );
+  }
+}
+
+class _EmptyPickerContent extends StatelessWidget {
+  final bool isDark;
+  const _EmptyPickerContent({required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.video_file_outlined, color: iconColor, size: 32),
+        const SizedBox(height: 8),
+        Text(
+          l10n?.selectVideo ?? 'Select Video File to Uniquify',
+          style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          'Supports MP4, MOV, MKV • Zero Network Transmission',
+          style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
+        ),
+      ],
     );
   }
 }

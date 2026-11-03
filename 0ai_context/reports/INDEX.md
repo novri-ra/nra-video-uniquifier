@@ -37,6 +37,9 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 82 | `82-live-sheets-and-bento-visuals.md` | Live Google Sheets Webhook Integration, Dynamic Bento Visual Gauges, Instant History Deletion State Eviction, and Production Release Merge |
 | 83 | `83-bento-cards-layout-fix.md` | Perbaikan Total Tata Letak Bento Cards: Eliminasi Teks Bertumpuk, Perbesar Elemen Tengah, dan Rapikan Hierarki Visual |
 | 84 | `84-bento-gauge-expansion-and-release.md` | Perbesar Diameter Ring Gauge 30% Lebih Lapang, Quality Gates, Merge ke Main, dan Build & Install Release APK via ADB |
+| 85 | `85-super-deep-advanced-audit.md` | Super Deep Advanced Forensic Audit: Kode, Stabilitas Async, Viewport 320dp, & Cache Profiling |
+| 85 | `85-notification-fix-and-channel-binding.md` | Perbaikan Notifikasi Sistem Android 13+ Channel Binding, ProGuard Rules, & Button Trigger |
+| 86 | `86-audit-remediation-complete.md` | Remediasi Penuh Temuan Audit Sprint 85: Unmounted setState, RenderFlex 320dp/1.3x Font, & Bounded LRU Cache |
 
 ---
 

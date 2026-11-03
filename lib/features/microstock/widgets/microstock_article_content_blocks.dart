@@ -97,17 +97,20 @@ class ArticleKeyTakeawaysBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
+          Row(
+            children: const [
               Icon(Icons.bolt_rounded, size: 16, color: Color(0xFF9D8DF1)),
               SizedBox(width: 6),
-              Text(
-                'KEY TAKEAWAYS / REKOMENDASI CEPAT',
-                style: TextStyle(
-                  color: Color(0xFF9D8DF1),
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.6,
+              Expanded(
+                child: Text(
+                  'KEY TAKEAWAYS / REKOMENDASI CEPAT',
+                  style: TextStyle(
+                    color: Color(0xFF9D8DF1),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.6,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -148,17 +151,20 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
+          Row(
+            children: const [
               Icon(Icons.tune_rounded, size: 15, color: Color(0xFF38BDF8)),
               SizedBox(width: 6),
-              Text(
-                'PARAMETER TEKNIS REKOMENDASI',
-                style: TextStyle(
-                  color: Color(0xFF38BDF8),
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: Text(
+                  'PARAMETER TEKNIS REKOMENDASI',
+                  style: TextStyle(
+                    color: Color(0xFF38BDF8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -210,17 +216,20 @@ class ArticleContributorChecklistBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
-            children: [
+          Row(
+            children: const [
               Icon(Icons.check_circle_outline_rounded, size: 15, color: Color(0xFF10B981)),
               SizedBox(width: 6),
-              Text(
-                'CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)',
-                style: TextStyle(
-                  color: Color(0xFF10B981),
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: Text(
+                  'CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)',
+                  style: TextStyle(
+                    color: Color(0xFF10B981),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

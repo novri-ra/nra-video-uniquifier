@@ -6,7 +6,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Natural paragraph-level translation service with preserved microstock glossary and sanitized entities.
 class TranslationService {
   static const String _cacheKeyPrefix = 'nra_trans_natural_v5_';
+  static const int maxMemoryEntries = 500;
   static final Map<String, String> _memoryCache = {};
+
+  @visibleForTesting
+  static void clearMemoryCache() => _memoryCache.clear();
+
+  @visibleForTesting
+  static int get memoryCacheSize => _memoryCache.length;
+
+  static void _putMemoryCache(String key, String value) {
+    if (_memoryCache.containsKey(key)) {
+      _memoryCache.remove(key);
+    } else if (_memoryCache.length >= maxMemoryEntries) {
+      _memoryCache.remove(_memoryCache.keys.first);
+    }
+    _memoryCache[key] = value;
+  }
 
   @visibleForTesting
   static Future<String> Function(String text, String targetLang)? mockTranslator;
@@ -145,12 +161,16 @@ class TranslationService {
   }
 
   static Future<String?> _getCached(String key) async {
-    if (_memoryCache.containsKey(key)) return _memoryCache[key];
+    if (_memoryCache.containsKey(key)) {
+      final val = _memoryCache.remove(key)!;
+      _memoryCache[key] = val;
+      return val;
+    }
     try {
       final prefs = await SharedPreferences.getInstance();
       final val = prefs.getString('$_cacheKeyPrefix$key');
       if (val != null && val.isNotEmpty) {
-        _memoryCache[key] = val;
+        _putMemoryCache(key, val);
         return val;
       }
     } catch (_) {}
@@ -158,7 +178,7 @@ class TranslationService {
   }
 
   static Future<void> _cacheTranslation(String key, String translated) async {
-    _memoryCache[key] = translated;
+    _putMemoryCache(key, translated);
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('$_cacheKeyPrefix$key', translated);
