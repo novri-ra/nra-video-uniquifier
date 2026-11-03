@@ -75,25 +75,25 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
   bool _pressed = false;
 
   Widget _buildTopRow() {
-    const emerald = Color(0xFF10B981);
+    final accent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(
           widget.isClean ? Icons.shield_rounded : Icons.shield_outlined,
-          color: widget.accentColor,
+          color: widget.isClean ? accent : widget.accentColor,
           size: 19,
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: emerald.withValues(alpha: 0.12),
+            color: accent.withValues(alpha: widget.isDark ? 0.15 : 0.12),
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
             widget.isClean ? 'ACTIVE' : 'OFF',
-            style: const TextStyle(
-              color: emerald,
+            style: TextStyle(
+              color: accent,
               fontSize: 8,
               fontWeight: FontWeight.w700,
               fontFamily: 'monospace',
@@ -105,7 +105,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
   }
 
   Widget _buildCenterVisual() {
-    const emerald = Color(0xFF10B981);
+    final ringColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
     final labelColor = widget.isDark ? Colors.white70 : const Color(0xFF4B5563);
 
     return Center(
@@ -115,12 +115,12 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
           _BentoGaugeRing(
             value: widget.isClean ? 1.0 : 0.0,
             text: widget.isClean ? '100%' : '0%',
-            ringColor: emerald,
-            textColor: emerald,
+            ringColor: ringColor,
+            textColor: ringColor,
             shadows: [
               if (widget.isClean)
                 BoxShadow(
-                  color: emerald.withValues(alpha: 0.25),
+                  color: ringColor.withValues(alpha: widget.isDark ? 0.25 : 0.20),
                   blurRadius: 10,
                   spreadRadius: 1,
                 ),
@@ -175,11 +175,11 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final bgColor = widget.isDark ? AppColors.obsidianDark : Colors.white;
+    final borderColor = widget.isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final subColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    const emerald = Color(0xFF10B981);
+    final accent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -192,8 +192,8 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: _cardDecoration(bgColor, borderColor, emerald),
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+          decoration: _cardDecoration(bgColor, borderColor, accent),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -246,7 +246,6 @@ class _BentoStorageCard extends StatelessWidget {
 
   Widget _buildCenterVisual() {
     final percent = (freeFraction * 100).toInt();
-    const cyan = Color(0xFF06B6D4);
     final labelColor = isDark ? Colors.white60 : const Color(0xFF6B7280);
 
     return Center(
@@ -257,7 +256,7 @@ class _BentoStorageCard extends StatelessWidget {
             value: freeFraction,
             text: '$percent%',
             ringColor: ringColor,
-            textColor: cyan,
+            textColor: ringColor,
           ),
           const SizedBox(height: 6),
           Text(
@@ -296,12 +295,12 @@ class _BentoStorageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final bgColor = isDark ? AppColors.obsidianDark : Colors.white;
+    final borderColor = isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),

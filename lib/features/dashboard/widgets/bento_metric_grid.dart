@@ -47,9 +47,55 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
   }
 
   Color _storageColor(double gb) {
-    if (gb >= 5.0) return const Color(0xFF10B981);
-    if (gb >= 2.0) return const Color(0xFFF59E0B);
-    return const Color(0xFFEF4444);
+    if (gb >= 5.0) return AppColors.mustardOchre;
+    if (gb >= 2.0) return AppColors.persimmonOrange;
+    return AppColors.vividCoral;
+  }
+
+  List<Widget> _buildGridCards(
+    BuildContext context,
+    UniquifierProvider provider,
+    BatchQueueProvider queue,
+    AppLocalizations? l10n,
+    bool isDark,
+    bool isClean,
+    Color metadataColor,
+    Color ringColor,
+  ) {
+    return [
+      BentoCards.buildHygieneCard(
+        title: l10n?.metadataHygiene ?? 'Metadata Hygiene',
+        isClean: isClean,
+        accentColor: metadataColor,
+        isDark: isDark,
+        onTap: () => provider.toggleRemoveMetadata(!isClean),
+      ),
+      BentoCards.buildEngineCard(
+        title: l10n?.techSpecsGuard ?? 'Production Engine',
+        fps: provider.targetFps,
+        codec: provider.videoCodec.key == 'h265' ? 'H.265' : 'H.264',
+        hardwareAcc: provider.hardwareAcceleration,
+        isDark: isDark,
+        onTap: () => context.read<UniquifierProvider>().setTabIndex(2),
+      ),
+      BentoCards.buildStorageCard(
+        title: l10n?.storageBuffer ?? 'Storage Safe Buffer',
+        freeGbText: _storageSpace?.freeSize ?? '${_freeGigabytes.toStringAsFixed(1)} GB FREE',
+        freeFraction: _freeFraction,
+        ringColor: ringColor,
+        isDark: isDark,
+      ),
+      _BentoQueueCard(
+        title: l10n?.assetStaging ?? 'Asset Staging',
+        queue: queue,
+        isDark: isDark,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const BatchQueueTabScreen()),
+          );
+        },
+      ),
+    ];
   }
 
   @override
@@ -61,7 +107,7 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
 
     final isClean = provider.removeMetadata;
     final metadataColor = isClean
-        ? (isDark ? AppColors.primaryContainer : const Color(0xFF10B981))
+        ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
         : (isDark ? AppColors.outline : const Color(0xFF6B7280));
     final ringColor = _storageColor(_freeGigabytes);
 
@@ -69,43 +115,19 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 0.71,
+      childAspectRatio: 0.70,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: [
-        BentoCards.buildHygieneCard(
-          title: l10n?.metadataHygiene ?? 'Metadata Hygiene',
-          isClean: isClean,
-          accentColor: metadataColor,
-          isDark: isDark,
-          onTap: () => provider.toggleRemoveMetadata(!isClean),
-        ),
-        BentoCards.buildEngineCard(
-          title: l10n?.techSpecsGuard ?? 'Production Engine',
-          fps: provider.targetFps,
-          codec: provider.videoCodec.key == 'h265' ? 'H.265' : 'H.264',
-          hardwareAcc: provider.hardwareAcceleration,
-          isDark: isDark,
-          onTap: () => context.read<UniquifierProvider>().setTabIndex(2),
-        ),
-        BentoCards.buildStorageCard(
-          title: l10n?.storageBuffer ?? 'Storage Safe Buffer',
-          freeGbText: _storageSpace?.freeSize ?? '${_freeGigabytes.toStringAsFixed(1)} GB FREE',
-          freeFraction: _freeFraction,
-          ringColor: ringColor,
-          isDark: isDark,
-        ),
-        _BentoQueueCard(
-          title: l10n?.assetStaging ?? 'Asset Staging',
-          queue: queue,
-          isDark: isDark,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const BatchQueueTabScreen()),
-            );
-          },
-        ),
-      ],
+      children: _buildGridCards(
+        context,
+        provider,
+        queue,
+        l10n,
+        isDark,
+        isClean,
+        metadataColor,
+        ringColor,
+      ),
     );
   }
 }
@@ -131,7 +153,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
   bool _pressed = false;
 
   Widget _buildTopRow() {
-    const queueColor = Color(0xFFF59E0B);
+    const queueColor = AppColors.persimmonOrange;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -152,42 +174,49 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
     );
   }
 
+  Widget _buildPillContainer(Color countColor) {
+    return Container(
+      width: 110,
+      height: 46,
+      decoration: BoxDecoration(
+        color: AppColors.peachCream,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.persimmonOrange.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.peachCream.withValues(alpha: widget.isDark ? 0.25 : 0.40),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.layers_rounded, color: countColor, size: 22),
+          const SizedBox(width: 8),
+          Text(
+            '${widget.queue.totalCount}',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              color: countColor,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCenterVisual() {
-    const queueColor = Color(0xFFF59E0B);
     final labelColor = widget.isDark ? Colors.white60 : const Color(0xFF6B7280);
+    const countColor = Color(0xFF8B3A00);
 
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 110,
-            height: 46,
-            decoration: BoxDecoration(
-              color: queueColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: queueColor.withValues(alpha: 0.4)),
-              boxShadow: [
-                BoxShadow(color: queueColor.withValues(alpha: 0.2), blurRadius: 6),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.layers_rounded, color: queueColor, size: 22),
-                const SizedBox(width: 8),
-                Text(
-                  '${widget.queue.totalCount}',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: queueColor,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildPillContainer(countColor),
           const SizedBox(height: 6),
           Text(
             'SIAP ANTREAN',
@@ -245,10 +274,10 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
 
   @override
   Widget build(BuildContext context) {
-    const queueColor = Color(0xFFF59E0B);
-    final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
+    const queueColor = AppColors.persimmonOrange;
+    final bgColor = widget.isDark ? AppColors.obsidianDark : Colors.white;
+    final borderColor = widget.isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -261,7 +290,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
           decoration: _cardDecoration(bgColor, borderColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

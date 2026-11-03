@@ -113,3 +113,5 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 61 | `61-anti-vdna-evasion-enhancement.md` | Anti-vDNA Visual Fingerprint Hardening & TikTok Detection Evasion Pipeline |
 | 62 | `62-real-ncnn-vulkan-ai-upscale-and-lossless-clarity.md` | Real Bundled Real-ESRGAN NCNN Vulkan Weights & Crystal-Clear 2K/4K Upscale Pipeline |
 | 63 | `63-deep-ui-sync-and-pipeline-optimization-audit.md` | Deep UI Synchronization, Two-Way Binding & Engine Pipeline Optimization Audit |
+| 88 | `88-notification-audit-and-bento-110dp.md` | Audit Notifikasi Android 13+ Channel v2 & Pembesaran Visual Gauge Bento 110dp |
+| 89 | `89-editorial-craft-theme-redesign.md` | Redesain Anti-Slop Editorial Palet Forest Emerald & Obsidian Ochre, Emil Tactile Interactions, & Header Bento 16dp |
