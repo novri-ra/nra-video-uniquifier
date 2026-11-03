@@ -571,11 +571,12 @@ class UniquifierProvider extends ChangeNotifier {
   void _applyMediaStreams(dynamic streams) {
     for (final s in streams) {
       if (s.getType() == 'video') _applyVideoStream(s);
-      if (s.getType() == 'audio')
+      if (s.getType() == 'audio') {
         _audioInfo = Formatters.formatAudioInfo(
           s.getCodec(),
           s.getSampleRate(),
         );
+      }
     }
   }
 

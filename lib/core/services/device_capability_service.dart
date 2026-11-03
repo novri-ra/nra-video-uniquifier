@@ -130,8 +130,9 @@ class DeviceCapabilityService {
   }) {
     if (tier == DeviceTier.flagship) return null;
     if (tier == DeviceTier.entry) {
-      if (targetKey == '2k' || targetKey == '4k')
+      if (targetKey == '2k' || targetKey == '4k') {
         return 'RISIKO PANAS / LAMBAT';
+      }
     } else if (tier == DeviceTier.mid) {
       if (targetKey == '4k') return 'BEBAN TINGGI';
     }

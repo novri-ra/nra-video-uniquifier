@@ -111,10 +111,11 @@ class FfmpegService {
       final ssFormatted = ss == 0.5 ? '0.5' : ss.toStringAsFixed(2);
       buffer.write(' -ss $ssFormatted');
       final trimTotalMs = ((ss + 0.5) * 1000).toInt();
-      if (durationMs > trimTotalMs)
+      if (durationMs > trimTotalMs) {
         buffer.write(
           ' -t ${((durationMs - trimTotalMs) / 1000).toStringAsFixed(2)}',
         );
+      }
     }
     buffer.write(' -i "${_escapePath(inputPath)}"');
   }
@@ -257,8 +258,9 @@ class FfmpegService {
           '-y -ss 00:00:00.500 -i "${_escapePath(inputPath)}" -vframes 1 -q:v 2 "${_escapePath(thumbPath)}"';
       final session = await FFmpegKit.execute(cmd);
       if (ReturnCode.isSuccess(await session.getReturnCode()) &&
-          File(thumbPath).existsSync())
+          File(thumbPath).existsSync()) {
         return thumbPath;
+      }
     } catch (_) {}
     return null;
   }
@@ -268,8 +270,9 @@ class FfmpegService {
     if (Platform.isAndroid) {
       final publicMovies = Directory('/storage/emulated/0/Movies/Uniquifier');
       try {
-        if (!await publicMovies.exists())
+        if (!await publicMovies.exists()) {
           await publicMovies.create(recursive: true);
+        }
         return publicMovies;
       } catch (_) {
         try {
@@ -278,8 +281,9 @@ class FfmpegService {
           );
           if (dirs != null && dirs.isNotEmpty) {
             final fallback = Directory('${dirs.first.path}/Uniquifier');
-            if (!await fallback.exists())
+            if (!await fallback.exists()) {
               await fallback.create(recursive: true);
+            }
             return fallback;
           }
         } catch (_) {}
@@ -298,8 +302,9 @@ class FfmpegService {
   ) async {
     try {
       final destFile = File(destinationPath);
-      if (!destFile.parent.existsSync())
+      if (!destFile.parent.existsSync()) {
         destFile.parent.createSync(recursive: true);
+      }
       await File(stagedPath).copy(destinationPath);
       return destinationPath;
     } catch (_) {
@@ -343,12 +348,13 @@ class FfmpegService {
         final durMs =
             ((double.tryParse(info.getDuration() ?? '') ?? 0.0) * 1000).toInt();
         for (final s in info.getStreams()) {
-          if (s.getType() == 'video')
+          if (s.getType() == 'video') {
             return (
               durationMs: durMs,
               width: s.getWidth() ?? 0,
               height: s.getHeight() ?? 0,
             );
+          }
         }
         return (durationMs: durMs, width: 0, height: 0);
       }
@@ -398,10 +404,11 @@ class FfmpegService {
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
   }) async {
-    if (!await StorageService.hasEnoughSpace())
+    if (!await StorageService.hasEnoughSpace()) {
       throw Exception(
         'Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.',
       );
+    }
     final meta = await _resolveInputMeta(
       inputPath,
       isPortrait,
@@ -553,10 +560,12 @@ class FfmpegService {
     int resolvedDuration = totalDurationMs;
     if (isPortrait == null || totalDurationMs <= 0) {
       final meta = await _probeMediaMeta(effectiveInput);
-      if (isPortrait == null && meta.width > 0 && meta.height > 0)
+      if (isPortrait == null && meta.width > 0 && meta.height > 0) {
         resolvedPortrait = meta.height > meta.width;
-      if (totalDurationMs <= 0 && meta.durationMs > 0)
+      }
+      if (totalDurationMs <= 0 && meta.durationMs > 0) {
         resolvedDuration = meta.durationMs;
+      }
     }
     return (
       effectiveInput: effectiveInput,
@@ -665,8 +674,9 @@ class FfmpegService {
       final returnCode = await session.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) return outputPath;
       _deletePartialFile(outputPath, sourcePath: sourcePath);
-      if (ReturnCode.isCancel(returnCode))
+      if (ReturnCode.isCancel(returnCode)) {
         throw Exception('FFmpeg execution was canceled');
+      }
 
       final logs = await session.getAllLogsAsString();
       final err =

@@ -271,12 +271,15 @@ class _CentralModuleCard extends StatelessWidget {
 
   String _getStageDescription(double p) {
     if (p < 0.10) return 'Menyiapkan staging environment & membaca metadata...';
-    if (p < 0.30)
+    if (p < 0.30) {
       return 'Menerapkan transformasi spasial, micro-trim & rotasi...';
-    if (p < 0.75)
+    }
+    if (p < 0.75) {
       return 'Memproses rendering filtergraph & penajaman kanonikal...';
-    if (p < 0.95)
+    }
+    if (p < 0.95) {
       return 'Mengompresi video fidelitas tinggi (CRF 17) & enkoding audio...';
+    }
     return 'Menyinkronkan ke galeri publik (MediaStore) & membersihkan cache...';
   }
 

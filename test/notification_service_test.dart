@@ -39,8 +39,9 @@ void main() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(permissionChannel, (MethodCall call) async {
           capturedPermissionCalls.add(call);
-          if (call.method == 'checkPermissionStatus')
+          if (call.method == 'checkPermissionStatus') {
             return 1; // PermissionStatus.granted
+          }
           if (call.method == 'requestPermissions') return <int, int>{13: 1};
           return null;
         });

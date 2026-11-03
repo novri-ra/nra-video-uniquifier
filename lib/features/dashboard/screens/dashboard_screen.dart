@@ -53,12 +53,15 @@ class _GreetingHeaderSection extends StatelessWidget {
   const _GreetingHeaderSection();
 
   String _getTimeGreeting(int hour, AppLocalizations? l10n) {
-    if (hour >= 5 && hour < 12)
+    if (hour >= 5 && hour < 12) {
       return l10n?.greetingMorning ?? 'Good Morning, Creator';
-    if (hour >= 12 && hour < 17)
+    }
+    if (hour >= 12 && hour < 17) {
       return l10n?.greetingAfternoon ?? 'Good Afternoon, Creator';
-    if (hour >= 17 && hour < 21)
+    }
+    if (hour >= 17 && hour < 21) {
       return l10n?.greetingEvening ?? 'Good Evening, Creator';
+    }
     return l10n?.greetingNight ?? 'Good Night, Creator';
   }
 

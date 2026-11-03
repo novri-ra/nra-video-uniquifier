@@ -130,8 +130,9 @@ class TranslationService {
     try {
       final req = await client.getUrl(uri);
       final res = await req.close().timeout(const Duration(seconds: 4));
-      if (res.statusCode == 200)
+      if (res.statusCode == 200) {
         return await res.transform(utf8.decoder).join();
+      }
     } catch (_) {
     } finally {
       client.close();

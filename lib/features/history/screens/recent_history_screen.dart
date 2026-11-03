@@ -46,11 +46,12 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
         });
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         setState(() {
           _error = e.toString();
           _isLoading = false;
         });
+      }
     }
   }
 
