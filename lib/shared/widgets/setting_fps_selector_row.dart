@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_colors.dart';
 
 /// Row widget for choosing video target framerate (24, 30, 60 FPS).
 class SettingFpsSelectorRow extends StatelessWidget {
@@ -15,9 +15,9 @@ class SettingFpsSelectorRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
-    final iconColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -74,15 +74,14 @@ class _FpsButtonRow extends StatelessWidget {
     return Row(
       children: [24, 30, 60].map((fps) {
         final isSelected = selectedFps == fps;
-        final activeBg = isDark
-            ? AppColors.primaryContainer.withValues(alpha: 0.2)
-            : const Color(0xFF10B981).withValues(alpha: 0.12);
-        final inactiveBg = isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF3F4F6);
-        final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
-        final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+        final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+        final activeBg = activeColor.withValues(alpha: isDark ? 0.20 : 0.12);
+        final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
+        final activeBorder = activeColor;
+        final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
         final textColor = isSelected
-            ? (isDark ? AppColors.primaryContainer : const Color(0xFF047857))
-            : (isDark ? AppColors.onSurfaceVariant : const Color(0xFF374151));
+            ? activeColor
+            : (isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant);
 
         return Expanded(
           child: Padding(

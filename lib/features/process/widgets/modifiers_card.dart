@@ -72,13 +72,13 @@ class _PresetChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeBg = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final inactiveBg = isDark ? AppColors.surfaceContainerLow : const Color(0xFFF3F4F6);
-    final activeText = isDark ? AppColors.onPrimary : Colors.white;
-    final inactiveText = isDark ? AppColors.onSurfaceVariant : const Color(0xFF374151);
+    final activeBg = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
+    final activeText = isDark ? AppColors.obsidianBase : AppColors.white;
+    final inactiveText = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final borderColor = isSelected
         ? activeBg
-        : (isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant);
+        : (isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant);
 
     return ActionChip(
       label: Text(
@@ -104,7 +104,7 @@ class ModifiersHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

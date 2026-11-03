@@ -218,8 +218,8 @@ class _SettingsSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,16 +302,16 @@ class _CacheMaintenanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mb = (cacheBytes / (1024 * 1024)).toStringAsFixed(1);
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final btnColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final btnColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
+        color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
+        border: Border.all(color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant),
         boxShadow: [
           if (!isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
         ],

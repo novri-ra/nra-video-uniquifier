@@ -16,7 +16,7 @@ class SeasonalHeroCard extends StatelessWidget {
         end: Alignment.bottomRight,
         colors: [
           AppColors.forestDeep,
-          Color(0xFF073822),
+          AppColors.obsidianBase,
         ],
       ),
       boxShadow: [
@@ -130,16 +130,16 @@ class _SpecBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
+        color: AppColors.mintSage.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.25),
+          color: AppColors.mintSage.withValues(alpha: 0.30),
         ),
       ),
       child: Text(
         label,
         style: const TextStyle(
-          color: Colors.white,
+          color: AppColors.mintSage,
           fontSize: 10,
           fontWeight: FontWeight.w600,
           fontFamily: 'monospace',

@@ -74,11 +74,11 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final summaryColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    const purpleAccent = Color(0xFF6C5CE7);
+    final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final summaryColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final cardAccent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     final displayTitle = (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
     final displaySummary = (_isTranslated && _translatedSummary != null) ? _translatedSummary! : widget.article.summary;
@@ -117,7 +117,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                     Text(
                       widget.article.publishedDate,
                       style: TextStyle(
-                        color: widget.isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                        color: widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                         fontSize: 10,
                         fontFamily: 'monospace',
                       ),
@@ -146,7 +146,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                       child: Text(
                         widget.article.source,
                         style: TextStyle(
-                          color: widget.isDark ? AppColors.outline : const Color(0xFF6B7280),
+                          color: widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'monospace',
@@ -160,7 +160,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                       isTranslated: _isTranslated,
                       isTranslating: _isTranslating,
                       isDark: widget.isDark,
-                      accentColor: purpleAccent,
+                      accentColor: cardAccent,
                       onTap: _toggleTranslation,
                     ),
                   ],
@@ -182,7 +182,7 @@ class _CategoryBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accent = Color(0xFF6C5CE7);
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
@@ -191,7 +191,7 @@ class _CategoryBadge extends StatelessWidget {
       ),
       child: Text(
         category.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           color: accent,
           fontSize: 9,
           fontWeight: FontWeight.w700,
@@ -209,10 +209,10 @@ class _SourceBadge extends StatelessWidget {
   const _SourceBadge({required this.source, required this.isDark});
 
   Color _getSourceColor() {
-    if (source.contains('Reddit')) return const Color(0xFFFF5722);
-    if (source.contains('Shutterstock')) return const Color(0xFF00ADB5);
-    if (source.contains('Adobe')) return const Color(0xFFE11D48);
-    return const Color(0xFF10B981);
+    if (source.contains('Reddit')) return AppColors.persimmonOrange;
+    if (source.contains('Shutterstock')) return AppColors.electricIce;
+    if (source.contains('Adobe')) return AppColors.vividCoral;
+    return AppColors.mintSage;
   }
 
   @override
@@ -259,8 +259,8 @@ class _TagsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final textColor = isDark ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563);
+    final chipBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Wrap(
       spacing: 6,

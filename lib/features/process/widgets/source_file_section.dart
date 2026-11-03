@@ -53,8 +53,8 @@ class _SourceFileHeader extends StatelessWidget {
     final statusText = isBatch
         ? 'BATCH: ${batchQueue.totalCount} QUEUED'
         : (hasFile ? 'READY FOR TRANSCODE' : 'NO FILE SELECTED');
-    final activeStatusColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
-    final headerColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final activeStatusColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final headerColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -67,7 +67,7 @@ class _SourceFileHeader extends StatelessWidget {
         Flexible(
           child: Text(
             statusText,
-            style: TextStyle(color: hasFile ? activeStatusColor : (isDark ? AppColors.outline : const Color(0xFF9CA3AF)), fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+            style: TextStyle(color: hasFile ? activeStatusColor : AppColors.outline, fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -142,9 +142,9 @@ class _VideoThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasThumb = thumbnailPath != null && File(thumbnailPath!).existsSync();
-    final thumbBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF3F4F6);
+    final thumbBg = isDark ? AppColors.surfaceContainerHigh : AppColors.hairlineBorder;
     final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final iconColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: 64,
@@ -176,7 +176,7 @@ class _ThumbnailDurationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = (isDark ? AppColors.surfaceContainerLowest : const Color(0xFF111827)).withValues(alpha: 0.9);
+    final bg = (isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(2)),
@@ -192,8 +192,8 @@ class _VideoMetaColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,8 +234,8 @@ class _ClearIconButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.close, size: 16),
       style: IconButton.styleFrom(
-        backgroundColor: isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6),
-        foregroundColor: isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563),
+        backgroundColor: isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder,
+        foregroundColor: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
         padding: EdgeInsets.zero,
         minimumSize: const Size(28, 28),
         fixedSize: const Size(28, 28),
@@ -256,8 +256,8 @@ class _VideoReplaceFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final shaColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final shaColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return InkWell(
       onTap: onTap,
@@ -268,7 +268,7 @@ class _VideoReplaceFooter extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.refresh, color: isDark ? AppColors.outline : const Color(0xFF6B7280), size: 12),
+                Icon(Icons.refresh, color: AppColors.outline, size: 12),
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
@@ -303,8 +303,8 @@ class _EmptyPickerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -337,9 +337,9 @@ class _EmptyPickerContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -367,9 +367,9 @@ class _MetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chipBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF374151);
+    final chipBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

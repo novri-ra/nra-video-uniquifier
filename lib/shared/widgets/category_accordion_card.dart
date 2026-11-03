@@ -35,10 +35,10 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final iconColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       decoration: BoxDecoration(
@@ -93,7 +93,7 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
                       const SizedBox(width: 6),
                       Icon(
                         _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563),
+                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
                         size: 18,
                       ),
                     ],
@@ -120,15 +120,13 @@ class _ActiveBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isActive = activeCount > 0;
-    final activeBg = isDark
-        ? AppColors.primaryContainer.withValues(alpha: 0.15)
-        : const Color(0xFF10B981).withValues(alpha: 0.12);
-    final inactiveBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final activeColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
-    final inactiveColor = isDark ? AppColors.outline : const Color(0xFF6B7280);
+    final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final activeBg = activeColor.withValues(alpha: isDark ? 0.15 : 0.12);
+    final inactiveBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final inactiveColor = AppColors.outline;
     final borderColor = isActive
-        ? (isDark ? AppColors.primaryContainer.withValues(alpha: 0.4) : const Color(0xFF10B981).withValues(alpha: 0.4))
-        : (isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant);
+        ? activeColor.withValues(alpha: 0.4)
+        : (isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

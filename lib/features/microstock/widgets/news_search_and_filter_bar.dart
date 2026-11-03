@@ -72,10 +72,11 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
 
   @override
   Widget build(BuildContext context) {
-    final searchBg = widget.isDark ? AppColors.surfaceContainerLow : const Color(0xFFF3F4F6);
-    final borderColor = widget.isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final hintColor = widget.isDark ? AppColors.outline : const Color(0xFF9CA3AF);
-    final textColor = widget.isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final searchBg = widget.isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final hintColor = widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final textColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final searchAccent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +101,7 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
             decoration: InputDecoration(
               hintText: 'Cari panduan 4K, tren, kurasi...',
               hintStyle: TextStyle(color: hintColor, fontSize: 13),
-              prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF6C5CE7)),
+              prefixIcon: Icon(Icons.search_rounded, size: 20, color: searchAccent),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -154,10 +155,11 @@ class _AdaptiveFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accent = Color(0xFF6C5CE7);
-    final unselectedBg = isDark ? const Color(0xFF232334) : const Color(0xFFF3F4F6);
-    final unselectedBorder = isDark ? const Color(0xFF2E2E44) : const Color(0xFFE5E7EB);
-    final unselectedText = isDark ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563);
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final unselectedBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
+    final unselectedBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final unselectedText = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final selectedText = isDark ? AppColors.obsidianBase : AppColors.white;
 
     return InkWell(
       onTap: onTap,
@@ -185,7 +187,7 @@ class _AdaptiveFilterChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: isSelected ? Colors.white : unselectedText,
+              color: isSelected ? selectedText : unselectedText,
               fontSize: 11.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),

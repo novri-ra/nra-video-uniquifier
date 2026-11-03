@@ -119,8 +119,8 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
-    final bgColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.88,
@@ -171,7 +171,7 @@ class _DragHandle extends StatelessWidget {
       width: 44,
       height: 4,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white24 : Colors.black12,
+        color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -209,8 +209,8 @@ class _ArticleContentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final bodyColor = isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final bodyColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return ListView(
       controller: scrollController,
@@ -262,12 +262,12 @@ class _HeaderBar extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.menu_book_rounded, size: 18, color: Color(0xFF6C5CE7)),
+              Icon(Icons.menu_book_rounded, size: 18, color: isDark ? AppColors.mintSage : AppColors.forestDeep),
               const SizedBox(width: 8),
               Text(
                 'MICROSTOCK INTEL READER',
                 style: TextStyle(
-                  color: isDark ? AppColors.outline : const Color(0xFF6B7280),
+                  color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
@@ -277,7 +277,7 @@ class _HeaderBar extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 20),
-            color: isDark ? Colors.white70 : Colors.black54,
+            color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
             onPressed: onClose,
             tooltip: 'Close reader',
           ),
@@ -317,7 +317,7 @@ class _ActionToolbar extends StatelessWidget {
           icon: const Icon(Icons.open_in_browser_rounded, size: 15),
           label: const Text('Buka Sumber', style: TextStyle(fontSize: 11)),
           style: TextButton.styleFrom(
-            foregroundColor: const Color(0xFF6C5CE7),
+            foregroundColor: isDark ? AppColors.mintSage : AppColors.forestDeep,
             visualDensity: VisualDensity.compact,
           ),
         ),

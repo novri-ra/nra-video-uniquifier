@@ -53,7 +53,7 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
   }
 
   Widget _buildCenterVisual() {
-    final labelColor = widget.isDark ? Colors.white70 : const Color(0xFF4B5563);
+    final labelColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -129,8 +129,8 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.isDark ? AppColors.obsidianDark : Colors.white;
-    final borderColor = widget.isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return GestureDetector(

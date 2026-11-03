@@ -63,12 +63,12 @@ class _EngineOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = engine == selectedEngine;
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
-    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final textColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final descColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return InkWell(
       onTap: onTap,

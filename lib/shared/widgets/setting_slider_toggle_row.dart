@@ -78,10 +78,10 @@ class _HeaderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF6C5CE7);
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
-    final linkColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final iconColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final linkColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +150,7 @@ class _SliderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final inactiveColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
 
     return Padding(

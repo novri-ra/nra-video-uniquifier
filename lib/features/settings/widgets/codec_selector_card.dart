@@ -34,7 +34,7 @@ class CodecSelectorCard extends StatelessWidget {
           title: 'H.265 / HEVC (High Efficiency)',
           description: 'CRF 26 • ~40% higher compression efficiency with -tag:v hvc1',
           badge: 'HIGH EFFICIENCY',
-          badgeColor: isDark ? AppColors.secondary : const Color(0xFF007AFF),
+          badgeColor: isDark ? AppColors.skyPastel : AppColors.forestDeep,
           isSelected: currentCodec == VideoCodec.h265,
           isDark: isDark,
           onTap: () => onSelect(VideoCodec.h265),
@@ -62,13 +62,13 @@ class _CodecTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
-    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    const activeBorder = Color(0xFF6C5CE7);
-    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final iconColor = isSelected ? const Color(0xFF10B981) : (isDark ? AppColors.outline : const Color(0xFF9CA3AF));
+    final iconColor = isSelected ? (isDark ? AppColors.mintSage : AppColors.forestDeep) : AppColors.outline;
 
     return InkWell(
       onTap: onTap,
