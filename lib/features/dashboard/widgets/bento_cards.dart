@@ -192,7 +192,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: _cardDecoration(bgColor, borderColor, emerald),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class _BentoStorageCard extends StatelessWidget {
     final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(16),
@@ -343,27 +343,29 @@ class _BentoGaugeRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 84,
-      height: 84,
+      width: 110.0,
+      height: 110.0,
       decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadows),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CircularProgressIndicator(
-            value: value,
-            strokeWidth: 4.0,
-            backgroundColor: ringColor.withValues(alpha: 0.15),
-            color: ringColor,
+          SizedBox.expand(
+            child: CircularProgressIndicator(
+              value: value,
+              strokeWidth: 4.5,
+              backgroundColor: ringColor.withValues(alpha: 0.15),
+              color: ringColor,
+            ),
           ),
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   text,
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: 16.5,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                     color: textColor,

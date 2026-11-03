@@ -69,7 +69,7 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
       crossAxisCount: 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 0.88,
+      childAspectRatio: 0.71,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -161,8 +161,8 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 86,
-            height: 38,
+            width: 110,
+            height: 46,
             decoration: BoxDecoration(
               color: queueColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(10),
@@ -174,12 +174,12 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.layers_rounded, color: queueColor, size: 20),
+                const Icon(Icons.layers_rounded, color: queueColor, size: 22),
                 const SizedBox(width: 8),
                 Text(
                   '${widget.queue.totalCount}',
                   style: const TextStyle(
-                    fontSize: 19,
+                    fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: queueColor,
                     fontFamily: 'monospace',
@@ -229,6 +229,20 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
     );
   }
 
+  BoxDecoration _cardDecoration(Color bg, Color border) => BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: border),
+        boxShadow: [
+          if (!widget.isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
     const queueColor = Color(0xFFF59E0B);
@@ -247,20 +261,8 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              if (!widget.isDark)
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-            ],
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: _cardDecoration(bgColor, borderColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

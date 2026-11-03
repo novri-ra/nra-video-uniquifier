@@ -19,9 +19,9 @@ class NotificationService {
   static const int completeNotificationId = 8802;
   static const int testNotificationId = 7777;
 
-  static const String mainChannelId = 'nra_uniquifier_channel';
+  static const String mainChannelId = 'nra_uniquifier_channel_v2';
   static const String processChannelId = 'nra_video_processing_channel';
-  static const String completeChannelId = 'nra_uniquifier_channel';
+  static const String completeChannelId = 'nra_uniquifier_channel_v2';
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -100,11 +100,22 @@ class NotificationService {
     }
   }
 
+  static Future<void> _ensurePermission() async {
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final bool? enabled = await android?.areNotificationsEnabled();
+      if (enabled == false) {
+        await android?.requestNotificationsPermission();
+      }
+    } catch (_) {}
+  }
+
   /// Requests notification permission on Android 13+ (POST_NOTIFICATIONS).
   @pragma('vm:entry-point')
   static Future<bool> requestPermission() async {
     try {
       if (_canRun) {
+        await _ensurePermission();
         final status = await Permission.notification.status;
         if (!status.isGranted) {
           final result = await Permission.notification.request();
@@ -142,6 +153,9 @@ class NotificationService {
     required String body,
     required AndroidNotificationDetails androidDetails,
   }) async {
+    if (_canRun && _testOverride != true) {
+      await _ensurePermission();
+    }
     try {
       await _plugin.show(
         id: id,

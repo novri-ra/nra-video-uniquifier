@@ -147,6 +147,7 @@ void main() {
       final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
       expect(specifics['playSound'], isTrue);
       expect(specifics['channelId'], equals(NotificationService.completeChannelId));
+      expect(NotificationService.completeChannelId, equals('nra_uniquifier_channel_v2'));
       expect(specifics['icon'], equals('@mipmap/ic_launcher'));
     });
 
@@ -165,6 +166,7 @@ void main() {
       expect(args['body'], equals('Testing Android 13+ channel binding'));
       final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
       expect(specifics['channelId'], equals(NotificationService.mainChannelId));
+      expect(NotificationService.mainChannelId, equals('nra_uniquifier_channel_v2'));
       expect(specifics['icon'], equals('@mipmap/ic_launcher'));
     });
   });

@@ -52,7 +52,7 @@ class MainActivity : FlutterActivity() {
                 description = "Alerts when video processing finishes"
             }
             val uniquifierChannel = NotificationChannel(
-                "nra_uniquifier_channel",
+                "nra_uniquifier_channel_v2",
                 "NRA Uniquifier Processing",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
