@@ -12,11 +12,11 @@ void main() {
     log.clear();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      log.add(methodCall);
-      if (methodCall.method == 'scanFile') return true;
-      if (methodCall.method == 'openGallery') return true;
-      return null;
-    });
+          log.add(methodCall);
+          if (methodCall.method == 'scanFile') return true;
+          if (methodCall.method == 'openGallery') return true;
+          return null;
+        });
   });
 
   tearDown(() {
@@ -25,14 +25,24 @@ void main() {
   });
 
   group('MediaScannerService', () {
-    test('scanFile executes method channel or completes safely on non-Android', () async {
-      final res = await MediaScannerService.scanFile('/storage/emulated/0/Movies/Uniquifier/test.mp4');
-      expect(res, isA<bool>());
-    });
+    test(
+      'scanFile executes method channel or completes safely on non-Android',
+      () async {
+        final res = await MediaScannerService.scanFile(
+          '/storage/emulated/0/Movies/Uniquifier/test.mp4',
+        );
+        expect(res, isA<bool>());
+      },
+    );
 
-    test('openGallery executes method channel or completes safely on non-Android', () async {
-      final res = await MediaScannerService.openGallery('/storage/emulated/0/Movies/Uniquifier/test.mp4');
-      expect(res, isA<bool>());
-    });
+    test(
+      'openGallery executes method channel or completes safely on non-Android',
+      () async {
+        final res = await MediaScannerService.openGallery(
+          '/storage/emulated/0/Movies/Uniquifier/test.mp4',
+        );
+        expect(res, isA<bool>());
+      },
+    );
   });
 }

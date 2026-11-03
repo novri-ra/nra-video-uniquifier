@@ -13,10 +13,13 @@ class MicrostockInspirationFeed extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final info = SeasonalEventHelper.getSeasonalWindowInfo();
-    final headerColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final headerColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final subColor = isDark ? AppColors.outline : AppColors.outline;
 
-    final chipText = (l10n?.tapChipCopy ?? 'TAP CHIP TO COPY TAG').toUpperCase();
+    final chipText = (l10n?.tapChipCopy ?? 'TAP CHIP TO COPY TAG')
+        .toUpperCase();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +28,10 @@ class MicrostockInspirationFeed extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              (l10n?.trendMicrostockTitle ?? l10n?.inspirationTitle ?? '${info.quarterLabel} COMMERCIAL TRENDS').toUpperCase(),
+              (l10n?.trendMicrostockTitle ??
+                      l10n?.inspirationTitle ??
+                      '${info.quarterLabel} COMMERCIAL TRENDS')
+                  .toUpperCase(),
               style: TextStyle(
                 color: headerColor,
                 fontSize: 11,
@@ -53,10 +59,8 @@ class MicrostockInspirationFeed extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             itemCount: info.upcomingTrends.length,
             separatorBuilder: (context, index) => const SizedBox(width: 12),
-            itemBuilder: (context, i) => _TrendCard(
-              trend: info.upcomingTrends[i],
-              isDark: isDark,
-            ),
+            itemBuilder: (context, i) =>
+                _TrendCard(trend: info.upcomingTrends[i], isDark: isDark),
           ),
         ),
       ],
@@ -84,9 +88,13 @@ class _TrendCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
@@ -114,7 +122,10 @@ class _TrendCard extends StatelessWidget {
               Container(
                 width: 6,
                 height: 6,
-                decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  shape: BoxShape.circle,
+                ),
               ),
               const SizedBox(width: 6),
               Text(
@@ -146,11 +157,7 @@ class _TrendCard extends StatelessWidget {
                 trend.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: descColor,
-                  fontSize: 9.5,
-                  height: 1.25,
-                ),
+                style: TextStyle(color: descColor, fontSize: 9.5, height: 1.25),
               ),
             ],
           ),
@@ -216,7 +223,11 @@ class _InteractiveKeywordChip extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 3),
-                Icon(Icons.copy_rounded, size: 9, color: textColor.withValues(alpha: 0.7)),
+                Icon(
+                  Icons.copy_rounded,
+                  size: 9,
+                  color: textColor.withValues(alpha: 0.7),
+                ),
               ],
             ),
           ),

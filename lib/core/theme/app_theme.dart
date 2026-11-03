@@ -111,7 +111,10 @@ class AppTheme {
         color: AppColors.lightSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: AppColors.lightOutlineVariant, width: 1),
+          side: const BorderSide(
+            color: AppColors.lightOutlineVariant,
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(4),
         ),
         margin: EdgeInsets.zero,
@@ -171,21 +174,22 @@ class AppTheme {
     );
   }
 
-  static const BottomNavigationBarThemeData _bottomNavBarTheme = BottomNavigationBarThemeData(
-    backgroundColor: AppColors.surfaceContainerLowest,
-    selectedItemColor: AppColors.primaryContainer,
-    unselectedItemColor: AppColors.onSurfaceVariant,
-    type: BottomNavigationBarType.fixed,
-    elevation: 0,
-    selectedLabelStyle: TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w600,
-      fontFamily: 'monospace',
-    ),
-    unselectedLabelStyle: TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.w500,
-      fontFamily: 'monospace',
-    ),
-  );
+  static const BottomNavigationBarThemeData _bottomNavBarTheme =
+      BottomNavigationBarThemeData(
+        backgroundColor: AppColors.surfaceContainerLowest,
+        selectedItemColor: AppColors.primaryContainer,
+        unselectedItemColor: AppColors.onSurfaceVariant,
+        type: BottomNavigationBarType.fixed,
+        elevation: 0,
+        selectedLabelStyle: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'monospace',
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'monospace',
+        ),
+      );
 }

@@ -64,7 +64,9 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            e is TranslationOfflineException ? e.message : 'Gagal menerjemahkan berita',
+            e is TranslationOfflineException
+                ? e.message
+                : 'Gagal menerjemahkan berita',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -75,13 +77,25 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final summaryColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final cardAccent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final summaryColor = widget.isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+    final cardAccent = widget.isDark
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
 
-    final displayTitle = (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
-    final displaySummary = (_isTranslated && _translatedSummary != null) ? _translatedSummary! : widget.article.summary;
+    final displayTitle = (_isTranslated && _translatedTitle != null)
+        ? _translatedTitle!
+        : widget.article.title;
+    final displaySummary = (_isTranslated && _translatedSummary != null)
+        ? _translatedSummary!
+        : widget.article.summary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -102,7 +116,11 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => MicrostockArticleSheet.show(context, widget.article, widget.isDark),
+          onTap: () => MicrostockArticleSheet.show(
+            context,
+            widget.article,
+            widget.isDark,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -110,14 +128,22 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
               children: [
                 Row(
                   children: [
-                    _CategoryBadge(category: widget.article.category, isDark: widget.isDark),
+                    _CategoryBadge(
+                      category: widget.article.category,
+                      isDark: widget.isDark,
+                    ),
                     const SizedBox(width: 6),
-                    _SourceBadge(source: widget.article.source, isDark: widget.isDark),
+                    _SourceBadge(
+                      source: widget.article.source,
+                      isDark: widget.isDark,
+                    ),
                     const Spacer(),
                     Text(
                       widget.article.publishedDate,
                       style: TextStyle(
-                        color: widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                        color: widget.isDark
+                            ? AppColors.outline
+                            : AppColors.lightOnSurfaceVariant,
                         fontSize: 10,
                         fontFamily: 'monospace',
                       ),
@@ -127,12 +153,21 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                 const SizedBox(height: 10),
                 Text(
                   displayTitle,
-                  style: TextStyle(color: titleColor, fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.3),
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: 14.5,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   displaySummary,
-                  style: TextStyle(color: summaryColor, fontSize: 12, height: 1.4),
+                  style: TextStyle(
+                    color: summaryColor,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _TagsRow(tags: widget.article.tags, isDark: widget.isDark),
@@ -146,7 +181,9 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                       child: Text(
                         widget.article.source,
                         style: TextStyle(
-                          color: widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                          color: widget.isDark
+                              ? AppColors.outline
+                              : AppColors.lightOnSurfaceVariant,
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'monospace',
@@ -219,7 +256,9 @@ class _SourceBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getSourceColor();
     final isReddit = source.contains('Reddit');
-    final label = isReddit ? 'Reddit Community' : (source.length > 18 ? '${source.substring(0, 16)}..' : source);
+    final label = isReddit
+        ? 'Reddit Community'
+        : (source.length > 18 ? '${source.substring(0, 16)}..' : source);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -259,8 +298,12 @@ class _TagsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final chipBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Wrap(
       spacing: 6,

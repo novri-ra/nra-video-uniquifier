@@ -57,7 +57,9 @@ class RenderIntegrityException implements Exception {
 /// Service for inspecting rendered video metadata and encoding characteristics.
 class RenderDiagnosticService {
   /// Inspects rendered video using FFprobe to produce diagnostic report.
-  static Future<RenderDiagnosticInfo?> inspectRenderedFile(String filePath) async {
+  static Future<RenderDiagnosticInfo?> inspectRenderedFile(
+    String filePath,
+  ) async {
     try {
       final file = File(filePath);
       if (!await file.exists()) return null;
@@ -93,9 +95,17 @@ class RenderDiagnosticService {
   }
 
   static ({
-    int? width, int? height, String? videoCodec, String? videoProfile, String? videoBitrate,
-    String? audioCodec, String? audioSampleRate, int? audioChannels, String? audioBitrate,
-  }) _parseStreams(dynamic mediaInfo) {
+    int? width,
+    int? height,
+    String? videoCodec,
+    String? videoProfile,
+    String? videoBitrate,
+    String? audioCodec,
+    String? audioSampleRate,
+    int? audioChannels,
+    String? audioBitrate,
+  })
+  _parseStreams(dynamic mediaInfo) {
     int? w, h, aChannels;
     String? vCodec, vProfile, vBitrate, aCodec, aSampleRate, aBitrate;
 
@@ -114,8 +124,15 @@ class RenderDiagnosticService {
       }
     }
     return (
-      width: w, height: h, videoCodec: vCodec, videoProfile: vProfile, videoBitrate: vBitrate,
-      audioCodec: aCodec, audioSampleRate: aSampleRate, audioChannels: aChannels, audioBitrate: aBitrate,
+      width: w,
+      height: h,
+      videoCodec: vCodec,
+      videoProfile: vProfile,
+      videoBitrate: vBitrate,
+      audioCodec: aCodec,
+      audioSampleRate: aSampleRate,
+      audioChannels: aChannels,
+      audioBitrate: aBitrate,
     );
   }
 }

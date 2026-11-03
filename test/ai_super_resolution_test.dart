@@ -11,19 +11,20 @@ void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-      switch (methodCall.method) {
-        case 'isVulkanSupported':
-          return true;
-        case 'getModelInfo':
-          return {
-            'model': 'Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)',
-            'tilingSupport': true,
-            'fallbackEngine': 'Hardware-accelerated Lanczos3',
-          };
-        default:
-          return null;
-      }
-    });
+          switch (methodCall.method) {
+            case 'isVulkanSupported':
+              return true;
+            case 'getModelInfo':
+              return {
+                'model':
+                    'Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)',
+                'tilingSupport': true,
+                'fallbackEngine': 'Hardware-accelerated Lanczos3',
+              };
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -67,17 +68,20 @@ void main() {
       expect(planLandscape.targetHeight, equals(2160));
     });
 
-    test('resolvePlan for Real-ESRGAN Neural AI engine with Vulkan acceleration', () async {
-      final plan = await AiSuperResolutionService.resolvePlan(
-        engine: UpscaleEngine.neuralAi,
-        targetResolution: TargetResolution.r2k,
-        isPortrait: true,
-      );
-      expect(plan.engine, equals(UpscaleEngine.neuralAi));
-      expect(plan.targetWidth, equals(1440));
-      expect(plan.targetHeight, equals(2560));
-      expect(plan.summary, contains('Real-ESRGAN'));
-    });
+    test(
+      'resolvePlan for Real-ESRGAN Neural AI engine with Vulkan acceleration',
+      () async {
+        final plan = await AiSuperResolutionService.resolvePlan(
+          engine: UpscaleEngine.neuralAi,
+          targetResolution: TargetResolution.r2k,
+          isPortrait: true,
+        );
+        expect(plan.engine, equals(UpscaleEngine.neuralAi));
+        expect(plan.targetWidth, equals(1440));
+        expect(plan.targetHeight, equals(2560));
+        expect(plan.summary, contains('Real-ESRGAN'));
+      },
+    );
 
     test('describePipeline generates clean human-readable summaries', () {
       final descLanczos = AiSuperResolutionService.describePipeline(
@@ -98,9 +102,12 @@ void main() {
       expect(descAi, contains('Auto-Fallback Lanczos3 Enabled'));
     });
 
-    test('prepareModelAssets safely extracts or returns asset model paths', () async {
-      final paths = await AiSuperResolutionService.prepareModelAssets();
-      expect(paths, isA<List<String>>());
-    });
+    test(
+      'prepareModelAssets safely extracts or returns asset model paths',
+      () async {
+        final paths = await AiSuperResolutionService.prepareModelAssets();
+        expect(paths, isA<List<String>>());
+      },
+    );
   });
 }

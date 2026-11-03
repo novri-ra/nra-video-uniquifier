@@ -32,10 +32,14 @@ class AiSuperResolutionPlan {
 
 /// Native bridge and capability manager for NCNN Vulkan Neural Super-Resolution.
 class AiSuperResolutionService {
-  static const MethodChannel _channel = MethodChannel('id.novrira.videouniquifier/ai_super_res');
+  static const MethodChannel _channel = MethodChannel(
+    'id.novrira.videouniquifier/ai_super_res',
+  );
 
-  static const String modelRealEsrganAnimeVideoV3 = 'Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)';
-  static const String modelLanczosFallback = 'Lanczos3 Anti-Aliased Mathematical Matrix';
+  static const String modelRealEsrganAnimeVideoV3 =
+      'Real-ESRGAN AnimeVideo-v3 Compact (x2/x4 NCNN Vulkan)';
+  static const String modelLanczosFallback =
+      'Lanczos3 Anti-Aliased Mathematical Matrix';
 
   /// Extracts bundled NCNN model weights from assets to internal storage cache.
   static Future<List<String>> prepareModelAssets() async {
@@ -54,7 +58,10 @@ class AiSuperResolutionService {
         final target = File('${modelsDir.path}/$name');
         if (!await target.exists() || await target.length() == 0) {
           final data = await rootBundle.load('assets/models/$name');
-          await target.writeAsBytes(data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes), flush: true);
+          await target.writeAsBytes(
+            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+            flush: true,
+          );
         }
         outPaths.add(target.path);
       }
@@ -91,13 +98,19 @@ class AiSuperResolutionService {
     required TargetResolution targetResolution,
     required bool isPortrait,
   }) async {
-    final targetW = isPortrait ? targetResolution.height : targetResolution.width;
-    final targetH = isPortrait ? targetResolution.width : targetResolution.height;
+    final targetW = isPortrait
+        ? targetResolution.height
+        : targetResolution.width;
+    final targetH = isPortrait
+        ? targetResolution.width
+        : targetResolution.height;
 
     if (engine == UpscaleEngine.neuralAi) {
       final vulkanAvailable = await isVulkanSupported();
       if (!vulkanAvailable) {
-        debugPrint('[AiSuperResolution] Vulkan compute unavailable on this device. Transparent fallback: Real-ESRGAN -> Lanczos3.');
+        debugPrint(
+          '[AiSuperResolution] Vulkan compute unavailable on this device. Transparent fallback: Real-ESRGAN -> Lanczos3.',
+        );
       }
       return AiSuperResolutionPlan(
         engine: engine,
@@ -131,8 +144,12 @@ class AiSuperResolutionService {
     required TargetResolution targetResolution,
     required bool isPortrait,
   }) {
-    final targetW = isPortrait ? targetResolution.height : targetResolution.width;
-    final targetH = isPortrait ? targetResolution.width : targetResolution.height;
+    final targetW = isPortrait
+        ? targetResolution.height
+        : targetResolution.width;
+    final targetH = isPortrait
+        ? targetResolution.width
+        : targetResolution.height;
     if (engine == UpscaleEngine.neuralAi) {
       return 'Real-ESRGAN NCNN Vulkan AI ($targetW×$targetH) • Auto-Fallback Lanczos3 Enabled';
     }

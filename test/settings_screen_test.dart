@@ -28,9 +28,7 @@ void main() {
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
-          child: const MaterialApp(
-            home: SettingsScreen(),
-          ),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
       await tester.pumpAndSettle();
@@ -46,7 +44,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('toggles background and sound switches without error', (tester) async {
+    testWidgets('toggles background and sound switches without error', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -59,9 +59,7 @@ void main() {
             ChangeNotifierProvider(create: (_) => LocaleProvider()),
             ChangeNotifierProvider.value(value: provider),
           ],
-          child: const MaterialApp(
-            home: SettingsScreen(),
-          ),
+          child: const MaterialApp(home: SettingsScreen()),
         ),
       );
       await tester.pumpAndSettle();

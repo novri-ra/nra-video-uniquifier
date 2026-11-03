@@ -23,10 +23,16 @@ class SettingToggleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final iconColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final linkColor = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final outlineColor = isDark ? AppColors.outline : AppColors.textDark.withValues(alpha: 0.75);
+    final linkColor = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
+    final outlineColor = isDark
+        ? AppColors.outline
+        : AppColors.textDark.withValues(alpha: 0.75);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -57,7 +63,9 @@ class SettingToggleRow extends StatelessWidget {
                         child: Text(
                           subtitle,
                           style: TextStyle(
-                            color: onTapSubtitle != null ? linkColor : outlineColor,
+                            color: onTapSubtitle != null
+                                ? linkColor
+                                : outlineColor,
                             fontSize: 10,
                             fontFamily: 'monospace',
                             decoration: onTapSubtitle != null

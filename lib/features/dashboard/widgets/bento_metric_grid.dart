@@ -36,7 +36,9 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
         final freeBytes = space.free;
         final totalBytes = space.total;
         final gb = freeBytes / (1024 * 1024 * 1024);
-        final fraction = totalBytes > 0 ? (freeBytes / totalBytes).clamp(0.0, 1.0) : 0.5;
+        final fraction = totalBytes > 0
+            ? (freeBytes / totalBytes).clamp(0.0, 1.0)
+            : 0.5;
         setState(() {
           _storageSpace = space;
           _freeGigabytes = gb;
@@ -80,7 +82,9 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
       ),
       BentoCards.buildStorageCard(
         title: l10n?.storageBuffer ?? 'Storage Safe Buffer',
-        freeGbText: _storageSpace?.freeSize ?? '${_freeGigabytes.toStringAsFixed(1)} GB FREE',
+        freeGbText:
+            _storageSpace?.freeSize ??
+            '${_freeGigabytes.toStringAsFixed(1)} GB FREE',
         freeFraction: _freeFraction,
         ringColor: ringColor,
         isDark: isDark,
@@ -181,10 +185,14 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
       decoration: BoxDecoration(
         color: AppColors.peachCream,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.persimmonOrange.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: AppColors.persimmonOrange.withValues(alpha: 0.45),
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.peachCream.withValues(alpha: widget.isDark ? 0.25 : 0.40),
+            color: AppColors.peachCream.withValues(
+              alpha: widget.isDark ? 0.25 : 0.40,
+            ),
             blurRadius: 8,
           ),
         ],
@@ -209,7 +217,9 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
   }
 
   Widget _buildCenterVisual(BuildContext context) {
-    final labelColor = widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final labelColor = widget.isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
     const countColor = AppColors.persimmonOrange;
     final l10n = AppLocalizations.of(context);
     final queueLabel = l10n?.queueReady ?? 'SIAP ANTREAN';
@@ -234,7 +244,11 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
     );
   }
 
-  Widget _buildFooter(Color titleColor, Color queueColor, BuildContext context) {
+  Widget _buildFooter(
+    Color titleColor,
+    Color queueColor,
+    BuildContext context,
+  ) {
     final l10n = AppLocalizations.of(context);
     final emptyText = l10n?.readyToUpload ?? 'Ready to Upload • Tap +';
 
@@ -245,7 +259,11 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(
           widget.queue.hasItems
@@ -264,25 +282,29 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
   }
 
   BoxDecoration _cardDecoration(Color bg, Color border) => BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: border),
-        boxShadow: [
-          if (!widget.isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-        ],
-      );
+    color: bg,
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: border),
+    boxShadow: [
+      if (!widget.isDark)
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
     const queueColor = AppColors.persimmonOrange;
     final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),

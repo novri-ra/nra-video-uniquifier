@@ -19,16 +19,26 @@ class SuccessScreen extends StatelessWidget {
     if (!await file.exists()) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error: Output video file not found.'), backgroundColor: AppColors.error),
+          const SnackBar(
+            content: Text('Error: Output video file not found.'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
       return;
     }
     try {
-      await Share.shareXFiles([XFile(path, mimeType: 'video/mp4')], text: 'Unique video exported via NRA Uniquifier');
+      await Share.shareXFiles([
+        XFile(path, mimeType: 'video/mp4'),
+      ], text: 'Unique video exported via NRA Uniquifier');
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Share error: $e'), backgroundColor: AppColors.error));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Share error: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     }
   }
@@ -40,12 +50,20 @@ class SuccessScreen extends StatelessWidget {
         final res = await OpenFilex.open(path);
         if (res.type != ResultType.done && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Unable to open: ${res.message}'), backgroundColor: AppColors.surfaceContainerHighest),
+            SnackBar(
+              content: Text('Unable to open: ${res.message}'),
+              backgroundColor: AppColors.surfaceContainerHighest,
+            ),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Open error: $e'), backgroundColor: AppColors.error));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Open error: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
         }
       }
     }
@@ -55,8 +73,11 @@ class SuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<UniquifierProvider>();
     final effectivePath = outputPath ?? provider.lastProcessedOutputPath;
-    final fileName = effectivePath != null ? effectivePath.split(RegExp(r'[/\\]')).last : 'UQ_video_output.mp4';
-    final directoryPath = effectivePath ?? '/storage/emulated/0/Movies/Uniquifier';
+    final fileName = effectivePath != null
+        ? effectivePath.split(RegExp(r'[/\\]')).last
+        : 'UQ_video_output.mp4';
+    final directoryPath =
+        effectivePath ?? '/storage/emulated/0/Movies/Uniquifier';
     final thumbPath = provider.outputThumbnailPath;
 
     return Scaffold(
@@ -97,15 +118,26 @@ class _SuccessHeroCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final title = l10n?.videoSavedTitle ?? 'Video Saved!';
-    final desc = l10n?.videoSavedDesc ?? 'Exported to public Movies/Uniquifier gallery';
+    final desc =
+        l10n?.videoSavedDesc ?? 'Exported to public Movies/Uniquifier gallery';
 
     final cardBg = isDark ? AppColors.surface : AppColors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
     final titleColor = isDark ? AppColors.white : AppColors.textDark;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final circleBg = isDark ? AppColors.surfaceContainer : AppColors.lightSurfaceContainer;
-    final circleBorder = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
-    final iconColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+    final circleBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.lightSurfaceContainer;
+    final circleBorder = isDark
+        ? AppColors.primaryContainer
+        : AppColors.forestDeep;
+    final iconColor = isDark
+        ? AppColors.primaryContainer
+        : AppColors.forestDeep;
 
     return Container(
       width: double.infinity,
@@ -128,7 +160,14 @@ class _SuccessHeroCard extends StatelessWidget {
             child: Icon(Icons.check_circle, color: iconColor, size: 32),
           ),
           const SizedBox(height: 12),
-          Text(title, style: TextStyle(color: titleColor, fontSize: 22, fontWeight: FontWeight.w700)),
+          Text(
+            title,
+            style: TextStyle(
+              color: titleColor,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(desc, style: TextStyle(color: descColor, fontSize: 12)),
           const SizedBox(height: 12),
@@ -137,11 +176,20 @@ class _SuccessHeroCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('SANDBOX HASH:', style: TextStyle(color: descColor, fontSize: 10, fontFamily: 'monospace')),
+              Text(
+                'SANDBOX HASH:',
+                style: TextStyle(
+                  color: descColor,
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                ),
+              ),
               Text(
                 '0x9F41..C7E0 (MODIFIED)',
                 style: TextStyle(
-                  color: isDark ? AppColors.primaryContainer : AppColors.forestDeep,
+                  color: isDark
+                      ? AppColors.primaryContainer
+                      : AppColors.forestDeep,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace',
@@ -170,7 +218,9 @@ class _SuccessManifestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.surface : AppColors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
 
     return Container(
       width: double.infinity,
@@ -188,7 +238,10 @@ class _SuccessManifestCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ThumbnailReadyBadge(thumbnailPath: thumbnailPath, isDark: isDark),
+              _ThumbnailReadyBadge(
+                thumbnailPath: thumbnailPath,
+                isDark: isDark,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: _ManifestDetailsColumn(
@@ -217,7 +270,9 @@ class _ManifestHeader extends StatelessWidget {
         Text(
           'EXPORT MANIFEST',
           style: TextStyle(
-            color: isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75),
+            color: isDark
+                ? AppColors.onSurfaceVariant
+                : AppColors.textDark.withValues(alpha: 0.75),
             fontSize: 10,
             letterSpacing: 0.8,
             fontFamily: 'monospace',
@@ -252,21 +307,33 @@ class _ManifestDetailsColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final fileNameColor = isDark ? Colors.white : AppColors.textDark;
     final dirColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
-    final metaColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final metaColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           fileName,
-          style: TextStyle(color: fileNameColor, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: fileNameColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'monospace',
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
           directoryPath,
-          style: TextStyle(color: dirColor, fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: dirColor,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'monospace',
+          ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
@@ -288,15 +355,21 @@ class _ThumbnailReadyBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasThumb = thumbnailPath != null && File(thumbnailPath!).existsSync();
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
-    final badgeColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
+    final badgeColor = isDark
+        ? AppColors.primaryContainer
+        : AppColors.forestDeep;
 
     return Container(
       width: 80,
       height: 80,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceContainerLow : AppColors.offWhiteCanvas,
+        color: isDark
+            ? AppColors.surfaceContainerLow
+            : AppColors.offWhiteCanvas,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: borderColor),
       ),
@@ -304,16 +377,25 @@ class _ThumbnailReadyBadge extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (hasThumb)
-            Image.file(File(thumbnailPath!), cacheWidth: 240, cacheHeight: 240, fit: BoxFit.cover)
+            Image.file(
+              File(thumbnailPath!),
+              cacheWidth: 240,
+              cacheHeight: 240,
+              fit: BoxFit.cover,
+            )
           else
-            const Center(child: Icon(Icons.videocam, color: AppColors.outline, size: 32)),
+            const Center(
+              child: Icon(Icons.videocam, color: AppColors.outline, size: 32),
+            ),
           Positioned(
             top: 4,
             left: 4,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceContainerLowest.withValues(alpha: 0.9) : AppColors.white.withValues(alpha: 0.9),
+                color: isDark
+                    ? AppColors.surfaceContainerLowest.withValues(alpha: 0.9)
+                    : AppColors.white.withValues(alpha: 0.9),
                 border: Border.all(color: badgeColor),
               ),
               child: Text(
@@ -349,7 +431,8 @@ class _SuccessActionButtons extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final exportShareText = l10n?.exportShareVideo ?? 'Export & Share Video';
     final openGalleryText = l10n?.openGallery ?? 'Open Gallery';
-    final uniquifyAnotherText = l10n?.uniquifyAnother ?? 'Uniquify Another Video';
+    final uniquifyAnotherText =
+        l10n?.uniquifyAnother ?? 'Uniquify Another Video';
 
     return Column(
       children: [
@@ -358,12 +441,24 @@ class _SuccessActionButtons extends StatelessWidget {
             backgroundColor: AppColors.forestDeep,
             foregroundColor: AppColors.white,
             minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
             elevation: 0,
           ),
           onPressed: outputPath != null ? onShare : null,
-          icon: const Icon(Icons.share_rounded, size: 18, color: AppColors.white),
-          label: Text(exportShareText, style: const TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
+          icon: const Icon(
+            Icons.share_rounded,
+            size: 18,
+            color: AppColors.white,
+          ),
+          label: Text(
+            exportShareText,
+            style: const TextStyle(
+              color: AppColors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
@@ -372,11 +467,23 @@ class _SuccessActionButtons extends StatelessWidget {
             foregroundColor: AppColors.forestDeep,
             side: const BorderSide(color: AppColors.forestDeep, width: 1.5),
             minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
           onPressed: outputPath != null ? onOpen : null,
-          icon: const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.forestDeep),
-          label: Text(openGalleryText, style: const TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w700)),
+          icon: const Icon(
+            Icons.photo_library_outlined,
+            size: 18,
+            color: AppColors.forestDeep,
+          ),
+          label: Text(
+            openGalleryText,
+            style: const TextStyle(
+              color: AppColors.forestDeep,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
         const SizedBox(height: 10),
         TextButton.icon(
@@ -384,7 +491,8 @@ class _SuccessActionButtons extends StatelessWidget {
             foregroundColor: AppColors.outline,
             minimumSize: const Size.fromHeight(44),
           ),
-          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          onPressed: () =>
+              Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.restart_alt, size: 18),
           label: Text(uniquifyAnotherText),
         ),

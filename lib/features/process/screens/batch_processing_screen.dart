@@ -59,7 +59,8 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: queue.items.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (ctx, idx) => _BatchItemRow(item: queue.items[idx], index: idx),
+                  itemBuilder: (ctx, idx) =>
+                      _BatchItemRow(item: queue.items[idx], index: idx),
                 ),
               ),
               const SizedBox(height: 16),
@@ -97,11 +98,15 @@ class _BatchProgressCard extends StatelessWidget {
               Text(
                 queue.isProcessing
                     ? 'PROCESSING ITEM ${queue.currentIndex + 1} OF ${queue.totalCount}'
-                    : (queue.isCancelled ? 'BATCH CANCELLED' : 'BATCH COMPLETED'),
+                    : (queue.isCancelled
+                          ? 'BATCH CANCELLED'
+                          : 'BATCH COMPLETED'),
                 style: TextStyle(
                   color: queue.isProcessing
                       ? AppColors.primaryContainer
-                      : (queue.isCancelled ? AppColors.error : AppColors.primary),
+                      : (queue.isCancelled
+                            ? AppColors.error
+                            : AppColors.primary),
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace',
@@ -125,7 +130,9 @@ class _BatchProgressCard extends StatelessWidget {
               value: overall,
               minHeight: 6,
               backgroundColor: AppColors.surfaceContainerHighest,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryContainer),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                AppColors.primaryContainer,
+              ),
             ),
           ),
         ],
@@ -180,7 +187,9 @@ class _BatchItemRow extends StatelessWidget {
         color: AppColors.surfaceContainer,
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: item.isProcessing ? AppColors.primaryContainer : AppColors.surfaceContainerHighest,
+          color: item.isProcessing
+              ? AppColors.primaryContainer
+              : AppColors.surfaceContainerHighest,
         ),
       ),
       child: Column(
@@ -222,7 +231,9 @@ class _BatchItemRow extends StatelessWidget {
                 value: item.progress,
                 minHeight: 3,
                 backgroundColor: AppColors.surfaceContainerHighest,
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryContainer),
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  AppColors.primaryContainer,
+                ),
               ),
             ),
           ],

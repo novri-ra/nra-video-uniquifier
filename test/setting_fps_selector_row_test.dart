@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/shared/widgets/setting_fps_selector_row.dart';
 
 void main() {
-  testWidgets('SettingFpsSelectorRow renders labels and handles tap', (tester) async {
+  testWidgets('SettingFpsSelectorRow renders labels and handles tap', (
+    tester,
+  ) async {
     int currentFps = 30;
 
     await tester.pumpWidget(

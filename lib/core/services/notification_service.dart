@@ -5,7 +5,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'settings_service.dart';
 
 class NotificationService {
-  static final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
   static bool? _testOverride;
@@ -47,12 +48,21 @@ class NotificationService {
       ongoing: false,
       autoCancel: true,
     );
-    await _safeShow(id: 999, title: 'NRA Video Uniquifier', body: 'NRA Video Uniquifier siap', androidDetails: details);
-    try { await _plugin.cancel(id: 999); } catch (_) {}
+    await _safeShow(
+      id: 999,
+      title: 'NRA Video Uniquifier',
+      body: 'NRA Video Uniquifier siap',
+      androidDetails: details,
+    );
+    try {
+      await _plugin.cancel(id: 999);
+    } catch (_) {}
   }
 
   /// Registers official notification channels with Android OS.
-  static Future<void> _createNotificationChannels(AndroidFlutterLocalNotificationsPlugin plugin) async {
+  static Future<void> _createNotificationChannels(
+    AndroidFlutterLocalNotificationsPlugin plugin,
+  ) async {
     const channel = AndroidNotificationChannel(
       mainChannelId,
       'NRA Uniquifier Processing',
@@ -77,10 +87,17 @@ class NotificationService {
 
   static Future<bool> _tryInitialize(String icon) async {
     try {
-      final settings = InitializationSettings(android: AndroidInitializationSettings(icon));
+      final settings = InitializationSettings(
+        android: AndroidInitializationSettings(icon),
+      );
       await _plugin.initialize(settings: settings);
-      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-      if (androidPlugin != null) await _createNotificationChannels(androidPlugin);
+      final androidPlugin = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (androidPlugin != null) {
+        await _createNotificationChannels(androidPlugin);
+      }
       return true;
     } catch (_) {
       return false;
@@ -91,7 +108,11 @@ class NotificationService {
   @pragma('vm:entry-point')
   static Future<void> init() async {
     if (_initialized || !_canRun) return;
-    const candidates = ['@mipmap/ic_launcher', 'ic_launcher', 'notification_icon'];
+    const candidates = [
+      '@mipmap/ic_launcher',
+      'ic_launcher',
+      'notification_icon',
+    ];
     for (final icon in candidates) {
       if (await _tryInitialize(icon)) {
         _initialized = true;
@@ -102,7 +123,10 @@ class NotificationService {
 
   static Future<void> _ensurePermission() async {
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       final bool? enabled = await android?.areNotificationsEnabled();
       if (enabled == false) {
         await android?.requestNotificationsPermission();
@@ -181,7 +205,12 @@ class NotificationService {
           progress: androidDetails.progress,
           onlyAlertOnce: androidDetails.onlyAlertOnce,
         );
-        await _plugin.show(id: id, title: title, body: body, notificationDetails: NotificationDetails(android: fallback));
+        await _plugin.show(
+          id: id,
+          title: title,
+          body: body,
+          notificationDetails: NotificationDetails(android: fallback),
+        );
       } catch (_) {}
     }
   }
@@ -211,13 +240,23 @@ class NotificationService {
     _lastProgressPercent = clamped;
     _lastProgressTime = now;
 
-    final androidDetails = _buildProgressDetails(progress: clamped, maxProgress: maxProgress);
-    await _safeShow(id: id, title: title, body: body, androidDetails: androidDetails);
+    final androidDetails = _buildProgressDetails(
+      progress: clamped,
+      maxProgress: maxProgress,
+    );
+    await _safeShow(
+      id: id,
+      title: title,
+      body: body,
+      androidDetails: androidDetails,
+    );
   }
 
   /// Cancels ongoing progress notification.
   @pragma('vm:entry-point')
-  static Future<void> cancelProgressNotification([int id = progressNotificationId]) async {
+  static Future<void> cancelProgressNotification([
+    int id = progressNotificationId,
+  ]) async {
     _lastProgressPercent = -1;
     _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
     if (!_canRun) return;
@@ -236,7 +275,9 @@ class NotificationService {
   }) async {
     if (!_canRun) return;
     await init();
-    await cancelProgressNotification(id == completeNotificationId ? progressNotificationId : id);
+    await cancelProgressNotification(
+      id == completeNotificationId ? progressNotificationId : id,
+    );
 
     bool playSound = true;
     try {
@@ -256,7 +297,12 @@ class NotificationService {
       ongoing: false,
     );
 
-    await _safeShow(id: id, title: title, body: body, androidDetails: androidDetails);
+    await _safeShow(
+      id: id,
+      title: title,
+      body: body,
+      androidDetails: androidDetails,
+    );
   }
 
   /// Instant test notification trigger for diagnostics and verification.
@@ -278,6 +324,11 @@ class NotificationService {
       enableVibration: true,
       autoCancel: true,
     );
-    await _safeShow(id: testNotificationId, title: title, body: body, androidDetails: androidDetails);
+    await _safeShow(
+      id: testNotificationId,
+      title: title,
+      body: body,
+      androidDetails: androidDetails,
+    );
   }
 }

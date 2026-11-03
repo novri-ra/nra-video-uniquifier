@@ -16,8 +16,12 @@ class BatchQueueTabScreen extends StatelessWidget {
     final queue = context.watch<BatchQueueProvider>();
     final config = context.watch<UniquifierProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryAccent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final onPrimaryText = isDark ? AppColors.onPrimary : AppColors.lightOnPrimary;
+    final primaryAccent = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
+    final onPrimaryText = isDark
+        ? AppColors.onPrimary
+        : AppColors.lightOnPrimary;
 
     return Scaffold(
       appBar: TopAppBar(
@@ -41,7 +45,9 @@ class BatchQueueTabScreen extends StatelessWidget {
                       Text(
                         'QUEUED ASSETS',
                         style: TextStyle(
-                          color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                          color: isDark
+                              ? AppColors.outline
+                              : AppColors.lightOnSurfaceVariant,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1,
@@ -51,12 +57,20 @@ class BatchQueueTabScreen extends StatelessWidget {
                       if (queue.hasItems && !queue.isProcessing)
                         TextButton(
                           onPressed: queue.clear,
-                          child: const Text('Clear All', style: TextStyle(color: AppColors.error, fontSize: 12)),
+                          child: const Text(
+                            'Clear All',
+                            style: TextStyle(
+                              color: AppColors.error,
+                              fontSize: 12,
+                            ),
+                          ),
                         ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  ...queue.items.map((item) => _BatchItemRow(item: item, isDark: isDark)),
+                  ...queue.items.map(
+                    (item) => _BatchItemRow(item: item, isDark: isDark),
+                  ),
                   const SizedBox(height: 20),
                   if (!queue.isProcessing)
                     ElevatedButton.icon(
@@ -64,17 +78,24 @@ class BatchQueueTabScreen extends StatelessWidget {
                         backgroundColor: primaryAccent,
                         foregroundColor: onPrimaryText,
                         minimumSize: const Size.fromHeight(48),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onPressed: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const BatchProcessingScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const BatchProcessingScreen(),
+                          ),
                         );
                       },
                       icon: const Icon(Icons.play_arrow_rounded),
                       label: Text(
                         'START BATCH (${queue.totalCount} VIDEOS)',
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'monospace',
+                        ),
                       ),
                     ),
                 ],
@@ -96,7 +117,9 @@ class _EmptyBatchQueueView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final accent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
 
     return Center(
@@ -113,7 +136,11 @@ class _EmptyBatchQueueView extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'No Videos in Batch Queue',
-              style: TextStyle(color: titleColor, fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: titleColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -126,7 +153,9 @@ class _EmptyBatchQueueView extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: accent,
                 side: BorderSide(color: accent),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
               ),
               onPressed: onJumpToStudio,
               icon: const Icon(Icons.auto_fix_high_rounded, size: 16),
@@ -148,8 +177,12 @@ class _BatchSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface;
-    final border = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final successColor = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final border = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
+    final successColor = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -169,8 +202,17 @@ class _BatchSummaryCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatColumn(label: 'TOTAL', value: '${queue.totalCount}', isDark: isDark),
-          _StatColumn(label: 'COMPLETED', value: '${queue.completedCount}', color: successColor, isDark: isDark),
+          _StatColumn(
+            label: 'TOTAL',
+            value: '${queue.totalCount}',
+            isDark: isDark,
+          ),
+          _StatColumn(
+            label: 'COMPLETED',
+            value: '${queue.completedCount}',
+            color: successColor,
+            isDark: isDark,
+          ),
           _StatColumn(
             label: 'FAILED',
             value: '${queue.failedCount}',
@@ -197,14 +239,32 @@ class _StatColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final labelColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final defaultColor = isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final labelColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
 
     return Column(
       children: [
-        Text(value, style: TextStyle(color: color ?? defaultColor, fontSize: 18, fontWeight: FontWeight.w700)),
+        Text(
+          value,
+          style: TextStyle(
+            color: color ?? defaultColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 2),
-        Text(label, style: TextStyle(color: labelColor, fontSize: 10, fontFamily: 'monospace')),
+        Text(
+          label,
+          style: TextStyle(
+            color: labelColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+          ),
+        ),
       ],
     );
   }
@@ -219,10 +279,16 @@ class _BatchItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface;
-    final border = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final border = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final primaryAccent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final inactiveOutline = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final primaryAccent = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
+    final inactiveOutline = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -238,10 +304,12 @@ class _BatchItemRow extends StatelessWidget {
             item.status == BatchItemStatus.completed
                 ? Icons.check_circle
                 : item.status == BatchItemStatus.processing
-                    ? Icons.sync
-                    : Icons.schedule,
+                ? Icons.sync
+                : Icons.schedule,
             size: 16,
-            color: item.status == BatchItemStatus.completed ? primaryAccent : inactiveOutline,
+            color: item.status == BatchItemStatus.completed
+                ? primaryAccent
+                : inactiveOutline,
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -249,13 +317,19 @@ class _BatchItemRow extends StatelessWidget {
               item.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: textColor, fontSize: 12, fontFamily: 'monospace'),
+              style: TextStyle(
+                color: textColor,
+                fontSize: 12,
+                fontFamily: 'monospace',
+              ),
             ),
           ),
           Text(
             item.status.name.toUpperCase(),
             style: TextStyle(
-              color: item.status == BatchItemStatus.completed ? primaryAccent : inactiveOutline,
+              color: item.status == BatchItemStatus.completed
+                  ? primaryAccent
+                  : inactiveOutline,
               fontSize: 10,
               fontFamily: 'monospace',
               fontWeight: FontWeight.w600,

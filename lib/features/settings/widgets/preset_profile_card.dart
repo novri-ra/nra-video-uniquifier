@@ -18,7 +18,8 @@ class PresetProfileCard extends StatelessWidget {
           icon: Icons.bolt,
           iconAccent: AppColors.persimmonOrange,
           title: 'TikTok / Reels Aggressive',
-          description: 'Spectral Shift, Speed Warp 1.015x, Ken Burns Zoom, HFlip, Noise',
+          description:
+              'Spectral Shift, Speed Warp 1.015x, Ken Burns Zoom, HFlip, Noise',
           badge: 'FAST',
           badgeColor: AppColors.persimmonOrange,
           isSelected: provider.activePreset == 'TikTok / Reels',
@@ -44,7 +45,8 @@ class PresetProfileCard extends StatelessWidget {
           icon: Icons.movie_filter,
           iconAccent: AppColors.skyPastel,
           title: 'Cinematic 2K / 4K Clean',
-          description: 'No HFlip, No Canvas Blur, AI Upscale + Unsharp, Target 2K',
+          description:
+              'No HFlip, No Canvas Blur, AI Upscale + Unsharp, Target 2K',
           badge: 'CINEMA',
           badgeColor: AppColors.electricIce,
           isSelected: provider.activePreset == 'Cinematic 2K/4K',
@@ -67,7 +69,8 @@ class PresetProfileCard extends StatelessWidget {
           icon: Icons.flash_on,
           iconAccent: AppColors.mintSage,
           title: 'Ultra-Light / Quick Export',
-          description: 'Minimal filters, CRF 22, no AI upscale, metadata scrub only',
+          description:
+              'Minimal filters, CRF 22, no AI upscale, metadata scrub only',
           badge: 'QUICK',
           badgeColor: AppColors.mintSage,
           isSelected: provider.activePreset == 'Quick Export',
@@ -113,12 +116,18 @@ class _PresetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final activeBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.lightSurfaceContainer;
     final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
     final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final inactiveBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final iconColor = isSelected ? activeBorder : iconAccent;
 
     return InkWell(
@@ -166,11 +175,20 @@ class _PresetTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: badgeColor.withValues(alpha: isDark ? 0.15 : 0.12),
+                          color: badgeColor.withValues(
+                            alpha: isDark ? 0.15 : 0.12,
+                          ),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: badgeColor.withValues(alpha: isDark ? 0.4 : 0.3)),
+                          border: Border.all(
+                            color: badgeColor.withValues(
+                              alpha: isDark ? 0.4 : 0.3,
+                            ),
+                          ),
                         ),
                         child: Text(
                           badge,

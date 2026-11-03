@@ -8,8 +8,12 @@ void main() {
   AndroidFlutterLocalNotificationsPlugin.registerWith();
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const localNotificationsChannel = MethodChannel('dexterous.com/flutter/local_notifications');
-  const permissionChannel = MethodChannel('flutter.baseflow.com/permissions/methods');
+  const localNotificationsChannel = MethodChannel(
+    'dexterous.com/flutter/local_notifications',
+  );
+  const permissionChannel = MethodChannel(
+    'flutter.baseflow.com/permissions/methods',
+  );
 
   final capturedNotificationsCalls = <MethodCall>[];
   final capturedPermissionCalls = <MethodCall>[];
@@ -22,21 +26,25 @@ void main() {
     capturedPermissionCalls.clear();
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(localNotificationsChannel, (MethodCall call) async {
-      capturedNotificationsCalls.add(call);
-      if (call.method == 'initialize') return true;
-      if (call.method == 'show') return null;
-      if (call.method == 'cancel') return null;
-      return null;
-    });
+        .setMockMethodCallHandler(localNotificationsChannel, (
+          MethodCall call,
+        ) async {
+          capturedNotificationsCalls.add(call);
+          if (call.method == 'initialize') return true;
+          if (call.method == 'show') return null;
+          if (call.method == 'cancel') return null;
+          return null;
+        });
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(permissionChannel, (MethodCall call) async {
-      capturedPermissionCalls.add(call);
-      if (call.method == 'checkPermissionStatus') return 1; // PermissionStatus.granted
-      if (call.method == 'requestPermissions') return <int, int>{13: 1};
-      return null;
-    });
+          capturedPermissionCalls.add(call);
+          if (call.method == 'checkPermissionStatus') {
+            return 1; // PermissionStatus.granted
+          }
+          if (call.method == 'requestPermissions') return <int, int>{13: 1};
+          return null;
+        });
   });
 
   tearDown(() {
@@ -53,121 +61,208 @@ void main() {
     test('init invokes initialize on local notifications channel', () async {
       await NotificationService.init();
 
-      expect(capturedNotificationsCalls.any((call) => call.method == 'initialize'), isTrue);
-      final initCall = capturedNotificationsCalls.firstWhere((call) => call.method == 'initialize');
+      expect(
+        capturedNotificationsCalls.any((call) => call.method == 'initialize'),
+        isTrue,
+      );
+      final initCall = capturedNotificationsCalls.firstWhere(
+        (call) => call.method == 'initialize',
+      );
       expect(initCall.arguments, isNotNull);
       final args = Map<String, dynamic>.from(initCall.arguments as Map);
       expect(args['defaultIcon'], equals('@mipmap/ic_launcher'));
     });
 
-    test('requestPermission invokes checkPermissionStatus on permission channel and returns true', () async {
-      final res = await NotificationService.requestPermission();
+    test(
+      'requestPermission invokes checkPermissionStatus on permission channel and returns true',
+      () async {
+        final res = await NotificationService.requestPermission();
 
-      expect(res, isTrue);
-      expect(capturedPermissionCalls.any((call) => call.method == 'checkPermissionStatus'), isTrue);
-    });
+        expect(res, isTrue);
+        expect(
+          capturedPermissionCalls.any(
+            (call) => call.method == 'checkPermissionStatus',
+          ),
+          isTrue,
+        );
+      },
+    );
 
-    test('showProgressNotification invokes show with ongoing progress payload', () async {
-      await NotificationService.showProgressNotification(
-        progress: 50,
-        title: 'Testing Progress',
-        body: '50% complete',
-        force: true,
-      );
+    test(
+      'showProgressNotification invokes show with ongoing progress payload',
+      () async {
+        await NotificationService.showProgressNotification(
+          progress: 50,
+          title: 'Testing Progress',
+          body: '50% complete',
+          force: true,
+        );
 
-      final showCalls = capturedNotificationsCalls.where((call) => call.method == 'show').toList();
-      expect(showCalls.isNotEmpty, isTrue, reason: 'showProgressNotification must invoke show on channel');
-      final call = showCalls.first;
-      final args = Map<String, dynamic>.from(call.arguments as Map);
-      expect(args['id'], equals(NotificationService.progressNotificationId));
-      expect(args['title'], equals('Testing Progress'));
-      expect(args['body'], equals('50% complete'));
-      final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
-      expect(specifics['showProgress'], isTrue);
-      expect(specifics['progress'], equals(50));
-      expect(specifics['ongoing'], isTrue);
-      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
-    });
-
-    test('showProgressNotification allows 0% and 100% to bypass throttling without force', () async {
-      await NotificationService.showProgressNotification(
-        progress: 0,
-        title: 'Start',
-        body: '0%',
-      );
-      expect(capturedNotificationsCalls.where((call) => call.method == 'show').length, equals(1));
-
-      // 100% should also bypass throttling immediately
-      await NotificationService.showProgressNotification(
-        progress: 100,
-        title: 'Finished',
-        body: '100%',
-      );
-      expect(capturedNotificationsCalls.where((call) => call.method == 'show').length, equals(2));
-    });
-
-    test('progressNotificationId is 101 and initialize initializes channel', () async {
-      expect(NotificationService.progressNotificationId, equals(101));
-      await NotificationService.initialize();
-      expect(capturedNotificationsCalls.any((call) => call.method == 'initialize'), isTrue);
-    });
-
-    test('cancelProgressNotification invokes cancel with progressNotificationId', () async {
-      await NotificationService.cancelProgressNotification();
-
-      final cancelCalls = capturedNotificationsCalls.where((call) => call.method == 'cancel').toList();
-      expect(cancelCalls.isNotEmpty, isTrue, reason: 'cancelProgressNotification must invoke cancel on channel');
-      final call = cancelCalls.first;
-      if (call.arguments is Map) {
+        final showCalls = capturedNotificationsCalls
+            .where((call) => call.method == 'show')
+            .toList();
+        expect(
+          showCalls.isNotEmpty,
+          isTrue,
+          reason: 'showProgressNotification must invoke show on channel',
+        );
+        final call = showCalls.first;
         final args = Map<String, dynamic>.from(call.arguments as Map);
         expect(args['id'], equals(NotificationService.progressNotificationId));
-      } else {
-        expect(call.arguments, equals(NotificationService.progressNotificationId));
-      }
-    });
+        expect(args['title'], equals('Testing Progress'));
+        expect(args['body'], equals('50% complete'));
+        final specifics = Map<String, dynamic>.from(
+          args['platformSpecifics'] as Map,
+        );
+        expect(specifics['showProgress'], isTrue);
+        expect(specifics['progress'], equals(50));
+        expect(specifics['ongoing'], isTrue);
+        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+      },
+    );
 
-    test('showCompleteNotification cancels ongoing progress and invokes show with high importance', () async {
-      await NotificationService.showCompleteNotification(
-        title: 'Processing Done',
-        body: 'Video exported successfully',
-        success: true,
-      );
+    test(
+      'showProgressNotification allows 0% and 100% to bypass throttling without force',
+      () async {
+        await NotificationService.showProgressNotification(
+          progress: 0,
+          title: 'Start',
+          body: '0%',
+        );
+        expect(
+          capturedNotificationsCalls
+              .where((call) => call.method == 'show')
+              .length,
+          equals(1),
+        );
 
-      // Verify cancel was invoked first for ongoing progress
-      expect(capturedNotificationsCalls.any((call) => call.method == 'cancel'), isTrue);
+        // 100% should also bypass throttling immediately
+        await NotificationService.showProgressNotification(
+          progress: 100,
+          title: 'Finished',
+          body: '100%',
+        );
+        expect(
+          capturedNotificationsCalls
+              .where((call) => call.method == 'show')
+              .length,
+          equals(2),
+        );
+      },
+    );
 
-      // Verify show was invoked with complete notification payload
-      final showCalls = capturedNotificationsCalls.where((call) => call.method == 'show').toList();
-      expect(showCalls.isNotEmpty, isTrue);
-      final completeCall = showCalls.last;
-      final args = Map<String, dynamic>.from(completeCall.arguments as Map);
-      expect(args['id'], equals(NotificationService.completeNotificationId));
-      expect(args['title'], equals('Processing Done'));
-      expect(args['body'], equals('Video exported successfully'));
-      final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
-      expect(specifics['playSound'], isTrue);
-      expect(specifics['channelId'], equals(NotificationService.completeChannelId));
-      expect(NotificationService.completeChannelId, equals('nra_uniquifier_channel_v2'));
-      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
-    });
+    test(
+      'progressNotificationId is 101 and initialize initializes channel',
+      () async {
+        expect(NotificationService.progressNotificationId, equals(101));
+        await NotificationService.initialize();
+        expect(
+          capturedNotificationsCalls.any((call) => call.method == 'initialize'),
+          isTrue,
+        );
+      },
+    );
 
-    test('showTestNotification invokes show with testNotificationId and channel', () async {
-      await NotificationService.showTestNotification(
-        title: 'Diagnostic Test',
-        body: 'Testing Android 13+ channel binding',
-      );
+    test(
+      'cancelProgressNotification invokes cancel with progressNotificationId',
+      () async {
+        await NotificationService.cancelProgressNotification();
 
-      final showCalls = capturedNotificationsCalls.where((call) => call.method == 'show').toList();
-      expect(showCalls.isNotEmpty, isTrue);
-      final testCall = showCalls.last;
-      final args = Map<String, dynamic>.from(testCall.arguments as Map);
-      expect(args['id'], equals(NotificationService.testNotificationId));
-      expect(args['title'], equals('Diagnostic Test'));
-      expect(args['body'], equals('Testing Android 13+ channel binding'));
-      final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
-      expect(specifics['channelId'], equals(NotificationService.mainChannelId));
-      expect(NotificationService.mainChannelId, equals('nra_uniquifier_channel_v2'));
-      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
-    });
+        final cancelCalls = capturedNotificationsCalls
+            .where((call) => call.method == 'cancel')
+            .toList();
+        expect(
+          cancelCalls.isNotEmpty,
+          isTrue,
+          reason: 'cancelProgressNotification must invoke cancel on channel',
+        );
+        final call = cancelCalls.first;
+        if (call.arguments is Map) {
+          final args = Map<String, dynamic>.from(call.arguments as Map);
+          expect(
+            args['id'],
+            equals(NotificationService.progressNotificationId),
+          );
+        } else {
+          expect(
+            call.arguments,
+            equals(NotificationService.progressNotificationId),
+          );
+        }
+      },
+    );
+
+    test(
+      'showCompleteNotification cancels ongoing progress and invokes show with high importance',
+      () async {
+        await NotificationService.showCompleteNotification(
+          title: 'Processing Done',
+          body: 'Video exported successfully',
+          success: true,
+        );
+
+        // Verify cancel was invoked first for ongoing progress
+        expect(
+          capturedNotificationsCalls.any((call) => call.method == 'cancel'),
+          isTrue,
+        );
+
+        // Verify show was invoked with complete notification payload
+        final showCalls = capturedNotificationsCalls
+            .where((call) => call.method == 'show')
+            .toList();
+        expect(showCalls.isNotEmpty, isTrue);
+        final completeCall = showCalls.last;
+        final args = Map<String, dynamic>.from(completeCall.arguments as Map);
+        expect(args['id'], equals(NotificationService.completeNotificationId));
+        expect(args['title'], equals('Processing Done'));
+        expect(args['body'], equals('Video exported successfully'));
+        final specifics = Map<String, dynamic>.from(
+          args['platformSpecifics'] as Map,
+        );
+        expect(specifics['playSound'], isTrue);
+        expect(
+          specifics['channelId'],
+          equals(NotificationService.completeChannelId),
+        );
+        expect(
+          NotificationService.completeChannelId,
+          equals('nra_uniquifier_channel_v2'),
+        );
+        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+      },
+    );
+
+    test(
+      'showTestNotification invokes show with testNotificationId and channel',
+      () async {
+        await NotificationService.showTestNotification(
+          title: 'Diagnostic Test',
+          body: 'Testing Android 13+ channel binding',
+        );
+
+        final showCalls = capturedNotificationsCalls
+            .where((call) => call.method == 'show')
+            .toList();
+        expect(showCalls.isNotEmpty, isTrue);
+        final testCall = showCalls.last;
+        final args = Map<String, dynamic>.from(testCall.arguments as Map);
+        expect(args['id'], equals(NotificationService.testNotificationId));
+        expect(args['title'], equals('Diagnostic Test'));
+        expect(args['body'], equals('Testing Android 13+ channel binding'));
+        final specifics = Map<String, dynamic>.from(
+          args['platformSpecifics'] as Map,
+        );
+        expect(
+          specifics['channelId'],
+          equals(NotificationService.mainChannelId),
+        );
+        expect(
+          NotificationService.mainChannelId,
+          equals('nra_uniquifier_channel_v2'),
+        );
+        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+      },
+    );
   });
 }

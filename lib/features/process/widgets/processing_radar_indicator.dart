@@ -5,16 +5,15 @@ import '../../../../core/theme/app_theme.dart';
 class ProcessingRadarIndicator extends StatelessWidget {
   final double progress;
 
-  const ProcessingRadarIndicator({
-    super.key,
-    required this.progress,
-  });
+  const ProcessingRadarIndicator({super.key, required this.progress});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final trackColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final trackColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
 
     return LayoutBuilder(
       builder: (context, constraints) {

@@ -11,11 +11,19 @@ class HistoryEmptyView extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 48),
         child: Column(
           children: [
-            Icon(Icons.video_library_outlined, size: 48, color: AppColors.outline.withValues(alpha: 0.5)),
+            Icon(
+              Icons.video_library_outlined,
+              size: 48,
+              color: AppColors.outline.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             const Text(
               'No exported videos yet',
-              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 4),
             const Text(

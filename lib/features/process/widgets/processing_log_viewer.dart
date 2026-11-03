@@ -19,7 +19,8 @@ class ProcessingLogViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayLogs = (terminalLogs != null && terminalLogs!.trim().isNotEmpty)
+    final displayLogs =
+        (terminalLogs != null && terminalLogs!.trim().isNotEmpty)
         ? terminalLogs!
         : '[SANDBOX] Initializing media engine & filtergraph pipeline...\n[SANDBOX] Awaiting stdout/stderr stream...';
 
@@ -27,7 +28,9 @@ class ProcessingLogViewer extends StatelessWidget {
       builder: (context, constraints) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         final cardColor = isDark ? AppColors.surface : AppColors.white;
-        final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+        final borderColor = isDark
+            ? AppColors.surfaceContainerHighest
+            : AppColors.hairlineBorder;
         final isBounded = constraints.hasBoundedHeight;
         final logBox = _TerminalLogBox(logs: displayLogs);
 
@@ -44,7 +47,10 @@ class ProcessingLogViewer extends StatelessWidget {
             children: [
               _TelemetryRow(label: 'SOURCE', value: '$fileName ($duration)'),
               Divider(color: borderColor, height: 16),
-              _TelemetryRow(label: 'EXECUTION TIME', value: '$executionTime / Est. $estimatedRemaining'),
+              _TelemetryRow(
+                label: 'EXECUTION TIME',
+                value: '$executionTime / Est. $estimatedRemaining',
+              ),
               Divider(color: borderColor, height: 16),
               const _SandboxStateRow(),
               Divider(color: borderColor, height: 16),
@@ -64,10 +70,7 @@ class _TelemetryRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _TelemetryRow({
-    required this.label,
-    required this.value,
-  });
+  const _TelemetryRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +114,9 @@ class _SandboxStateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final stateColor = isDark ? AppColors.onSurfaceVariant.withValues(alpha: 0.9) : AppColors.forestDeep;
+    final stateColor = isDark
+        ? AppColors.onSurfaceVariant.withValues(alpha: 0.9)
+        : AppColors.forestDeep;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +134,13 @@ class _SandboxStateRow extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.memory, color: isDark ? AppColors.primaryContainer : AppColors.forestDeep, size: 13),
+              Icon(
+                Icons.memory,
+                color: isDark
+                    ? AppColors.primaryContainer
+                    : AppColors.forestDeep,
+                size: 13,
+              ),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
@@ -195,9 +206,15 @@ class _TerminalLogBoxState extends State<_TerminalLogBox> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final boxBg = isDark ? AppColors.surfaceContainerLowest : AppColors.offWhiteCanvas;
-    final boxBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
-    final logTextColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
+    final boxBg = isDark
+        ? AppColors.surfaceContainerLowest
+        : AppColors.offWhiteCanvas;
+    final boxBorder = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
+    final logTextColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.forestDeep;
 
     return Container(
       width: double.infinity,

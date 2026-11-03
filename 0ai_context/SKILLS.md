@@ -1,160 +1,126 @@
-# SKILLS.md — OpenCode & Hermes Skills Matrix
+# Tooling & Skills Catalog — nra_video_uniquifier
 
-Dokumentasi referensi lengkap seluruh skill yang terinstall di environment OpenCode / Hermes untuk proyek `nra_video_uniquifier`.
+## 1. Snapshot Metadata
+- Generated: 2026-11-04T01:32:00+07:00
+- Installed Skills: 34 system skills
+- Built-in Subagents: 7 available
+- MCP Servers: 2 active (`codebase-memory-mcp`, `antigravity`)
+- Behavior Rules: 3 active behavioral directives
 
----
+## 2. Installed Skills
 
-## 1. Standard Mandatory Skills
-Empat core engineering skills terpasang dan diverifikasi:
-- `/senior-architect`: Desain arsitektur sistem, dekomposisi modul, manajemen boundary, dan evaluasi trade-off skalabilitas.
-- `/clean-code`: Standar koding pragmatis, batasan ketat (<= 40 baris/fungsi, <= 400 baris/file), prinsip YAGNI, minim abstraksi.
-- `/systematic-debugging`: Investigasi bug 4 fase berbasis bukti, isolasi akar masalah sebelum patch, no speculative fixes.
-- `/senior-qa`: Strategi testing menyeluruh, test automation, responsive widget testing, verifikasi multi-resolusi, edge-case matrix.
+### flutter-expert
+- Purpose: Flutter/Dart development, widget lifecycle, platform channels, rendering performance.
+- Invocation: Automatic or prompt reference for Flutter architecture and Dart 3 optimization.
 
----
+### clean-code
+- Purpose: Pragmatic coding standards, concise implementations, no over-engineering or noise.
+- Invocation: General coding tasks and refactoring passes.
 
-## 2. Mobile & Flutter Stack Matrix
-Skill spesifik untuk platform mobile dan stack aplikasi ini:
-- `/flutter-expert`: Arsitektur Flutter mendalam, Dart 3, state management, InheritedWidget/Provider, canvas shaders, render tree optimization.
-- `/mobile-design`: Prinsip desain antarmuka mobile-first untuk iOS dan Android, interaksi sentuh, platform conventions.
-- `/mobile-native`: Adaptasi web/hybrid agar terasa native di mobile (100vh bug, notch/safe-area, tap latency, gesture conflicts).
-- `/write-swift`: Panduan modern Swift 6, data-race safety, concurrency (`actors`, `task groups`), value types, dan Swift Testing.
+### code-reviewer
+- Purpose: Comprehensive automated code analysis, security scanning, and review checklists.
+- Invocation: Pull request evaluations and code audits.
 
----
+### codebase-memory
+- Purpose: Codebase knowledge graph exploration, symbol resolution, and dependency tracing.
+- Invocation: Exploring architecture, callers, fan-in/fan-out, and impact analysis.
 
-## 3. Architecture, Fullstack & DevOps Matrix
-Skill perancangan sistem dan infrastruktur:
-- `/senior-fullstack`: Pengembangan fullstack komprehensif (React, Next.js, Node.js, GraphQL, PostgreSQL), scaffolding, pola arsitektur.
-- `/senior-devops`: Automasi CI/CD, deployment pipelines, containerization, Infrastructure as Code (IaC), monitoring cloud (AWS, GCP, Azure).
-- `/docker-expert`: Optimasi Docker multi-stage builds, container hardening, security scan, Docker Compose orchestration.
-- `/supabase-postgres-best-practices`: Optimasi performa PostgreSQL, query tuning, indexing, schema design, konfigurasi database.
+### security-audit
+- Purpose: Vulnerability review, static analysis, secrets detection, and hardening.
+- Invocation: Security audits, credential leakage checks, and file permission reviews.
 
----
+### senior-qa
+- Purpose: Test automation strategies, widget smoke tests, and coverage analysis.
+- Invocation: Generating test suites and verifying regression baselines.
 
-## 4. Security & Vulnerability Matrix
-Skill audit keamanan dan hardening:
-- `/security-audit`: Review keamanan menyeluruh untuk codebase, API, service, dan CLI tools, vulnerability research, threat modeling.
-- `/senior-security`: Engineering keamanan tingkat lanjut, penetration testing, arsitektur kriptografi, audit kepatuhan.
-- `/vulnerability-scanner`: Analisis kerentanan berbasis OWASP 2025, supply chain security, mapping attack surface, mitigasi dependensi.
+### ponytail
+- Purpose: Lazy senior developer mode enforcing minimum viable diffs and standard libraries.
+- Invocation: General coding, refactoring, and dependency evaluation.
 
----
+### systematic-debugging
+- Purpose: Root cause analysis and step-by-step diagnostic loops before proposing code fixes.
+- Invocation: Unexpected test failures, exceptions, and runtime bugs.
 
-## 5. QA, Debugging & Code Review Matrix
-Skill penjaminan kualitas kode dan eksekusi:
-- `/code-reviewer`: Code review multi-bahasa (TypeScript, JavaScript, Python, Swift, Kotlin, Go), best practices, automated linting checklist.
-- `/karpathy-guidelines`: Pedoman perilaku coding: perubahan surgical, no over-engineering, validasi asumsi, success criteria terukur.
-- `/break-ui`: Stress-testing antarmuka menggunakan input edge-case ekstrem (teks panjang, formatting aneh, angka batas, karakter khusus).
+### git-commit-helper
+- Purpose: Conventional and descriptive git commit message generation.
+- Invocation: Commit preparation and staged changes review.
 
----
+### ui-craft
+- Purpose: Anti-slop UI design system enforcement, accessibility, and token discipline.
+- Invocation: UI component creation, layout polishing, and visual refinement.
 
-## 6. Ponytail Suite (Lazy Senior Dev Mode)
-Rangkaian skill minimal diff, standard-library/native-first, anti-bloat:
-- `/ponytail`: Mode senior dev malas: solusi tuntas dengan diff terkecil, native API rungs, zero unnecessary abstractions.
-- `/ponytail-audit`: Audit repo menyeluruh untuk bug, celah keamanan, bottleneck performa, bloat, dan target pembersihan kode.
-- `/ponytail-debt`: Ledger pencatatan seluruh shortcut teknis (`shortcut:` dan `ponytail:` comments) dalam codebase.
-- `/ponytail-gain`: Laporan efisiensi terukur dari reduksi kode, token cost, dan kecepatan eksekusi.
-- `/ponytail-help`: Panduan cepat tingkatan mode ponytail (lite, full, ultra) dan perintah terkait.
-- `/ponytail-review`: Review kualitas diff mencakup logika, ketahanan beban nyata, kecukupan tes, dan kebutuhan tiap baris kode.
+## 3. Built-in Agents
 
----
+### explore / explorer
+- Purpose: High-speed read-only codebase exploration, glob search, and keyword discovery.
+- When to use: Locating files, manifests, configuration values, and structural overviews.
 
-## 7. UI/UX Design Systems & Craft Matrix
-Skill perancangan antarmuka, layout, dan token desain:
-- `/impeccable`: Perancangan, redesign, polish antarmuka frontend (web, mobile, dashboard) dengan standar visual tinggi.
-- `/ui-craft`: Prinsip anti-slop UI: discovery phase wajib, hierarki layout, tipografi, warna, dashboard, polish details.
-- `/ui-craft-dense-dashboard`: Template dashboard padat/data-heavy (Bloomberg/Retool style, IBM Plex, tabular numbers, sparklines).
-- `/ui-craft-editorial`: Desain editorial/majalah/long-form content (serif typography, kolom baca lebar, drop caps).
-- `/ui-craft-minimal`: Desain minimalis/clean (gaya Linear/Notion/Vercel, monochrome + single accent, subtle hairline borders).
-- `/ui-ux-pro-max`: Intelijen desain UI/UX mencakup 50 style, 21 palet, 50 font pairing, multi-framework support (Tailwind, shadcn).
-- `/taste-skill`: Art direction anti-slop berdasarkan riset 247 web gallery terbaik, section blueprints, visual inspection loop.
-- `/superdesign`: Canvas design tools untuk UI, wireframe, slide deck, visual assets berbasis multi-model AI.
-- `/frontend-design`: Desain visual terarah yang menghindari template default AI, pilihan tipografi dan layout distingtif.
-- `/design-doctrine`: House rules desain UI: zero emoji, verifikasi strict, token by intent, konsistensi 8 state komponen.
-- `/design-screen`: Pipeline lengkap mendesain halaman dari nol (brief inference, visual direction, tokenisasi, implementasi).
-- `/design-component`: Spesifikasi anatomi komponen UI, varian, sizing, 8 status interaksi, aksesibilitas.
-- `/design-tokens`: Pembuatan dan audit token desain format W3C DTCG (arsitektur 3-tier: primitive -> semantic -> component).
-- `/token-build`: Automasi transform token DTCG ke platform target (CSS vars, Tailwind @theme, TS, Android, iOS).
-- `/tokens`: Audit dan penetapan 3-layer token spine dalam proyek.
-- `/figma-integration`: Sinkronisasi dua arah antara token/komponen Figma Variables dan codebase.
-- `/apply-aesthetic`: Penerapan arah visual spesifik (archetypes atau 2,000+ brand design systems) ke layer token.
-- `/sddesign`: Spec-driven design pipeline penuh dari brief, shape spec, build, converge, hingga ship.
-- `/shape`: Desain wireframe ASCII, inventaris konten, dan pemetaan state sebelum menulis kode.
-- `/craft`: Pipeline one-shot pembuatan antarmuka lengkap dari resep hasil akhir yang siap rilis.
-- `/redesign`: Modernisasi antarmuka eksisting dengan mempertahankan apa yang sudah bekerja (IA, brand, SEO).
+### reviewer
+- Purpose: Bug inspection, security diagnostics, and code quality audits.
+- When to use: Reviewing pull requests, scanning for defect markers, and vulnerability audits.
 
----
+### codebase-memory-scout
+- Purpose: Rapid positive provisional lookups in the knowledge graph.
+- When to use: Finding symbol definitions, call traces, and structural dependencies.
 
-## 8. Micro-Tuning & Polish Matrix
-Skill iterasi terfokus pada detail UI spesifik:
-- `/polish`: Pass finishing akhir: micro-typography, ritme spacing, hover choreography, satu detail tanda tangan.
-- `/delight`: Penambahan micro-interaction berkarakter tanpa dekorasi murahan atau confetti.
-- `/bolder`: Peningkatan kepribadian UI, variasi layout, kontras tipografi saat desain terasa terlalu datar.
-- `/quieter`: Meredam kebisingan visual, simplifikasi layout dan saturasi warna saat antarmuka terlalu ramai.
-- `/colorize`: Strategi aksen warna tunggal pada 3-5 titik terencana, menjaga 90% netral.
-- `/distill`: Pemangkasan elemen dekoratif, teks berlebih, dan dead code yang tidak mendukung tindakan pengguna.
-- `/extract`: Ekstraksi duplikasi markup/class Tailwind ke komponen reusable dan pengangkatan nilai magic ke token.
-- `/typeset`: Optimasi tipografi: modular scale, tracking, line height, weight contrast, dan fitur OpenType.
-- `/clarify`: Review UX copy untuk tombol, pesan error, label form, dan empty state agar lugas dan manusiawi.
-- `/ux-writing`: Penulisan copy antarmuka berbasis framework what-why-how dan panduan inklusif.
-- `/unhappy`: Perancangan state non-happy path lengkap (loading, empty, error, partial, offline, conflict).
-- `/harden`: Kesiapan produksi: skeleton loading, graceful degradation, permission handling, offline resiliency.
-- `/adapt`: Layout responsif: breakpoint audit, target sentuh aman (touch targets), safe area, fluid typography.
-- `/brief`: Pembuatan dan pembaruan brief desain tahan lama pada `.ui-craft/brief.md`.
-- `/remember`: Pencatatan konstrain desain dan koreksi pengguna ke dalam dokumen brief proyek.
-- `/start`: Diagnostik awal proyek untuk mendeteksi framework, token, dan memandu langkah berikutnya.
-- `/finalize`: Quality gate pra-merge: verifikasi 10-pass finish bar dan feedback hierarchy (READY / NOT READY).
+### codebase-memory-auditor
+- Purpose: Comprehensive bounded-scope graph verification and coverage audit.
+- When to use: Verifying exhaustiveness, refactor candidates, and dead-code detection.
 
----
+### general
+- Purpose: General-purpose reasoning and execution of multi-step parallel work.
+- When to use: Complex operations combining shell execution, file synthesis, and analysis.
 
-## 9. Motion & Animation Matrix
-Skill perancangan, optimasi, dan pembersihan animasi:
-- `/animate`: Desain motion bermakna, timing, easing curves sesuai hierarki antarmuka.
-- `/animate-expo`: Implementasi gesture dan animasi di React Native / Expo (Reanimated, Gesture Handler, Haptics).
-- `/apple-design`: Prinsip motion dan interaksi ala Apple: spring physics, interruptible transitions, translusensi, kedalaman.
-- `/animation-performance`: Menjaga animasi pada batas frame budget (60/120 FPS), composite-only properties, off-main-thread.
-- `/animation-vocabulary`: Glosarium istilah tepat untuk jenis motion UI (rubber-banding, pop-in, spring dampening).
-- `/find-animation-opportunities`: Audit read-only untuk mendeteksi titik antarmuka yang memerlukan motion bermakna.
-- `/improve-animations`: Audit komprehensif motion codebase dan pembuatan roadmap perbaikan performa animasi.
-- `/remove-animations`: Mengidentifikasi dan membuang animasi tidak perlu pada aksi berfrekuensi tinggi atau data fungsional.
+## 4. Behavior Rules
+*Note: Behavior rules are NOT skills. Skills provide procedural domain knowledge and tool workflows; behavior rules govern agent decision-making, code minimalism, and communication style across all skills.*
 
----
+- **Andrej Karpathy Coding Guidelines**:
+  - Think Before Coding (surface tradeoffs, no speculative assumptions)
+  - Simplicity First (minimum necessary code, no unrequested abstractions)
+  - Surgical Changes (touch only requested lines, never gratuitously reformat adjacent code)
+  - Goal-Driven Execution (define verifiable tests and loop until passing)
+- **Lazy Senior Developer (Ponytail)**:
+  - Prefer stdlib and native platform features over third-party packages
+  - Shortest working diff wins; mark deliberate simplifications with `ponytail:` comments
+- **Terse Caveman Mode**:
+  - Drops filler, hedging, and pleasantries in chat responses while preserving technical identifiers verbatim
 
-## 10. Performance, Web & Accessibility Matrix
-Skill optimasi web, audit kepatuhan, dan integrasi UI:
-- `/web-performance-optimization`: Optimasi kecepatan web, Core Web Vitals (LCP, INP, CLS), bundle splitting, caching runtime.
-- `/performance`: Pencegahan layout shift (CLS), optimasi responsivitas interaksi (INP), dan audit performa runtime UI.
-- `/react-best-practices`: 40+ aturan performa React & Next.js: eliminasi waterfall request, optimasi bundle, re-render minim.
-- `/a11y-audit`: Audit aksesibilitas sesuai standar WCAG 2.2 AA/AAA, ARIA roles, kontras warna, keyboard navigation.
-- `/audit`: Audit teknis gabungan mencakup a11y, performa, dan responsivitas dengan tabel prioritas temuan.
-- `/heuristic`: Penilaian usability heuristik berbasis 10 prinsip Nielsen + 6 hukum desain dengan skor UsabilityScore.
-- `/design-review`: Evaluasi desain komprehensif pada 6 dimensi terbobot sebelum maupun sesudah implementasi.
-- `/design-qa`: Setup automated CI quality gates untuk linting token, kontras rasio, dan visual regression testing.
-- `/data-dashboard`: Perancangan layar data padat: candlestick, volume, heatmaps, sparklines, dan order books dengan kontras akurat.
-- `/ask-sonner`: Panduan implementasi dan debugging toast notification library Sonner di React.
-- `/design-code`: Generator kode komponen aksesibel berbasis token untuk beragam framework (React, Vue, Svelte, Flutter, Compose).
+## 5. MCP Servers
+*Note: MCP servers are NOT skills. They are external protocol adapters exposing tool APIs to the runtime.*
 
----
+- **codebase-memory-mcp**:
+  - Transport: Local STDIO subprocess (`codebase-memory-mcp.exe`)
+  - Tools: `get_graph_schema`, `get_architecture`, `query_graph`, `search_graph`, `trace_path`, `get_code_snippet`, `check_index_coverage`, `detect_changes`
+- **antigravity**:
+  - Transport: Antigravity runtime internal MCP
+  - Tools: `models`, `read_mcp_resource`, `session_move`, `session_rename`, `worktree_create`
 
-## 11. Codebase Memory, Tooling & Platform Skills
-Skill pengelolaan knowledge graph kode, version control, dan harness:
-- `/codebase-memory`: Query graf pengetahuan kode struktural (callers, callees, symbol traces, dependency mapping).
-- `/git-commit-helper`: Analisis git diff untuk membuat commit message deskriptif dan presisi.
-- `/antigravity`: Referensi lengkap platform Antigravity, konfigurasi agent, subagents, SDK, MCP, keybinds, tools, troubleshooting.
-- `/report`: Pengumpulan diagnostik otomatis dan pembuatan issue pelaporan bug via GitHub CLI.
+## 6. Recommended Skills to Install
+- `flutter-test-gen`: Automated golden test generation for responsive multi-screen layouts
+- `native-android-expert`: JNI/NDK optimization for C++ Vulkan real-esrgan compute bindings
 
----
+## 7. Selection Protocol
+1. **Identify Problem Domain**: Determine whether task relates to architecture, UI, security, or debugging.
+2. **Consult Behavioral Guardrails**: Apply Karpathy guidelines and Ponytail rules to check if code needs to exist at all.
+3. **Select Specialized Agent**: Delegate read-only discovery to `explore`, graph queries to `codebase-memory-scout`, and auditing to `reviewer`.
+4. **Invoke Minimum Skill Set**: Load only skills directly pertinent to the active phase.
+5. **Anti-patterns to Avoid**:
+   - Calling multiple overlapping UI skills on backend code
+   - Calling security audits on pure documentation tasks
+   - Treating behavior rules or MCP servers as invocable skills
 
-## 12. MCP Usage Matrix
-Routing tugas untuk `codebase-memory-mcp`:
-| Task | MCP Tool | Arguments / Filter | Expected Output |
-|---|---|---|---|
-| Architecture Mapping | `get_architecture` | `aspects: ["all"]` | System entry points, component tiers |
-| Symbol Discovery | `search_graph` | `name_pattern`, `label` | Qualified names, file locations, in/out degrees |
-| Dead Code Detection | `search_graph` | `file_pattern: "lib/.*"`, `max_degree: 0` | Symbols with 0 references |
-| Dependency / Call Path | `trace_path` | `function_name`, `direction: "both"` | Inbound callers and outbound callees |
-| File Outline | `get_file_outline` | `file_path`, `format: "tree"` | Declarations, line spans, methods/classes |
-| Impact Analysis | `detect_changes` | Git diff / staging | Affected symbols, cascade risk |
-| Graph Inventory | `get_graph_schema` | `diagnostics: "none"` | Counts of node labels and edge types |
-| Multi-hop Relationships | `query_graph` | openCypher `MATCH ...` | Custom graph traversals |
-| Index Status & Readiness | `index_status` | `diagnostics: "summary"` | Graph readiness, node/edge counts, watch state |
-| Snapshot Comparison | `compare_graphs` | `base_project`, `target_project` | Added/removed nodes and edge diffs |
+## 8. Permission Surface
+| Action | Resource | Effect |
+|--------|----------|--------|
+| Read | Repository files, logs, manifests | Allowed (unrestricted) |
+| Write | `0ai_context/**` | Allowed |
+| Write | Source files, tests, configs outside `0ai_context/` | Forbidden (locked) |
+| Shell | Read-only commands (`git status`, `git log`, read-only linters) | Allowed |
+| Shell | Destructive or modifying commands (`git commit`, format write) | Forbidden |
+
+## 9. Archive Policy
+This file is append-only for tool and skill history. Installed skills and agent inventories are re-verified dynamically at runtime. Historical capabilities and previous evaluations are retained in section 10.
+
+## 10. Change Log
+### 2026-11-04
+- Initial enumeration of 34 system skills, 7 built-in agents, 2 MCP servers, and active behavioral rules during context mapping v6.0 run.

@@ -18,8 +18,18 @@ void main() {
     testWidgets('renders batch queue list and progress bars', (tester) async {
       final queue = BatchQueueProvider();
       queue.setItems([
-        BatchVideoItem(id: '1', path: '/invalid1.mp4', name: 'video1.mp4', sizeBytes: 1024),
-        BatchVideoItem(id: '2', path: '/invalid2.mp4', name: 'video2.mp4', sizeBytes: 2048),
+        BatchVideoItem(
+          id: '1',
+          path: '/invalid1.mp4',
+          name: 'video1.mp4',
+          sizeBytes: 1024,
+        ),
+        BatchVideoItem(
+          id: '2',
+          path: '/invalid2.mp4',
+          name: 'video2.mp4',
+          sizeBytes: 2048,
+        ),
       ]);
       final config = UniquifierProvider();
 
@@ -29,9 +39,7 @@ void main() {
             ChangeNotifierProvider.value(value: queue),
             ChangeNotifierProvider.value(value: config),
           ],
-          child: const MaterialApp(
-            home: BatchProcessingScreen(),
-          ),
+          child: const MaterialApp(home: BatchProcessingScreen()),
         ),
       );
       await tester.pump();
@@ -45,10 +53,17 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('cancel batch button triggers batch cancellation', (tester) async {
+    testWidgets('cancel batch button triggers batch cancellation', (
+      tester,
+    ) async {
       final queue = BatchQueueProvider();
       queue.setItems([
-        BatchVideoItem(id: '1', path: '/invalid1.mp4', name: 'video1.mp4', sizeBytes: 1024),
+        BatchVideoItem(
+          id: '1',
+          path: '/invalid1.mp4',
+          name: 'video1.mp4',
+          sizeBytes: 1024,
+        ),
       ]);
       final config = UniquifierProvider();
 
@@ -58,9 +73,7 @@ void main() {
             ChangeNotifierProvider.value(value: queue),
             ChangeNotifierProvider.value(value: config),
           ],
-          child: const MaterialApp(
-            home: BatchProcessingScreen(),
-          ),
+          child: const MaterialApp(home: BatchProcessingScreen()),
         ),
       );
       await tester.pump();

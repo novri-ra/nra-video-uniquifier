@@ -18,13 +18,18 @@ class MicrostockArticleSheet extends StatefulWidget {
     required this.isDark,
   });
 
-  static void show(BuildContext context, MicrostockNewsArticle article, bool isDark) {
+  static void show(
+    BuildContext context,
+    MicrostockNewsArticle article,
+    bool isDark,
+  ) {
     UserInterestService.recordArticleRead(article);
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => MicrostockArticleSheet(article: article, isDark: isDark),
+      builder: (ctx) =>
+          MicrostockArticleSheet(article: article, isDark: isDark),
     );
   }
 
@@ -41,22 +46,29 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   List<String>? _translatedSpecs;
   List<String>? _translatedChecklist;
 
-  String get _displayTitle =>
-      (_isTranslated && _translatedTitle != null) ? _translatedTitle! : widget.article.title;
+  String get _displayTitle => (_isTranslated && _translatedTitle != null)
+      ? _translatedTitle!
+      : widget.article.title;
 
-  String get _displayContent =>
-      (_isTranslated && _translatedContent != null)
-          ? _translatedContent!
-          : (widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary);
+  String get _displayContent => (_isTranslated && _translatedContent != null)
+      ? _translatedContent!
+      : (widget.article.fullContent.isNotEmpty
+            ? widget.article.fullContent
+            : widget.article.summary);
 
   String get _displayTakeaways =>
-      (_isTranslated && _translatedTakeaways != null) ? _translatedTakeaways! : widget.article.keyTakeaways;
+      (_isTranslated && _translatedTakeaways != null)
+      ? _translatedTakeaways!
+      : widget.article.keyTakeaways;
 
-  List<String> get _displaySpecs =>
-      (_isTranslated && _translatedSpecs != null) ? _translatedSpecs! : widget.article.technicalSpecs;
+  List<String> get _displaySpecs => (_isTranslated && _translatedSpecs != null)
+      ? _translatedSpecs!
+      : widget.article.technicalSpecs;
 
   List<String> get _displayChecklist =>
-      (_isTranslated && _translatedChecklist != null) ? _translatedChecklist! : widget.article.contributorChecklist;
+      (_isTranslated && _translatedChecklist != null)
+      ? _translatedChecklist!
+      : widget.article.contributorChecklist;
 
   Future<void> _toggleTranslation() async {
     if (_isTranslated) {
@@ -77,20 +89,39 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   }
 
   Future<void> _executeTranslation() async {
-    final tTitle = await TranslationService.translateText(widget.article.title, targetLang: 'id');
-    final raw = widget.article.fullContent.isNotEmpty ? widget.article.fullContent : widget.article.summary;
-    final tContent = await TranslationService.translateLongText(raw, targetLang: 'id');
+    final tTitle = await TranslationService.translateText(
+      widget.article.title,
+      targetLang: 'id',
+    );
+    final raw = widget.article.fullContent.isNotEmpty
+        ? widget.article.fullContent
+        : widget.article.summary;
+    final tContent = await TranslationService.translateLongText(
+      raw,
+      targetLang: 'id',
+    );
 
     final tTakeaways = widget.article.keyTakeaways.isNotEmpty
-        ? await TranslationService.translateText(widget.article.keyTakeaways, targetLang: 'id')
+        ? await TranslationService.translateText(
+            widget.article.keyTakeaways,
+            targetLang: 'id',
+          )
         : null;
 
     final tSpecs = widget.article.technicalSpecs.isNotEmpty
-        ? await Future.wait(widget.article.technicalSpecs.map((s) => TranslationService.translateText(s, targetLang: 'id')))
+        ? await Future.wait(
+            widget.article.technicalSpecs.map(
+              (s) => TranslationService.translateText(s, targetLang: 'id'),
+            ),
+          )
         : <String>[];
 
     final tCheck = widget.article.contributorChecklist.isNotEmpty
-        ? await Future.wait(widget.article.contributorChecklist.map((c) => TranslationService.translateText(c, targetLang: 'id')))
+        ? await Future.wait(
+            widget.article.contributorChecklist.map(
+              (c) => TranslationService.translateText(c, targetLang: 'id'),
+            ),
+          )
         : <String>[];
 
     if (mounted) {
@@ -120,7 +151,9 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
     final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.88,
@@ -171,7 +204,9 @@ class _DragHandle extends StatelessWidget {
       width: 44,
       height: 4,
       decoration: BoxDecoration(
-        color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
+        color: isDark
+            ? AppColors.outlineVariant
+            : AppColors.lightOutlineVariant,
         borderRadius: BorderRadius.circular(2),
       ),
     );
@@ -210,7 +245,9 @@ class _ArticleContentList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final bodyColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final bodyColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return ListView(
       controller: scrollController,
@@ -218,7 +255,15 @@ class _ArticleContentList extends StatelessWidget {
       children: [
         ArticleMetaTagsRow(article: article, isDark: isDark),
         const SizedBox(height: 14),
-        Text(displayTitle, style: TextStyle(color: titleColor, fontSize: 18, fontWeight: FontWeight.w700, height: 1.35)),
+        Text(
+          displayTitle,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            height: 1.35,
+          ),
+        ),
         const SizedBox(height: 12),
         _ActionToolbar(
           isTranslated: isTranslated,
@@ -232,14 +277,20 @@ class _ArticleContentList extends StatelessWidget {
           ArticleKeyTakeawaysBox(text: displayTakeaways, isDark: isDark),
           const SizedBox(height: 18),
         ],
-        Text(displayContent, style: TextStyle(color: bodyColor, fontSize: 15, height: 1.6)),
+        Text(
+          displayContent,
+          style: TextStyle(color: bodyColor, fontSize: 15, height: 1.6),
+        ),
         if (displaySpecs.isNotEmpty) ...[
           const SizedBox(height: 22),
           ArticleTechnicalSpecsBox(specs: displaySpecs, isDark: isDark),
         ],
         if (displayChecklist.isNotEmpty) ...[
           const SizedBox(height: 18),
-          ArticleContributorChecklistBox(items: displayChecklist, isDark: isDark),
+          ArticleContributorChecklistBox(
+            items: displayChecklist,
+            isDark: isDark,
+          ),
         ],
         const SizedBox(height: 24),
         ArticleFooterSourceBox(article: article, isDark: isDark),
@@ -262,12 +313,18 @@ class _HeaderBar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.menu_book_rounded, size: 18, color: isDark ? AppColors.mintSage : AppColors.forestDeep),
+              Icon(
+                Icons.menu_book_rounded,
+                size: 18,
+                color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+              ),
               const SizedBox(width: 8),
               Text(
                 'MICROSTOCK INTEL READER',
                 style: TextStyle(
-                  color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                  color: isDark
+                      ? AppColors.outline
+                      : AppColors.lightOnSurfaceVariant,
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.8,
@@ -277,7 +334,9 @@ class _HeaderBar extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 20),
-            color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+            color: isDark
+                ? AppColors.onSurfaceVariant
+                : AppColors.lightOnSurfaceVariant,
             onPressed: onClose,
             tooltip: 'Close reader',
           ),

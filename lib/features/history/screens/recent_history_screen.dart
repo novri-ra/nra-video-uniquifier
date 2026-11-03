@@ -46,7 +46,12 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _isLoading = false; });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -55,11 +60,29 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
-        title: const Text('Delete Video?', style: TextStyle(color: Colors.white, fontSize: 16)),
-        content: Text('Delete ${item.fileName}?', style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 13)),
+        title: const Text(
+          'Delete Video?',
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
+        content: Text(
+          'Delete ${item.fileName}?',
+          style: const TextStyle(
+            color: AppColors.onSurfaceVariant,
+            fontSize: 13,
+          ),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Delete', style: TextStyle(color: AppColors.error))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
         ],
       ),
     );
@@ -78,7 +101,11 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(existed ? 'Video berhasil dihapus' : 'Berkas dibersihkan dari riwayat'),
+            content: Text(
+              existed
+                  ? 'Video berhasil dihapus'
+                  : 'Berkas dibersihkan dari riwayat',
+            ),
             backgroundColor: AppColors.surfaceContainerHighest,
             behavior: SnackBarBehavior.floating,
           ),
@@ -102,14 +129,16 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
 
   Future<void> _shareItem(VideoExportItem item) async {
     try {
-      await Share.shareXFiles(
-        [XFile(item.file.path, mimeType: 'video/mp4')],
-        text: 'Exported video: ${item.fileName}',
-      );
+      await Share.shareXFiles([
+        XFile(item.file.path, mimeType: 'video/mp4'),
+      ], text: 'Exported video: ${item.fileName}');
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Share error: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Share error: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -120,13 +149,19 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
       final res = await OpenFilex.open(item.file.path);
       if (res.type != ResultType.done && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unable to open: ${res.message}'), backgroundColor: AppColors.surfaceContainerHighest),
+          SnackBar(
+            content: Text('Unable to open: ${res.message}'),
+            backgroundColor: AppColors.surfaceContainerHighest,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Open error: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Open error: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -146,7 +181,11 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 108),
             children: [
-              HistoryHeader(itemCount: _items.length, totalSize: totalSize, onRefresh: _loadHistory),
+              HistoryHeader(
+                itemCount: _items.length,
+                totalSize: totalSize,
+                onRefresh: _loadHistory,
+              ),
               const SizedBox(height: 12),
               StorageTelemetryBar(
                 totalSize: totalSize,
@@ -167,7 +206,10 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(40),
-          child: CircularProgressIndicator(color: AppColors.primaryContainer, strokeWidth: 2),
+          child: CircularProgressIndicator(
+            color: AppColors.primaryContainer,
+            strokeWidth: 2,
+          ),
         ),
       );
     }
@@ -175,7 +217,10 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(40),
-          child: Text('Error loading history: $_error', style: const TextStyle(color: AppColors.error, fontSize: 12)),
+          child: Text(
+            'Error loading history: $_error',
+            style: const TextStyle(color: AppColors.error, fontSize: 12),
+          ),
         ),
       );
     }

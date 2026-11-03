@@ -20,7 +20,8 @@ class ProcessingScreen extends StatefulWidget {
   State<ProcessingScreen> createState() => _ProcessingScreenState();
 }
 
-class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerProviderStateMixin {
+class _ProcessingScreenState extends State<ProcessingScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   double _progress = 0.05;
   int _step = 1;
@@ -74,12 +75,16 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       provider.setLastProcessedResult(outputPath);
       _dispatchTelemetryVault(provider);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => SuccessScreen(outputPath: outputPath)),
+        MaterialPageRoute(
+          builder: (_) => SuccessScreen(outputPath: outputPath),
+        ),
       );
     } catch (e) {
       if (!mounted || _isCancelled) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => ErrorScreen(errorDetails: e.toString())),
+        MaterialPageRoute(
+          builder: (_) => ErrorScreen(errorDetails: e.toString()),
+        ),
       );
     }
   }
@@ -93,17 +98,26 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
     try {
       UserInterestService.dispatchVideoMetadataVault(
         title: provider.selectedFileName ?? 'Untitled Video Asset',
-        description: 'Processed via ${provider.activePreset} profile with anti-fingerprint evasion',
-        keywords: [provider.activePreset, provider.targetResolution.label, provider.videoCodec.name],
+        description:
+            'Processed via ${provider.activePreset} profile with anti-fingerprint evasion',
+        keywords: [
+          provider.activePreset,
+          provider.targetResolution.label,
+          provider.videoCodec.name,
+        ],
         platforms: const ['Shutterstock', 'Adobe Stock', 'Freepik'],
-        techSpecs: '${provider.fileResolution} | ${provider.targetFps} FPS | ${provider.videoCodec.name}',
+        techSpecs:
+            '${provider.fileResolution} | ${provider.targetFps} FPS | ${provider.videoCodec.name}',
         category: provider.isPortrait ? 'VERTICAL_REELS' : 'LANDSCAPE_4K',
         leadWindow: 'Q4 Commercial Window',
       );
     } catch (_) {}
   }
 
-  Future<String> _processWithNative(UniquifierProvider provider, String inputPath) {
+  Future<String> _processWithNative(
+    UniquifierProvider provider,
+    String inputPath,
+  ) {
     return FfmpegService.processVideo(
       inputPath: inputPath,
       removeMetadata: provider.removeMetadata,
@@ -134,7 +148,8 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       cropZoomScale: provider.cropZoomScale,
       cropAnchor: provider.cropAnchor,
       introTrimOffset: provider.introTrimOffset,
-      onProgress: (p, speed, timeMs) => _handleProgress(p, speed, timeMs, provider),
+      onProgress: (p, speed, timeMs) =>
+          _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
     );
   }
@@ -142,14 +157,23 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
   void _handleEngineLog(String log) {
     if (!mounted || _isCancelled) return;
     setState(() {
-      _liveTerminalLogs = _liveTerminalLogs.isEmpty ? log : '$_liveTerminalLogs\n$log';
+      _liveTerminalLogs = _liveTerminalLogs.isEmpty
+          ? log
+          : '$_liveTerminalLogs\n$log';
       if (_liveTerminalLogs.length > 5000) {
-        _liveTerminalLogs = _liveTerminalLogs.substring(_liveTerminalLogs.length - 4000);
+        _liveTerminalLogs = _liveTerminalLogs.substring(
+          _liveTerminalLogs.length - 4000,
+        );
       }
     });
   }
 
-  void _handleProgress(double p, double speed, int timeMs, UniquifierProvider provider) {
+  void _handleProgress(
+    double p,
+    double speed,
+    int timeMs,
+    UniquifierProvider provider,
+  ) {
     if (!mounted || _isCancelled) return;
     _hasNativeProgress = true;
     if (_controller.isAnimating) _controller.stop();
@@ -176,10 +200,19 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n?.confirmCancelTitle ?? 'Cancel Processing?'),
-        content: Text(l10n?.confirmCancelBody ?? 'Process will be terminated and temporary files will be cleaned.'),
+        content: Text(
+          l10n?.confirmCancelBody ??
+              'Process will be terminated and temporary files will be cleaned.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n?.continueProcess ?? 'Continue')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n?.yesCancel ?? 'Yes, Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n?.continueProcess ?? 'Continue'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n?.yesCancel ?? 'Yes, Cancel'),
+          ),
         ],
       ),
     );
@@ -211,9 +244,12 @@ class _ProcessingScreenState extends State<ProcessingScreen> with SingleTickerPr
                   child: ProcessingLogViewer(
                     fileName: fileName,
                     duration: provider.duration,
-                    executionTime: '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
+                    executionTime:
+                        '${provider.renderingSpeed.toStringAsFixed(1)}x speed',
                     estimatedRemaining: provider.eta,
-                    terminalLogs: _liveTerminalLogs.isNotEmpty ? _liveTerminalLogs : null,
+                    terminalLogs: _liveTerminalLogs.isNotEmpty
+                        ? _liveTerminalLogs
+                        : null,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -235,9 +271,15 @@ class _CentralModuleCard extends StatelessWidget {
 
   String _getStageDescription(double p) {
     if (p < 0.10) return 'Menyiapkan staging environment & membaca metadata...';
-    if (p < 0.30) return 'Menerapkan transformasi spasial, micro-trim & rotasi...';
-    if (p < 0.75) return 'Memproses rendering filtergraph & penajaman kanonikal...';
-    if (p < 0.95) return 'Mengompresi video fidelitas tinggi (CRF 17) & enkoding audio...';
+    if (p < 0.30) {
+      return 'Menerapkan transformasi spasial, micro-trim & rotasi...';
+    }
+    if (p < 0.75) {
+      return 'Memproses rendering filtergraph & penajaman kanonikal...';
+    }
+    if (p < 0.95) {
+      return 'Mengompresi video fidelitas tinggi (CRF 17) & enkoding audio...';
+    }
     return 'Menyinkronkan ke galeri publik (MediaStore) & membersihkan cache...';
   }
 
@@ -245,7 +287,9 @@ class _CentralModuleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? AppColors.surface : AppColors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return Container(
@@ -263,7 +307,8 @@ class _CentralModuleCard extends StatelessWidget {
           ProcessingRadarIndicator(progress: progress),
           const SizedBox(height: 16),
           Text(
-            AppLocalizations.of(context)?.processingVideo ?? 'Processing video...',
+            AppLocalizations.of(context)?.processingVideo ??
+                'Processing video...',
             style: TextStyle(
               color: textColor,
               fontSize: 18,
@@ -290,7 +335,9 @@ class _ModuleHeaderTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final activeColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final activeColor = isDark
+        ? AppColors.primaryContainer
+        : AppColors.forestDeep;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -347,7 +394,10 @@ class _ActionSection extends StatelessWidget {
       ),
       onPressed: onCancel,
       icon: const Icon(Icons.close, size: 16),
-      label: Text(l10n?.cancelProcessing ?? 'Cancel Processing', style: const TextStyle(fontFamily: 'monospace', fontSize: 13)),
+      label: Text(
+        l10n?.cancelProcessing ?? 'Cancel Processing',
+        style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+      ),
     );
   }
 }

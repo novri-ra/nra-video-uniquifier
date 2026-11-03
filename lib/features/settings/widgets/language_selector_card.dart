@@ -14,7 +14,9 @@ class LanguageSelectorCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final currentCode = localeProvider.languageCode;
-    final border = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final border = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
 
     return Container(
       decoration: BoxDecoration(
@@ -63,8 +65,12 @@ class _LanguageOptionTile extends StatelessWidget {
     final radioActive = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final radioInactive = AppColors.outline;
     final activeTextColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveTextColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final inactiveTextColor = isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
@@ -87,11 +93,16 @@ class _LanguageOptionTile extends StatelessWidget {
                     style: TextStyle(
                       color: isSelected ? activeTextColor : inactiveTextColor,
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 1),
-                  Text(subtitle, style: TextStyle(color: subColor, fontSize: 11)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: subColor, fontSize: 11),
+                  ),
                 ],
               ),
             ),

@@ -29,7 +29,9 @@ class SettingsGroupCard extends StatelessWidget {
               Text(
                 title.toUpperCase(),
                 style: TextStyle(
-                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                  color: isDark
+                      ? AppColors.onSurface
+                      : AppColors.lightOnSurface,
                   fontSize: 11.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
@@ -41,7 +43,9 @@ class SettingsGroupCard extends StatelessWidget {
                 Text(
                   subtitle!,
                   style: TextStyle(
-                    color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                    color: isDark
+                        ? AppColors.onSurfaceVariant
+                        : AppColors.lightOnSurfaceVariant,
                     fontSize: 10.5,
                   ),
                 ),
@@ -51,10 +55,14 @@ class SettingsGroupCard extends StatelessWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
+            color: isDark
+                ? AppColors.surfaceContainerLow
+                : AppColors.lightSurface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+              color: isDark
+                  ? AppColors.surfaceContainerHighest
+                  : AppColors.lightOutlineVariant,
             ),
             boxShadow: [
               if (!isDark)

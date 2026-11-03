@@ -23,7 +23,9 @@ class HistoryItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -47,8 +49,14 @@ class HistoryItemCard extends StatelessWidget {
           children: [
             _ThumbnailBadge(item: item, isDark: isDark),
             const SizedBox(width: 12),
-            Expanded(child: _ItemInfoColumn(item: item, isDark: isDark)),
-            _ItemActionButtons(onShare: onShare, onDelete: onDelete, isDark: isDark),
+            Expanded(
+              child: _ItemInfoColumn(item: item, isDark: isDark),
+            ),
+            _ItemActionButtons(
+              onShare: onShare,
+              onDelete: onDelete,
+              isDark: isDark,
+            ),
           ],
         ),
       ),
@@ -89,7 +97,10 @@ class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
       final thumbDir = Directory('${tempDir.path}/thumbnails');
       if (!await thumbDir.exists()) await thumbDir.create(recursive: true);
 
-      final baseName = widget.item.fileName.replaceAll(RegExp(r'[^\w\.-]'), '_');
+      final baseName = widget.item.fileName.replaceAll(
+        RegExp(r'[^\w\.-]'),
+        '_',
+      );
       final expectedPath = '${thumbDir.path}/thumb_$baseName.jpg';
 
       if (await File(expectedPath).exists()) {
@@ -114,10 +125,16 @@ class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
 
   @override
   Widget build(BuildContext context) {
-    final thumbBg = widget.isDark ? AppColors.obsidianDark : AppColors.offWhiteCanvas;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final thumbBg = widget.isDark
+        ? AppColors.obsidianDark
+        : AppColors.offWhiteCanvas;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final iconColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final checkColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final checkColor = widget.isDark
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
 
     final hasThumb = _thumbPath != null && File(_thumbPath!).existsSync();
 
@@ -162,10 +179,21 @@ class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               decoration: BoxDecoration(
-                color: (widget.isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9),
+                color:
+                    (widget.isDark
+                            ? AppColors.obsidianBase
+                            : AppColors.obsidianDark)
+                        .withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(2),
               ),
-              child: const Text('MP4', style: TextStyle(color: Colors.white, fontSize: 8, fontFamily: 'monospace')),
+              child: const Text(
+                'MP4',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontFamily: 'monospace',
+                ),
+              ),
             ),
           ),
         ],
@@ -182,21 +210,31 @@ class _ItemInfoColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final dateColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final dateColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           item.fileName,
-          style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
           '${item.formattedDate} • ${item.formattedSize}',
-          style: TextStyle(color: dateColor, fontSize: 10, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: dateColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -241,7 +279,11 @@ class _ItemStatusRow extends StatelessWidget {
         Flexible(
           child: Text(
             'H.264 • MODIFIED',
-            style: TextStyle(color: dateColor, fontSize: 9, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: dateColor,
+              fontSize: 9,
+              fontFamily: 'monospace',
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -264,8 +306,12 @@ class _ItemActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
-    final btnBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final btnBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
+    final btnBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final shareColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     const deleteColor = AppColors.vividCoral;
 

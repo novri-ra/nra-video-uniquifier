@@ -2,13 +2,17 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 
 class MediaScannerService {
-  static const MethodChannel _channel = MethodChannel('id.novrira.videouniquifier/media_scanner');
+  static const MethodChannel _channel = MethodChannel(
+    'id.novrira.videouniquifier/media_scanner',
+  );
 
   /// Requests Android MediaScanner to index the file so it shows in Gallery immediately.
   static Future<bool> scanFile(String filePath) async {
     if (!Platform.isAndroid) return true;
     try {
-      final res = await _channel.invokeMethod<bool>('scanFile', {'path': filePath});
+      final res = await _channel.invokeMethod<bool>('scanFile', {
+        'path': filePath,
+      });
       return res ?? false;
     } catch (_) {
       return false;
@@ -19,7 +23,9 @@ class MediaScannerService {
   static Future<bool> openGallery([String? filePath]) async {
     if (!Platform.isAndroid) return false;
     try {
-      final res = await _channel.invokeMethod<bool>('openGallery', {'path': filePath});
+      final res = await _channel.invokeMethod<bool>('openGallery', {
+        'path': filePath,
+      });
       return res ?? false;
     } catch (_) {
       return false;

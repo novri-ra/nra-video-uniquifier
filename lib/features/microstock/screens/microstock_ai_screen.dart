@@ -19,21 +19,24 @@ class MicrostockAiScreen extends StatelessWidget {
             _FeatureRowCard(
               icon: Icons.burst_mode_rounded,
               title: 'Keyframe Extraction Engine',
-              subtitle: 'Extracts sharpest unblurred 4K thumbnails for stock preview',
+              subtitle:
+                  'Extracts sharpest unblurred 4K thumbnails for stock preview',
               badge: 'READY',
             ),
             SizedBox(height: 12),
             _FeatureRowCard(
               icon: Icons.tag_rounded,
               title: 'Automated Metadata & XMP',
-              subtitle: 'Generates 50 SEO keywords & commercial descriptions compliant with Adobe Stock & Shutterstock',
+              subtitle:
+                  'Generates 50 SEO keywords & commercial descriptions compliant with Adobe Stock & Shutterstock',
               badge: 'V2 PIPELINE',
             ),
             SizedBox(height: 12),
             _FeatureRowCard(
               icon: Icons.high_quality_rounded,
               title: 'Commercial Quality Gate',
-              subtitle: 'Checks noise floor, artifact ratio, and macroblock compression before submission',
+              subtitle:
+                  'Checks noise floor, artifact ratio, and macroblock compression before submission',
               badge: 'ACTIVE',
             ),
           ],
@@ -49,7 +52,9 @@ class _HeroWorkspaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final primary = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -57,7 +62,9 @@ class _HeroWorkspaceCard extends StatelessWidget {
         color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.surfaceContainerHighest
+              : AppColors.lightOutlineVariant,
         ),
         boxShadow: [
           if (!isDark)
@@ -89,7 +96,9 @@ class _HeroWorkspaceCard extends StatelessWidget {
                     Text(
                       'AI Microstock Suite',
                       style: TextStyle(
-                        color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                        color: isDark
+                            ? AppColors.onSurface
+                            : AppColors.lightOnSurface,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
@@ -97,7 +106,9 @@ class _HeroWorkspaceCard extends StatelessWidget {
                     Text(
                       'Automated Tagging & Keyframe Studio',
                       style: TextStyle(
-                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                        color: isDark
+                            ? AppColors.onSurfaceVariant
+                            : AppColors.lightOnSurfaceVariant,
                         fontSize: 11,
                       ),
                     ),
@@ -110,7 +121,9 @@ class _HeroWorkspaceCard extends StatelessWidget {
           Text(
             'Extract pristine keyframes, generate high-converting commercial tags, and burn QuickTime metadata directly into rendered outputs for instant stock marketplace approval.',
             style: TextStyle(
-              color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+              color: isDark
+                  ? AppColors.onSurfaceVariant
+                  : AppColors.lightOnSurfaceVariant,
               fontSize: 12,
               height: 1.4,
             ),
@@ -137,7 +150,9 @@ class _FeatureRowCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primary = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final primary = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -145,7 +160,9 @@ class _FeatureRowCard extends StatelessWidget {
         color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.surfaceContainerHighest
+              : AppColors.lightOutlineVariant,
         ),
       ),
       child: Row(
@@ -164,16 +181,23 @@ class _FeatureRowCard extends StatelessWidget {
                       child: Text(
                         title,
                         style: TextStyle(
-                          color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                          color: isDark
+                              ? AppColors.onSurface
+                              : AppColors.lightOnSurface,
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainerLow,
+                        color: isDark
+                            ? AppColors.surfaceContainerHigh
+                            : AppColors.lightSurfaceContainerLow,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -192,7 +216,9 @@ class _FeatureRowCard extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                    color: isDark
+                        ? AppColors.onSurfaceVariant
+                        : AppColors.lightOnSurfaceVariant,
                     fontSize: 11,
                     height: 1.3,
                   ),

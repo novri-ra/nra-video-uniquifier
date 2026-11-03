@@ -16,13 +16,16 @@ class CodecSelectorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryBadge = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final primaryBadge = isDark
+        ? AppColors.primaryContainer
+        : AppColors.lightPrimary;
 
     return Column(
       children: [
         _CodecTile(
           title: 'H.264 / AVC (TikTok Universal)',
-          description: 'CRF 22 • Maximum compatibility across TikTok, Reels, & MediaCodec',
+          description:
+              'CRF 22 • Maximum compatibility across TikTok, Reels, & MediaCodec',
           badge: 'TIKTOK UNIVERSAL',
           badgeColor: primaryBadge,
           isSelected: currentCodec == VideoCodec.h264,
@@ -32,7 +35,8 @@ class CodecSelectorCard extends StatelessWidget {
         const SizedBox(height: 8),
         _CodecTile(
           title: 'H.265 / HEVC (High Efficiency)',
-          description: 'CRF 26 • ~40% higher compression efficiency with -tag:v hvc1',
+          description:
+              'CRF 26 • ~40% higher compression efficiency with -tag:v hvc1',
           badge: 'HIGH EFFICIENCY',
           badgeColor: isDark ? AppColors.skyPastel : AppColors.forestDeep,
           isSelected: currentCodec == VideoCodec.h265,
@@ -62,13 +66,21 @@ class _CodecTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final activeBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.lightSurfaceContainer;
     final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
     final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final inactiveBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final iconColor = isSelected ? (isDark ? AppColors.mintSage : AppColors.forestDeep) : AppColors.outline;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+    final iconColor = isSelected
+        ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
+        : AppColors.outline;
 
     return InkWell(
       onTap: onTap,
@@ -119,11 +131,16 @@ class _CodecTile extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1.5,
+                        ),
                         decoration: BoxDecoration(
                           color: badgeColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(3),
-                          border: Border.all(color: badgeColor.withValues(alpha: 0.5)),
+                          border: Border.all(
+                            color: badgeColor.withValues(alpha: 0.5),
+                          ),
                         ),
                         child: Text(
                           badge,

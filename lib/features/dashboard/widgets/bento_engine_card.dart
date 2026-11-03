@@ -53,7 +53,9 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
   }
 
   Widget _buildCenterVisual() {
-    final labelColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final labelColor = widget.isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -100,7 +102,11 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(
           '${widget.codec} LOCKED • ${widget.hardwareAcc ? "GPU" : "CPU"}',
@@ -118,20 +124,28 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
   }
 
   BoxDecoration _cardDecoration(Color bg, Color border) => BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: border),
-        boxShadow: [
-          if (!widget.isDark)
-            BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
-        ],
-      );
+    color: bg,
+    borderRadius: BorderRadius.circular(16),
+    border: Border.all(color: border),
+    boxShadow: [
+      if (!widget.isDark)
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -179,7 +193,10 @@ class _WaveBar extends StatelessWidget {
           end: Alignment.topCenter,
         ),
         boxShadow: [
-          BoxShadow(color: AppColors.electricIce.withValues(alpha: 0.35), blurRadius: 4),
+          BoxShadow(
+            color: AppColors.electricIce.withValues(alpha: 0.35),
+            blurRadius: 4,
+          ),
         ],
       ),
     );

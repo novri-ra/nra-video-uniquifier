@@ -11,14 +11,13 @@ class BentoCards {
     required Color accentColor,
     required bool isDark,
     required VoidCallback onTap,
-  }) =>
-      _BentoHygieneCard(
-        title: title,
-        isClean: isClean,
-        accentColor: accentColor,
-        isDark: isDark,
-        onTap: onTap,
-      );
+  }) => _BentoHygieneCard(
+    title: title,
+    isClean: isClean,
+    accentColor: accentColor,
+    isDark: isDark,
+    onTap: onTap,
+  );
 
   static Widget buildEngineCard({
     required String title,
@@ -27,15 +26,14 @@ class BentoCards {
     required bool hardwareAcc,
     required bool isDark,
     required VoidCallback onTap,
-  }) =>
-      BentoEngineCard(
-        title: title,
-        fps: fps,
-        codec: codec,
-        hardwareAcc: hardwareAcc,
-        isDark: isDark,
-        onTap: onTap,
-      );
+  }) => BentoEngineCard(
+    title: title,
+    fps: fps,
+    codec: codec,
+    hardwareAcc: hardwareAcc,
+    isDark: isDark,
+    onTap: onTap,
+  );
 
   static Widget buildStorageCard({
     required String title,
@@ -43,14 +41,13 @@ class BentoCards {
     required double freeFraction,
     required Color ringColor,
     required bool isDark,
-  }) =>
-      _BentoStorageCard(
-        title: title,
-        freeGbText: freeGbText,
-        freeFraction: freeFraction,
-        ringColor: ringColor,
-        isDark: isDark,
-      );
+  }) => _BentoStorageCard(
+    title: title,
+    freeGbText: freeGbText,
+    freeFraction: freeFraction,
+    ringColor: ringColor,
+    isDark: isDark,
+  );
 }
 
 class _BentoHygieneCard extends StatefulWidget {
@@ -107,7 +104,9 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
 
   Widget _buildCenterVisual(BuildContext context) {
     final ringColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final labelColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final labelColor = widget.isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final l10n = AppLocalizations.of(context);
     final exifText = l10n?.exifClean ?? 'EXIF CLEAN';
 
@@ -123,7 +122,9 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
             shadows: [
               if (widget.isClean)
                 BoxShadow(
-                  color: ringColor.withValues(alpha: widget.isDark ? 0.25 : 0.20),
+                  color: ringColor.withValues(
+                    alpha: widget.isDark ? 0.25 : 0.20,
+                  ),
                   blurRadius: 10,
                   spreadRadius: 1,
                 ),
@@ -146,7 +147,8 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
 
   Widget _buildFooter(Color titleColor, Color subColor, BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final zeroFingerprintText = l10n?.zeroFingerprint ?? 'Zero Digital Fingerprint';
+    final zeroFingerprintText =
+        l10n?.zeroFingerprint ?? 'Zero Digital Fingerprint';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,7 +157,11 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
           widget.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(
           widget.isClean ? zeroFingerprintText : 'Original Raw Exif',
@@ -167,14 +173,26 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
     );
   }
 
-  BoxDecoration _cardDecoration(Color bgColor, Color borderColor, Color activeColor) {
+  BoxDecoration _cardDecoration(
+    Color bgColor,
+    Color borderColor,
+    Color activeColor,
+  ) {
     return BoxDecoration(
       color: bgColor,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: widget.isClean ? activeColor.withValues(alpha: 0.35) : borderColor),
+      border: Border.all(
+        color: widget.isClean
+            ? activeColor.withValues(alpha: 0.35)
+            : borderColor,
+      ),
       boxShadow: [
         if (!widget.isDark)
-          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
       ],
     );
   }
@@ -182,9 +200,15 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final titleColor = widget.isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final subColor = widget.isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final accent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return GestureDetector(
@@ -243,7 +267,11 @@ class _BentoStorageCard extends StatelessWidget {
           ),
           child: const Text(
             'SANDBOX',
-            style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+            style: TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'monospace',
+            ),
           ),
         ),
       ],
@@ -289,13 +317,22 @@ class _BentoStorageCard extends StatelessWidget {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(
           freeGbText,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: ringColor, fontSize: 9.5, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: ringColor,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'monospace',
+          ),
         ),
       ],
     );
@@ -304,7 +341,9 @@ class _BentoStorageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return Container(
@@ -315,7 +354,11 @@ class _BentoStorageCard extends StatelessWidget {
         border: Border.all(color: borderColor),
         boxShadow: [
           if (!isDark)
-            BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Column(

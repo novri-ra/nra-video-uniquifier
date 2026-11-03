@@ -73,10 +73,18 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
   @override
   Widget build(BuildContext context) {
     final searchBg = widget.isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final hintColor = widget.isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
-    final textColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final searchAccent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final hintColor = widget.isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
+    final textColor = widget.isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final searchAccent = widget.isDark
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +109,11 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
             decoration: InputDecoration(
               hintText: 'Cari panduan 4K, tren, kurasi...',
               hintStyle: TextStyle(color: hintColor, fontSize: 13),
-              prefixIcon: Icon(Icons.search_rounded, size: 20, color: searchAccent),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                size: 20,
+                color: searchAccent,
+              ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -125,7 +137,8 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
             separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, index) {
               final chip = _adaptiveChips[index];
-              final isSelected = widget.selectedChip.toLowerCase() == chip.toLowerCase();
+              final isSelected =
+                  widget.selectedChip.toLowerCase() == chip.toLowerCase();
               return _AdaptiveFilterChip(
                 label: chip,
                 isSelected: isSelected,
@@ -156,9 +169,15 @@ class _AdaptiveFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final unselectedBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
-    final unselectedBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final unselectedText = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final unselectedBg = isDark
+        ? AppColors.obsidianDark
+        : AppColors.hairlineBorder;
+    final unselectedBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final unselectedText = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final selectedText = isDark ? AppColors.obsidianBase : AppColors.white;
 
     return InkWell(

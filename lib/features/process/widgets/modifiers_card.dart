@@ -23,12 +23,18 @@ class PresetChipRow extends StatelessWidget {
             label: 'TikTok / Reels',
             isSelected: provider.activePreset == 'TikTok / Reels',
             onTap: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true,
-              upscale1080p: false, upscaleTarget: '1080p',
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: true,
-              enableHorizontalFlip: true, enableAutoTrim: true,
+              removeMetadata: true,
+              modifyAudio: true,
+              modifyVisuals: true,
+              upscale1080p: false,
+              upscaleTarget: '1080p',
+              enableEnhanceAndDenoise: false,
+              enableDeepAntiFingerprint: true,
+              enableHorizontalFlip: true,
+              enableAutoTrim: true,
               enableDynamicZoom: true,
-              enableBlurredCanvas: true, canvasScalePercent: 95.0,
+              enableBlurredCanvas: true,
+              canvasScalePercent: 95.0,
               targetFps: 30,
               presetName: 'TikTok / Reels',
             ),
@@ -38,10 +44,15 @@ class PresetChipRow extends StatelessWidget {
             label: 'Cinematic 2K/4K',
             isSelected: provider.activePreset == 'Cinematic 2K/4K',
             onTap: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: true, modifyVisuals: true,
-              upscale1080p: true, upscaleTarget: '2k',
-              enableEnhanceAndDenoise: true, enableDeepAntiFingerprint: false,
-              enableHorizontalFlip: false, enableBlurredCanvas: false,
+              removeMetadata: true,
+              modifyAudio: true,
+              modifyVisuals: true,
+              upscale1080p: true,
+              upscaleTarget: '2k',
+              enableEnhanceAndDenoise: true,
+              enableDeepAntiFingerprint: false,
+              enableHorizontalFlip: false,
+              enableBlurredCanvas: false,
               presetName: 'Cinematic 2K/4K',
             ),
           ),
@@ -50,10 +61,15 @@ class PresetChipRow extends StatelessWidget {
             label: 'Quick Export',
             isSelected: provider.activePreset == 'Quick Export',
             onTap: () => provider.applyPreset(
-              removeMetadata: true, modifyAudio: false, modifyVisuals: false,
-              upscale1080p: false, upscaleTarget: '1080p',
-              enableEnhanceAndDenoise: false, enableDeepAntiFingerprint: false,
-              enableHorizontalFlip: false, enableBlurredCanvas: false,
+              removeMetadata: true,
+              modifyAudio: false,
+              modifyVisuals: false,
+              upscale1080p: false,
+              upscaleTarget: '1080p',
+              enableEnhanceAndDenoise: false,
+              enableDeepAntiFingerprint: false,
+              enableHorizontalFlip: false,
+              enableBlurredCanvas: false,
               presetName: 'Quick Export',
             ),
           ),
@@ -67,15 +83,23 @@ class _PresetChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
-  const _PresetChip({required this.label, required this.isSelected, required this.onTap});
+  const _PresetChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final activeBg = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
+    final inactiveBg = isDark
+        ? AppColors.obsidianDark
+        : AppColors.hairlineBorder;
     final activeText = isDark ? AppColors.obsidianBase : AppColors.white;
-    final inactiveText = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final inactiveText = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final borderColor = isSelected
         ? activeBg
         : (isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant);
@@ -104,7 +128,9 @@ class ModifiersHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -151,24 +177,28 @@ class ModifiersCard extends StatelessWidget {
     return ListenableBuilder(
       listenable: provider,
       builder: (context, _) {
-        final coreActive = (provider.removeMetadata ? 1 : 0) +
+        final coreActive =
+            (provider.removeMetadata ? 1 : 0) +
             (provider.enableDeepAntiFingerprint ? 1 : 0) +
             (provider.enableAutoTrim ? 1 : 0);
 
-        final visualActive = (provider.modifyVisuals ? 1 : 0) +
+        final visualActive =
+            (provider.modifyVisuals ? 1 : 0) +
             (provider.upscale1080p ? 1 : 0) +
             (provider.enableEnhanceAndDenoise ? 1 : 0) +
             (provider.enableHorizontalFlip ? 1 : 0) +
             (provider.enableDynamicZoom ? 1 : 0) +
             (provider.enableFrameSkip ? 1 : 0);
 
-        final textureActive = (provider.enableBlurredCanvas ? 1 : 0) +
+        final textureActive =
+            (provider.enableBlurredCanvas ? 1 : 0) +
             (provider.enableChromaShift ? 1 : 0) +
             (provider.enableMicroOverlay ? 1 : 0) +
             (provider.sharpeningLevel != 1.0 ? 1 : 0) +
             (provider.saturationLevel != 1.0 ? 1 : 0);
 
-        final audioActive = (provider.modifyAudio ? 1 : 0) +
+        final audioActive =
+            (provider.modifyAudio ? 1 : 0) +
             (provider.enableAggressiveAudio ? 1 : 0) +
             (provider.muteOriginalAudio ? 1 : 0);
 
@@ -188,7 +218,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.removeMetadata,
                   onChanged: provider.toggleRemoveMetadata,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.shield_outlined,
                   title: 'Deep Evasion',
@@ -196,7 +229,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableDeepAntiFingerprint,
                   onChanged: provider.toggleDeepAntiFingerprint,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.content_cut,
                   title: 'Auto-Trim',
@@ -204,7 +240,8 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableAutoTrim,
                   onChanged: provider.toggleAutoTrim,
                 ),
-                if (provider.enableDeepAntiFingerprint || provider.enableAutoTrim)
+                if (provider.enableDeepAntiFingerprint ||
+                    provider.enableAutoTrim)
                   StudioCustomSlidersCard(provider: provider),
               ],
             ),
@@ -223,7 +260,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.modifyVisuals,
                   onChanged: provider.toggleModifyVisuals,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.hd,
                   title: 'Upscale to ${provider.targetResolutionLabel}',
@@ -234,7 +274,10 @@ class ModifiersCard extends StatelessWidget {
                   onChanged: provider.toggleUpscale1080p,
                   onTapSubtitle: onOpenAdvanced,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.auto_fix_high,
                   title: 'Denoise & Clarity',
@@ -242,7 +285,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableEnhanceAndDenoise,
                   onChanged: provider.toggleEnhanceAndDenoise,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.flip,
                   title: 'Horizontal Flip',
@@ -250,7 +296,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableHorizontalFlip,
                   onChanged: provider.toggleHorizontalFlip,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.zoom_in,
                   title: 'Dynamic Zoom Motion',
@@ -258,7 +307,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableDynamicZoom,
                   onChanged: provider.toggleDynamicZoom,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.speed,
                   title: 'Temporal Frame Skip',
@@ -266,7 +318,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableFrameSkip,
                   onChanged: provider.toggleFrameSkip,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingFpsSelectorRow(
                   selectedFps: provider.targetFps,
                   onChanged: provider.setTargetFps,
@@ -291,7 +346,10 @@ class ModifiersCard extends StatelessWidget {
                   sliderLabel: 'Scale: ${provider.canvasScalePercent.toInt()}%',
                   onSliderChanged: provider.setCanvasScalePercent,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.palette_outlined,
                   title: 'Film Chroma Shift',
@@ -299,7 +357,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableChromaShift,
                   onChanged: provider.toggleChromaShift,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.grain,
                   title: 'Micro-Noise Overlay',
@@ -307,30 +368,42 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableMicroOverlay,
                   onChanged: provider.toggleMicroOverlay,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingSliderToggleRow(
                   icon: Icons.deblur,
-                  title: AppLocalizations.of(context)?.sharpeningLabel ?? 'Sharpening Level',
+                  title:
+                      AppLocalizations.of(context)?.sharpeningLabel ??
+                      'Sharpening Level',
                   subtitle: 'Adjust unsharp mask intensity',
                   value: true,
                   onChanged: (_) {},
                   sliderValue: provider.sharpeningLevel * 100,
                   min: 20.0,
                   max: 200.0,
-                  sliderLabel: '${provider.sharpeningLevel.toStringAsFixed(1)}x',
+                  sliderLabel:
+                      '${provider.sharpeningLevel.toStringAsFixed(1)}x',
                   onSliderChanged: (v) => provider.setSharpeningLevel(v / 100),
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingSliderToggleRow(
                   icon: Icons.color_lens_outlined,
-                  title: AppLocalizations.of(context)?.saturationLabel ?? 'Saturation Level',
+                  title:
+                      AppLocalizations.of(context)?.saturationLabel ??
+                      'Saturation Level',
                   subtitle: 'Color intensity control',
                   value: true,
                   onChanged: (_) {},
                   sliderValue: provider.saturationLevel * 100,
                   min: 80.0,
                   max: 130.0,
-                  sliderLabel: '${provider.saturationLevel.toStringAsFixed(2)}x',
+                  sliderLabel:
+                      '${provider.saturationLevel.toStringAsFixed(2)}x',
                   onSliderChanged: (v) => provider.setSaturationLevel(v / 100),
                 ),
               ],
@@ -350,7 +423,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.modifyAudio,
                   onChanged: provider.toggleModifyAudio,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.waves,
                   title: 'Audio Masking',
@@ -358,7 +434,10 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableAggressiveAudio,
                   onChanged: provider.toggleAggressiveAudio,
                 ),
-                const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
                 SettingToggleRow(
                   icon: Icons.volume_off,
                   title: 'Mute Original Audio',

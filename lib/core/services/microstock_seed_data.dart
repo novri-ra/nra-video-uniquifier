@@ -7,14 +7,16 @@ class MicrostockSeedData {
       MicrostockNewsArticle(
         id: 'adobe-2026-trends',
         title: 'Adobe Stock Releases 2026 Visual Trend Forecast',
-        summary: 'Autonomous robotics, clean energy, and authentic cultural celebrations lead creator demand.',
+        summary:
+            'Autonomous robotics, clean energy, and authentic cultural celebrations lead creator demand.',
         source: 'Adobe Stock Brief',
         category: 'TRENDS',
         publishedDate: '2026-11-01',
         sourceUrl: 'https://stock.adobe.com/trends',
         tags: ['#AdobeStock', '#VisualTrends', '#Robotics', '#CleanEnergy'],
         readTime: '4 min read',
-        keyTakeaways: 'Enterprise buyers prioritize vertical portrait (9:16) clips with micro-movements, authentic human expressions, and strict Rec.709 color profiles.',
+        keyTakeaways:
+            'Enterprise buyers prioritize vertical portrait (9:16) clips with micro-movements, authentic human expressions, and strict Rec.709 color profiles.',
         technicalSpecs: [
           'Aspect Ratio: 9:16 Vertical Portrait & 16:9 4K UHD',
           'Frame Rate: Constant 30.00 / 60.00 FPS (Strict CFR)',
@@ -33,14 +35,16 @@ class MicrostockSeedData {
       MicrostockNewsArticle(
         id: 'shutterstock-4k-specs',
         title: 'Shutterstock Accelerates Editorial Video Requirements',
-        summary: '4K 60FPS CFR format with clean primary BT.709 color spaces now favored for enterprise licensing.',
+        summary:
+            '4K 60FPS CFR format with clean primary BT.709 color spaces now favored for enterprise licensing.',
         source: 'Shutterstock Official',
         category: 'REQUIREMENTS',
         publishedDate: '2026-10-28',
         sourceUrl: 'https://shutterstock.com/blog',
         tags: ['#Shutterstock', '#4K60FPS', '#BT709', '#CFR'],
         readTime: '3 min read',
-        keyTakeaways: 'Variable Frame Rate (VFR) containers are immediately rejected by Shutterstock bot reviewers; files must have faststart headers.',
+        keyTakeaways:
+            'Variable Frame Rate (VFR) containers are immediately rejected by Shutterstock bot reviewers; files must have faststart headers.',
         technicalSpecs: [
           'Resolution: 3840×2160 (4K UHD) or 2560×1440 (2K QHD)',
           'Container & Flags: MP4 / MOV with -movflags +faststart',
@@ -58,15 +62,23 @@ class MicrostockSeedData {
       ),
       MicrostockNewsArticle(
         id: 'reddit-microstock-evasion',
-        title: 'Community Discussion: AI Duplicate Detection on Cross-Agency Uploads',
-        summary: 'Contributors discuss perceptual hashing algorithms used by Shutterstock and Adobe Stock in late 2026.',
+        title:
+            'Community Discussion: AI Duplicate Detection on Cross-Agency Uploads',
+        summary:
+            'Contributors discuss perceptual hashing algorithms used by Shutterstock and Adobe Stock in late 2026.',
         source: 'Reddit Community Discussion',
         category: 'COMMUNITY',
         publishedDate: '2026-10-26',
         sourceUrl: 'https://reddit.com/r/microstock/hot',
-        tags: ['#Reddit', '#MicrostockCommunity', '#AntiDuplication', '#Hashing'],
+        tags: [
+          '#Reddit',
+          '#MicrostockCommunity',
+          '#AntiDuplication',
+          '#Hashing',
+        ],
         readTime: '4 min read',
-        keyTakeaways: 'Top contributors recommend 2-4% zoom, subtle sensor noise, and audio speed shifts (1.01x) to prevent false-positive duplicate bans.',
+        keyTakeaways:
+            'Top contributors recommend 2-4% zoom, subtle sensor noise, and audio speed shifts (1.01x) to prevent false-positive duplicate bans.',
         technicalSpecs: [
           'Micro-Crop: 2% - 5% subtle frame re-centering',
           'Sensor Dither: Gaussian grain intensity 0.03',
@@ -85,14 +97,16 @@ class MicrostockSeedData {
       MicrostockNewsArticle(
         id: 'freepik-bonus-program',
         title: 'Freepik Announces Enhanced Contributor Royalty Program',
-        summary: 'High-converting microstock deduplication and cinematic footage unlock bonus revenue tiers.',
+        summary:
+            'High-converting microstock deduplication and cinematic footage unlock bonus revenue tiers.',
         source: 'Freepik Trends',
         category: 'EARNINGS',
         publishedDate: '2026-10-25',
         sourceUrl: 'https://freepik.com/contributor',
         tags: ['#Freepik', '#Royalties', '#Cinematic', '#Deduplication'],
         readTime: '3 min read',
-        keyTakeaways: 'Top-tier 4K cinematic b-roll unlocks 25% royalty bonus, but duplicate or near-identical batch uploads face automated penalties.',
+        keyTakeaways:
+            'Top-tier 4K cinematic b-roll unlocks 25% royalty bonus, but duplicate or near-identical batch uploads face automated penalties.',
         technicalSpecs: [
           'Aspect Ratio: 16:9 Cinematic & 9:16 Vertical Reels',
           'Frame Rates: 24, 25, 30, or 60 FPS continuous',
@@ -111,14 +125,16 @@ class MicrostockSeedData {
       MicrostockNewsArticle(
         id: 'microstock-ai-dedup',
         title: 'Microstock AI Inspection Guidelines 2026',
-        summary: 'Metadata stripping and sensor fingerprint variation prevent automated duplicate rejections.',
+        summary:
+            'Metadata stripping and sensor fingerprint variation prevent automated duplicate rejections.',
         source: 'Adobe Stock Brief',
         category: 'GUIDELINES',
         publishedDate: '2026-10-20',
         sourceUrl: 'https://microstockguild.org/guidelines',
         tags: ['#AntiDuplication', '#Metadata', '#SensorNoise', '#Evasion'],
         readTime: '5 min read',
-        keyTakeaways: 'Clean metadata sanitization, micro-crop (1-5%), and imperceptible noise injection prevent false-positive duplicate bans.',
+        keyTakeaways:
+            'Clean metadata sanitization, micro-crop (1-5%), and imperceptible noise injection prevent false-positive duplicate bans.',
         technicalSpecs: [
           'Crop Margin: 1% - 8% dynamic inner-box scaling',
           'Noise Injection: Gaussian temporal noise (strength 3-5)',

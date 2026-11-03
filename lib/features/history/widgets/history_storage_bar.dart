@@ -17,7 +17,9 @@ class HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final metaColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final metaColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -28,7 +30,11 @@ class HistoryHeader extends StatelessWidget {
           children: [
             Text(
               '$itemCount Files • $totalSize',
-              style: TextStyle(color: metaColor, fontSize: 11, fontFamily: 'monospace'),
+              style: TextStyle(
+                color: metaColor,
+                fontSize: 11,
+                fontFamily: 'monospace',
+              ),
             ),
             const SizedBox(width: 8),
             IconButton(
@@ -52,8 +58,12 @@ class _HistoryHeaderTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final badgeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.hairlineBorder;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final badgeBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final badgeText = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Row(
@@ -62,7 +72,11 @@ class _HistoryHeaderTitle extends StatelessWidget {
         Flexible(
           child: Text(
             'Recent Exports',
-            style: TextStyle(color: titleColor, fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: titleColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -105,7 +119,9 @@ class StorageTelemetryBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -116,7 +132,11 @@ class StorageTelemetryBar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _StorageTopRow(totalSize: totalSize, deviceStorage: deviceStorage, isDark: isDark),
+          _StorageTopRow(
+            totalSize: totalSize,
+            deviceStorage: deviceStorage,
+            isDark: isDark,
+          ),
           const SizedBox(height: 8),
           _StorageProgressBar(
             hasItems: hasItems,
@@ -135,19 +155,37 @@ class _StorageTopRow extends StatelessWidget {
   final String totalSize;
   final StorageSpace? deviceStorage;
   final bool isDark;
-  const _StorageTopRow({required this.totalSize, this.deviceStorage, required this.isDark});
+  const _StorageTopRow({
+    required this.totalSize,
+    this.deviceStorage,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final freeColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final freeLabel = deviceStorage != null ? '${deviceStorage!.freeSize} FREE' : 'DEVICE STORAGE';
+    final freeColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+    final freeLabel = deviceStorage != null
+        ? '${deviceStorage!.freeSize} FREE'
+        : 'DEVICE STORAGE';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Flexible(child: _SandboxUsedLabel(totalSize: totalSize, isDark: isDark)),
+        Flexible(
+          child: _SandboxUsedLabel(totalSize: totalSize, isDark: isDark),
+        ),
         const SizedBox(width: 8),
-        Text(freeLabel, style: TextStyle(color: freeColor, fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w600)),
+        Text(
+          freeLabel,
+          style: TextStyle(
+            color: freeColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
   }
@@ -177,7 +215,11 @@ class _SandboxUsedLabel extends StatelessWidget {
               children: [
                 TextSpan(
                   text: '$totalSize used',
-                  style: TextStyle(color: usedColor, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: usedColor,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ],
             ),
@@ -192,12 +234,21 @@ class _SandboxUsedLabel extends StatelessWidget {
 class _StorageProgressBar extends StatelessWidget {
   final bool hasItems, isDark;
   final double? usageFraction;
-  const _StorageProgressBar({required this.hasItems, this.usageFraction, required this.isDark});
+  const _StorageProgressBar({
+    required this.hasItems,
+    this.usageFraction,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final widthFactor = (usageFraction ?? (hasItems ? 0.15 : 0.01)).clamp(0.01, 1.0);
-    final trackBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final widthFactor = (usageFraction ?? (hasItems ? 0.15 : 0.01)).clamp(
+      0.01,
+      1.0,
+    );
+    final trackBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
     final activeBarColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
@@ -227,7 +278,9 @@ class _StorageBottomTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tagColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final tagColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -235,14 +288,24 @@ class _StorageBottomTags extends StatelessWidget {
         Flexible(
           child: Text(
             'V-SANDBOX ISOLATION: ACTIVE',
-            style: TextStyle(color: tagColor, fontSize: 9, fontFamily: 'monospace', fontWeight: FontWeight.w600),
+            style: TextStyle(
+              color: tagColor,
+              fontSize: 9,
+              fontFamily: 'monospace',
+              fontWeight: FontWeight.w600,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(width: 8),
         Text(
           'ZERO NETWORK LEAK',
-          style: TextStyle(color: tagColor, fontSize: 9, fontFamily: 'monospace', fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: tagColor,
+            fontSize: 9,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );

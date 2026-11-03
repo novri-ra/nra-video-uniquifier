@@ -12,7 +12,9 @@ class StudioCustomSlidersCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderCol = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderCol = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final zoomAccent = isDark ? AppColors.electricIce : AppColors.forestDeep;
     final trimAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
@@ -35,7 +37,9 @@ class StudioCustomSlidersCard extends StatelessWidget {
                 child: Text(
                   'ZOOM & FACE FOCUS (CROP)',
                   style: TextStyle(
-                    color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                    color: isDark
+                        ? AppColors.outline
+                        : AppColors.lightOnSurfaceVariant,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.6,
@@ -78,7 +82,9 @@ class StudioCustomSlidersCard extends StatelessWidget {
               Text(
                 'Anchor: ',
                 style: TextStyle(
-                  color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                  color: isDark
+                      ? AppColors.outline
+                      : AppColors.lightOnSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
@@ -114,7 +120,9 @@ class StudioCustomSlidersCard extends StatelessWidget {
                   child: Text(
                     'INTRO TRIM OFFSET (FIRST FRAME CUT)',
                     style: TextStyle(
-                      color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                      color: isDark
+                          ? AppColors.outline
+                          : AppColors.lightOnSurfaceVariant,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.6,
@@ -171,7 +179,9 @@ class _AnchorPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inActiveBg = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final inActiveBg = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.hairlineBorder;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
@@ -188,7 +198,9 @@ class _AnchorPill extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? activeColor : (isDark ? AppColors.textLight : AppColors.textDark),
+            color: isSelected
+                ? activeColor
+                : (isDark ? AppColors.textLight : AppColors.textDark),
             fontSize: 10,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),

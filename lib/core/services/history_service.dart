@@ -28,7 +28,8 @@ class VideoExportItem {
 
   String get formattedDate {
     final now = DateTime.now();
-    final isToday = now.year == modified.year &&
+    final isToday =
+        now.year == modified.year &&
         now.month == modified.month &&
         now.day == modified.day;
     final hour = modified.hour.toString().padLeft(2, '0');
@@ -45,7 +46,9 @@ class HistoryService {
     if (Platform.isAndroid) {
       dirs.add(Directory('/storage/emulated/0/Movies/Uniquifier'));
       try {
-        final extDirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
+        final extDirs = await getExternalStorageDirectories(
+          type: StorageDirectory.movies,
+        );
         if (extDirs != null) {
           for (final dir in extDirs) {
             dirs.add(Directory('${dir.path}/Uniquifier'));
@@ -60,7 +63,10 @@ class HistoryService {
     return dirs;
   }
 
-  static Future<List<VideoExportItem>> scanDirectory(Directory dir, Set<String> seenPaths) async {
+  static Future<List<VideoExportItem>> scanDirectory(
+    Directory dir,
+    Set<String> seenPaths,
+  ) async {
     final results = <VideoExportItem>[];
     if (!await dir.exists()) return results;
     try {
@@ -73,12 +79,14 @@ class HistoryService {
           if (isVideo && seenPaths.add(entry.path)) {
             final stat = await entry.stat();
             if (stat.size > 0) {
-              results.add(VideoExportItem(
-                file: entry,
-                fileName: name,
-                bytes: stat.size,
-                modified: stat.modified,
-              ));
+              results.add(
+                VideoExportItem(
+                  file: entry,
+                  fileName: name,
+                  bytes: stat.size,
+                  modified: stat.modified,
+                ),
+              );
             }
           }
         }

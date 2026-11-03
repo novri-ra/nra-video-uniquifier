@@ -38,22 +38,23 @@ class MicrostockNewsArticle {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'summary': summary,
-        'source': source,
-        'category': category,
-        'publishedDate': publishedDate,
-        'sourceUrl': sourceUrl,
-        'tags': tags,
-        'fullContent': fullContent,
-        'readTime': readTime,
-        'keyTakeaways': keyTakeaways,
-        'technicalSpecs': technicalSpecs,
-        'contributorChecklist': contributorChecklist,
-      };
+    'id': id,
+    'title': title,
+    'summary': summary,
+    'source': source,
+    'category': category,
+    'publishedDate': publishedDate,
+    'sourceUrl': sourceUrl,
+    'tags': tags,
+    'fullContent': fullContent,
+    'readTime': readTime,
+    'keyTakeaways': keyTakeaways,
+    'technicalSpecs': technicalSpecs,
+    'contributorChecklist': contributorChecklist,
+  };
 
-  factory MicrostockNewsArticle.fromJson(Map<String, dynamic> json) => MicrostockNewsArticle(
+  factory MicrostockNewsArticle.fromJson(Map<String, dynamic> json) =>
+      MicrostockNewsArticle(
         id: json['id'] as String? ?? '',
         title: json['title'] as String? ?? '',
         summary: json['summary'] as String? ?? '',
@@ -61,12 +62,25 @@ class MicrostockNewsArticle {
         category: json['category'] as String? ?? '',
         publishedDate: json['publishedDate'] as String? ?? '',
         sourceUrl: json['sourceUrl'] as String? ?? '',
-        tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-        fullContent: json['fullContent'] as String? ?? json['summary'] as String? ?? '',
+        tags:
+            (json['tags'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
+        fullContent:
+            json['fullContent'] as String? ?? json['summary'] as String? ?? '',
         readTime: json['readTime'] as String? ?? '3 min read',
         keyTakeaways: json['keyTakeaways'] as String? ?? '',
-        technicalSpecs: (json['technicalSpecs'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
-        contributorChecklist: (json['contributorChecklist'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? const [],
+        technicalSpecs:
+            (json['technicalSpecs'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            const [],
+        contributorChecklist:
+            (json['contributorChecklist'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            const [],
       );
 }
 
@@ -82,7 +96,9 @@ class MicrostockNewsService {
   static Future<String> Function(Uri uri)? customHttpGet;
 
   /// Loads cached news or fetches online if connection is active.
-  static Future<List<MicrostockNewsArticle>> loadNews({bool forceRefresh = false}) async {
+  static Future<List<MicrostockNewsArticle>> loadNews({
+    bool forceRefresh = false,
+  }) async {
     final isOnline = ConnectivityService.instance.isOnline.value;
     if (forceRefresh && isOnline) return await fetchAndCacheNews();
 
@@ -141,7 +157,9 @@ class MicrostockNewsService {
       final uri = Uri.parse(
         'https://news.google.com/rss/search?q=microstock+contributor+OR+shutterstock+contributor&hl=en-US&gl=US&ceid=US:en',
       );
-      final raw = customHttpGet != null ? await customHttpGet!(uri) : await _defaultHttpGet(uri);
+      final raw = customHttpGet != null
+          ? await customHttpGet!(uri)
+          : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw);
     } catch (_) {}
@@ -151,12 +169,36 @@ class MicrostockNewsService {
   /// Parses standard RSS 2.0 XML channel items into MicrostockNewsArticle models.
   static List<MicrostockNewsArticle> parseRssXmlFeed(String xml) {
     final articles = <MicrostockNewsArticle>[];
-    final itemRegex = RegExp(r'<item>(.*?)<\/item>', dotAll: true, caseSensitive: false);
-    final titleRegex = RegExp(r'<title>(.*?)<\/title>', dotAll: true, caseSensitive: false);
-    final linkRegex = RegExp(r'<link>(.*?)<\/link>', dotAll: true, caseSensitive: false);
-    final descRegex = RegExp(r'<description>(.*?)<\/description>', dotAll: true, caseSensitive: false);
-    final pubRegex = RegExp(r'<pubDate>(.*?)<\/pubDate>', dotAll: true, caseSensitive: false);
-    final sourceRegex = RegExp(r'<source[^>]*>(.*?)<\/source>', dotAll: true, caseSensitive: false);
+    final itemRegex = RegExp(
+      r'<item>(.*?)<\/item>',
+      dotAll: true,
+      caseSensitive: false,
+    );
+    final titleRegex = RegExp(
+      r'<title>(.*?)<\/title>',
+      dotAll: true,
+      caseSensitive: false,
+    );
+    final linkRegex = RegExp(
+      r'<link>(.*?)<\/link>',
+      dotAll: true,
+      caseSensitive: false,
+    );
+    final descRegex = RegExp(
+      r'<description>(.*?)<\/description>',
+      dotAll: true,
+      caseSensitive: false,
+    );
+    final pubRegex = RegExp(
+      r'<pubDate>(.*?)<\/pubDate>',
+      dotAll: true,
+      caseSensitive: false,
+    );
+    final sourceRegex = RegExp(
+      r'<source[^>]*>(.*?)<\/source>',
+      dotAll: true,
+      caseSensitive: false,
+    );
 
     for (final match in itemRegex.allMatches(xml)) {
       final itemBlock = match.group(1) ?? '';
@@ -184,7 +226,8 @@ class MicrostockNewsService {
           sourceUrl: link.isNotEmpty ? link : 'https://news.google.com',
           tags: ['#Microstock', '#MarketIntel', '#$source'],
           readTime: '3 min read',
-          keyTakeaways: 'Market trend movement, contributor payout policies, and platform guidelines.',
+          keyTakeaways:
+              'Market trend movement, contributor payout policies, and platform guidelines.',
           technicalSpecs: const [
             'Resolution: 4K UHD & 1080p',
             'Cadence: 30 / 60 FPS CFR',
@@ -206,11 +249,15 @@ class MicrostockNewsService {
       final uri = Uri.parse(
         'https://api.rss2json.com/v1/api.json?rss_url=https://blog.shutterstock.com/feed/',
       );
-      final raw = customHttpGet != null ? await customHttpGet!(uri) : await _defaultHttpGet(uri);
+      final raw = customHttpGet != null
+          ? await customHttpGet!(uri)
+          : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       final data = jsonDecode(raw);
       if (data['status'] == 'ok' && data['items'] is List) {
-        return (data['items'] as List).map((i) => _parseRssJsonItem(i as Map<String, dynamic>)).toList();
+        return (data['items'] as List)
+            .map((i) => _parseRssJsonItem(i as Map<String, dynamic>))
+            .toList();
       }
     } catch (_) {}
     return [];
@@ -221,7 +268,9 @@ class MicrostockNewsService {
     final desc = parseRssContent(item['description'] as String? ?? '');
     final content = parseRssContent(item['content'] as String? ?? desc);
     final pub = (item['pubDate'] as String? ?? '').split(' ').first;
-    final cats = (item['categories'] as List<dynamic>?)?.map((c) => '#$c').toList() ?? ['#Shutterstock'];
+    final cats =
+        (item['categories'] as List<dynamic>?)?.map((c) => '#$c').toList() ??
+        ['#Shutterstock'];
 
     return MicrostockNewsArticle(
       id: 'rss-${title.hashCode}',
@@ -233,7 +282,8 @@ class MicrostockNewsService {
       sourceUrl: item['link'] as String? ?? 'https://shutterstock.com/blog',
       tags: cats,
       readTime: '3 min read',
-      keyTakeaways: 'Strict 4K/FHD requirements, CFR cadence, and clean Rec.709 color curve compliance.',
+      keyTakeaways:
+          'Strict 4K/FHD requirements, CFR cadence, and clean Rec.709 color curve compliance.',
       technicalSpecs: const [
         'Resolution: 4K UHD (3840x2160) & 1080p',
         'Frame Rate: CFR 30.00 / 60.00 FPS',
@@ -250,35 +300,49 @@ class MicrostockNewsService {
   static Future<List<MicrostockNewsArticle>> _fetchReddit(String sub) async {
     try {
       final uri = Uri.parse('https://www.reddit.com/r/$sub/hot.json?limit=5');
-      final raw = customHttpGet != null ? await customHttpGet!(uri) : await _defaultHttpGet(uri);
+      final raw = customHttpGet != null
+          ? await customHttpGet!(uri)
+          : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       final data = jsonDecode(raw);
       final children = data['data']?['children'] as List<dynamic>?;
       if (children != null) {
-        return children.map((c) => _parseRedditPost(c['data'] as Map<String, dynamic>, sub)).toList();
+        return children
+            .map(
+              (c) => _parseRedditPost(c['data'] as Map<String, dynamic>, sub),
+            )
+            .toList();
       }
     } catch (_) {}
     return [];
   }
 
-  static MicrostockNewsArticle _parseRedditPost(Map<String, dynamic> data, String sub) {
+  static MicrostockNewsArticle _parseRedditPost(
+    Map<String, dynamic> data,
+    String sub,
+  ) {
     final title = data['title'] as String? ?? '';
     final selftext = data['selftext'] as String? ?? '';
     final permalink = data['permalink'] as String? ?? '';
     final createdUtc = (data['created_utc'] as num? ?? 0).toInt();
-    final dateStr = DateTime.fromMillisecondsSinceEpoch(createdUtc * 1000).toIso8601String().split('T').first;
+    final dateStr = DateTime.fromMillisecondsSinceEpoch(
+      createdUtc * 1000,
+    ).toIso8601String().split('T').first;
 
     return MicrostockNewsArticle(
       id: 'reddit-${data['id'] ?? title.hashCode}',
       title: title,
-      summary: selftext.length > 150 ? '${selftext.substring(0, 150)}...' : (selftext.isNotEmpty ? selftext : title),
+      summary: selftext.length > 150
+          ? '${selftext.substring(0, 150)}...'
+          : (selftext.isNotEmpty ? selftext : title),
       source: 'Reddit Community Discussion',
       category: 'COMMUNITY',
       publishedDate: dateStr,
       sourceUrl: 'https://reddit.com$permalink',
       tags: ['#Reddit', '#MicrostockCommunity', '#$sub'],
       readTime: '4 min read',
-      keyTakeaways: 'Community real-world experiences, rejection patterns, and evasion guidelines.',
+      keyTakeaways:
+          'Community real-world experiences, rejection patterns, and evasion guidelines.',
       technicalSpecs: const [
         'Micro-Crop: 2% - 5% subtle crop',
         'Noise Dither: Temporal Gaussian noise',
@@ -296,9 +360,14 @@ class MicrostockNewsService {
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 4);
     try {
       final req = await client.getUrl(uri);
-      req.headers.set('User-Agent', 'NRA-Video-Uniquifier/1.0 (Flutter; Mobile)');
+      req.headers.set(
+        'User-Agent',
+        'NRA-Video-Uniquifier/1.0 (Flutter; Mobile)',
+      );
       final res = await req.close().timeout(const Duration(seconds: 4));
-      if (res.statusCode == 200) return await res.transform(utf8.decoder).join();
+      if (res.statusCode == 200) {
+        return await res.transform(utf8.decoder).join();
+      }
     } catch (_) {
     } finally {
       client.close();
@@ -309,7 +378,11 @@ class MicrostockNewsService {
   /// Parses RSS/Atom entry content, extracting clean markdown text from CDATA or HTML.
   static String parseRssContent(String rawXml) {
     if (rawXml.isEmpty) return '';
-    final contentRegex = RegExp(r'<content(?::encoded)?>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/content(?::encoded)?>', dotAll: true, caseSensitive: false);
+    final contentRegex = RegExp(
+      r'<content(?::encoded)?>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/content(?::encoded)?>',
+      dotAll: true,
+      caseSensitive: false,
+    );
     final match = contentRegex.firstMatch(rawXml);
     final rawText = match != null ? match.group(1) ?? '' : rawXml;
     return rawText
@@ -329,14 +402,20 @@ class MicrostockNewsService {
       final jsonString = prefs.getString(_cacheKey);
       if (jsonString != null && jsonString.isNotEmpty) {
         final List<dynamic> decoded = jsonDecode(jsonString);
-        return decoded.map((e) => MicrostockNewsArticle.fromJson(e as Map<String, dynamic>)).toList();
+        return decoded
+            .map(
+              (e) => MicrostockNewsArticle.fromJson(e as Map<String, dynamic>),
+            )
+            .toList();
       }
     } catch (_) {}
     return [];
   }
 
   /// Writes articles to local persistent cache.
-  static Future<void> saveNewsToCache(List<MicrostockNewsArticle> articles) async {
+  static Future<void> saveNewsToCache(
+    List<MicrostockNewsArticle> articles,
+  ) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final encoded = jsonEncode(articles.map((a) => a.toJson()).toList());
@@ -356,5 +435,6 @@ class MicrostockNewsService {
   }
 
   /// Baseline seed articles.
-  static List<MicrostockNewsArticle> getSeedArticles() => MicrostockSeedData.getSeedArticles();
+  static List<MicrostockNewsArticle> getSeedArticles() =>
+      MicrostockSeedData.getSeedArticles();
 }

@@ -18,9 +18,7 @@ void main() {
       await tester.pumpWidget(
         ChangeNotifierProvider.value(
           value: provider,
-          child: const MaterialApp(
-            home: ProcessingScreen(),
-          ),
+          child: const MaterialApp(home: ProcessingScreen()),
         ),
       );
       await tester.pump(const Duration(milliseconds: 100));
@@ -38,9 +36,7 @@ void main() {
       await tester.pumpWidget(
         ChangeNotifierProvider.value(
           value: provider,
-          child: const MaterialApp(
-            home: ProcessingScreen(),
-          ),
+          child: const MaterialApp(home: ProcessingScreen()),
         ),
       );
       await tester.pump(const Duration(milliseconds: 100));

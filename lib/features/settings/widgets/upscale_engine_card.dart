@@ -63,12 +63,18 @@ class _EngineOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = engine == selectedEngine;
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final activeBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.lightSurfaceContainer;
     final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
     final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final inactiveBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
@@ -127,10 +133,14 @@ class _EngineOptionTile extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isSelected
                     ? activeBorder.withValues(alpha: 0.15)
-                    : (isDark ? AppColors.surfaceContainerHighest : AppColors.lightSurfaceContainerHigh),
+                    : (isDark
+                          ? AppColors.surfaceContainerHighest
+                          : AppColors.lightSurfaceContainerHigh),
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: isSelected ? activeBorder.withValues(alpha: 0.5) : Colors.transparent,
+                  color: isSelected
+                      ? activeBorder.withValues(alpha: 0.5)
+                      : Colors.transparent,
                   width: 1,
                 ),
               ),

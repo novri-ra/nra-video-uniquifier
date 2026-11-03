@@ -8,17 +8,15 @@ class HardwareAccelerationCard extends StatelessWidget {
   final bool? enabled;
   final ValueChanged<bool>? onToggle;
 
-  const HardwareAccelerationCard({
-    super.key,
-    this.enabled,
-    this.onToggle,
-  });
+  const HardwareAccelerationCard({super.key, this.enabled, this.onToggle});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
-    final subtitle = l10n?.hardwareAccelerationDesc ?? 'Force OpenGLES/Metal Shader Pipeline';
+    final subtitle =
+        l10n?.hardwareAccelerationDesc ??
+        'Force OpenGLES/Metal Shader Pipeline';
 
     return ValueListenableBuilder<bool>(
       valueListenable: SettingsService.hardwareAccelerationNotifier,
@@ -26,10 +24,14 @@ class HardwareAccelerationCard extends StatelessWidget {
         final active = enabled ?? hwAccel;
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
+            color: isDark
+                ? AppColors.surfaceContainerLow
+                : AppColors.lightSurface,
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
-              color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+              color: isDark
+                  ? AppColors.surfaceContainerHighest
+                  : AppColors.lightOutlineVariant,
             ),
           ),
           child: SettingToggleRow(

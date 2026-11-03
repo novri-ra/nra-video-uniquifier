@@ -59,8 +59,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Purge cache?'),
         content: Text('Delete $mb MB of temporary files and thumbnails?'),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Purge')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Purge'),
+          ),
         ],
       ),
     );
@@ -72,7 +78,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _cacheSizeBytes = updated);
     final freedMb = (freed / (1024 * 1024)).toStringAsFixed(1);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Cache purged: $freedMb MB freed'), backgroundColor: AppColors.primaryContainer),
+      SnackBar(
+        content: Text('Cache purged: $freedMb MB freed'),
+        backgroundColor: AppColors.primaryContainer,
+      ),
     );
   }
 
@@ -141,29 +150,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _buildPresetsAndCodecSection(UniquifierProvider provider) {
     return [
-      const _SettingsSectionHeader(title: 'PRESET PROFILES', subtitle: 'Quick configuration templates for evasion workflows'),
+      const _SettingsSectionHeader(
+        title: 'PRESET PROFILES',
+        subtitle: 'Quick configuration templates for evasion workflows',
+      ),
       const SizedBox(height: 8),
       PresetProfileCard(provider: provider),
       const SizedBox(height: 16),
-      const _SettingsSectionHeader(title: 'VIDEO ENCODING CODEC', subtitle: 'Select output video codec standard for render pipeline'),
+      const _SettingsSectionHeader(
+        title: 'VIDEO ENCODING CODEC',
+        subtitle: 'Select output video codec standard for render pipeline',
+      ),
       const SizedBox(height: 8),
-      CodecSelectorCard(currentCodec: provider.videoCodec, onSelect: provider.setVideoCodec),
+      CodecSelectorCard(
+        currentCodec: provider.videoCodec,
+        onSelect: provider.setVideoCodec,
+      ),
       const SizedBox(height: 16),
-      const _SettingsSectionHeader(title: 'TARGET FRAMERATE (FPS)', subtitle: 'Output framerate control (-fps_mode cfr -r)'),
+      const _SettingsSectionHeader(
+        title: 'TARGET FRAMERATE (FPS)',
+        subtitle: 'Output framerate control (-fps_mode cfr -r)',
+      ),
       const SizedBox(height: 8),
       Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceContainerLow : Colors.white,
+          color: Theme.of(context).brightness == Brightness.dark
+              ? AppColors.surfaceContainerLow
+              : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: Theme.of(context).brightness == Brightness.dark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.surfaceContainerHighest
+                : AppColors.lightOutlineVariant,
           ),
           boxShadow: [
             if (Theme.of(context).brightness == Brightness.light)
-              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
           ],
         ),
-        child: SettingFpsSelectorRow(selectedFps: provider.targetFps, onChanged: provider.setTargetFps),
+        child: SettingFpsSelectorRow(
+          selectedFps: provider.targetFps,
+          onChanged: provider.setTargetFps,
+        ),
       ),
       const SizedBox(height: 16),
     ];
@@ -171,7 +203,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _buildEngineSection(UniquifierProvider provider) {
     return [
-      const _SettingsSectionHeader(title: 'DEFAULT RESOLUTION UPSCALE', subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix'),
+      const _SettingsSectionHeader(
+        title: 'DEFAULT RESOLUTION UPSCALE',
+        subtitle: 'Lanczos 3-lobe anti-aliased scaling matrix',
+      ),
       const SizedBox(height: 8),
       UpscaleResolutionCard(
         selectedValue: provider.selectedUpscaleTarget,
@@ -179,15 +214,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         tier: provider.deviceTier,
       ),
       const SizedBox(height: 16),
-      const _SettingsSectionHeader(title: 'SUPER-RESOLUTION ENGINE', subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3'),
+      const _SettingsSectionHeader(
+        title: 'SUPER-RESOLUTION ENGINE',
+        subtitle: 'Neural AI (NCNN Vulkan) or mathematical Lanczos3',
+      ),
       const SizedBox(height: 8),
-      UpscaleEngineCard(selectedEngine: provider.upscaleEngine, onSelect: provider.setUpscaleEngine),
+      UpscaleEngineCard(
+        selectedEngine: provider.upscaleEngine,
+        onSelect: provider.setUpscaleEngine,
+      ),
       const SizedBox(height: 16),
-      const _SettingsSectionHeader(title: 'HARDWARE ACCELERATION', subtitle: 'MediaCodec / OpenGL shader pipeline'),
+      const _SettingsSectionHeader(
+        title: 'HARDWARE ACCELERATION',
+        subtitle: 'MediaCodec / OpenGL shader pipeline',
+      ),
       const SizedBox(height: 8),
-      HardwareAccelerationCard(enabled: provider.hardwareAcceleration, onToggle: provider.toggleHardwareAcceleration),
+      HardwareAccelerationCard(
+        enabled: provider.hardwareAcceleration,
+        onToggle: provider.toggleHardwareAcceleration,
+      ),
       const SizedBox(height: 16),
-      const _SettingsSectionHeader(title: 'BACKGROUND & ALERTS', subtitle: 'Background processing & notification chime'),
+      const _SettingsSectionHeader(
+        title: 'BACKGROUND & ALERTS',
+        subtitle: 'Background processing & notification chime',
+      ),
       const SizedBox(height: 8),
       _AlertsSettingsCard(
         backgroundProcessing: _backgroundProcessing,
@@ -201,7 +251,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   List<Widget> _buildMaintenanceSection() {
     return [
-      const _SettingsSectionHeader(title: 'STORAGE & CACHE MAINTENANCE', subtitle: 'Staged input buffers and generated thumbnails'),
+      const _SettingsSectionHeader(
+        title: 'STORAGE & CACHE MAINTENANCE',
+        subtitle: 'Staged input buffers and generated thumbnails',
+      ),
       const SizedBox(height: 8),
       _CacheMaintenanceCard(cacheBytes: _cacheSizeBytes, onPurge: _purgeCache),
       const SizedBox(height: 16),
@@ -219,7 +272,9 @@ class _SettingsSectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,13 +289,7 @@ class _SettingsSectionHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          subtitle,
-          style: TextStyle(
-            color: subColor,
-            fontSize: 11,
-          ),
-        ),
+        Text(subtitle, style: TextStyle(color: subColor, fontSize: 11)),
       ],
     );
   }
@@ -264,9 +313,18 @@ class _AlertsSettingsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceContainerLow : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
+        border: Border.all(
+          color: isDark
+              ? AppColors.surfaceContainerHighest
+              : AppColors.lightOutlineVariant,
+        ),
         boxShadow: [
-          if (!isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Column(
@@ -278,7 +336,12 @@ class _AlertsSettingsCard extends StatelessWidget {
             value: backgroundProcessing,
             onChanged: onToggleBackground,
           ),
-          Divider(height: 1, color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant),
+          Divider(
+            height: 1,
+            color: isDark
+                ? AppColors.surfaceContainerHighest
+                : AppColors.lightOutlineVariant,
+          ),
           SettingToggleRow(
             icon: Icons.volume_up_outlined,
             title: 'Notification Sound',
@@ -296,14 +359,19 @@ class _CacheMaintenanceCard extends StatelessWidget {
   final int cacheBytes;
   final VoidCallback onPurge;
 
-  const _CacheMaintenanceCard({required this.cacheBytes, required this.onPurge});
+  const _CacheMaintenanceCard({
+    required this.cacheBytes,
+    required this.onPurge,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final mb = (cacheBytes / (1024 * 1024)).toStringAsFixed(1);
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final btnColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
@@ -311,9 +379,18 @@ class _CacheMaintenanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant),
+        border: Border.all(
+          color: isDark
+              ? AppColors.outlineVariant
+              : AppColors.lightOutlineVariant,
+        ),
         boxShadow: [
-          if (!isDark) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Wrap(
@@ -325,9 +402,23 @@ class _CacheMaintenanceCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Temporary Cache', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600)),
+              Text(
+                'Temporary Cache',
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 2),
-              Text('$mb MB staged files & thumbnails', style: TextStyle(color: subColor, fontSize: 11, fontFamily: 'monospace')),
+              Text(
+                '$mb MB staged files & thumbnails',
+                style: TextStyle(
+                  color: subColor,
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                ),
+              ),
             ],
           ),
           OutlinedButton.icon(
@@ -335,15 +426,19 @@ class _CacheMaintenanceCard extends StatelessWidget {
               foregroundColor: btnColor,
               side: BorderSide(color: btnColor),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
             ),
             onPressed: onPurge,
             icon: const Icon(Icons.delete_sweep, size: 16),
-            label: const Text('Purge Cache', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+            label: const Text(
+              'Purge Cache',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+            ),
           ),
         ],
       ),
     );
   }
 }
-

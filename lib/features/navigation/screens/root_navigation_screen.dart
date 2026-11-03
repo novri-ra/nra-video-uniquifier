@@ -27,27 +27,31 @@ class _RootNavigationScreenState extends State<RootNavigationScreen> {
 
     final pages = [
       _initializedTabs[0] ? const DashboardScreen() : const SizedBox.shrink(),
-      _initializedTabs[1] ? const MicrostockNewsScreen() : const SizedBox.shrink(),
+      _initializedTabs[1]
+          ? const MicrostockNewsScreen()
+          : const SizedBox.shrink(),
       _initializedTabs[2] ? const ProcessScreen() : const SizedBox.shrink(),
-      _initializedTabs[3] ? const RecentHistoryScreen() : const SizedBox.shrink(),
-      _initializedTabs[4] ? const ProfilePlaceholderScreen() : const SizedBox.shrink(),
+      _initializedTabs[3]
+          ? const RecentHistoryScreen()
+          : const SizedBox.shrink(),
+      _initializedTabs[4]
+          ? const ProfilePlaceholderScreen()
+          : const SizedBox.shrink(),
     ];
 
     return Scaffold(
       extendBody: true,
       body: Stack(
         children: [
-          IndexedStack(
-            index: currentIndex,
-            children: pages,
-          ),
+          IndexedStack(index: currentIndex, children: pages),
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: FloatingCapsuleNavBar(
               currentIndex: currentIndex,
-              onTap: (index) => context.read<UniquifierProvider>().setTabIndex(index),
+              onTap: (index) =>
+                  context.read<UniquifierProvider>().setTabIndex(index),
             ),
           ),
         ],

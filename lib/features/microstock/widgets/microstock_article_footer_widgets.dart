@@ -41,19 +41,20 @@ class ArticleTranslateButton extends StatelessWidget {
               SizedBox(
                 width: 12,
                 height: 12,
-                child: CircularProgressIndicator(strokeWidth: 1.5, color: accent),
+                child: CircularProgressIndicator(
+                  strokeWidth: 1.5,
+                  color: accent,
+                ),
               )
             else
-              Icon(
-                Icons.translate_rounded,
-                size: 14,
-                color: accent,
-              ),
+              Icon(Icons.translate_rounded, size: 14, color: accent),
             const SizedBox(width: 6),
             Text(
               isTranslating
                   ? 'Menerjemahkan...'
-                  : (isTranslated ? 'Tampilkan Asli' : 'Terjemahkan Artikel (ID)'),
+                  : (isTranslated
+                        ? 'Tampilkan Asli'
+                        : 'Terjemahkan Artikel (ID)'),
               style: TextStyle(
                 color: accent,
                 fontSize: 11,
@@ -70,7 +71,11 @@ class ArticleTranslateButton extends StatelessWidget {
 class ArticleFooterSourceBox extends StatelessWidget {
   final MicrostockNewsArticle article;
   final bool isDark;
-  const ArticleFooterSourceBox({super.key, required this.article, required this.isDark});
+  const ArticleFooterSourceBox({
+    super.key,
+    required this.article,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +87,9 @@ class ArticleFooterSourceBox extends StatelessWidget {
         color: isDark ? AppColors.obsidianDark : AppColors.hairlineBorder,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.outlineVariant
+              : AppColors.lightOutlineVariant,
         ),
       ),
       child: Row(
@@ -93,7 +100,9 @@ class ArticleFooterSourceBox extends StatelessWidget {
             child: Text(
               'Verified Microstock Guideline • ${article.source}',
               style: TextStyle(
-                color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                color: isDark
+                    ? AppColors.onSurfaceVariant
+                    : AppColors.lightOnSurfaceVariant,
                 fontSize: 11,
               ),
             ),

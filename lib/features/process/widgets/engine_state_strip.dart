@@ -16,7 +16,9 @@ class EngineStateStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -31,7 +33,12 @@ class EngineStateStrip extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(child: _EngineStatusLabel(isHardware: provider.hardwareAcceleration, isDark: isDark)),
+            Expanded(
+              child: _EngineStatusLabel(
+                isHardware: provider.hardwareAcceleration,
+                isDark: isDark,
+              ),
+            ),
             const SizedBox(width: 8),
             _RenderEstimateLabel(isDark: isDark),
           ],
@@ -48,7 +55,9 @@ class _EngineStatusLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75);
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.textDark.withValues(alpha: 0.75);
 
     return Row(
       children: [
@@ -56,9 +65,16 @@ class _EngineStatusLabel extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: Text(
-            isHardware ? 'GPU Accel: Metal / GLES (Active)' : 'Software CPU Fallback',
+            isHardware
+                ? 'GPU Accel: Metal / GLES (Active)'
+                : 'Software CPU Fallback',
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: textColor, fontSize: 11, fontFamily: 'monospace', fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 11,
+              fontFamily: 'monospace',
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ],
@@ -72,14 +88,20 @@ class _RenderEstimateLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75);
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.textDark.withValues(alpha: 0.75);
     final iconColor = isDark ? AppColors.outline : AppColors.forestDeep;
 
     return Row(
       children: [
         Text(
           'Est. Render: ~2.4s',
-          style: TextStyle(color: textColor, fontSize: 11, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 11,
+            fontFamily: 'monospace',
+          ),
         ),
         const SizedBox(width: 4),
         Icon(Icons.tune, color: iconColor, size: 12),

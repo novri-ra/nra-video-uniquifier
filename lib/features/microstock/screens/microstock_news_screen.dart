@@ -54,7 +54,9 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      final list = await MicrostockNewsService.loadNews(forceRefresh: forceRefresh);
+      final list = await MicrostockNewsService.loadNews(
+        forceRefresh: forceRefresh,
+      );
       if (!mounted) return;
       setState(() {
         _allArticles = list;
@@ -76,22 +78,30 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   }
 
   void _openSettings(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   List<MicrostockNewsArticle> get _filteredArticles {
     return _allArticles.where((article) {
-      final matchesSearch = _searchQuery.isEmpty ||
+      final matchesSearch =
+          _searchQuery.isEmpty ||
           article.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           article.summary.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          article.tags.any((t) => t.toLowerCase().contains(_searchQuery.toLowerCase()));
+          article.tags.any(
+            (t) => t.toLowerCase().contains(_searchQuery.toLowerCase()),
+          );
 
-      final matchesChip = _selectedChip == 'All' ||
-          article.tags.any((t) => t.toLowerCase().contains(_selectedChip.toLowerCase())) ||
+      final matchesChip =
+          _selectedChip == 'All' ||
+          article.tags.any(
+            (t) => t.toLowerCase().contains(_selectedChip.toLowerCase()),
+          ) ||
           article.source.toLowerCase().contains(_selectedChip.toLowerCase()) ||
-          article.category.toLowerCase().contains(_selectedChip.toLowerCase()) ||
+          article.category.toLowerCase().contains(
+            _selectedChip.toLowerCase(),
+          ) ||
           article.title.toLowerCase().contains(_selectedChip.toLowerCase());
 
       return matchesSearch && matchesChip;
@@ -113,7 +123,9 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
         onRefresh: () => _loadNewsFeed(forceRefresh: true),
         color: isDark ? AppColors.mintSage : AppColors.forestDeep,
         child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
           slivers: [
             _buildSliverHeader(isDark, online),
             _buildSliverBody(isDark, online, displayList),
@@ -149,10 +161,18 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     );
   }
 
-  Widget _buildSliverBody(bool isDark, bool online, List<MicrostockNewsArticle> displayList) {
+  Widget _buildSliverBody(
+    bool isDark,
+    bool online,
+    List<MicrostockNewsArticle> displayList,
+  ) {
     if (_isLoading && _allArticles.isEmpty) {
       return SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator(color: isDark ? AppColors.mintSage : AppColors.forestDeep)),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+          ),
+        ),
       );
     }
     if (displayList.isEmpty) {
@@ -162,7 +182,11 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 108),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) => MicrostockNewsCard(article: displayList[index], isDark: isDark, isOnline: online),
+          (context, index) => MicrostockNewsCard(
+            article: displayList[index],
+            isDark: isDark,
+            isOnline: online,
+          ),
           childCount: displayList.length,
         ),
       ),
@@ -176,11 +200,22 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 48, color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant),
+            Icon(
+              Icons.search_off_rounded,
+              size: 48,
+              color: isDark
+                  ? AppColors.outlineVariant
+                  : AppColors.lightOutlineVariant,
+            ),
             const SizedBox(height: 12),
             Text(
               'Tidak ada berita atau panduan sesuai filter',
-              style: TextStyle(color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant, fontSize: 13),
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.onSurfaceVariant
+                    : AppColors.lightOnSurfaceVariant,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -205,7 +240,9 @@ class _FeedHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subtitleColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subtitleColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -216,7 +253,11 @@ class _FeedHeader extends StatelessWidget {
           children: [
             Text(
               'Microstock Intel',
-              style: TextStyle(color: titleColor, fontSize: 18, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                color: titleColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             const SizedBox(height: 3),
             Row(
@@ -225,7 +266,11 @@ class _FeedHeader extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   syncStatusText,
-                  style: TextStyle(color: subtitleColor, fontSize: 11, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: subtitleColor,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ],
             ),

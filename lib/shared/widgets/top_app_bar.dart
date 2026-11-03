@@ -29,9 +29,9 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (onSettingsTap != null) {
       onSettingsTap!();
     } else {
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => const SettingsScreen()),
-      );
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
     }
   }
 
@@ -45,7 +45,9 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: isDark ? AppColors.surface : AppColors.lightSurface,
         border: Border(
           bottom: BorderSide(
-            color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+            color: isDark
+                ? AppColors.surfaceContainerHighest
+                : AppColors.lightOutlineVariant,
             width: 1,
           ),
         ),
@@ -69,7 +71,9 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               const SizedBox(width: 4),
             ],
-            Expanded(child: _TitleSection(title: title, isDark: isDark)),
+            Expanded(
+              child: _TitleSection(title: title, isDark: isDark),
+            ),
             const SizedBox(width: 8),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -86,14 +90,14 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ),
                     tooltip: 'Settings',
-                    constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                    constraints: const BoxConstraints(
+                      minWidth: 48,
+                      minHeight: 48,
+                    ),
                     onPressed: () => _openSettings(context),
                   ),
                 if (showSettingsAction) const SizedBox(width: 4),
-                _NetworkStatusBadge(
-                  forcedOffline: isOffline,
-                  isDark: isDark,
-                ),
+                _NetworkStatusBadge(forcedOffline: isOffline, isDark: isDark),
               ],
             ),
           ],
@@ -140,10 +144,7 @@ class _NetworkStatusBadge extends StatelessWidget {
   final bool? forcedOffline;
   final bool isDark;
 
-  const _NetworkStatusBadge({
-    this.forcedOffline,
-    required this.isDark,
-  });
+  const _NetworkStatusBadge({this.forcedOffline, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +153,9 @@ class _NetworkStatusBadge extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: connectivity.isOnline,
       builder: (context, onlineValue, _) {
-        final effectiveOnline = forcedOffline != null ? !forcedOffline! : onlineValue;
+        final effectiveOnline = forcedOffline != null
+            ? !forcedOffline!
+            : onlineValue;
         return effectiveOnline
             ? _OnlineBadge(isDark: isDark)
             : _OfflineBadge(isDark: isDark);

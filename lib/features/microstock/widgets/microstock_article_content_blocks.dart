@@ -6,12 +6,18 @@ import '../../../core/theme/app_colors.dart';
 class ArticleMetaTagsRow extends StatelessWidget {
   final MicrostockNewsArticle article;
   final bool isDark;
-  const ArticleMetaTagsRow({super.key, required this.article, required this.isDark});
+  const ArticleMetaTagsRow({
+    super.key,
+    required this.article,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     final catAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final metaColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final metaColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
 
     return Wrap(
       spacing: 8,
@@ -37,22 +43,22 @@ class ArticleMetaTagsRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder,
+            color: isDark
+                ? AppColors.surfaceContainer
+                : AppColors.hairlineBorder,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.schedule_rounded,
-                size: 11,
-                color: metaColor,
-              ),
+              Icon(Icons.schedule_rounded, size: 11, color: metaColor),
               const SizedBox(width: 4),
               Text(
                 article.readTime,
                 style: TextStyle(
-                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                  color: isDark
+                      ? AppColors.onSurface
+                      : AppColors.lightOnSurface,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
@@ -62,10 +68,7 @@ class ArticleMetaTagsRow extends StatelessWidget {
         ),
         Text(
           '• ${article.publishedDate}',
-          style: TextStyle(
-            color: metaColor,
-            fontSize: 11,
-          ),
+          style: TextStyle(color: metaColor, fontSize: 11),
         ),
         Text(
           '• ${article.source}',
@@ -84,7 +87,11 @@ class ArticleMetaTagsRow extends StatelessWidget {
 class ArticleKeyTakeawaysBox extends StatelessWidget {
   final String text;
   final bool isDark;
-  const ArticleKeyTakeawaysBox({super.key, required this.text, required this.isDark});
+  const ArticleKeyTakeawaysBox({
+    super.key,
+    required this.text,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +145,11 @@ class ArticleKeyTakeawaysBox extends StatelessWidget {
 class ArticleTechnicalSpecsBox extends StatelessWidget {
   final List<String> specs;
   final bool isDark;
-  const ArticleTechnicalSpecsBox({super.key, required this.specs, required this.isDark});
+  const ArticleTechnicalSpecsBox({
+    super.key,
+    required this.specs,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +161,9 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
         color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.outlineVariant
+              : AppColors.lightOutlineVariant,
         ),
       ),
       child: Column(
@@ -181,12 +194,20 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('• ', style: TextStyle(color: specAccent, fontWeight: FontWeight.bold)),
+                  Text(
+                    '• ',
+                    style: TextStyle(
+                      color: specAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   Expanded(
                     child: Text(
                       spec,
                       style: TextStyle(
-                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                        color: isDark
+                            ? AppColors.onSurfaceVariant
+                            : AppColors.lightOnSurfaceVariant,
                         fontSize: 12.5,
                         height: 1.45,
                       ),
@@ -205,7 +226,11 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
 class ArticleContributorChecklistBox extends StatelessWidget {
   final List<String> items;
   final bool isDark;
-  const ArticleContributorChecklistBox({super.key, required this.items, required this.isDark});
+  const ArticleContributorChecklistBox({
+    super.key,
+    required this.items,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +248,11 @@ class ArticleContributorChecklistBox extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle_outline_rounded, size: 15, color: checkAccent),
+              Icon(
+                Icons.check_circle_outline_rounded,
+                size: 15,
+                color: checkAccent,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -252,7 +281,9 @@ class ArticleContributorChecklistBox extends StatelessWidget {
                     child: Text(
                       item,
                       style: TextStyle(
-                        color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                        color: isDark
+                            ? AppColors.onSurface
+                            : AppColors.lightOnSurface,
                         fontSize: 12.5,
                         height: 1.45,
                       ),

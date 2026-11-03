@@ -53,21 +53,36 @@ class _SourceFileHeader extends StatelessWidget {
     final statusText = isBatch
         ? 'BATCH: ${batchQueue.totalCount} QUEUED'
         : (hasFile ? 'READY FOR TRANSCODE' : 'NO FILE SELECTED');
-    final activeStatusColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final headerColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final activeStatusColor = isDark
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
+    final headerColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           'SOURCE FILE',
-          style: TextStyle(color: headerColor, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.8, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: headerColor,
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+            fontFamily: 'monospace',
+          ),
         ),
         const SizedBox(width: 8),
         Flexible(
           child: Text(
             statusText,
-            style: TextStyle(color: hasFile ? activeStatusColor : AppColors.outline, fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: hasFile ? activeStatusColor : AppColors.outline,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'monospace',
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -92,7 +107,9 @@ class _SelectedVideoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -142,20 +159,33 @@ class _VideoThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final hasThumb = thumbnailPath != null && File(thumbnailPath!).existsSync();
-    final thumbBg = isDark ? AppColors.surfaceContainerHigh : AppColors.hairlineBorder;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final thumbBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: 64,
       height: 80,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: thumbBg, borderRadius: BorderRadius.circular(4), border: Border.all(color: borderColor)),
+      decoration: BoxDecoration(
+        color: thumbBg,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor),
+      ),
       child: Stack(
         fit: StackFit.expand,
         children: [
           if (hasThumb)
-            Image.file(File(thumbnailPath!), cacheWidth: 240, cacheHeight: 240, fit: BoxFit.cover)
+            Image.file(
+              File(thumbnailPath!),
+              cacheWidth: 240,
+              cacheHeight: 240,
+              fit: BoxFit.cover,
+            )
           else
             Center(child: Icon(Icons.videocam, color: iconColor, size: 24)),
           Positioned(
@@ -176,11 +206,22 @@ class _ThumbnailDurationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = (isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9);
+    final bg = (isDark ? AppColors.obsidianBase : AppColors.obsidianDark)
+        .withValues(alpha: 0.9);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(2)),
-      child: Text(duration, style: const TextStyle(color: Colors.white, fontSize: 9, fontFamily: 'monospace')),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        duration,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 9,
+          fontFamily: 'monospace',
+        ),
+      ),
     );
   }
 }
@@ -193,21 +234,31 @@ class _VideoMetaColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           provider.selectedFileName ?? '',
-          style: TextStyle(color: titleColor, fontSize: 14, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
           '${provider.fileResolution} • ${provider.fileSize} • ${provider.fileCodec}',
-          style: TextStyle(color: subColor, fontSize: 11, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: subColor,
+            fontSize: 11,
+            fontFamily: 'monospace',
+          ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -234,8 +285,12 @@ class _ClearIconButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.close, size: 16),
       style: IconButton.styleFrom(
-        backgroundColor: isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder,
-        foregroundColor: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+        backgroundColor: isDark
+            ? AppColors.surfaceContainer
+            : AppColors.hairlineBorder,
+        foregroundColor: isDark
+            ? AppColors.onSurfaceVariant
+            : AppColors.lightOnSurfaceVariant,
         padding: EdgeInsets.zero,
         minimumSize: const Size(28, 28),
         fixedSize: const Size(28, 28),
@@ -256,7 +311,9 @@ class _VideoReplaceFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final shaColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return InkWell(
@@ -273,7 +330,11 @@ class _VideoReplaceFooter extends StatelessWidget {
                 Flexible(
                   child: Text(
                     l10n?.changeVideo ?? 'Tap to replace source file',
-                    style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
+                    style: TextStyle(
+                      color: subColor,
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -285,7 +346,11 @@ class _VideoReplaceFooter extends StatelessWidget {
           Flexible(
             child: Text(
               'SHA-256: $sha256',
-              style: TextStyle(color: shaColor, fontSize: 10, fontFamily: 'monospace'),
+              style: TextStyle(
+                color: shaColor,
+                fontSize: 10,
+                fontFamily: 'monospace',
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -304,7 +369,9 @@ class _EmptyPickerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -338,7 +405,9 @@ class _EmptyPickerContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Column(
@@ -348,12 +417,20 @@ class _EmptyPickerContent extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           l10n?.selectVideo ?? 'Select Video File to Uniquify',
-          style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 2),
         Text(
           'Supports MP4, MOV, MKV • Zero Network Transmission',
-          style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: subColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+          ),
         ),
       ],
     );
@@ -367,9 +444,15 @@ class _MetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final chipBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final chipBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -380,7 +463,11 @@ class _MetaChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(color: textColor, fontSize: 10, fontFamily: 'monospace'),
+        style: TextStyle(
+          color: textColor,
+          fontSize: 10,
+          fontFamily: 'monospace',
+        ),
       ),
     );
   }

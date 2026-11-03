@@ -26,8 +26,16 @@ enum VideoCodec {
 }
 
 enum UpscaleEngine {
-  lanczos('lanczos', 'Lanczos3 (Standard)', 'Fast mathematical 3-lobe anti-aliased scaling matrix'),
-  neuralAi('neural_ai', 'Real-ESRGAN AI (Neural)', 'NCNN Vulkan AnimeVideo-v3 / Compact neural upscale');
+  lanczos(
+    'lanczos',
+    'Lanczos3 (Standard)',
+    'Fast mathematical 3-lobe anti-aliased scaling matrix',
+  ),
+  neuralAi(
+    'neural_ai',
+    'Real-ESRGAN AI (Neural)',
+    'NCNN Vulkan AnimeVideo-v3 / Compact neural upscale',
+  );
 
   final String key;
   final String label;
@@ -60,7 +68,13 @@ enum TargetResolution {
   final int width;
   final int height;
 
-  const TargetResolution(this.key, this.label, this.details, this.width, this.height);
+  const TargetResolution(
+    this.key,
+    this.label,
+    this.details,
+    this.width,
+    this.height,
+  );
 
   String scaleFilter({bool isPortrait = false}) {
     final targetW = isPortrait ? height : width;
@@ -94,7 +108,8 @@ class SettingsService {
   static const String keyHorizontalFlip = 'app_horizontal_flip';
   static const String keyAggressiveAudio = 'app_aggressive_audio';
   static const String keyAutoTrim = 'app_auto_trim';
-  static const String keyMicroTrim = 'app_auto_trim'; // Alias for vDNA micro-head trim
+  static const String keyMicroTrim =
+      'app_auto_trim'; // Alias for vDNA micro-head trim
   static const String keyDynamicZoom = 'app_dynamic_zoom';
   static const String keyMicroOverlay = 'app_micro_overlay';
   static const String keyFrameSkip = 'app_frame_skip';
@@ -142,11 +157,15 @@ class SettingsService {
     await prefs.setString(keyVideoCodec, codec.key);
   }
 
-  static Future<bool> getNotificationSound() => _getBool(keyNotificationSound, true);
-  static Future<void> setNotificationSound(bool enabled) => _setBool(keyNotificationSound, enabled);
+  static Future<bool> getNotificationSound() =>
+      _getBool(keyNotificationSound, true);
+  static Future<void> setNotificationSound(bool enabled) =>
+      _setBool(keyNotificationSound, enabled);
 
-  static Future<bool> getBackgroundProcessing() => _getBool(keyBackgroundProcessing, true);
-  static Future<void> setBackgroundProcessing(bool enabled) => _setBool(keyBackgroundProcessing, enabled);
+  static Future<bool> getBackgroundProcessing() =>
+      _getBool(keyBackgroundProcessing, true);
+  static Future<void> setBackgroundProcessing(bool enabled) =>
+      _setBool(keyBackgroundProcessing, enabled);
 
   static final ValueNotifier<TargetResolution> upscaleResolutionNotifier =
       ValueNotifier<TargetResolution>(TargetResolution.r1080p);
@@ -183,25 +202,34 @@ class SettingsService {
   }
 
   static Future<bool> getRemoveMetadata() => _getBool(keyRemoveMetadata, true);
-  static Future<void> setRemoveMetadata(bool enabled) => _setBool(keyRemoveMetadata, enabled);
+  static Future<void> setRemoveMetadata(bool enabled) =>
+      _setBool(keyRemoveMetadata, enabled);
 
   static Future<bool> getModifyVisuals() => _getBool(keyModifyVisuals, true);
-  static Future<void> setModifyVisuals(bool enabled) => _setBool(keyModifyVisuals, enabled);
+  static Future<void> setModifyVisuals(bool enabled) =>
+      _setBool(keyModifyVisuals, enabled);
 
   static Future<bool> getModifyAudio() => _getBool(keyModifyAudio, true);
-  static Future<void> setModifyAudio(bool enabled) => _setBool(keyModifyAudio, enabled);
+  static Future<void> setModifyAudio(bool enabled) =>
+      _setBool(keyModifyAudio, enabled);
 
   static Future<bool> getUpscale1080p() => _getBool(keyUpscale1080p, false);
-  static Future<void> setUpscale1080p(bool enabled) => _setBool(keyUpscale1080p, enabled);
+  static Future<void> setUpscale1080p(bool enabled) =>
+      _setBool(keyUpscale1080p, enabled);
 
   static Future<bool> getBlurredCanvas() => _getBool(keyBlurredCanvas, false);
-  static Future<void> setBlurredCanvas(bool enabled) => _setBool(keyBlurredCanvas, enabled);
+  static Future<void> setBlurredCanvas(bool enabled) =>
+      _setBool(keyBlurredCanvas, enabled);
 
-  static Future<bool> getMuteOriginalAudio() => _getBool(keyMuteOriginalAudio, false);
-  static Future<void> setMuteOriginalAudio(bool enabled) => _setBool(keyMuteOriginalAudio, enabled);
+  static Future<bool> getMuteOriginalAudio() =>
+      _getBool(keyMuteOriginalAudio, false);
+  static Future<void> setMuteOriginalAudio(bool enabled) =>
+      _setBool(keyMuteOriginalAudio, enabled);
 
-  static Future<bool> getThermalThrottle() => _getBool(keyThermalThrottle, false);
-  static Future<void> setThermalThrottle(bool enabled) => _setBool(keyThermalThrottle, enabled);
+  static Future<bool> getThermalThrottle() =>
+      _getBool(keyThermalThrottle, false);
+  static Future<void> setThermalThrottle(bool enabled) =>
+      _setBool(keyThermalThrottle, enabled);
 
   static Future<double> getSharpeningLevel() async {
     final prefs = await SharedPreferences.getInstance();
@@ -253,35 +281,47 @@ class SettingsService {
     await prefs.setString(keyAppTheme, mode);
   }
 
-  static Future<bool> getEnhanceAndDenoise() => _getBool(keyEnhanceAndDenoise, true);
-  static Future<void> setEnhanceAndDenoise(bool enabled) => _setBool(keyEnhanceAndDenoise, enabled);
+  static Future<bool> getEnhanceAndDenoise() =>
+      _getBool(keyEnhanceAndDenoise, true);
+  static Future<void> setEnhanceAndDenoise(bool enabled) =>
+      _setBool(keyEnhanceAndDenoise, enabled);
 
-  static Future<bool> getDeepAntiFingerprint() => _getBool(keyDeepAntiFingerprint, true);
-  static Future<void> setDeepAntiFingerprint(bool enabled) => _setBool(keyDeepAntiFingerprint, enabled);
+  static Future<bool> getDeepAntiFingerprint() =>
+      _getBool(keyDeepAntiFingerprint, true);
+  static Future<void> setDeepAntiFingerprint(bool enabled) =>
+      _setBool(keyDeepAntiFingerprint, enabled);
 
   static Future<bool> getHorizontalFlip() => _getBool(keyHorizontalFlip, false);
-  static Future<void> setHorizontalFlip(bool enabled) => _setBool(keyHorizontalFlip, enabled);
+  static Future<void> setHorizontalFlip(bool enabled) =>
+      _setBool(keyHorizontalFlip, enabled);
 
-  static Future<bool> getAggressiveAudio() => _getBool(keyAggressiveAudio, false);
-  static Future<void> setAggressiveAudio(bool enabled) => _setBool(keyAggressiveAudio, enabled);
+  static Future<bool> getAggressiveAudio() =>
+      _getBool(keyAggressiveAudio, false);
+  static Future<void> setAggressiveAudio(bool enabled) =>
+      _setBool(keyAggressiveAudio, enabled);
 
   static Future<bool> getAutoTrim() => _getBool(keyAutoTrim, false);
-  static Future<void> setAutoTrim(bool enabled) => _setBool(keyAutoTrim, enabled);
+  static Future<void> setAutoTrim(bool enabled) =>
+      _setBool(keyAutoTrim, enabled);
 
   static Future<bool> getMicroTrim() => getAutoTrim();
   static Future<void> setMicroTrim(bool enabled) => setAutoTrim(enabled);
 
   static Future<bool> getDynamicZoom() => _getBool(keyDynamicZoom, false);
-  static Future<void> setDynamicZoom(bool enabled) => _setBool(keyDynamicZoom, enabled);
+  static Future<void> setDynamicZoom(bool enabled) =>
+      _setBool(keyDynamicZoom, enabled);
 
   static Future<bool> getMicroOverlay() => _getBool(keyMicroOverlay, false);
-  static Future<void> setMicroOverlay(bool enabled) => _setBool(keyMicroOverlay, enabled);
+  static Future<void> setMicroOverlay(bool enabled) =>
+      _setBool(keyMicroOverlay, enabled);
 
   static Future<bool> getFrameSkip() => _getBool(keyFrameSkip, false);
-  static Future<void> setFrameSkip(bool enabled) => _setBool(keyFrameSkip, enabled);
+  static Future<void> setFrameSkip(bool enabled) =>
+      _setBool(keyFrameSkip, enabled);
 
   static Future<bool> getChromaShift() => _getBool(keyChromaShift, false);
-  static Future<void> setChromaShift(bool enabled) => _setBool(keyChromaShift, enabled);
+  static Future<void> setChromaShift(bool enabled) =>
+      _setBool(keyChromaShift, enabled);
 
   static Future<double> getCanvasScalePercent() async {
     final prefs = await SharedPreferences.getInstance();

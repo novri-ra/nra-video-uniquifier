@@ -75,3 +75,7 @@ android/key.properties
 android/release-keystore-password.txt
 *release-keystore-password.txt
 
+# Test artifacts
+staged_*
+
+

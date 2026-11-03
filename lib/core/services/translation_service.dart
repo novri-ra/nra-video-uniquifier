@@ -25,7 +25,8 @@ class TranslationService {
   }
 
   @visibleForTesting
-  static Future<String> Function(String text, String targetLang)? mockTranslator;
+  static Future<String> Function(String text, String targetLang)?
+  mockTranslator;
 
   @visibleForTesting
   static Future<String> Function(Uri uri)? customHttpGet;
@@ -51,14 +52,18 @@ class TranslationService {
     }
 
     if (!isOnline) {
-      throw const TranslationOfflineException('Koneksi internet diperlukan untuk menerjemahkan');
+      throw const TranslationOfflineException(
+        'Koneksi internet diperlukan untuk menerjemahkan',
+      );
     }
 
     final raw = mockTranslator != null
         ? await mockTranslator!(sanitized, targetLang)
         : await _fetchGtxChunk(sanitized, targetLang);
 
-    final res = raw.isNotEmpty ? raw : _performRuleBasedTranslation(sanitized, targetLang);
+    final res = raw.isNotEmpty
+        ? raw
+        : _performRuleBasedTranslation(sanitized, targetLang);
     final finalResult = _protectGlossary(_cleanHtmlArtifacts(res));
     await _cacheTranslation(cacheKey, finalResult);
     return finalResult;
@@ -83,7 +88,11 @@ class TranslationService {
     for (final p in paragraphs) {
       final pTrim = p.trim();
       if (pTrim.isEmpty) continue;
-      final t = await translateText(pTrim, targetLang: targetLang, isOnline: isOnline);
+      final t = await translateText(
+        pTrim,
+        targetLang: targetLang,
+        isOnline: isOnline,
+      );
       translatedChunks.add(t);
     }
 
@@ -98,7 +107,9 @@ class TranslationService {
       final uri = Uri.parse(
         'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=$targetLang&dt=t&q=${Uri.encodeComponent(chunk)}',
       );
-      final raw = customHttpGet != null ? await customHttpGet!(uri) : await _defaultHttpGet(uri);
+      final raw = customHttpGet != null
+          ? await customHttpGet!(uri)
+          : await _defaultHttpGet(uri);
       if (raw.isEmpty) return '';
       final decoded = jsonDecode(raw);
       if (decoded is List && decoded.isNotEmpty && decoded[0] is List) {
@@ -119,7 +130,9 @@ class TranslationService {
     try {
       final req = await client.getUrl(uri);
       final res = await req.close().timeout(const Duration(seconds: 4));
-      if (res.statusCode == 200) return await res.transform(utf8.decoder).join();
+      if (res.statusCode == 200) {
+        return await res.transform(utf8.decoder).join();
+      }
     } catch (_) {
     } finally {
       client.close();
@@ -155,7 +168,10 @@ class TranslationService {
       r'\bCommercial Rights\b': 'Lisensi Komersial',
     };
     technicalGlossary.forEach((pattern, replacement) {
-      result = result.replaceAll(RegExp(pattern, caseSensitive: false), replacement);
+      result = result.replaceAll(
+        RegExp(pattern, caseSensitive: false),
+        replacement,
+      );
     });
     return result;
   }
@@ -185,10 +201,14 @@ class TranslationService {
     } catch (_) {}
   }
 
-  static String? _translateFromOfflineDictionary(String text, String targetLang) {
+  static String? _translateFromOfflineDictionary(
+    String text,
+    String targetLang,
+  ) {
     if (targetLang.toLowerCase() != 'id') return null;
     const dict = {
-      'Adobe Stock Releases 2026 Visual Trend Forecast': 'Adobe Stock Merilis Prakiraan Tren Visual 2026',
+      'Adobe Stock Releases 2026 Visual Trend Forecast':
+          'Adobe Stock Merilis Prakiraan Tren Visual 2026',
       'Autonomous robotics, clean energy, and authentic cultural celebrations lead creator demand.':
           'Robotika otonom, energi bersih, dan perayaan budaya autentik memimpin permintaan kreator.',
       'Shutterstock Accelerates Editorial Video Requirements':
@@ -199,7 +219,8 @@ class TranslationService {
           'Freepik Mengumumkan Peningkatan Program Royalti Kontributor',
       'High-converting microstock deduplication and cinematic footage unlock bonus revenue tiers.':
           'Deduplikasi microstock berkonversi tinggi dan footage sinematik membuka bonus tingkatan pendapatan.',
-      'Microstock AI Inspection Guidelines 2026': 'Panduan Inspeksi Microstock AI 2026',
+      'Microstock AI Inspection Guidelines 2026':
+          'Panduan Inspeksi Microstock AI 2026',
       'Metadata stripping and sensor fingerprint variation prevent automated duplicate rejections.':
           'Pembersihan metadata dan variasi sidik jari sensor mencegah penolakan duplikat otomatis.',
       'Community Discussion: AI Duplicate Detection on Cross-Agency Uploads':
@@ -235,7 +256,10 @@ class TranslationService {
       'guidelines': 'panduan',
     };
     terms.forEach((en, id) {
-      result = result.replaceAll(RegExp(RegExp.escape(en), caseSensitive: false), id);
+      result = result.replaceAll(
+        RegExp(RegExp.escape(en), caseSensitive: false),
+        id,
+      );
     });
     return result;
   }

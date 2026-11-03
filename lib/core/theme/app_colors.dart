@@ -3,17 +3,39 @@ import 'package:flutter/material.dart';
 /// Central color tokens for dark and light themes.
 class AppColors {
   // Editorial Architecture Tokens (Sprint 89)
-  static const Color forestDeep = Color(0xFF0E5535);      // Deep Forest Emerald (Hero Light, Accent Kontras Tinggi)
-  static const Color mintSage = Color(0xFFA3EFD5);        // Soft Mint Sage (Status Active / Glow Halus Dark)
-  static const Color skyPastel = Color(0xFF7DDCF0);       // Sky Cyan Pastel (Secondary Data)
-  static const Color butterYellow = Color(0xFFFFE98C);    // Cream Butter Yellow (Warm Highlight)
-  static const Color persimmonOrange = Color(0xFFFF8E3E); // Warm Persimmon (CTA Secondary)
-  static const Color obsidianBase = Color(0xFF111817);    // Dark Obsidian Deep Canvas
-  static const Color obsidianDark = Color(0xFF1A2523);    // Dark Obsidian Surface Card
-  static const Color mustardOchre = Color(0xFFC2A500);    // Vintage Mustard Ochre (Storage / Warning)
-  static const Color electricIce = Color(0xFF7BD6F3);     // Electric Ice Blue (CFR 60 Engine)
-  static const Color peachCream = Color(0xFFFEC7A0);      // Soft Peach (Pipeline Queue Container)
-  static const Color vividCoral = Color(0xFFFF4431);      // Vivid Coral (High-Impact Action)
+  static const Color forestDeep = Color(
+    0xFF0E5535,
+  ); // Deep Forest Emerald (Hero Light, Accent Kontras Tinggi)
+  static const Color mintSage = Color(
+    0xFFA3EFD5,
+  ); // Soft Mint Sage (Status Active / Glow Halus Dark)
+  static const Color skyPastel = Color(
+    0xFF7DDCF0,
+  ); // Sky Cyan Pastel (Secondary Data)
+  static const Color butterYellow = Color(
+    0xFFFFE98C,
+  ); // Cream Butter Yellow (Warm Highlight)
+  static const Color persimmonOrange = Color(
+    0xFFFF8E3E,
+  ); // Warm Persimmon (CTA Secondary)
+  static const Color obsidianBase = Color(
+    0xFF111817,
+  ); // Dark Obsidian Deep Canvas
+  static const Color obsidianDark = Color(
+    0xFF1A2523,
+  ); // Dark Obsidian Surface Card
+  static const Color mustardOchre = Color(
+    0xFFC2A500,
+  ); // Vintage Mustard Ochre (Storage / Warning)
+  static const Color electricIce = Color(
+    0xFF7BD6F3,
+  ); // Electric Ice Blue (CFR 60 Engine)
+  static const Color peachCream = Color(
+    0xFFFEC7A0,
+  ); // Soft Peach (Pipeline Queue Container)
+  static const Color vividCoral = Color(
+    0xFFFF4431,
+  ); // Vivid Coral (High-Impact Action)
 
   // Dark Palette (Obsidian Editorial & Container terangkat)
   static const Color surface = Color(0xFF1A2523);

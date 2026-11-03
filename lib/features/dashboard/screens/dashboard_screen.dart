@@ -15,9 +15,9 @@ class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   void _openSettings(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   void _openStudioTab(BuildContext context) {
@@ -53,9 +53,15 @@ class _GreetingHeaderSection extends StatelessWidget {
   const _GreetingHeaderSection();
 
   String _getTimeGreeting(int hour, AppLocalizations? l10n) {
-    if (hour >= 5 && hour < 12) return l10n?.greetingMorning ?? 'Good Morning, Creator';
-    if (hour >= 12 && hour < 17) return l10n?.greetingAfternoon ?? 'Good Afternoon, Creator';
-    if (hour >= 17 && hour < 21) return l10n?.greetingEvening ?? 'Good Evening, Creator';
+    if (hour >= 5 && hour < 12) {
+      return l10n?.greetingMorning ?? 'Good Morning, Creator';
+    }
+    if (hour >= 12 && hour < 17) {
+      return l10n?.greetingAfternoon ?? 'Good Afternoon, Creator';
+    }
+    if (hour >= 17 && hour < 21) {
+      return l10n?.greetingEvening ?? 'Good Evening, Creator';
+    }
     return l10n?.greetingNight ?? 'Good Night, Creator';
   }
 
@@ -66,11 +72,15 @@ class _GreetingHeaderSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final hour = DateTime.now().hour;
     final greeting = _getTimeGreeting(hour, l10n);
-    final isHw = context.select<UniquifierProvider, bool>((p) => p.hardwareAcceleration);
+    final isHw = context.select<UniquifierProvider, bool>(
+      (p) => p.hardwareAcceleration,
+    );
 
     final statusColor = isHw
         ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
-        : (isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant);
+        : (isDark
+              ? AppColors.onSurfaceVariant
+              : AppColors.lightOnSurfaceVariant);
     final statusText = isHw
         ? (l10n?.engineHardwareActive ?? 'Hardware Engine Active')
         : (l10n?.engineCpuEfficiency ?? 'CPU Efficiency Engine');
@@ -81,7 +91,9 @@ class _GreetingHeaderSection extends StatelessWidget {
         color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
+          color: isDark
+              ? AppColors.outlineVariant
+              : AppColors.lightOutlineVariant,
         ),
       ),
       child: Row(
@@ -117,7 +129,9 @@ class _GreetingHeaderSection extends StatelessWidget {
                 Text(
                   greeting,
                   style: TextStyle(
-                    color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                    color: isDark
+                        ? AppColors.onSurface
+                        : AppColors.lightOnSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                   ),

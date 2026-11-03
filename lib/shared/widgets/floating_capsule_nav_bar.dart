@@ -193,11 +193,7 @@ class _CenterHeroButton extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                       )
-                    : Icon(
-                        data.fallbackIcon,
-                        size: 24,
-                        color: AppColors.white,
-                      ),
+                    : Icon(data.fallbackIcon, size: 24, color: AppColors.white),
               ),
             ),
           ),
@@ -222,9 +218,7 @@ class _NavBarItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = isDark
-        ? AppColors.mintSage
-        : AppColors.forestDeep;
+    final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final inactiveColor = isDark
         ? AppColors.mintSage.withValues(alpha: 0.40)
         : AppColors.obsidianDark.withValues(alpha: 0.40);

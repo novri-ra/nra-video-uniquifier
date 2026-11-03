@@ -14,7 +14,9 @@ class ThemeSelectorCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final current = themeProvider.themeMode;
-    final dividerColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final dividerColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
 
     return Column(
       children: [
@@ -74,8 +76,12 @@ class _ThemeTile extends StatelessWidget {
     final radioActive = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final radioInactive = AppColors.outline;
     final activeTextColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final inactiveTextColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final inactiveTextColor = isDark
+        ? AppColors.onSurface
+        : AppColors.lightOnSurface;
+    final subColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
     final effectiveIconColor = isSelected ? activeTextColor : iconAccent;
 
     return InkWell(
@@ -84,11 +90,7 @@ class _ThemeTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 20,
-              color: effectiveIconColor,
-            ),
+            Icon(icon, size: 20, color: effectiveIconColor),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -99,11 +101,16 @@ class _ThemeTile extends StatelessWidget {
                     style: TextStyle(
                       color: isSelected ? activeTextColor : inactiveTextColor,
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 1),
-                  Text(subtitle, style: TextStyle(color: subColor, fontSize: 11)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: subColor, fontSize: 11),
+                  ),
                 ],
               ),
             ),

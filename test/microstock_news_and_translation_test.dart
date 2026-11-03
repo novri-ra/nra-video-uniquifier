@@ -23,19 +23,22 @@ void main() {
   });
 
   group('Sprint 76: ConnectivityService Unit Tests', () {
-    test('checkConnectivity returns mocked state without socket connection', () async {
-      final connectivity = ConnectivityService.instance;
-      ConnectivityService.mockPingHandler = () async => true;
+    test(
+      'checkConnectivity returns mocked state without socket connection',
+      () async {
+        final connectivity = ConnectivityService.instance;
+        ConnectivityService.mockPingHandler = () async => true;
 
-      final isOnline = await connectivity.checkConnectivity();
-      expect(isOnline, isTrue);
-      expect(connectivity.isOnline.value, isTrue);
+        final isOnline = await connectivity.checkConnectivity();
+        expect(isOnline, isTrue);
+        expect(connectivity.isOnline.value, isTrue);
 
-      ConnectivityService.mockPingHandler = () async => false;
-      final isOffline = await connectivity.checkConnectivity();
-      expect(isOffline, isFalse);
-      expect(connectivity.isOnline.value, isFalse);
-    });
+        ConnectivityService.mockPingHandler = () async => false;
+        final isOffline = await connectivity.checkConnectivity();
+        expect(isOffline, isFalse);
+        expect(connectivity.isOnline.value, isFalse);
+      },
+    );
 
     test('setOnlineForTesting directly toggles ValueNotifier state', () {
       final connectivity = ConnectivityService.instance;
@@ -54,71 +57,106 @@ void main() {
         targetLang: 'id',
         isOnline: false,
       );
-      expect(translated, equals('Adobe Stock Merilis Prakiraan Tren Visual 2026'));
-    });
-
-    test('translateText caches translated output in SharedPreferences', () async {
-      TranslationService.mockTranslator = (text, lang) async => 'Terjemahan Khusus';
-
-      final res1 = await TranslationService.translateText(
-        'Special Custom Query',
-        targetLang: 'id',
-        isOnline: true,
+      expect(
+        translated,
+        equals('Adobe Stock Merilis Prakiraan Tren Visual 2026'),
       );
-      expect(res1, equals('Terjemahan Khusus'));
-
-      // Invalidate mock to confirm cache hit
-      TranslationService.mockTranslator = null;
-      final resCached = await TranslationService.translateText(
-        'Special Custom Query',
-        targetLang: 'id',
-        isOnline: false,
-      );
-      expect(resCached, equals('Terjemahan Khusus'));
     });
 
-    test('translateLongText chunks multi-paragraph text and reassembles correctly', () async {
-      TranslationService.mockTranslator = (text, lang) async => 'Terjemahan: $text';
+    test(
+      'translateText caches translated output in SharedPreferences',
+      () async {
+        TranslationService.mockTranslator = (text, lang) async =>
+            'Terjemahan Khusus';
 
-      const multiPara = 'First paragraph content.\n\nSecond paragraph content.';
-      final result = await TranslationService.translateLongText(multiPara, targetLang: 'id');
+        final res1 = await TranslationService.translateText(
+          'Special Custom Query',
+          targetLang: 'id',
+          isOnline: true,
+        );
+        expect(res1, equals('Terjemahan Khusus'));
 
-      expect(result, contains('Terjemahan: First paragraph content.'));
-      expect(result, contains('Terjemahan: Second paragraph content.'));
-      expect(result.contains('\n\n'), isTrue);
+        // Invalidate mock to confirm cache hit
+        TranslationService.mockTranslator = null;
+        final resCached = await TranslationService.translateText(
+          'Special Custom Query',
+          targetLang: 'id',
+          isOnline: false,
+        );
+        expect(resCached, equals('Terjemahan Khusus'));
+      },
+    );
 
-      // Verify persistent cache hit
-      TranslationService.mockTranslator = null;
-      final cached = await TranslationService.translateLongText(multiPara, targetLang: 'id');
-      expect(cached, equals(result));
-    });
+    test(
+      'translateLongText chunks multi-paragraph text and reassembles correctly',
+      () async {
+        TranslationService.mockTranslator = (text, lang) async =>
+            'Terjemahan: $text';
 
-    test('protectGlossary preserves technical microstock terminology and cleans html entities', () async {
-      TranslationService.mockTranslator = (text, lang) async => 'Hasil &quot;Stock Footage&quot; dengan 60 FPS CFR dan Rec.709.';
-      final res = await TranslationService.translateText('Test Footage query');
-      expect(res, contains('"Footage Video Stok"'));
-      expect(res, contains('CFR'));
-      expect(res, contains('Rec.709'));
-      expect(res, isNot(contains('&quot;')));
-    });
+        const multiPara =
+            'First paragraph content.\n\nSecond paragraph content.';
+        final result = await TranslationService.translateLongText(
+          multiPara,
+          targetLang: 'id',
+        );
 
-    test('bounded LRU cache evicts oldest entry when exceeding maxMemoryEntries (500)', () async {
-      TranslationService.clearMemoryCache();
-      TranslationService.mockTranslator = (text, lang) async => 'Trans: $text';
+        expect(result, contains('Terjemahan: First paragraph content.'));
+        expect(result, contains('Terjemahan: Second paragraph content.'));
+        expect(result.contains('\n\n'), isTrue);
 
-      for (int i = 0; i < 505; i++) {
-        await TranslationService.translateText('sample paragraph query index $i');
-      }
+        // Verify persistent cache hit
+        TranslationService.mockTranslator = null;
+        final cached = await TranslationService.translateLongText(
+          multiPara,
+          targetLang: 'id',
+        );
+        expect(cached, equals(result));
+      },
+    );
 
-      expect(TranslationService.memoryCacheSize, equals(TranslationService.maxMemoryEntries));
-    });
+    test(
+      'protectGlossary preserves technical microstock terminology and cleans html entities',
+      () async {
+        TranslationService.mockTranslator = (text, lang) async =>
+            'Hasil &quot;Stock Footage&quot; dengan 60 FPS CFR dan Rec.709.';
+        final res = await TranslationService.translateText(
+          'Test Footage query',
+        );
+        expect(res, contains('"Footage Video Stok"'));
+        expect(res, contains('CFR'));
+        expect(res, contains('Rec.709'));
+        expect(res, isNot(contains('&quot;')));
+      },
+    );
+
+    test(
+      'bounded LRU cache evicts oldest entry when exceeding maxMemoryEntries (500)',
+      () async {
+        TranslationService.clearMemoryCache();
+        TranslationService.mockTranslator = (text, lang) async =>
+            'Trans: $text';
+
+        for (int i = 0; i < 505; i++) {
+          await TranslationService.translateText(
+            'sample paragraph query index $i',
+          );
+        }
+
+        expect(
+          TranslationService.memoryCacheSize,
+          equals(TranslationService.maxMemoryEntries),
+        );
+      },
+    );
   });
 
   group('Sprint 79: Hybrid Feed Integration (RSS2JSON + Reddit Intel)', () {
-    test('fetchHybridNews correctly parses and sorts RSS2JSON and Reddit posts', () async {
-      MicrostockNewsService.customHttpGet = (uri) async {
-        if (uri.toString().contains('rss2json.com')) {
-          return '''
+    test(
+      'fetchHybridNews correctly parses and sorts RSS2JSON and Reddit posts',
+      () async {
+        MicrostockNewsService.customHttpGet = (uri) async {
+          if (uri.toString().contains('rss2json.com')) {
+            return '''
           {
             "status": "ok",
             "items": [
@@ -133,8 +171,8 @@ void main() {
             ]
           }
           ''';
-        } else if (uri.toString().contains('microstock/hot.json')) {
-          return '''
+          } else if (uri.toString().contains('microstock/hot.json')) {
+            return '''
           {
             "data": {
               "children": [
@@ -152,34 +190,42 @@ void main() {
             }
           }
           ''';
-        } else {
-          return '{"data": {"children": []}}';
-        }
-      };
+          } else {
+            return '{"data": {"children": []}}';
+          }
+        };
 
-      final items = await MicrostockNewsService.fetchHybridNews();
-      expect(items.length, equals(2));
+        final items = await MicrostockNewsService.fetchHybridNews();
+        expect(items.length, equals(2));
 
-      final rssItem = items.firstWhere((i) => i.source == 'Shutterstock Official');
-      expect(rssItem.title, equals('Agency 4K Guideline Update'));
-      expect(rssItem.summary, contains('Agency video description'));
+        final rssItem = items.firstWhere(
+          (i) => i.source == 'Shutterstock Official',
+        );
+        expect(rssItem.title, equals('Agency 4K Guideline Update'));
+        expect(rssItem.summary, contains('Agency video description'));
 
-      final redditItem = items.firstWhere((i) => i.source == 'Reddit Community Discussion');
-      expect(redditItem.title, equals('Reddit Hot Discussion on Dupes'));
-      expect(redditItem.category, equals('COMMUNITY'));
-      expect(redditItem.sourceUrl, contains('reddit.com/r/microstock'));
-    });
+        final redditItem = items.firstWhere(
+          (i) => i.source == 'Reddit Community Discussion',
+        );
+        expect(redditItem.title, equals('Reddit Hot Discussion on Dupes'));
+        expect(redditItem.category, equals('COMMUNITY'));
+        expect(redditItem.sourceUrl, contains('reddit.com/r/microstock'));
+      },
+    );
   });
 
   group('Sprint 76: MicrostockNewsService Unit Tests', () {
-    test('loadNews returns seed articles on first run and saves cache', () async {
-      final articles = await MicrostockNewsService.loadNews();
-      expect(articles, isNotEmpty);
-      expect(articles.length, greaterThanOrEqualTo(5));
+    test(
+      'loadNews returns seed articles on first run and saves cache',
+      () async {
+        final articles = await MicrostockNewsService.loadNews();
+        expect(articles, isNotEmpty);
+        expect(articles.length, greaterThanOrEqualTo(5));
 
-      final cached = await MicrostockNewsService.getCachedNews();
-      expect(cached.length, equals(articles.length));
-    });
+        final cached = await MicrostockNewsService.getCachedNews();
+        expect(cached.length, equals(articles.length));
+      },
+    );
 
     test('loadNews returns cached articles when offline', () async {
       ConnectivityService.instance.setOnlineForTesting(false);
@@ -213,22 +259,32 @@ void main() {
         contributorChecklist: ['Check lighting', 'Strip GPS'],
       );
       final json = article.toJson();
-      expect(json['fullContent'], equals('Full article body content here.\n\nParagraph 2 here.'));
+      expect(
+        json['fullContent'],
+        equals('Full article body content here.\n\nParagraph 2 here.'),
+      );
       expect(json['readTime'], equals('5 min read'));
       expect(json['keyTakeaways'], equals('Key points to remember'));
       expect(json['technicalSpecs'], equals(['4K UHD', 'Rec.709']));
-      expect(json['contributorChecklist'], equals(['Check lighting', 'Strip GPS']));
+      expect(
+        json['contributorChecklist'],
+        equals(['Check lighting', 'Strip GPS']),
+      );
 
       final parsed = MicrostockNewsArticle.fromJson(json);
       expect(parsed.fullContent, equals(article.fullContent));
       expect(parsed.readTime, equals('5 min read'));
       expect(parsed.keyTakeaways, equals('Key points to remember'));
       expect(parsed.technicalSpecs, equals(['4K UHD', 'Rec.709']));
-      expect(parsed.contributorChecklist, equals(['Check lighting', 'Strip GPS']));
+      expect(
+        parsed.contributorChecklist,
+        equals(['Check lighting', 'Strip GPS']),
+      );
     });
 
     test('parseRssContent strips HTML tags and decodes entities properly', () {
-      const xmlWithCdata = '<item><title>Foo</title><content:encoded><![CDATA[<p>Paragraph 1</p><p>Paragraph 2 with <b>bold</b> and &amp; &quot;quotes&quot;</p>]]></content:encoded></item>';
+      const xmlWithCdata =
+          '<item><title>Foo</title><content:encoded><![CDATA[<p>Paragraph 1</p><p>Paragraph 2 with <b>bold</b> and &amp; &quot;quotes&quot;</p>]]></content:encoded></item>';
       final parsed = MicrostockNewsService.parseRssContent(xmlWithCdata);
       expect(parsed, contains('Paragraph 1'));
       expect(parsed, contains('Paragraph 2 with bold and & "quotes"'));
@@ -240,7 +296,10 @@ void main() {
       final seeds = MicrostockNewsService.getSeedArticles();
       expect(seeds.length, greaterThanOrEqualTo(5));
       for (final seed in seeds) {
-        expect(seed.fullContent.split(RegExp(r'\n{1,2}')).length, greaterThanOrEqualTo(3));
+        expect(
+          seed.fullContent.split(RegExp(r'\n{1,2}')).length,
+          greaterThanOrEqualTo(3),
+        );
         expect(seed.readTime, isNotEmpty);
         expect(seed.keyTakeaways, isNotEmpty);
         expect(seed.technicalSpecs, isNotEmpty);
@@ -250,54 +309,68 @@ void main() {
   });
 
   group('Sprint 80: UserInterestService Unit Tests', () {
-    test('Self-learning affinity engine ranks interacted topics higher', () async {
-      await UserInterestService.initialize();
-      final initialKeywords = UserInterestService.getAdaptiveKeywords();
-      expect(initialKeywords.first, equals('All'));
+    test(
+      'Self-learning affinity engine ranks interacted topics higher',
+      () async {
+        await UserInterestService.initialize();
+        final initialKeywords = UserInterestService.getAdaptiveKeywords();
+        expect(initialKeywords.first, equals('All'));
 
-      // Record 3 searches for 'AI Video' (+9 weight)
-      await UserInterestService.recordSearch('AI Video');
-      await UserInterestService.recordSearch('AI Video');
-      await UserInterestService.recordSearch('AI Video');
+        // Record 3 searches for 'AI Video' (+9 weight)
+        await UserInterestService.recordSearch('AI Video');
+        await UserInterestService.recordSearch('AI Video');
+        await UserInterestService.recordSearch('AI Video');
 
-      // Record 1 chip click for 'Reels Algorithm' (+2 weight)
-      await UserInterestService.recordChipClick('Reels Algorithm');
+        // Record 1 chip click for 'Reels Algorithm' (+2 weight)
+        await UserInterestService.recordChipClick('Reels Algorithm');
 
-      final adaptive = UserInterestService.getAdaptiveKeywords();
-      expect(adaptive.first, equals('All'));
-      expect(adaptive[1], equals('AI Video'));
-      expect(adaptive[2], equals('Reels Algorithm'));
-    });
+        final adaptive = UserInterestService.getAdaptiveKeywords();
+        expect(adaptive.first, equals('All'));
+        expect(adaptive[1], equals('AI Video'));
+        expect(adaptive[2], equals('Reels Algorithm'));
+      },
+    );
 
-    test('Telemetry dispatcher queues payloads when offline and flushes when online', () async {
-      final dispatched = <Map<String, dynamic>>[];
-      UserInterestService.mockDispatcher = (payload) async {
-        dispatched.add(payload);
-        return true;
-      };
+    test(
+      'Telemetry dispatcher queues payloads when offline and flushes when online',
+      () async {
+        final dispatched = <Map<String, dynamic>>[];
+        UserInterestService.mockDispatcher = (payload) async {
+          dispatched.add(payload);
+          return true;
+        };
 
-      await UserInterestService.recordSearch('4K Cinematic');
-      expect(dispatched.length, equals(1));
-      expect(dispatched.first['type'], equals('user_interest_telemetry'));
-      expect(dispatched.first['query'], equals('4K Cinematic'));
+        await UserInterestService.recordSearch('4K Cinematic');
+        expect(dispatched.length, equals(1));
+        expect(dispatched.first['type'], equals('user_interest_telemetry'));
+        expect(dispatched.first['query'], equals('4K Cinematic'));
 
-      await UserInterestService.dispatchVideoMetadataVault(
-        title: 'Cinematic Sunset 4K',
-        description: 'B-roll sunset',
-        keywords: ['sunset', 'golden hour'],
-        platforms: ['Shutterstock', 'Adobe Stock'],
-        techSpecs: '3840x2160 60FPS',
-        category: 'NATURE',
-      );
+        await UserInterestService.dispatchVideoMetadataVault(
+          title: 'Cinematic Sunset 4K',
+          description: 'B-roll sunset',
+          keywords: ['sunset', 'golden hour'],
+          platforms: ['Shutterstock', 'Adobe Stock'],
+          techSpecs: '3840x2160 60FPS',
+          category: 'NATURE',
+        );
 
-      expect(dispatched.length, equals(2));
-      expect(dispatched[1]['type'], equals('video_metadata_vault'));
-      expect(dispatched[1]['title'], equals('Cinematic Sunset 4K'));
-    });
+        expect(dispatched.length, equals(2));
+        expect(dispatched[1]['type'], equals('video_metadata_vault'));
+        expect(dispatched[1]['title'], equals('Cinematic Sunset 4K'));
+      },
+    );
 
-    test('Sprint 82: UserInterestService binds live Google Apps Script webhook URL as default', () async {
-      final webhook = await UserInterestService.getWebhookUrl();
-      expect(webhook, contains('script.google.com/macros/s/AKfycbzy4jEhfXCqt2XJnYETH2UXF5vMo26AguljNl0a20PDDXXKsfX5EOPTUcwadlXCoya-/exec'));
-    });
+    test(
+      'Sprint 82: UserInterestService binds live Google Apps Script webhook URL as default',
+      () async {
+        final webhook = await UserInterestService.getWebhookUrl();
+        expect(
+          webhook,
+          contains(
+            'script.google.com/macros/s/AKfycbzy4jEhfXCqt2XJnYETH2UXF5vMo26AguljNl0a20PDDXXKsfX5EOPTUcwadlXCoya-/exec',
+          ),
+        );
+      },
+    );
   });
 }

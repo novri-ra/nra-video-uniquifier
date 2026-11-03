@@ -13,7 +13,8 @@ class LiveIntelTickerCard extends StatefulWidget {
   State<LiveIntelTickerCard> createState() => _LiveIntelTickerCardState();
 }
 
-class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTickerProviderStateMixin {
+class _LiveIntelTickerCardState extends State<LiveIntelTickerCard>
+    with SingleTickerProviderStateMixin {
   AnimationController? _pulseController;
   MicrostockNewsArticle? _topArticle;
 
@@ -70,7 +71,13 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
     );
   }
 
-  Widget _buildContent(String source, String title, Color accentColor, Color titleColor, bool isDark) {
+  Widget _buildContent(
+    String source,
+    String title,
+    Color accentColor,
+    Color titleColor,
+    bool isDark,
+  ) {
     return Row(
       children: [
         _PulsingLiveBadge(controller: _pulseController, isDark: isDark),
@@ -95,7 +102,9 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
                   Text(
                     '• REKOMENDASI TERKINI',
                     style: TextStyle(
-                      color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
+                      color: isDark
+                          ? AppColors.outline
+                          : AppColors.lightOnSurfaceVariant,
                       fontSize: 8.5,
                       fontWeight: FontWeight.w600,
                     ),
@@ -126,11 +135,14 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final article = _topArticle;
-    final title = article?.title ?? 'Adobe Stock Releases 2026 Visual Trend Forecast';
+    final title =
+        article?.title ?? 'Adobe Stock Releases 2026 Visual Trend Forecast';
     final source = article?.source ?? 'Adobe Stock Brief';
 
     final bgColor = isDark ? AppColors.obsidianDark : Colors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 

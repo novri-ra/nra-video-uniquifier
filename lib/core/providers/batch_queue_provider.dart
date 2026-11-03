@@ -99,14 +99,19 @@ class BatchQueueProvider extends ChangeNotifier {
     if (!_isCancelled) {
       await NotificationService.showCompleteNotification(
         title: 'Batch Processing Finished',
-        body: '$completedCount of ${_items.length} videos completed successfully',
+        body:
+            '$completedCount of ${_items.length} videos completed successfully',
         success: failedCount == 0,
       );
     }
     notifyListeners();
   }
 
-  Future<void> _processSingleItem(int i, BatchVideoItem current, UniquifierProvider config) async {
+  Future<void> _processSingleItem(
+    int i,
+    BatchVideoItem current,
+    UniquifierProvider config,
+  ) async {
     _currentIndex = i;
     current.status = BatchItemStatus.processing;
     current.progress = 0.0;
@@ -118,13 +123,19 @@ class BatchQueueProvider extends ChangeNotifier {
       current.outputPath = outputPath;
       current.progress = 1.0;
     } catch (e) {
-      current.status = _isCancelled ? BatchItemStatus.cancelled : BatchItemStatus.failed;
+      current.status = _isCancelled
+          ? BatchItemStatus.cancelled
+          : BatchItemStatus.failed;
       if (!_isCancelled) current.error = e.toString();
     }
     notifyListeners();
   }
 
-  Future<String> _executeBatchItem(int i, BatchVideoItem current, UniquifierProvider config) {
+  Future<String> _executeBatchItem(
+    int i,
+    BatchVideoItem current,
+    UniquifierProvider config,
+  ) {
     return FfmpegService.processVideo(
       inputPath: current.path,
       removeMetadata: config.removeMetadata,
@@ -156,11 +167,19 @@ class BatchQueueProvider extends ChangeNotifier {
       cropZoomScale: config.cropZoomScale,
       cropAnchor: config.cropAnchor,
       introTrimOffset: config.introTrimOffset,
-      onProgress: (p, speed, timeMs) => _handleBatchProgress(i, p, speed, timeMs, current, config),
+      onProgress: (p, speed, timeMs) =>
+          _handleBatchProgress(i, p, speed, timeMs, current, config),
     );
   }
 
-  void _handleBatchProgress(int i, double p, double speed, int timeMs, BatchVideoItem current, UniquifierProvider config) {
+  void _handleBatchProgress(
+    int i,
+    double p,
+    double speed,
+    int timeMs,
+    BatchVideoItem current,
+    UniquifierProvider config,
+  ) {
     if (_isCancelled || !current.isProcessing) return;
     current.progress = p;
     config.updateRealtimeStats(p, speed, timeMs);

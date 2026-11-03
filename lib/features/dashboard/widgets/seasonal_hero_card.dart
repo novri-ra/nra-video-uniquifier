@@ -15,10 +15,7 @@ class SeasonalHeroCard extends StatelessWidget {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          AppColors.forestDeep,
-          AppColors.obsidianBase,
-        ],
+        colors: [AppColors.forestDeep, AppColors.obsidianBase],
       ),
       boxShadow: [
         BoxShadow(
@@ -79,14 +76,17 @@ class _HeroBadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final text = l10n?.seasonalWindowLead ?? 'SEASONAL WINDOW • 60-90 DAYS LEAD';
+    final text =
+        l10n?.seasonalWindowLead ?? 'SEASONAL WINDOW • 60-90 DAYS LEAD';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.butterYellow.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.butterYellow.withValues(alpha: 0.40)),
+        border: Border.all(
+          color: AppColors.butterYellow.withValues(alpha: 0.40),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -136,9 +136,7 @@ class _SpecBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.mintSage.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: AppColors.mintSage.withValues(alpha: 0.30),
-        ),
+        border: Border.all(color: AppColors.mintSage.withValues(alpha: 0.30)),
       ),
       child: Text(
         label,

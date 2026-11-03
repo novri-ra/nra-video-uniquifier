@@ -8,7 +8,9 @@ class AppInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.surfaceContainerLowest : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -30,7 +32,13 @@ class AppInfoCard extends StatelessWidget {
         children: [
           Flexible(flex: 3, child: _AppInfoTitleColumn(isDark: isDark)),
           const SizedBox(width: 8),
-          Flexible(flex: 2, child: _AppInfoPrivacyBadge(isDark: isDark, borderColor: borderColor)),
+          Flexible(
+            flex: 2,
+            child: _AppInfoPrivacyBadge(
+              isDark: isDark,
+              borderColor: borderColor,
+            ),
+          ),
         ],
       ),
     );
@@ -44,14 +52,34 @@ class _AppInfoTitleColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('NRA Video Uniquifier v2.0.0', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w700)),
+        Text(
+          'NRA Video Uniquifier v2.0.0',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
         const SizedBox(height: 2),
-        Text('Anti-Fingerprint Evasion Engine', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace')),
+        Text(
+          'Anti-Fingerprint Evasion Engine',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: subColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+          ),
+        ),
       ],
     );
   }
@@ -64,7 +92,9 @@ class _AppInfoPrivacyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final badgeBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final badgeBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
     final badgeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -79,7 +109,17 @@ class _AppInfoPrivacyBadge extends StatelessWidget {
           Icon(Icons.verified_user, color: badgeColor, size: 14),
           const SizedBox(width: 4),
           Flexible(
-            child: Text('OFFLINE PRIVACY', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: badgeColor, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
+            child: Text(
+              'OFFLINE PRIVACY',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: badgeColor,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'monospace',
+              ),
+            ),
           ),
         ],
       ),

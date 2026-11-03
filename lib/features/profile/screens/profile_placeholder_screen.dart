@@ -33,9 +33,13 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final descColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 28),
@@ -61,7 +65,11 @@ class _ProfileCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             'Workstation Profile',
-            style: TextStyle(color: titleColor, fontSize: 18, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              color: titleColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
@@ -153,7 +161,9 @@ class _DiagnosticsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
@@ -168,12 +178,18 @@ class _DiagnosticsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.notifications_active_outlined, color: accent, size: 20),
+              Icon(
+                Icons.notifications_active_outlined,
+                color: accent,
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'NOTIFICATION DIAGNOSTICS',
                 style: TextStyle(
-                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                  color: isDark
+                      ? AppColors.onSurface
+                      : AppColors.lightOnSurface,
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
@@ -185,7 +201,9 @@ class _DiagnosticsCard extends StatelessWidget {
           Text(
             'Test native Android 13+ channel binding and alert triggers.',
             style: TextStyle(
-              color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+              color: isDark
+                  ? AppColors.onSurfaceVariant
+                  : AppColors.lightOnSurfaceVariant,
               fontSize: 12,
             ),
           ),
@@ -195,11 +213,16 @@ class _DiagnosticsCard extends StatelessWidget {
             child: ElevatedButton.icon(
               onPressed: () => _testNotification(context),
               icon: const Icon(Icons.send_rounded, size: 16),
-              label: const Text('Send Test Notification', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              label: const Text(
+                'Send Test Notification',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.forestDeep,
                 foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),

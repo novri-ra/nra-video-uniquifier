@@ -16,7 +16,9 @@ class SettingFpsSelectorRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Padding(
@@ -51,7 +53,11 @@ class SettingFpsSelectorRow extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          _FpsButtonRow(selectedFps: selectedFps, isDark: isDark, onChanged: onChanged),
+          _FpsButtonRow(
+            selectedFps: selectedFps,
+            isDark: isDark,
+            onChanged: onChanged,
+          ),
         ],
       ),
     );
@@ -76,12 +82,18 @@ class _FpsButtonRow extends StatelessWidget {
         final isSelected = selectedFps == fps;
         final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
         final activeBg = activeColor.withValues(alpha: isDark ? 0.20 : 0.12);
-        final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.hairlineBorder;
+        final inactiveBg = isDark
+            ? AppColors.obsidianDark
+            : AppColors.hairlineBorder;
         final activeBorder = activeColor;
-        final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+        final inactiveBorder = isDark
+            ? AppColors.outlineVariant
+            : AppColors.lightOutlineVariant;
         final textColor = isSelected
             ? activeColor
-            : (isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant);
+            : (isDark
+                  ? AppColors.onSurfaceVariant
+                  : AppColors.lightOnSurfaceVariant);
 
         return Expanded(
           child: Padding(

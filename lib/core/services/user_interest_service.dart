@@ -115,7 +115,10 @@ class UserInterestService {
   }
 
   /// Records article translation toggle (+1 weight).
-  static Future<void> recordTranslateToggle(MicrostockNewsArticle article, String langMode) async {
+  static Future<void> recordTranslateToggle(
+    MicrostockNewsArticle article,
+    String langMode,
+  ) async {
     await _addWeight(article.category, 1);
     await _dispatchTelemetry({
       'type': 'user_interest_telemetry',
@@ -188,7 +191,10 @@ class UserInterestService {
     if (!success) await _enqueuePayload(payload);
   }
 
-  static Future<bool> _postPayload(String url, Map<String, dynamic> payload) async {
+  static Future<bool> _postPayload(
+    String url,
+    Map<String, dynamic> payload,
+  ) async {
     final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
     try {
       final uri = Uri.parse(url);
@@ -229,7 +235,9 @@ class UserInterestService {
       final remaining = <String>[];
       for (final item in list) {
         final payload = jsonDecode(item) as Map<String, dynamic>;
-        final sent = mockDispatcher != null ? await mockDispatcher!(payload) : await _postPayload(url, payload);
+        final sent = mockDispatcher != null
+            ? await mockDispatcher!(payload)
+            : await _postPayload(url, payload);
         if (!sent) remaining.add(item);
       }
       await prefs.setStringList(_queueKey, remaining);

@@ -8,7 +8,10 @@ class FilterBuilders {
     double canvasScalePercent = 95.0,
     TargetResolution targetResolution = TargetResolution.r1080p,
   }) {
-    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final (targetW, targetH) = canonicalDimensions(
+      targetResolution,
+      isPortrait: isPortrait,
+    );
     final bgDim = '$targetW:$targetH';
     final factor = (canvasScalePercent / 100.0).clamp(0.0, 1.0);
     final fgW = ((targetW * factor) / 2).floor() * 2;
@@ -36,13 +39,21 @@ class FilterBuilders {
     int targetFps = 30,
     double? saturationLevel,
   }) {
-    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final (targetW, targetH) = canonicalDimensions(
+      targetResolution,
+      isPortrait: isPortrait,
+    );
     final zoomDim = '${targetW}x$targetH';
-    final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(4);
-    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(
+      4,
+    );
+    final isHighRes =
+        targetResolution == TargetResolution.r2k ||
+        targetResolution == TargetResolution.r4k;
     final allowFrameSkip = enableFrameSkip && !isHighRes;
     return <String>[
-      if (modifyVisuals) 'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
+      if (modifyVisuals)
+        'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=$zoomDim:fps=$targetFps",
@@ -54,7 +65,11 @@ class FilterBuilders {
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (allowFrameSkip) 'decimate=cycle=25',
       if (upscale)
-        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
+        buildScaleFilter(
+          targetResolution: targetResolution,
+          isPortrait: isPortrait,
+          upscaleEngine: upscaleEngine,
+        )
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'setpts=PTS-STARTPTS',
@@ -63,7 +78,10 @@ class FilterBuilders {
   }
 
   /// Determines canonical target resolution bounds (width, height).
-  static (int, int) canonicalDimensions(TargetResolution res, {required bool isPortrait}) {
+  static (int, int) canonicalDimensions(
+    TargetResolution res, {
+    required bool isPortrait,
+  }) {
     switch (res) {
       case TargetResolution.r1080p:
         return isPortrait ? (1080, 1920) : (1920, 1080);
@@ -80,11 +98,17 @@ class FilterBuilders {
     required bool isPortrait,
     UpscaleEngine upscaleEngine = UpscaleEngine.lanczos,
   }) {
-    final (w, h) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final (w, h) = canonicalDimensions(
+      targetResolution,
+      isPortrait: isPortrait,
+    );
     return 'scale=w=$w:h=$h:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5';
   }
 
-  static String _resolveCodecArgs(VideoCodec videoCodec, TargetResolution targetResolution) {
+  static String _resolveCodecArgs(
+    VideoCodec videoCodec,
+    TargetResolution targetResolution,
+  ) {
     if (targetResolution == TargetResolution.r4k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 25M -bufsize 50M'
@@ -114,7 +138,9 @@ class FilterBuilders {
       final yExpr = cropAnchor == 'top'
           ? '0'
           : (cropAnchor == 'bottom' ? '(ih-oh)' : '(ih-oh)/2');
-      list.add('crop=w=trunc(iw/$z/2)*2:h=trunc(ih/$z/2)*2:x=trunc((iw-ow)/4)*2:y=trunc($yExpr/2)*2');
+      list.add(
+        'crop=w=trunc(iw/$z/2)*2:h=trunc(ih/$z/2)*2:x=trunc((iw-ow)/4)*2:y=trunc($yExpr/2)*2',
+      );
     }
     if (!deep) {
       if (list.isEmpty) list.add('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2');
@@ -149,14 +175,28 @@ class FilterBuilders {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
   }) {
-    final (targetW, targetH) = canonicalDimensions(targetResolution, isPortrait: isPortrait);
+    final (targetW, targetH) = canonicalDimensions(
+      targetResolution,
+      isPortrait: isPortrait,
+    );
     final zoomDim = '${targetW}x$targetH';
-    final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(4);
-    final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
+    final satStr = ((saturationLevel ?? 1.0) * vars.saturation).toStringAsFixed(
+      4,
+    );
+    final isHighRes =
+        targetResolution == TargetResolution.r2k ||
+        targetResolution == TargetResolution.r4k;
     final allowFrameSkip = enableFrameSkip && !isHighRes;
     return <String>[
-      if (modifyVisuals) 'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
-      ..._buildSpatialCrop(vars, modifyVisuals, enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor),
+      if (modifyVisuals)
+        'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
+      ..._buildSpatialCrop(
+        vars,
+        modifyVisuals,
+        enableDeepAntiFingerprint,
+        cropZoomScale: cropZoomScale,
+        cropAnchor: cropAnchor,
+      ),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
         "zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=$zoomDim:fps=$targetFps",
@@ -168,7 +208,11 @@ class FilterBuilders {
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (allowFrameSkip) 'decimate=cycle=25',
       if (upscale)
-        buildScaleFilter(targetResolution: targetResolution, isPortrait: isPortrait, upscaleEngine: upscaleEngine)
+        buildScaleFilter(
+          targetResolution: targetResolution,
+          isPortrait: isPortrait,
+          upscaleEngine: upscaleEngine,
+        )
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'setpts=PTS-STARTPTS',
@@ -240,14 +284,49 @@ class FilterBuilders {
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
-      final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
+      final vars =
+          variations ??
+          (enableDeepAntiFingerprint
+              ? VariationGenerator.generate()
+              : VideoVariations.fallback);
       final vfString = enableBlurredCanvas
           ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel).join(',')}'
-          : _buildFiltersList(modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, enableHorizontalFlip: enableHorizontalFlip, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, enableEnhanceAndDenoise: enableEnhanceAndDenoise, isPortrait: isPortrait, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, vars: vars, targetFps: targetFps, saturationLevel: saturationLevel, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor).join(',');
+          : _buildFiltersList(
+              modifyVisuals: modifyVisuals,
+              enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+              enableHorizontalFlip: enableHorizontalFlip,
+              upscale: upscale,
+              targetResolution: targetResolution,
+              upscaleEngine: upscaleEngine,
+              enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+              isPortrait: isPortrait,
+              enableDynamicZoom: enableDynamicZoom,
+              enableMicroOverlay: enableMicroOverlay,
+              enableFrameSkip: enableFrameSkip,
+              enableChromaShift: enableChromaShift,
+              vars: vars,
+              targetFps: targetFps,
+              saturationLevel: saturationLevel,
+              cropZoomScale: cropZoomScale,
+              cropAnchor: cropAnchor,
+            ).join(',');
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {
-      return _fallbackVideoFilter(hasVisual: hasVisual, hasAudio: hasAudio, modifyVisuals: modifyVisuals, upscale: upscale, targetResolution: targetResolution, upscaleEngine: upscaleEngine, videoCodec: videoCodec, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableHorizontalFlip: enableHorizontalFlip, isPortrait: isPortrait, targetFps: targetFps, saturationLevel: saturationLevel);
+      return _fallbackVideoFilter(
+        hasVisual: hasVisual,
+        hasAudio: hasAudio,
+        modifyVisuals: modifyVisuals,
+        upscale: upscale,
+        targetResolution: targetResolution,
+        upscaleEngine: upscaleEngine,
+        videoCodec: videoCodec,
+        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+        enableHorizontalFlip: enableHorizontalFlip,
+        isPortrait: isPortrait,
+        targetFps: targetFps,
+        saturationLevel: saturationLevel,
+      );
     }
   }
 
@@ -262,7 +341,11 @@ class FilterBuilders {
   }) {
     if (!hasAudio) return hasVisual ? ' -c:a copy' : '';
     try {
-      final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
+      final vars =
+          variations ??
+          (enableDeepAntiFingerprint
+              ? VariationGenerator.generate()
+              : VideoVariations.fallback);
       final tempo = vars.audioTempo.toStringAsFixed(4);
       final pitchStr = vars.pitchFactor.toStringAsFixed(3);
       final pitchChain = 'asetrate=44100*$pitchStr,atempo=1/$pitchStr';

@@ -36,7 +36,9 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
-    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final borderColor = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
@@ -89,11 +91,19 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
                   const SizedBox(width: 6),
                   Row(
                     children: [
-                      _ActiveBadge(activeCount: widget.activeCount, totalCount: widget.totalCount, isDark: isDark),
+                      _ActiveBadge(
+                        activeCount: widget.activeCount,
+                        totalCount: widget.totalCount,
+                        isDark: isDark,
+                      ),
                       const SizedBox(width: 6),
                       Icon(
-                        _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                        _expanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: isDark
+                            ? AppColors.onSurfaceVariant
+                            : AppColors.lightOnSurfaceVariant,
                         size: 18,
                       ),
                     ],
@@ -115,14 +125,20 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
 class _ActiveBadge extends StatelessWidget {
   final int activeCount, totalCount;
   final bool isDark;
-  const _ActiveBadge({required this.activeCount, required this.totalCount, required this.isDark});
+  const _ActiveBadge({
+    required this.activeCount,
+    required this.totalCount,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isActive = activeCount > 0;
     final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final activeBg = activeColor.withValues(alpha: isDark ? 0.15 : 0.12);
-    final inactiveBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final inactiveBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
     final inactiveColor = AppColors.outline;
     final borderColor = isActive
         ? activeColor.withValues(alpha: 0.4)

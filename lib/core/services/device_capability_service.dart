@@ -74,19 +74,21 @@ class DeviceSpecs {
   }
 
   factory DeviceSpecs.defaultFallback() => DeviceSpecs(
-        totalRamBytes: 8 * 1024 * 1024 * 1024,
-        availRamBytes: 4 * 1024 * 1024 * 1024,
-        cpuCores: 8,
-        primaryAbi: 'arm64-v8a',
-        isArm64: true,
-        hasVulkan: true,
-        hasVulkanCompute: true,
-        tier: DeviceTier.mid,
-      );
+    totalRamBytes: 8 * 1024 * 1024 * 1024,
+    availRamBytes: 4 * 1024 * 1024 * 1024,
+    cpuCores: 8,
+    primaryAbi: 'arm64-v8a',
+    isArm64: true,
+    hasVulkan: true,
+    hasVulkanCompute: true,
+    tier: DeviceTier.mid,
+  );
 }
 
 class DeviceCapabilityService {
-  static const MethodChannel _channel = MethodChannel('id.novrira.videouniquifier/device_capability');
+  static const MethodChannel _channel = MethodChannel(
+    'id.novrira.videouniquifier/device_capability',
+  );
   static DeviceSpecs? _cachedSpecs;
   static bool? _testOverride;
   static DeviceSpecs? _testSpecsOverride;
@@ -94,7 +96,8 @@ class DeviceCapabilityService {
   @visibleForTesting
   static set testOverride(bool? value) => _testOverride = value;
   @visibleForTesting
-  static set testSpecsOverride(DeviceSpecs? specs) => _testSpecsOverride = specs;
+  static set testSpecsOverride(DeviceSpecs? specs) =>
+      _testSpecsOverride = specs;
 
   static bool get _canRun => _testOverride ?? Platform.isAndroid;
 
@@ -108,7 +111,9 @@ class DeviceCapabilityService {
     }
 
     try {
-      final res = await _channel.invokeMethod<Map<dynamic, dynamic>>('getDeviceSpecs');
+      final res = await _channel.invokeMethod<Map<dynamic, dynamic>>(
+        'getDeviceSpecs',
+      );
       if (res != null) {
         _cachedSpecs = DeviceSpecs.fromMap(res);
         return _cachedSpecs!;
@@ -125,7 +130,9 @@ class DeviceCapabilityService {
   }) {
     if (tier == DeviceTier.flagship) return null;
     if (tier == DeviceTier.entry) {
-      if (targetKey == '2k' || targetKey == '4k') return 'RISIKO PANAS / LAMBAT';
+      if (targetKey == '2k' || targetKey == '4k') {
+        return 'RISIKO PANAS / LAMBAT';
+      }
     } else if (tier == DeviceTier.mid) {
       if (targetKey == '4k') return 'BEBAN TINGGI';
     }

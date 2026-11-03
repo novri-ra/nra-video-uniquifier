@@ -4,10 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 class ProcessingStageTracker extends StatelessWidget {
   final int currentStep;
 
-  const ProcessingStageTracker({
-    super.key,
-    required this.currentStep,
-  });
+  const ProcessingStageTracker({super.key, required this.currentStep});
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +74,9 @@ class _StageStep extends StatelessWidget {
       textColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
       fontWeight = FontWeight.w800;
     } else {
-      textColor = isDark ? AppColors.textLight.withValues(alpha: 0.40) : AppColors.textDark.withValues(alpha: 0.40);
+      textColor = isDark
+          ? AppColors.textLight.withValues(alpha: 0.40)
+          : AppColors.textDark.withValues(alpha: 0.40);
       fontWeight = FontWeight.w600;
     }
 

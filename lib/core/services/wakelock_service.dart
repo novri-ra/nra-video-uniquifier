@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class WakeLockService {
-  static const MethodChannel _channel = MethodChannel('id.novrira.videouniquifier/wakelock');
+  static const MethodChannel _channel = MethodChannel(
+    'id.novrira.videouniquifier/wakelock',
+  );
   static bool? _testOverride;
   static bool _simulatedHeld = false;
 

@@ -25,9 +25,9 @@ class _ProcessScreenState extends State<ProcessScreen> {
   bool _isNavigating = false;
 
   void _openSettingsTab(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   Future<void> _pickVideo(BuildContext context) async {
@@ -45,7 +45,10 @@ class _ProcessScreenState extends State<ProcessScreen> {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error selecting file: $e'), backgroundColor: AppColors.errorContainer),
+          SnackBar(
+            content: Text('Error selecting file: $e'),
+            backgroundColor: AppColors.errorContainer,
+          ),
         );
       }
     }
@@ -55,12 +58,29 @@ class _ProcessScreenState extends State<ProcessScreen> {
     if (validFiles.length == 1) {
       final file = validFiles.first;
       context.read<BatchQueueProvider>().clear();
-      context.read<UniquifierProvider>().setVideoFile(path: file.path!, name: file.name, sizeBytes: file.size);
+      context.read<UniquifierProvider>().setVideoFile(
+        path: file.path!,
+        name: file.name,
+        sizeBytes: file.size,
+      );
     } else {
-      final batchItems = validFiles.map((f) => BatchVideoItem(id: f.path!, path: f.path!, name: f.name, sizeBytes: f.size)).toList();
+      final batchItems = validFiles
+          .map(
+            (f) => BatchVideoItem(
+              id: f.path!,
+              path: f.path!,
+              name: f.name,
+              sizeBytes: f.size,
+            ),
+          )
+          .toList();
       context.read<BatchQueueProvider>().setItems(batchItems);
       final first = validFiles.first;
-      context.read<UniquifierProvider>().setVideoFile(path: first.path!, name: first.name, sizeBytes: first.size);
+      context.read<UniquifierProvider>().setVideoFile(
+        path: first.path!,
+        name: first.name,
+        sizeBytes: first.size,
+      );
     }
   }
 
@@ -77,9 +97,9 @@ class _ProcessScreenState extends State<ProcessScreen> {
           MaterialPageRoute(builder: (_) => const BatchProcessingScreen()),
         );
       } else {
-        await Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ProcessingScreen()),
-        );
+        await Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => const ProcessingScreen()));
       }
     } finally {
       if (mounted) {
@@ -93,7 +113,9 @@ class _ProcessScreenState extends State<ProcessScreen> {
     final provider = context.watch<UniquifierProvider>();
     final batchQueue = context.watch<BatchQueueProvider>();
     final hasFile = provider.selectedFileName != null;
-    final batchCount = batchQueue.hasItems ? batchQueue.totalCount : (hasFile ? 1 : 0);
+    final batchCount = batchQueue.hasItems
+        ? batchQueue.totalCount
+        : (hasFile ? 1 : 0);
 
     return Scaffold(
       appBar: TopAppBar(onSettingsTap: () => _openSettingsTab(context)),
@@ -137,7 +159,11 @@ class _ProcessBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SourceFileSection(hasFile: hasFile, provider: provider, onPickVideo: onPickVideo),
+        SourceFileSection(
+          hasFile: hasFile,
+          provider: provider,
+          onPickVideo: onPickVideo,
+        ),
         const SizedBox(height: 16),
         const ModifiersHeader(),
         const SizedBox(height: 6),
@@ -166,7 +192,9 @@ class _OfflineGuaranteeNote extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
+    final textColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.forestDeep;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -204,12 +232,17 @@ class _ProcessActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final singleLabel = (l10n?.startProcess ?? 'START UNIQUIFYING').toUpperCase();
-    final labelText = batchCount > 1 ? 'START BATCH ($batchCount VIDEOS)' : singleLabel;
+    final singleLabel = (l10n?.startProcess ?? 'START UNIQUIFYING')
+        .toUpperCase();
+    final labelText = batchCount > 1
+        ? 'START BATCH ($batchCount VIDEOS)'
+        : singleLabel;
 
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: enabled ? AppColors.forestDeep : AppColors.surfaceContainerHigh,
+        backgroundColor: enabled
+            ? AppColors.forestDeep
+            : AppColors.surfaceContainerHigh,
         foregroundColor: enabled ? AppColors.white : AppColors.outline,
         minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),

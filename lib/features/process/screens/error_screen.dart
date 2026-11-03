@@ -18,7 +18,9 @@ class ErrorScreen extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(16),
               child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32,
+                ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -70,7 +72,11 @@ class _ErrorHeroHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.error),
                 ),
-                child: const Icon(Icons.warning, color: AppColors.error, size: 28),
+                child: const Icon(
+                  Icons.warning,
+                  color: AppColors.error,
+                  size: 28,
+                ),
               ),
             ),
           ),
@@ -78,12 +84,20 @@ class _ErrorHeroHeader extends StatelessWidget {
         const SizedBox(height: 14),
         const Text(
           'Processing Failed',
-          style: TextStyle(color: AppColors.onSurface, fontSize: 22, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: AppColors.onSurface,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         const SizedBox(height: 4),
         const Text(
           'Out of Memory or Unsupported Format',
-          style: TextStyle(color: AppColors.outline, fontSize: 12, fontFamily: 'monospace'),
+          style: TextStyle(
+            color: AppColors.outline,
+            fontSize: 12,
+            fontFamily: 'monospace',
+          ),
         ),
       ],
     );
@@ -125,11 +139,24 @@ class _TelemetryHeader extends StatelessWidget {
       children: [
         Row(
           children: [
-            Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.error, shape: BoxShape.circle)),
+            Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                color: AppColors.error,
+                shape: BoxShape.circle,
+              ),
+            ),
             const SizedBox(width: 6),
             const Text(
               'SANDBOX TELEMETRY',
-              style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.8, fontFamily: 'monospace'),
+              style: TextStyle(
+                color: AppColors.onSurfaceVariant,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+                fontFamily: 'monospace',
+              ),
             ),
           ],
         ),
@@ -140,7 +167,15 @@ class _TelemetryHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
             border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
           ),
-          child: const Text('FATAL', style: TextStyle(color: AppColors.error, fontSize: 9, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
+          child: const Text(
+            'FATAL',
+            style: TextStyle(
+              color: AppColors.error,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'monospace',
+            ),
+          ),
         ),
       ],
     );
@@ -152,17 +187,26 @@ class _TelemetryLogBox extends StatelessWidget {
   const _TelemetryLogBox({this.errorDetails});
 
   String _redactPath(String text) {
-    return text.replaceAll(RegExp(r'/storage/emulated/0/[^\s]+'), '<external storage>/...');
+    return text.replaceAll(
+      RegExp(r'/storage/emulated/0/[^\s]+'),
+      '<external storage>/...',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final raw = errorDetails ??
+    final raw =
+        errorDetails ??
         '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
-        'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
-        'Native pipeline state: 0/4 stages completed.';
+            'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
+            'Native pipeline state: 0/4 stages completed.';
     final redacted = _redactPath(raw);
-    final summary = redacted.split('\n').firstWhere((line) => line.trim().isNotEmpty, orElse: () => 'Processing error');
+    final summary = redacted
+        .split('\n')
+        .firstWhere(
+          (line) => line.trim().isNotEmpty,
+          orElse: () => 'Processing error',
+        );
 
     return Container(
       width: double.infinity,
@@ -180,14 +224,24 @@ class _TelemetryLogBox extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Text(
                 summary,
-                style: const TextStyle(color: AppColors.error, fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: AppColors.error,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             ExpansionTile(
-              title: const Text('View technical details', style: TextStyle(color: AppColors.outline, fontSize: 11)),
+              title: const Text(
+                'View technical details',
+                style: TextStyle(color: AppColors.outline, fontSize: 11),
+              ),
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                   child: SelectableText(
                     redacted,
                     style: const TextStyle(
@@ -225,14 +279,23 @@ class _ErrorRecommendedFixes extends StatelessWidget {
         children: [
           Text(
             'RECOMMENDED ACTION',
-            style: TextStyle(color: AppColors.outline, fontSize: 10, letterSpacing: 0.8, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: AppColors.outline,
+              fontSize: 10,
+              letterSpacing: 0.8,
+              fontFamily: 'monospace',
+            ),
           ),
           SizedBox(height: 8),
           Text(
             '• Switch to Software (libx264) Safe Engine in Settings.\n'
             '• Toggle off Upscaling (or lower target resolution).\n'
             '• Clear temporary cache before retrying.',
-            style: TextStyle(color: AppColors.onSurface, fontSize: 12, height: 1.5),
+            style: TextStyle(
+              color: AppColors.onSurface,
+              fontSize: 12,
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -252,12 +315,17 @@ class _ErrorActionButtons extends StatelessWidget {
             backgroundColor: AppColors.primaryContainer,
             foregroundColor: AppColors.onPrimary,
             minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
             elevation: 0,
           ),
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(Icons.refresh, size: 18),
-          label: const Text('Try Safe Mode', style: TextStyle(fontWeight: FontWeight.w700)),
+          label: const Text(
+            'Try Safe Mode',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
@@ -265,9 +333,12 @@ class _ErrorActionButtons extends StatelessWidget {
             foregroundColor: AppColors.outline,
             side: const BorderSide(color: AppColors.surfaceContainerHighest),
             minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
-          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          onPressed: () =>
+              Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.arrow_back, size: 18),
           label: const Text('Return to Source File'),
         ),

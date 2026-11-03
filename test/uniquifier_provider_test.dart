@@ -138,12 +138,15 @@ void main() {
       expect(notifications, equals(3));
     });
 
-    test('Reacts immediately when SettingsService broadcasts resolution change', () async {
-      await SettingsService.setUpscaleResolution(TargetResolution.r4k);
-      expect(provider.selectedUpscaleTarget, equals('4k'));
-      expect(provider.targetResolutionLabel, equals('4K'));
-      expect(provider.targetResolutionDetails, equals('3840x2160'));
-    });
+    test(
+      'Reacts immediately when SettingsService broadcasts resolution change',
+      () async {
+        await SettingsService.setUpscaleResolution(TargetResolution.r4k);
+        expect(provider.selectedUpscaleTarget, equals('4k'));
+        expect(provider.targetResolutionLabel, equals('4K'));
+        expect(provider.targetResolutionDetails, equals('3840x2160'));
+      },
+    );
 
     test('toggleEnhanceAndDenoise flips flag and notifies listeners', () {
       bool notified = false;
@@ -169,62 +172,68 @@ void main() {
       expect(provider.enableDeepAntiFingerprint, isTrue);
     });
 
-    test('toggleHorizontalFlip, toggleAggressiveAudio, and toggleAutoTrim flip flags and notify listeners', () {
-      int notifications = 0;
-      provider.addListener(() => notifications++);
+    test(
+      'toggleHorizontalFlip, toggleAggressiveAudio, and toggleAutoTrim flip flags and notify listeners',
+      () {
+        int notifications = 0;
+        provider.addListener(() => notifications++);
 
-      provider.toggleHorizontalFlip(true);
-      expect(provider.enableHorizontalFlip, isTrue);
-      expect(provider.enableHFlip, isTrue);
+        provider.toggleHorizontalFlip(true);
+        expect(provider.enableHorizontalFlip, isTrue);
+        expect(provider.enableHFlip, isTrue);
 
-      provider.toggleAggressiveAudio(true);
-      expect(provider.enableAggressiveAudio, isTrue);
+        provider.toggleAggressiveAudio(true);
+        expect(provider.enableAggressiveAudio, isTrue);
 
-      provider.toggleAutoTrim(true);
-      expect(provider.enableAutoTrim, isTrue);
-      expect(provider.enableMicroTrim, isTrue);
+        provider.toggleAutoTrim(true);
+        expect(provider.enableAutoTrim, isTrue);
+        expect(provider.enableMicroTrim, isTrue);
 
-      provider.toggleHFlip(false);
-      expect(provider.enableHorizontalFlip, isFalse);
-      expect(provider.enableHFlip, isFalse);
+        provider.toggleHFlip(false);
+        expect(provider.enableHorizontalFlip, isFalse);
+        expect(provider.enableHFlip, isFalse);
 
-      provider.toggleMicroTrim(false);
-      expect(provider.enableAutoTrim, isFalse);
-      expect(provider.enableMicroTrim, isFalse);
+        provider.toggleMicroTrim(false);
+        expect(provider.enableAutoTrim, isFalse);
+        expect(provider.enableMicroTrim, isFalse);
 
-      provider.toggleBlurredCanvas(true);
-      expect(provider.enableBlurredCanvas, isTrue);
+        provider.toggleBlurredCanvas(true);
+        expect(provider.enableBlurredCanvas, isTrue);
 
-      provider.toggleMuteOriginalAudio(true);
-      expect(provider.muteOriginalAudio, isTrue);
+        provider.toggleMuteOriginalAudio(true);
+        expect(provider.muteOriginalAudio, isTrue);
 
-      provider.toggleDynamicZoom(true);
-      expect(provider.enableDynamicZoom, isTrue);
+        provider.toggleDynamicZoom(true);
+        expect(provider.enableDynamicZoom, isTrue);
 
-      provider.toggleMicroOverlay(true);
-      expect(provider.enableMicroOverlay, isTrue);
+        provider.toggleMicroOverlay(true);
+        expect(provider.enableMicroOverlay, isTrue);
 
-      provider.toggleFrameSkip(true);
-      expect(provider.enableFrameSkip, isTrue);
+        provider.toggleFrameSkip(true);
+        expect(provider.enableFrameSkip, isTrue);
 
-      provider.toggleChromaShift(true);
-      expect(provider.enableChromaShift, isTrue);
+        provider.toggleChromaShift(true);
+        expect(provider.enableChromaShift, isTrue);
 
-      provider.setCanvasScalePercent(80.0);
-      expect(provider.canvasScalePercent, equals(80.0));
+        provider.setCanvasScalePercent(80.0);
+        expect(provider.canvasScalePercent, equals(80.0));
 
-      expect(notifications, equals(12));
-    });
+        expect(notifications, equals(12));
+      },
+    );
 
-    test('toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService', () async {
-      provider.toggleHardwareAcceleration(false);
-      expect(provider.hardwareAcceleration, isFalse);
-      expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
+    test(
+      'toggleHardwareAcceleration flips mode and syncs bidirectionally with SettingsService',
+      () async {
+        provider.toggleHardwareAcceleration(false);
+        expect(provider.hardwareAcceleration, isFalse);
+        expect(SettingsService.hardwareAccelerationNotifier.value, isFalse);
 
-      await SettingsService.setHardwareAcceleration(true);
-      expect(provider.hardwareAcceleration, isTrue);
-      expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
-    });
+        await SettingsService.setHardwareAcceleration(true);
+        expect(provider.hardwareAcceleration, isTrue);
+        expect(SettingsService.hardwareAccelerationNotifier.value, isTrue);
+      },
+    );
 
     test('setVideoCodec updates codec and notifies listeners', () {
       expect(provider.videoCodec, equals(VideoCodec.h264));
@@ -263,7 +272,10 @@ void main() {
 
     test('setLastProcessedResult updates output path', () {
       provider.setLastProcessedResult('/path/output_unique.mp4');
-      expect(provider.lastProcessedOutputPath, equals('/path/output_unique.mp4'));
+      expect(
+        provider.lastProcessedOutputPath,
+        equals('/path/output_unique.mp4'),
+      );
     });
 
     test('clearSelection resets file references', () {
