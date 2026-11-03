@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import 'bento_engine_card.dart';
 
 /// Interactive bento metric cards with scaled-up visual gauges and balanced hierarchy.
@@ -104,9 +105,11 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
     );
   }
 
-  Widget _buildCenterVisual() {
+  Widget _buildCenterVisual(BuildContext context) {
     final ringColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
     final labelColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final l10n = AppLocalizations.of(context);
+    final exifText = l10n?.exifClean ?? 'EXIF CLEAN';
 
     return Center(
       child: Column(
@@ -128,7 +131,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
           ),
           const SizedBox(height: 6),
           Text(
-            'EXIF CLEAN',
+            exifText,
             style: TextStyle(
               color: labelColor,
               fontSize: 9.5,
@@ -141,7 +144,10 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
     );
   }
 
-  Widget _buildFooter(Color titleColor, Color subColor) {
+  Widget _buildFooter(Color titleColor, Color subColor, BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final zeroFingerprintText = l10n?.zeroFingerprint ?? 'Zero Digital Fingerprint';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -152,7 +158,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
           style: TextStyle(color: titleColor, fontSize: 11.5, fontWeight: FontWeight.w700),
         ),
         Text(
-          widget.isClean ? 'Zero Digital Fingerprint' : 'Original Raw Exif',
+          widget.isClean ? zeroFingerprintText : 'Original Raw Exif',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(color: subColor, fontSize: 9.5),
@@ -199,9 +205,9 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
             children: [
               _buildTopRow(),
               const Spacer(),
-              _buildCenterVisual(),
+              _buildCenterVisual(context),
               const Spacer(),
-              _buildFooter(titleColor, subColor),
+              _buildFooter(titleColor, subColor, context),
             ],
           ),
         ),
@@ -244,9 +250,11 @@ class _BentoStorageCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCenterVisual() {
+  Widget _buildCenterVisual(BuildContext context) {
     final percent = (freeFraction * 100).toInt();
     final labelColor = isDark ? AppColors.outline : AppColors.outline;
+    final l10n = AppLocalizations.of(context);
+    final availableText = l10n?.storageAvailable ?? 'AVAILABLE';
 
     return Center(
       child: Column(
@@ -260,7 +268,7 @@ class _BentoStorageCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'AVAILABLE',
+            availableText,
             style: TextStyle(
               color: labelColor,
               fontSize: 9.5,
@@ -315,7 +323,7 @@ class _BentoStorageCard extends StatelessWidget {
         children: [
           _buildTopRow(),
           const Spacer(),
-          _buildCenterVisual(),
+          _buildCenterVisual(context),
           const Spacer(),
           _buildFooter(titleColor),
         ],

@@ -161,4 +161,76 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get presetExtreme => 'Evasif Ekstrem';
+
+  @override
+  String get greetingMorning => 'Selamat Pagi, Kreator';
+
+  @override
+  String get greetingAfternoon => 'Selamat Siang, Kreator';
+
+  @override
+  String get greetingEvening => 'Selamat Sore, Kreator';
+
+  @override
+  String get greetingNight => 'Selamat Malam, Kreator';
+
+  @override
+  String get engineHardwareActive => 'Akselerasi Perangkat Aktif';
+
+  @override
+  String get engineCpuEfficiency => 'Mesin Efisiensi CPU';
+
+  @override
+  String get seasonalWindowLead => 'JENDELA MUSIMAN • PERSIAPAN 60-90 HARI';
+
+  @override
+  String get launchStudioBtn => 'BUKA STUDIO DEDUPLIKASI';
+
+  @override
+  String get exifClean => 'BERSIH DARI EXIF';
+
+  @override
+  String get zeroFingerprint => 'Nol Jejak Digital';
+
+  @override
+  String get storageAvailable => 'TERSEDIA';
+
+  @override
+  String get queueReady => 'SIAP ANTREAN';
+
+  @override
+  String get readyToUpload => 'Siap Unggah • Ketuk +';
+
+  @override
+  String get exportShareVideo => 'Ekspor & Bagikan Video';
+
+  @override
+  String get openGallery => 'Buka Galeri';
+
+  @override
+  String get uniquifyAnother => 'Proses Video Lainnya';
+
+  @override
+  String get videoSavedTitle => 'Video Tersimpan!';
+
+  @override
+  String get videoSavedDesc => 'Diekspor ke galeri publik Movies/Uniquifier';
+
+  @override
+  String get processingVideoTitle => 'Sedang memproses video...';
+
+  @override
+  String get highComputeWarning => 'Beban komputasi tinggi';
+
+  @override
+  String get recommendedTag => 'Direkomendasikan';
+
+  @override
+  String get hardwareAccelerationDesc => 'Gunakan pipeline OpenGLES/Vulkan';
+
+  @override
+  String get trendMicrostockTitle => 'Tren Microstock Mendatang';
+
+  @override
+  String get tapChipCopy => 'Ketuk tag untuk menyalin';
 }

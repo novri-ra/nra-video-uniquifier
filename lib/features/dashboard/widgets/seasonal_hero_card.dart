@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../helpers/seasonal_event_helper.dart';
 
 /// Hero Bento Card highlighting dynamic seasonal microstock event upload windows.
@@ -77,6 +78,9 @@ class _HeroBadgeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final text = l10n?.seasonalWindowLead ?? 'SEASONAL WINDOW • 60-90 DAYS LEAD';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -84,12 +88,12 @@ class _HeroBadgeRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.butterYellow.withValues(alpha: 0.40)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '🔥 SEASONAL WINDOW • 60-90 DAYS LEAD',
-            style: TextStyle(
+            '🔥 $text',
+            style: const TextStyle(
               color: AppColors.butterYellow,
               fontSize: 10,
               fontWeight: FontWeight.w700,
@@ -179,15 +183,18 @@ class _LaunchButtonState extends State<_LaunchButton> {
     );
   }
 
-  Widget _btnContent() {
-    return const Row(
+  Widget _btnContent(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final label = l10n?.launchStudioBtn ?? 'LAUNCH STUDIO DEDUPLICATION';
+
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.auto_fix_high_rounded, color: Colors.white, size: 18),
-        SizedBox(width: 8),
+        const Icon(Icons.auto_fix_high_rounded, color: Colors.white, size: 18),
+        const SizedBox(width: 8),
         Text(
-          'LAUNCH STUDIO DEDUPLICATION',
-          style: TextStyle(
+          label,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 12,
             fontWeight: FontWeight.w800,
@@ -215,7 +222,7 @@ class _LaunchButtonState extends State<_LaunchButton> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: _btnDecoration(),
-          child: _btnContent(),
+          child: _btnContent(context),
         ),
       ),
     );

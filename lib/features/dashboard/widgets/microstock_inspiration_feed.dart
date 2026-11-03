@@ -16,6 +16,8 @@ class MicrostockInspirationFeed extends StatelessWidget {
     final headerColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final subColor = isDark ? AppColors.outline : AppColors.outline;
 
+    final chipText = (l10n?.tapChipCopy ?? 'TAP CHIP TO COPY TAG').toUpperCase();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -23,7 +25,7 @@ class MicrostockInspirationFeed extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              (l10n?.inspirationTitle ?? '${info.quarterLabel} COMMERCIAL TRENDS').toUpperCase(),
+              (l10n?.trendMicrostockTitle ?? l10n?.inspirationTitle ?? '${info.quarterLabel} COMMERCIAL TRENDS').toUpperCase(),
               style: TextStyle(
                 color: headerColor,
                 fontSize: 11,
@@ -33,7 +35,7 @@ class MicrostockInspirationFeed extends StatelessWidget {
               ),
             ),
             Text(
-              'TAP CHIP TO COPY TAG',
+              chipText,
               style: TextStyle(
                 color: subColor,
                 fontSize: 9,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/device_capability_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class UpscaleResolutionCard extends StatelessWidget {
   final String selectedValue;
@@ -16,14 +17,17 @@ class UpscaleResolutionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final warn2k = DeviceCapabilityService.getResolutionWarning(targetKey: '2k', tier: tier);
     final warn4k = DeviceCapabilityService.getResolutionWarning(targetKey: '4k', tier: tier);
+    final recTag = l10n?.recommendedTag ?? 'Recommended';
+    final highComputeWarn = l10n?.highComputeWarning ?? 'Extreme computation load';
 
     return Column(
       children: [
         _ResolutionOptionTile(
-          title: '1080p Full HD (Recommended)',
+          title: '1080p Full HD ($recTag)',
           subtitle: 'Optimal quality & balance • Lanczos filter',
           resolution: '1920×1080',
           value: '1080p',
@@ -45,7 +49,7 @@ class UpscaleResolutionCard extends StatelessWidget {
         const SizedBox(height: 8),
         _ResolutionOptionTile(
           title: tier == DeviceTier.flagship ? '4K UHD (Fully Supported)' : '4K UHD (High Compute)',
-          subtitle: tier == DeviceTier.flagship ? 'Flagship GPU accelerated • Max detail' : 'Extreme computation load',
+          subtitle: tier == DeviceTier.flagship ? 'Flagship GPU accelerated • Max detail' : highComputeWarn,
           resolution: '3840×2160',
           value: '4k',
           selectedValue: selectedValue,

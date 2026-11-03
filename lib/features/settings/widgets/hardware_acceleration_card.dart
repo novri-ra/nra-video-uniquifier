@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 
 class HardwareAccelerationCard extends StatelessWidget {
@@ -16,6 +17,8 @@ class HardwareAccelerationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
+    final subtitle = l10n?.hardwareAccelerationDesc ?? 'Force OpenGLES/Metal Shader Pipeline';
 
     return ValueListenableBuilder<bool>(
       valueListenable: SettingsService.hardwareAccelerationNotifier,
@@ -32,7 +35,7 @@ class HardwareAccelerationCard extends StatelessWidget {
           child: SettingToggleRow(
             icon: Icons.memory,
             title: 'Hardware Acceleration',
-            subtitle: 'Force OpenGLES/Metal Shader Pipeline',
+            subtitle: subtitle,
             value: active,
             onChanged: onToggle ?? SettingsService.setHardwareAcceleration,
           ),
