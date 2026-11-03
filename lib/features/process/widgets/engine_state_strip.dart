@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class EngineStateStrip extends StatelessWidget {
   final UniquifierProvider provider;
@@ -15,8 +15,8 @@ class EngineStateStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF8FAFC);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : const Color(0xFFE2E8F0);
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
@@ -47,8 +47,8 @@ class _EngineStatusLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF0F172A);
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       children: [
@@ -72,8 +72,8 @@ class _RenderEstimateLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6B7280);
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final iconColor = AppColors.outline;
 
     return Row(
       children: [

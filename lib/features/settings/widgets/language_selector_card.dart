@@ -60,11 +60,11 @@ class _LanguageOptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const radioActiveGreen = Color(0xFF10B981);
-    final radioInactive = isDark ? AppColors.outline : const Color(0xFF9CA3AF);
-    final activeTextColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final inactiveTextColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final radioActive = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final radioInactive = AppColors.outline;
+    final activeTextColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveTextColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
@@ -74,7 +74,7 @@ class _LanguageOptionTile extends StatelessWidget {
           children: [
             Icon(
               isSelected ? Icons.check_circle_rounded : Icons.radio_button_off,
-              color: isSelected ? radioActiveGreen : radioInactive,
+              color: isSelected ? radioActive : radioInactive,
               size: 20,
             ),
             const SizedBox(width: 12),

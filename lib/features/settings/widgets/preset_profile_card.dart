@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// Redesigned selectable preset profile cards matching video codec and upscale cards.
 class PresetProfileCard extends StatelessWidget {
@@ -16,11 +16,11 @@ class PresetProfileCard extends StatelessWidget {
       children: [
         _PresetTile(
           icon: Icons.bolt,
-          iconAccent: const Color(0xFF6C5CE7),
+          iconAccent: AppColors.persimmonOrange,
           title: 'TikTok / Reels Aggressive',
           description: 'Spectral Shift, Speed Warp 1.015x, Ken Burns Zoom, HFlip, Noise',
           badge: 'FAST',
-          badgeColor: const Color(0xFF6C5CE7),
+          badgeColor: AppColors.persimmonOrange,
           isSelected: provider.activePreset == 'TikTok / Reels',
           isDark: isDark,
           onTap: () => provider.applyPreset(
@@ -42,11 +42,11 @@ class PresetProfileCard extends StatelessWidget {
         const SizedBox(height: 8),
         _PresetTile(
           icon: Icons.movie_filter,
-          iconAccent: const Color(0xFF007AFF),
+          iconAccent: AppColors.skyPastel,
           title: 'Cinematic 2K / 4K Clean',
           description: 'No HFlip, No Canvas Blur, AI Upscale + Unsharp, Target 2K',
           badge: 'CINEMA',
-          badgeColor: const Color(0xFF007AFF),
+          badgeColor: AppColors.electricIce,
           isSelected: provider.activePreset == 'Cinematic 2K/4K',
           isDark: isDark,
           onTap: () => provider.applyPreset(
@@ -65,11 +65,11 @@ class PresetProfileCard extends StatelessWidget {
         const SizedBox(height: 8),
         _PresetTile(
           icon: Icons.flash_on,
-          iconAccent: const Color(0xFF10B981),
+          iconAccent: AppColors.mintSage,
           title: 'Ultra-Light / Quick Export',
           description: 'Minimal filters, CRF 22, no AI upscale, metadata scrub only',
           badge: 'QUICK',
-          badgeColor: const Color(0xFF10B981),
+          badgeColor: AppColors.mintSage,
           isSelected: provider.activePreset == 'Quick Export',
           isDark: isDark,
           onTap: () => provider.applyPreset(
@@ -113,10 +113,10 @@ class _PresetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
-    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    const activeBorder = Color(0xFF6C5CE7);
-    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.lightSurfaceContainer;
+    final inactiveBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final activeBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final iconColor = isSelected ? activeBorder : iconAccent;

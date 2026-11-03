@@ -13,8 +13,8 @@ class MicrostockInspirationFeed extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final info = SeasonalEventHelper.getSeasonalWindowInfo();
-    final headerColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final subColor = isDark ? AppColors.outline : const Color(0xFF6B7280);
+    final headerColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark ? AppColors.outline : AppColors.outline;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,11 +81,11 @@ class _TrendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final descColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    const accentColor = Color(0xFF6C5CE7);
+    final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: 260,
@@ -112,12 +112,12 @@ class _TrendCard extends StatelessWidget {
               Container(
                 width: 6,
                 height: 6,
-                decoration: const BoxDecoration(color: accentColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(color: accentColor, shape: BoxShape.circle),
               ),
               const SizedBox(width: 6),
               Text(
                 trend.category,
-                style: const TextStyle(
+                style: TextStyle(
                   color: accentColor,
                   fontSize: 9,
                   fontWeight: FontWeight.w700,
@@ -183,9 +183,9 @@ class _InteractiveKeywordChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chipBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final textColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final chipBg = AppColors.mintSage.withValues(alpha: 0.12);
+    final borderColor = AppColors.mintSage.withValues(alpha: 0.30);
+    final textColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Padding(
       padding: const EdgeInsets.only(right: 6),

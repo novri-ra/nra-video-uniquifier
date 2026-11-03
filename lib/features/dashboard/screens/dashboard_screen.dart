@@ -61,10 +61,10 @@ class _GreetingHeaderSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
+        color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
         ),
       ),
       child: Row(
@@ -73,10 +73,8 @@ class _GreetingHeaderSection extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [AppColors.primaryContainer, const Color(0xFF00B074)]
-                    : [AppColors.lightPrimary, const Color(0xFF007AFF)],
+              gradient: const LinearGradient(
+                colors: [AppColors.forestDeep, AppColors.mintSage],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -86,7 +84,7 @@ class _GreetingHeaderSection extends StatelessWidget {
               child: Text(
                 'NRA',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   fontFamily: 'monospace',
@@ -114,7 +112,7 @@ class _GreetingHeaderSection extends StatelessWidget {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.primaryContainer : AppColors.lightPrimary,
+                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -122,7 +120,7 @@ class _GreetingHeaderSection extends StatelessWidget {
                     Text(
                       l10n?.gpuStatusReady ?? 'Vulkan NCNN Ready',
                       style: TextStyle(
-                        color: isDark ? AppColors.primaryContainer : AppColors.lightPrimary,
+                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'monospace',

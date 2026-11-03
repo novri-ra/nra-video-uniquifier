@@ -16,35 +16,38 @@ class ArticleTranslateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return GestureDetector(
       onTap: isTranslating ? null : onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: isTranslated
-              ? const Color(0xFF6C5CE7).withValues(alpha: 0.15)
-              : const Color(0xFF6C5CE7).withValues(alpha: 0.08),
+              ? accent.withValues(alpha: 0.18)
+              : accent.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isTranslated
-                ? const Color(0xFF6C5CE7).withValues(alpha: 0.4)
-                : const Color(0xFF6C5CE7).withValues(alpha: 0.2),
+                ? accent.withValues(alpha: 0.45)
+                : accent.withValues(alpha: 0.25),
           ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isTranslating)
-              const SizedBox(
+              SizedBox(
                 width: 12,
                 height: 12,
-                child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFF6C5CE7)),
+                child: CircularProgressIndicator(strokeWidth: 1.5, color: accent),
               )
             else
               Icon(
                 Icons.translate_rounded,
                 size: 14,
-                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
+                color: accent,
               ),
             const SizedBox(width: 6),
             Text(
@@ -52,7 +55,7 @@ class ArticleTranslateButton extends StatelessWidget {
                   ? 'Menerjemahkan...'
                   : (isTranslated ? 'Tampilkan Asli' : 'Terjemahkan Artikel (ID)'),
               style: TextStyle(
-                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
+                color: accent,
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
               ),
@@ -71,24 +74,26 @@ class ArticleFooterSourceBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF181824) : const Color(0xFFF9FAFB),
+        color: isDark ? AppColors.obsidianDark : AppColors.hairlineBorder,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.verified_outlined, size: 16, color: Color(0xFF10B981)),
+          Icon(Icons.verified_outlined, size: 16, color: iconAccent),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Verified Microstock Guideline • ${article.source}',
               style: TextStyle(
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
                 fontSize: 11,
               ),
             ),

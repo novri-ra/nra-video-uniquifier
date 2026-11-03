@@ -106,7 +106,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
 
   Widget _buildCenterVisual() {
     final ringColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final labelColor = widget.isDark ? Colors.white70 : const Color(0xFF4B5563);
+    final labelColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Center(
       child: Column(
@@ -175,10 +175,10 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = widget.isDark ? AppColors.obsidianDark : Colors.white;
-    final borderColor = widget.isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = widget.isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final titleColor = widget.isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = widget.isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final subColor = widget.isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final accent = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return GestureDetector(
@@ -246,7 +246,7 @@ class _BentoStorageCard extends StatelessWidget {
 
   Widget _buildCenterVisual() {
     final percent = (freeFraction * 100).toInt();
-    final labelColor = isDark ? Colors.white60 : const Color(0xFF6B7280);
+    final labelColor = isDark ? AppColors.outline : AppColors.outline;
 
     return Center(
       child: Column(
@@ -295,8 +295,8 @@ class _BentoStorageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isDark ? AppColors.obsidianDark : Colors.white;
-    final borderColor = isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return Container(

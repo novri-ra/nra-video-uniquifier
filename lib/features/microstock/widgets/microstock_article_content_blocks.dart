@@ -10,6 +10,9 @@ class ArticleMetaTagsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final catAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final metaColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+
     return Wrap(
       spacing: 8,
       runSpacing: 6,
@@ -18,13 +21,13 @@ class ArticleMetaTagsRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
           decoration: BoxDecoration(
-            color: const Color(0xFF6C5CE7).withValues(alpha: 0.16),
+            color: catAccent.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             article.category,
-            style: const TextStyle(
-              color: Color(0xFF9D8DF1),
+            style: TextStyle(
+              color: catAccent,
               fontSize: 10,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -34,7 +37,7 @@ class ArticleMetaTagsRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF2A2A3C) : const Color(0xFFEEF2F6),
+            color: isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Row(
@@ -43,13 +46,13 @@ class ArticleMetaTagsRow extends StatelessWidget {
               Icon(
                 Icons.schedule_rounded,
                 size: 11,
-                color: isDark ? Colors.white60 : Colors.black54,
+                color: metaColor,
               ),
               const SizedBox(width: 4),
               Text(
                 article.readTime,
                 style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black87,
+                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
                   fontSize: 10,
                   fontWeight: FontWeight.w500,
                 ),
@@ -60,14 +63,14 @@ class ArticleMetaTagsRow extends StatelessWidget {
         Text(
           '• ${article.publishedDate}',
           style: TextStyle(
-            color: isDark ? AppColors.outline : const Color(0xFF9CA3AF),
+            color: metaColor,
             fontSize: 11,
           ),
         ),
         Text(
           '• ${article.source}',
           style: TextStyle(
-            color: isDark ? AppColors.outline : const Color(0xFF6B7280),
+            color: metaColor,
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
@@ -85,27 +88,27 @@ class ArticleKeyTakeawaysBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF6C5CE7).withValues(alpha: 0.12)
-            : const Color(0xFFF3F0FF),
+        color: accent.withValues(alpha: isDark ? 0.12 : 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF6C5CE7).withValues(alpha: 0.35)),
+        border: Border.all(color: accent.withValues(alpha: 0.35)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.bolt_rounded, size: 16, color: Color(0xFF9D8DF1)),
-              SizedBox(width: 6),
+            children: [
+              Icon(Icons.bolt_rounded, size: 16, color: accent),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'KEY TAKEAWAYS / REKOMENDASI CEPAT',
                   style: TextStyle(
-                    color: Color(0xFF9D8DF1),
+                    color: accent,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.6,
@@ -119,7 +122,7 @@ class ArticleKeyTakeawaysBox extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: isDark ? const Color(0xFFE5E7EB) : const Color(0xFF374151),
+              color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
               fontSize: 13,
               height: 1.5,
               fontWeight: FontWeight.w500,
@@ -139,27 +142,29 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final specAccent = isDark ? AppColors.skyPastel : AppColors.forestDeep;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF14141E) : const Color(0xFFF8FAFC),
+        color: isDark ? AppColors.obsidianDark : AppColors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
+          color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.tune_rounded, size: 15, color: Color(0xFF38BDF8)),
-              SizedBox(width: 6),
+            children: [
+              Icon(Icons.tune_rounded, size: 15, color: specAccent),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'PARAMETER TEKNIS REKOMENDASI',
                   style: TextStyle(
-                    color: Color(0xFF38BDF8),
+                    color: specAccent,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -176,12 +181,12 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: Color(0xFF38BDF8), fontWeight: FontWeight.bold)),
+                  Text('• ', style: TextStyle(color: specAccent, fontWeight: FontWeight.bold)),
                   Expanded(
                     child: Text(
                       spec,
                       style: TextStyle(
-                        color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF4B5563),
+                        color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
                         fontSize: 12.5,
                         height: 1.45,
                       ),
@@ -204,27 +209,27 @@ class ArticleContributorChecklistBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final checkAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF10B981).withValues(alpha: 0.08)
-            : const Color(0xFFECFDF5),
+        color: checkAccent.withValues(alpha: isDark ? 0.08 : 0.06),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+        border: Border.all(color: checkAccent.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.check_circle_outline_rounded, size: 15, color: Color(0xFF10B981)),
-              SizedBox(width: 6),
+            children: [
+              Icon(Icons.check_circle_outline_rounded, size: 15, color: checkAccent),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)',
                   style: TextStyle(
-                    color: Color(0xFF10B981),
+                    color: checkAccent,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -241,13 +246,13 @@ class ArticleContributorChecklistBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.check_rounded, size: 14, color: Color(0xFF10B981)),
+                  Icon(Icons.check_rounded, size: 14, color: checkAccent),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       item,
                       style: TextStyle(
-                        color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+                        color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
                         fontSize: 12.5,
                         height: 1.45,
                       ),

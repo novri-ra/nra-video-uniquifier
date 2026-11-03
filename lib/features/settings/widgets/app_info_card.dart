@@ -43,8 +43,8 @@ class _AppInfoTitleColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -64,8 +64,8 @@ class _AppInfoPrivacyBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final badgeBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final badgeColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+    final badgeBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final badgeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(

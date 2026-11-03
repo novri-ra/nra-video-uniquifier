@@ -37,6 +37,13 @@ class AppColors {
   static const Color outline = Color(0xFF84958A);
   static const Color outlineVariant = Color(0x1FA3EFD5);
 
+  // Controlled Neutrals (Official)
+  static const Color white = Color(0xFFFFFFFF);
+  static const Color offWhiteCanvas = Color(0xFFF4F7F5);
+  static const Color hairlineBorder = Color(0xFFE2ECE7);
+  static const Color textDark = Color(0xFF121E1B);
+  static const Color textLight = Color(0xFFF2F6F4);
+
   // Status & Error
   static const Color error = Color(0xFFFFB4AB);
   static const Color onError = Color(0xFF690005);
@@ -44,23 +51,23 @@ class AppColors {
   static const Color onErrorContainer = Color(0xFFFFDAD6);
 
   // Light Palette Tokens (High Contrast Editorial Sage & Ivory)
-  static const Color lightScaffoldBackground = Color(0xFFF4F7F5);
-  static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightSurfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color lightSurfaceContainerLow = Color(0xFFF4F7F5);
+  static const Color lightScaffoldBackground = offWhiteCanvas;
+  static const Color lightSurface = white;
+  static const Color lightSurfaceContainerLowest = white;
+  static const Color lightSurfaceContainerLow = offWhiteCanvas;
   static const Color lightSurfaceContainer = Color(0xFFEAF0EC);
   static const Color lightSurfaceContainerHigh = Color(0xFFE2ECE7);
   static const Color lightSurfaceContainerHighest = Color(0xFFD6E3DD);
 
-  static const Color lightPrimary = Color(0xFF0E5535);
-  static const Color lightOnPrimary = Color(0xFFFFFFFF);
-  static const Color lightPrimaryContainer = Color(0xFF0E5535);
-  static const Color lightOnPrimaryContainer = Color(0xFFFFFFFF);
-  static const Color lightSecondary = Color(0xFF10B981);
-  static const Color lightOnSecondary = Color(0xFFFFFFFF);
+  static const Color lightPrimary = forestDeep;
+  static const Color lightOnPrimary = white;
+  static const Color lightPrimaryContainer = forestDeep;
+  static const Color lightOnPrimaryContainer = white;
+  static const Color lightSecondary = forestDeep;
+  static const Color lightOnSecondary = white;
 
-  static const Color lightOnSurface = Color(0xFF121E1B);
+  static const Color lightOnSurface = textDark;
   static const Color lightOnSurfaceVariant = Color(0xFF4B5563);
   static const Color lightOutline = Color(0xFFD1D5DB);
-  static const Color lightOutlineVariant = Color(0xFFE2ECE7);
+  static const Color lightOutlineVariant = hairlineBorder;
 }

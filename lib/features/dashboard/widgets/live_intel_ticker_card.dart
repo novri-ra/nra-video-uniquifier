@@ -95,7 +95,7 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
                   Text(
                     '• REKOMENDASI TERKINI',
                     style: TextStyle(
-                      color: isDark ? AppColors.outline : const Color(0xFF9CA3AF),
+                      color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                       fontSize: 8.5,
                       fontWeight: FontWeight.w600,
                     ),
@@ -130,7 +130,7 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard> with SingleTi
     final source = article?.source ?? 'Adobe Stock Brief';
 
     final bgColor = isDark ? AppColors.obsidianDark : Colors.white;
-    final borderColor = isDark ? const Color(0x1FA3EFD5) : AppColors.lightOutlineVariant;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 

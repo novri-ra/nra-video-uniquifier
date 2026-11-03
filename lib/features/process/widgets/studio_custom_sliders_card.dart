@@ -11,8 +11,10 @@ class StudioCustomSlidersCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderCol = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderCol = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final zoomAccent = isDark ? AppColors.electricIce : AppColors.forestDeep;
+    final trimAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
@@ -27,13 +29,13 @@ class StudioCustomSlidersCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.center_focus_strong, size: 16, color: Color(0xFF6C5CE7)),
+              Icon(Icons.center_focus_strong, size: 16, color: zoomAccent),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'ZOOM & FACE FOCUS (CROP)',
                   style: TextStyle(
-                    color: isDark ? AppColors.outline : const Color(0xFF6B7280),
+                    color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.6,
@@ -44,8 +46,8 @@ class StudioCustomSlidersCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 '${provider.cropZoomScale.toStringAsFixed(2)}x',
-                style: const TextStyle(
-                  color: Color(0xFF6C5CE7),
+                style: TextStyle(
+                  color: zoomAccent,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'monospace',
@@ -55,8 +57,8 @@ class StudioCustomSlidersCard extends StatelessWidget {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: const Color(0xFF6C5CE7),
-              thumbColor: const Color(0xFF6C5CE7),
+              activeTrackColor: zoomAccent,
+              thumbColor: zoomAccent,
               trackHeight: 3,
             ),
             child: Slider(
@@ -76,7 +78,7 @@ class StudioCustomSlidersCard extends StatelessWidget {
               Text(
                 'Anchor: ',
                 style: TextStyle(
-                  color: isDark ? AppColors.outline : const Color(0xFF6B7280),
+                  color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                   fontSize: 11,
                 ),
               ),
@@ -106,13 +108,13 @@ class StudioCustomSlidersCard extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
-                const Icon(Icons.content_cut, size: 15, color: Color(0xFF10B981)),
+                Icon(Icons.content_cut, size: 15, color: trimAccent),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'INTRO TRIM OFFSET (FIRST FRAME CUT)',
                     style: TextStyle(
-                      color: isDark ? AppColors.outline : const Color(0xFF6B7280),
+                      color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.6,
@@ -123,8 +125,8 @@ class StudioCustomSlidersCard extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   '${provider.introTrimOffset.toStringAsFixed(1)}s',
-                  style: const TextStyle(
-                    color: Color(0xFF10B981),
+                  style: TextStyle(
+                    color: trimAccent,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'monospace',
@@ -134,8 +136,8 @@ class StudioCustomSlidersCard extends StatelessWidget {
             ),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: const Color(0xFF10B981),
-                thumbColor: const Color(0xFF10B981),
+                activeTrackColor: trimAccent,
+                thumbColor: trimAccent,
                 trackHeight: 3,
               ),
               child: Slider(
@@ -168,8 +170,8 @@ class _AnchorPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const activeColor = Color(0xFF6C5CE7);
-    final inActiveBg = isDark ? AppColors.surfaceContainerHighest : const Color(0xFFF3F4F6);
+    final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inActiveBg = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
@@ -186,7 +188,7 @@ class _AnchorPill extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: isSelected ? activeColor : (isDark ? Colors.white70 : Colors.black87),
+            color: isSelected ? activeColor : (isDark ? AppColors.textLight : AppColors.textDark),
             fontSize: 10,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),

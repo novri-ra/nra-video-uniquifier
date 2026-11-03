@@ -71,7 +71,7 @@ class AppTheme {
         color: AppColors.obsidianDark,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(color: Color(0x1FA3EFD5), width: 1),
+          side: const BorderSide(color: AppColors.outlineVariant, width: 1),
           borderRadius: BorderRadius.circular(4),
         ),
         margin: EdgeInsets.zero,

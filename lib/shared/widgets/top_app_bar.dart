@@ -61,7 +61,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                 icon: Icon(
                   Icons.arrow_back_ios_new_rounded,
                   size: 18,
-                  color: isDark ? const Color(0xFFF4F4F6) : const Color(0xFF111827),
+                  color: isDark ? AppColors.textLight : AppColors.textDark,
                 ),
                 tooltip: 'Back',
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
@@ -81,7 +81,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                       width: 20,
                       height: 20,
                       colorFilter: ColorFilter.mode(
-                        isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+                        isDark ? AppColors.mintSage : AppColors.forestDeep,
                         BlendMode.srcIn,
                       ),
                     ),
@@ -167,13 +167,9 @@ class _OnlineBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const onlineColor = Color(0xFF10B981);
-    final bg = isDark
-        ? const Color(0xFF064E3B).withValues(alpha: 0.40)
-        : const Color(0xFFECFDF5);
-    final border = isDark
-        ? const Color(0xFF047857)
-        : const Color(0xFFA7F3D0);
+    final onlineColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final bg = onlineColor.withValues(alpha: isDark ? 0.15 : 0.10);
+    final border = onlineColor.withValues(alpha: isDark ? 0.35 : 0.25);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
@@ -188,13 +184,13 @@ class _OnlineBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: onlineColor,
               shape: BoxShape.circle,
             ),
           ),
           const SizedBox(width: 5),
-          const Text(
+          Text(
             'ONLINE',
             style: TextStyle(
               color: onlineColor,
@@ -216,10 +212,10 @@ class _OfflineBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isDark ? AppColors.surfaceContainer : AppColors.lightSurfaceContainer;
-    final border = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final accent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final bg = AppColors.mustardOchre.withValues(alpha: 0.15);
+    final border = AppColors.mustardOchre.withValues(alpha: 0.35);
+    const accent = AppColors.mustardOchre;
+    const textColor = AppColors.mustardOchre;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -234,15 +230,15 @@ class _OfflineBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: accent,
               shape: BoxShape.circle,
             ),
           ),
           const SizedBox(width: 5),
-          Icon(Icons.lock, color: accent, size: 12),
+          const Icon(Icons.lock, color: accent, size: 12),
           const SizedBox(width: 4),
-          Text(
+          const Text(
             'OFFLINE',
             style: TextStyle(
               color: textColor,

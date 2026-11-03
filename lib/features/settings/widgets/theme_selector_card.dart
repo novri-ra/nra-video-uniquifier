@@ -20,7 +20,7 @@ class ThemeSelectorCard extends StatelessWidget {
       children: [
         _ThemeTile(
           icon: Icons.brightness_auto_rounded,
-          iconAccent: const Color(0xFF6C5CE7),
+          iconAccent: AppColors.skyPastel,
           title: l10n?.themeSystem ?? 'System Default',
           subtitle: 'Follows OS dynamic appearance',
           isSelected: current == ThemeMode.system,
@@ -30,7 +30,7 @@ class ThemeSelectorCard extends StatelessWidget {
         Divider(height: 1, color: dividerColor),
         _ThemeTile(
           icon: Icons.light_mode_rounded,
-          iconAccent: const Color(0xFFF59E0B),
+          iconAccent: AppColors.butterYellow,
           title: l10n?.themeLight ?? 'Light Mode',
           subtitle: 'Clean light surface palette',
           isSelected: current == ThemeMode.light,
@@ -40,7 +40,7 @@ class ThemeSelectorCard extends StatelessWidget {
         Divider(height: 1, color: dividerColor),
         _ThemeTile(
           icon: Icons.dark_mode_rounded,
-          iconAccent: const Color(0xFF6366F1),
+          iconAccent: AppColors.mintSage,
           title: l10n?.themeDark ?? 'Dark Mode',
           subtitle: 'Obsidian & charcoal high-contrast palette',
           isSelected: current == ThemeMode.dark,
@@ -71,11 +71,11 @@ class _ThemeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const radioActiveGreen = Color(0xFF10B981);
-    final radioInactive = isDark ? AppColors.outline : const Color(0xFF9CA3AF);
-    final activeTextColor = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final inactiveTextColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final radioActive = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final radioInactive = AppColors.outline;
+    final activeTextColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final inactiveTextColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final effectiveIconColor = isSelected ? activeTextColor : iconAccent;
 
     return InkWell(
@@ -109,7 +109,7 @@ class _ThemeTile extends StatelessWidget {
             ),
             Icon(
               isSelected ? Icons.check_circle_rounded : Icons.radio_button_off,
-              color: isSelected ? radioActiveGreen : radioInactive,
+              color: isSelected ? radioActive : radioInactive,
               size: 18,
             ),
           ],

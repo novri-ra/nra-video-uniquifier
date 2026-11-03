@@ -59,10 +59,10 @@ class _ThumbnailBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final thumbBg = isDark ? AppColors.surfaceContainerLowest : const Color(0xFFF3F4F6);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
-    final checkColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+    final thumbBg = isDark ? AppColors.obsidianBase : AppColors.hairlineBorder;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final checkColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: 72,
@@ -86,7 +86,7 @@ class _ThumbnailBadge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               decoration: BoxDecoration(
-                color: (isDark ? AppColors.surfaceContainerLowest : const Color(0xFF111827)).withValues(alpha: 0.9),
+                color: (isDark ? AppColors.obsidianBase : AppColors.obsidianDark).withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(2),
               ),
               child: const Text('MP4', style: TextStyle(color: Colors.white, fontSize: 8, fontFamily: 'monospace')),
@@ -105,8 +105,8 @@ class _ItemInfoColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final dateColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final dateColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,11 +138,9 @@ class _ItemStatusRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final readyBg = isDark
-        ? AppColors.primaryContainer.withValues(alpha: 0.12)
-        : const Color(0xFF10B981).withValues(alpha: 0.12);
-    final readyColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
-    final readyBorder = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+    final readyColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final readyBg = readyColor.withValues(alpha: 0.12);
+    final readyBorder = readyColor.withValues(alpha: 0.35);
 
     return Row(
       children: [
@@ -190,10 +188,10 @@ class _ItemActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final btnBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
-    final btnBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final shareColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final deleteColor = isDark ? AppColors.error : const Color(0xFFDC2626);
+    final btnBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final btnBorder = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final shareColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    const deleteColor = AppColors.vividCoral;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

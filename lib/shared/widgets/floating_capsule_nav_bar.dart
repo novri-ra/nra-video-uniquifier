@@ -15,8 +15,6 @@ class FloatingCapsuleNavBar extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color primaryPurple = Color(0xFF6C5CE7);
-
   static List<_NavItemData> _navItems(AppLocalizations? l10n) {
     return [
       _NavItemData(
@@ -98,10 +96,10 @@ class _CapsuleContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final capsuleBg = isDark
-        ? AppColors.surfaceContainer.withValues(alpha: 0.88)
-        : const Color(0xFFFFFFFF).withValues(alpha: 0.95);
+        ? AppColors.obsidianDark.withValues(alpha: 0.90)
+        : AppColors.white.withValues(alpha: 0.95);
     final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.12)
+        ? AppColors.outlineVariant
         : AppColors.lightOutlineVariant;
 
     return ClipRRect(
@@ -174,11 +172,11 @@ class _CenterHeroButton extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: FloatingCapsuleNavBar.primaryPurple,
+                color: AppColors.vividCoral,
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: FloatingCapsuleNavBar.primaryPurple.withValues(alpha: 0.40),
+                    color: AppColors.vividCoral.withValues(alpha: 0.40),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -191,14 +189,14 @@ class _CenterHeroButton extends StatelessWidget {
                         width: 22,
                         height: 22,
                         colorFilter: const ColorFilter.mode(
-                          Colors.white,
+                          AppColors.white,
                           BlendMode.srcIn,
                         ),
                       )
                     : Icon(
                         data.fallbackIcon,
                         size: 24,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
               ),
             ),
@@ -225,11 +223,11 @@ class _NavBarItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = isDark
-        ? AppColors.primaryContainer
-        : FloatingCapsuleNavBar.primaryPurple;
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
     final inactiveColor = isDark
-        ? const Color(0xFF6B7280)
-        : const Color(0xFF9CA3AF);
+        ? AppColors.mintSage.withValues(alpha: 0.40)
+        : AppColors.obsidianDark.withValues(alpha: 0.40);
     final iconColor = isSelected ? activeColor : inactiveColor;
 
     return Semantics(

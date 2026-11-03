@@ -29,13 +29,11 @@ class ProfilePlaceholderScreen extends StatelessWidget {
 class _ProfileCard extends StatelessWidget {
   const _ProfileCard();
 
-  static const Color primaryPurple = Color(0xFF6C5CE7);
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
@@ -82,11 +80,14 @@ class _ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Container(
       width: 64,
       height: 64,
       decoration: BoxDecoration(
-        color: _ProfileCard.primaryPurple.withValues(alpha: 0.12),
+        color: accent.withValues(alpha: 0.12),
         shape: BoxShape.circle,
       ),
       child: Center(
@@ -94,7 +95,7 @@ class _ProfileAvatar extends StatelessWidget {
           'assets/people-icon.svg',
           width: 28,
           height: 28,
-          colorFilter: const ColorFilter.mode(_ProfileCard.primaryPurple, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(accent, BlendMode.srcIn),
         ),
       ),
     );
@@ -106,17 +107,20 @@ class _DevelopmentBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _ProfileCard.primaryPurple.withValues(alpha: 0.12),
+        color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: _ProfileCard.primaryPurple.withValues(alpha: 0.3)),
+        border: Border.all(color: accent.withValues(alpha: 0.3)),
       ),
-      child: const Text(
+      child: Text(
         'UNDER ACTIVE DEVELOPMENT',
         style: TextStyle(
-          color: _ProfileCard.primaryPurple,
+          color: accent,
           fontSize: 10,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.8,
@@ -139,7 +143,7 @@ class _DiagnosticsCard extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Test notification sent to system tray'),
-        backgroundColor: Color(0xFF10B981),
+        backgroundColor: AppColors.forestDeep,
         duration: Duration(seconds: 2),
       ),
     );
@@ -148,8 +152,9 @@ class _DiagnosticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -163,7 +168,7 @@ class _DiagnosticsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_active_outlined, color: _ProfileCard.primaryPurple, size: 20),
+              Icon(Icons.notifications_active_outlined, color: accent, size: 20),
               const SizedBox(width: 8),
               Text(
                 'NOTIFICATION DIAGNOSTICS',
@@ -192,8 +197,8 @@ class _DiagnosticsCard extends StatelessWidget {
               icon: const Icon(Icons.send_rounded, size: 16),
               label: const Text('Send Test Notification', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: _ProfileCard.primaryPurple,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.forestDeep,
+                foregroundColor: AppColors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),

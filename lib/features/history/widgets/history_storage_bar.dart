@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:storage_space/storage_space.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class HistoryHeader extends StatelessWidget {
   final int itemCount;
@@ -17,7 +17,7 @@ class HistoryHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final metaColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final metaColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,10 +51,10 @@ class _HistoryHeaderTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final badgeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF3F4F6);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
-    final badgeText = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final badgeBg = isDark ? AppColors.surfaceContainerHigh : AppColors.hairlineBorder;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
+    final badgeText = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -104,8 +104,8 @@ class StorageTelemetryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardBg = isDark ? AppColors.surfaceContainerLow : const Color(0xFFF1F5F9);
-    final borderColor = isDark ? AppColors.surfaceContainerHighest : const Color(0xFFE2E8F0);
+    final cardBg = isDark ? AppColors.obsidianDark : AppColors.white;
+    final borderColor = isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant;
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -139,7 +139,7 @@ class _StorageTopRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final freeColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final freeColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final freeLabel = deviceStorage != null ? '${deviceStorage!.freeSize} FREE' : 'DEVICE STORAGE';
 
     return Row(
@@ -160,9 +160,9 @@ class _SandboxUsedLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final usedColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final usedColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -197,8 +197,8 @@ class _StorageProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final widthFactor = (usageFraction ?? (hasItems ? 0.15 : 0.01)).clamp(0.01, 1.0);
-    final trackBg = isDark ? AppColors.surfaceContainer : const Color(0xFFE2E8F0);
-    final activeBarColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+    final trackBg = isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder;
+    final activeBarColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       height: 4,
@@ -227,7 +227,7 @@ class _StorageBottomTags extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tagColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
+    final tagColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

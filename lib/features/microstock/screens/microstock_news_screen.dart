@@ -111,7 +111,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => _loadNewsFeed(forceRefresh: true),
-        color: const Color(0xFF6C5CE7),
+        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
@@ -151,8 +151,8 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
 
   Widget _buildSliverBody(bool isDark, bool online, List<MicrostockNewsArticle> displayList) {
     if (_isLoading && _allArticles.isEmpty) {
-      return const SliverFillRemaining(
-        child: Center(child: CircularProgressIndicator(color: Color(0xFF6C5CE7))),
+      return SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator(color: isDark ? AppColors.mintSage : AppColors.forestDeep)),
       );
     }
     if (displayList.isEmpty) {
@@ -176,7 +176,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.search_off_rounded, size: 48, color: isDark ? Colors.white24 : Colors.black26),
+            Icon(Icons.search_off_rounded, size: 48, color: isDark ? AppColors.outlineVariant : AppColors.lightOutlineVariant),
             const SizedBox(height: 12),
             Text(
               'Tidak ada berita atau panduan sesuai filter',
@@ -204,8 +204,8 @@ class _FeedHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final subtitleColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF6B7280);
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subtitleColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -233,7 +233,7 @@ class _FeedHeader extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.sync_rounded, size: 20),
-          color: const Color(0xFF6C5CE7),
+          color: isDark ? AppColors.mintSage : AppColors.forestDeep,
           tooltip: 'Sync News Feed',
           onPressed: onRefresh,
           visualDensity: VisualDensity.compact,
@@ -253,7 +253,7 @@ class _StatusDot extends StatelessWidget {
       width: 7,
       height: 7,
       decoration: BoxDecoration(
-        color: isOnline ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+        color: isOnline ? AppColors.mintSage : AppColors.mustardOchre,
         shape: BoxShape.circle,
       ),
     );
