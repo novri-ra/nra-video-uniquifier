@@ -216,6 +216,7 @@ Run each command from Phase 1, capture exit code + last line:
 cd <repo-root>
 <analyze> > 0ai_context/raw/health/analyze.log 2>&1; echo $? > 0ai_context/raw/health/analyze.exit
 <test>    > 0ai_context/raw/health/test.log    2>&1; echo $? > 0ai_context/raw/health/test.exit
+rm -f staged_* # (Cleanup test artifacts agar repo tidak kotor)
 <format>  > 0ai_context/raw/health/format.log  2>&1; echo $? > 0ai_context/raw/health/format.exit
 ```
 
@@ -1127,6 +1128,9 @@ fi
 
 # Check MCP usage
 grep -q "codebase-memory-mcp" 0ai_context/raw/run.md || { echo "MCP_NOT_USED"; FAIL=1; }
+
+# Cleanup test artifacts
+rm -f staged_* # (Cleanup test artifacts agar repo tidak kotor)
 
 if [ $FAIL -ne 0 ]; then
   echo "=== VALIDATION FAILED ==="
