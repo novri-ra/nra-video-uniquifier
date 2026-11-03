@@ -74,7 +74,7 @@ is canonical. NO "fix forward".
 
 ### 3.8 `## Report back` — MANDATORY
 What the executor must return. Structured format that enables before/after
-comparison. WAJIB mencetak `git status --short` di terminal agar user tahu file yang berubah. AI Chat WAJIB menginstruksikan Executor untuk mengembalikan output dalam format key-value (status, report, task_status, tests_status, git_status, next). Dilarang menggunakan teks paragraf bebas.
+comparison. WAJIB mencetak `git status --short` di terminal agar user tahu file yang berubah. AI Chat WAJIB menginstruksikan Executor untuk mengembalikan output dalam format key-value (status, summary, report, task_status, tests_status, git_status, next). Dilarang menggunakan teks paragraf bebas. Field `summary` WAJIB menggunakan format bullet points (minimal 3 poin) yang menjelaskan aksi spesifik (file yang disentuh, isu yang ditemukan, atau keputusan yang diambil), bukan sekadar kalimat umum.
 
 ## 4. Validation Rules (for executors)
 

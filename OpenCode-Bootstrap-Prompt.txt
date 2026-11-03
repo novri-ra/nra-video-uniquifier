@@ -1189,8 +1189,13 @@ Mark run complete: `raw/run.md` → `Mode: complete`.
 Reply to user in Bahasa Indonesia (Terse Caveman rule):
 
 ```
-=== OUTPUT RINGKAS TERMINAL ===
+=== EXECUTION SUMMARY ===
 status: done | failed
+summary:
+  - <Detail langkah 1: misal "Memindai 89 file Dart.">
+  - <Detail langkah 2: misal "Mendeteksi 3 P1 dan 2 P2 issues.">
+  - <Detail langkah 3: misal "Mengabaikan AUDIT-001 karena sudah ada di fix report.">
+  - <Detail langkah 4: misal "Membuat 04-audit.md dan update HANDOFF.md.">
 report: 0ai_context/reports/<next_n>-<slug>.md
 target_audit: <AUDIT-ID>
 task_1_status: true | false
@@ -1199,7 +1204,7 @@ tests_status: <pass/fail count, analyze status>
 git_status:
 <output dari perintah git status --short>
 next: <1 kalimat aksi selanjutnya>
-=== END OUTPUT ===
+=== END SUMMARY ===
 
 === MAPPING SELESAI ===
 
