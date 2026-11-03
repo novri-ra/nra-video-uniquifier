@@ -57,7 +57,7 @@ void main() {
       final initCall = capturedNotificationsCalls.firstWhere((call) => call.method == 'initialize');
       expect(initCall.arguments, isNotNull);
       final args = Map<String, dynamic>.from(initCall.arguments as Map);
-      expect(args['defaultIcon'], equals('@mipmap/launcher_icon'));
+      expect(args['defaultIcon'], equals('@mipmap/ic_launcher'));
     });
 
     test('requestPermission invokes checkPermissionStatus on permission channel and returns true', () async {
@@ -86,7 +86,7 @@ void main() {
       expect(specifics['showProgress'], isTrue);
       expect(specifics['progress'], equals(50));
       expect(specifics['ongoing'], isTrue);
-      expect(specifics['icon'], equals('@drawable/notification_icon'));
+      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
     });
 
     test('showProgressNotification allows 0% and 100% to bypass throttling without force', () async {
@@ -147,7 +147,25 @@ void main() {
       final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
       expect(specifics['playSound'], isTrue);
       expect(specifics['channelId'], equals(NotificationService.completeChannelId));
-      expect(specifics['icon'], equals('@drawable/notification_icon'));
+      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+    });
+
+    test('showTestNotification invokes show with testNotificationId and channel', () async {
+      await NotificationService.showTestNotification(
+        title: 'Diagnostic Test',
+        body: 'Testing Android 13+ channel binding',
+      );
+
+      final showCalls = capturedNotificationsCalls.where((call) => call.method == 'show').toList();
+      expect(showCalls.isNotEmpty, isTrue);
+      final testCall = showCalls.last;
+      final args = Map<String, dynamic>.from(testCall.arguments as Map);
+      expect(args['id'], equals(NotificationService.testNotificationId));
+      expect(args['title'], equals('Diagnostic Test'));
+      expect(args['body'], equals('Testing Android 13+ channel binding'));
+      final specifics = Map<String, dynamic>.from(args['platformSpecifics'] as Map);
+      expect(specifics['channelId'], equals(NotificationService.mainChannelId));
+      expect(specifics['icon'], equals('@mipmap/ic_launcher'));
     });
   });
 }

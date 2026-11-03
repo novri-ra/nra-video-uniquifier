@@ -5,6 +5,7 @@ import '../../../core/services/translation_service.dart';
 import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
 import 'microstock_article_content_blocks.dart';
+import 'microstock_article_footer_widgets.dart';
 
 /// Full article reader modal bottom sheet for Microstock Intel & Trends.
 class MicrostockArticleSheet extends StatefulWidget {
@@ -241,7 +242,7 @@ class _ArticleContentList extends StatelessWidget {
           ArticleContributorChecklistBox(items: displayChecklist, isDark: isDark),
         ],
         const SizedBox(height: 24),
-        _FooterSourceBox(article: article, isDark: isDark),
+        ArticleFooterSourceBox(article: article, isDark: isDark),
       ],
     );
   }
@@ -305,11 +306,10 @@ class _ActionToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _TranslateButton(
+        ArticleTranslateButton(
           isTranslated: isTranslated,
           isTranslating: isTranslating,
           onTap: onTranslateToggle,
-          isDark: isDark,
         ),
         const Spacer(),
         TextButton.icon(
@@ -322,102 +322,6 @@ class _ActionToolbar extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TranslateButton extends StatelessWidget {
-  final bool isTranslated;
-  final bool isTranslating;
-  final VoidCallback onTap;
-  final bool isDark;
-
-  const _TranslateButton({
-    required this.isTranslated,
-    required this.isTranslating,
-    required this.onTap,
-    required this.isDark,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final btnBg = isDark ? const Color(0xFF2A2A3C) : const Color(0xFFF3F4F6);
-    return InkWell(
-      onTap: isTranslating ? null : onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: isTranslated ? const Color(0xFF6C5CE7).withValues(alpha: 0.2) : btnBg,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isTranslated ? const Color(0xFF6C5CE7) : Colors.transparent,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isTranslating)
-              const SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(strokeWidth: 1.5, color: Color(0xFF6C5CE7)),
-              )
-            else
-              Icon(
-                Icons.translate_rounded,
-                size: 14,
-                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
-              ),
-            const SizedBox(width: 6),
-            Text(
-              isTranslating
-                  ? 'Menerjemahkan...'
-                  : (isTranslated ? 'Tampilkan Asli' : 'Terjemahkan Artikel (ID)'),
-              style: TextStyle(
-                color: isTranslated ? const Color(0xFF9D8DF1) : const Color(0xFF6C5CE7),
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FooterSourceBox extends StatelessWidget {
-  final MicrostockNewsArticle article;
-  final bool isDark;
-  const _FooterSourceBox({required this.article, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF181824) : const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant,
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.verified_outlined, size: 16, color: Color(0xFF10B981)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Verified Microstock Guideline • ${article.source}',
-              style: TextStyle(
-                color: isDark ? Colors.white60 : Colors.black54,
-                fontSize: 11,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

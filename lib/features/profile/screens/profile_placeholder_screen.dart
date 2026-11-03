@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 
@@ -14,7 +15,11 @@ class ProfilePlaceholderScreen extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 96),
-          children: const [_ProfileCard()],
+          children: const [
+            _ProfileCard(),
+            SizedBox(height: 16),
+            _DiagnosticsCard(),
+          ],
         ),
       ),
     );
@@ -117,6 +122,84 @@ class _DevelopmentBadge extends StatelessWidget {
           letterSpacing: 0.8,
           fontFamily: 'monospace',
         ),
+      ),
+    );
+  }
+}
+
+class _DiagnosticsCard extends StatelessWidget {
+  const _DiagnosticsCard();
+
+  Future<void> _testNotification(BuildContext context) async {
+    await NotificationService.showTestNotification(
+      title: 'NRA Uniquifier Test',
+      body: 'Notifikasi Android 13+ channel berhasil aktif!',
+    );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Test notification sent to system tray'),
+        backgroundColor: Color(0xFF10B981),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.notifications_active_outlined, color: _ProfileCard.primaryPurple, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'NOTIFICATION DIAGNOSTICS',
+                style: TextStyle(
+                  color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Test native Android 13+ channel binding and alert triggers.',
+            style: TextStyle(
+              color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () => _testNotification(context),
+              icon: const Icon(Icons.send_rounded, size: 16),
+              label: const Text('Send Test Notification', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _ProfileCard.primaryPurple,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

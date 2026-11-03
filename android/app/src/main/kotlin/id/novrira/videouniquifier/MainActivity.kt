@@ -51,6 +51,15 @@ class MainActivity : FlutterActivity() {
             ).apply {
                 description = "Alerts when video processing finishes"
             }
+            val uniquifierChannel = NotificationChannel(
+                "nra_uniquifier_channel",
+                "NRA Uniquifier Processing",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifikasi status proses video dan ekspor aset"
+                enableVibration(true)
+            }
+            notificationManager?.createNotificationChannel(uniquifierChannel)
             notificationManager?.createNotificationChannel(processChannel)
             notificationManager?.createNotificationChannel(completeChannel)
         }

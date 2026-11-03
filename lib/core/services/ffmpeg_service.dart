@@ -44,9 +44,8 @@ class FfmpegService {
       enableHorizontalFlip: enableHorizontalFlip, enableAggressiveAudio: enableAggressiveAudio,
       isPortrait: isPortrait, enableBlurredCanvas: enableBlurredCanvas, canvasScalePercent: canvasScalePercent,
       muteOriginalAudio: muteOriginalAudio, enableDynamicZoom: enableDynamicZoom,
-      enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip,
-      enableChromaShift: enableChromaShift, modifyAudio: modifyAudio, variations: variations,
-      targetFps: targetFps, saturationLevel: saturationLevel,
+      enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift,
+      modifyAudio: modifyAudio, variations: variations, targetFps: targetFps, saturationLevel: saturationLevel,
       cropZoomScale: cropZoomScale, cropAnchor: cropAnchor,
     );
     buffer.write(' "${_escapePath(outputPath)}"');
@@ -82,16 +81,10 @@ class FfmpegService {
     required bool modifyAudio, VideoVariations? variations, int? targetFps, double? saturationLevel,
     double cropZoomScale = 1.0, String cropAnchor = 'center',
   }) {
-    VideoVariations vars;
-    try {
-      vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
-    } catch (_) {
-      vars = VideoVariations.fallback;
-    }
+    final vars = variations ?? (enableDeepAntiFingerprint ? VariationGenerator.generate() : VideoVariations.fallback);
     final hasVisual = modifyVisuals || shouldUpscale || enableHorizontalFlip || enableBlurredCanvas ||
         enableDynamicZoom || enableMicroOverlay || enableFrameSkip || enableChromaShift;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
-
     final isHighRes = targetResolution == TargetResolution.r2k || targetResolution == TargetResolution.r4k;
     final effectiveFps = isHighRes ? 30 : (targetFps ?? 30);
 
@@ -184,12 +177,9 @@ class FfmpegService {
     } catch (_) {
       try {
         final dirs = await getExternalStorageDirectories(type: StorageDirectory.movies);
-        final fallbackDir = (dirs != null && dirs.isNotEmpty)
-            ? Directory('${dirs.first.path}/Uniquifier')
-            : Directory('${(await getApplicationDocumentsDirectory()).path}/Movies/Uniquifier');
-        if (!fallbackDir.existsSync()) fallbackDir.createSync(recursive: true);
-        final fileName = destinationPath.split(RegExp(r'[/\\]')).last;
-        final fallbackPath = '${fallbackDir.path}/$fileName';
+        final fb = (dirs != null && dirs.isNotEmpty) ? dirs.first.path : (await getApplicationDocumentsDirectory()).path;
+        final fallbackDir = Directory('$fb/Movies/Uniquifier')..createSync(recursive: true);
+        final fallbackPath = '${fallbackDir.path}/${destinationPath.split(RegExp(r"[/\\]")).last}';
         await File(stagedPath).copy(fallbackPath);
         return fallbackPath;
       } catch (_) {
@@ -214,9 +204,7 @@ class FfmpegService {
       if (info != null) {
         final durMs = ((double.tryParse(info.getDuration() ?? '') ?? 0.0) * 1000).toInt();
         for (final s in info.getStreams()) {
-          if (s.getType() == 'video') {
-            return (durationMs: durMs, width: s.getWidth() ?? 0, height: s.getHeight() ?? 0);
-          }
+          if (s.getType() == 'video') return (durationMs: durMs, width: s.getWidth() ?? 0, height: s.getHeight() ?? 0);
         }
         return (durationMs: durMs, width: 0, height: 0);
       }
@@ -269,6 +257,15 @@ class FfmpegService {
     await WakeLockService.acquire();
     try {
       return await _executeAndExport(command: command, stagedOutputPath: stagedOut, effectiveInput: meta.effectiveInput, finalDestPath: finalDest, suppressCompleteNotification: suppressCompleteNotification);
+    } catch (e) {
+      if (!suppressCompleteNotification) {
+        final lang = await SettingsService.getAppLanguageCode();
+        final isCancel = e.toString().toLowerCase().contains('cancel');
+        final title = isCancel ? (lang == 'en' ? 'Export Canceled' : 'Ekspor Dibatalkan') : (lang == 'en' ? 'Export Failed' : 'Ekspor Gagal');
+        final body = isCancel ? (lang == 'en' ? 'Rendering was canceled' : 'Proses rendering dibatalkan') : (lang == 'en' ? 'Rendering failed' : 'Terjadi kesalahan saat rendering');
+        await NotificationService.showCompleteNotification(title: title, body: body, success: false);
+      }
+      rethrow;
     } finally {
       await _cleanupAfterProcess(meta: meta, stagedOut: stagedOut, finalDest: finalDest, inputPath: inputPath, onProgress: onProgress != null, onLog: onLog != null);
     }
@@ -284,10 +281,8 @@ class FfmpegService {
     if (onLog) FFmpegKitConfig.enableLogCallback(null);
     await NotificationService.cancelProgressNotification(101);
     _deletePartialFile(stagedOut, sourcePath: meta.effectiveInput);
-    if (meta.stagedFile != null && meta.stagedFile!.existsSync()) {
-      try {
-        if (meta.stagedFile!.path != finalDest && meta.stagedFile!.path != inputPath) meta.stagedFile!.deleteSync();
-      } catch (_) {}
+    if (meta.stagedFile != null && meta.stagedFile!.existsSync() && meta.stagedFile!.path != finalDest && meta.stagedFile!.path != inputPath) {
+      try { meta.stagedFile!.deleteSync(); } catch (_) {}
     }
   }
 
@@ -315,8 +310,7 @@ class FfmpegService {
     if (percent < 15) return 'Inisialisasi & filter awal...';
     if (percent < 40) return 'Transformasi visual & anti-fingerprint...';
     if (percent < 80) return 'Encoding video stream & scaling...';
-    if (percent < 95) return 'Muxing audio & normalisasi...';
-    return 'Finalisasi ekspor & galeri...';
+    return percent < 95 ? 'Muxing audio & normalisasi...' : 'Finalisasi ekspor & galeri...';
   }
 
   static void _setupCallbacks({
@@ -386,12 +380,9 @@ class FfmpegService {
       if (ReturnCode.isCancel(returnCode)) throw Exception('FFmpeg execution was canceled');
 
       final logs = await session.getAllLogsAsString();
-      final failStackTrace = await session.getFailStackTrace();
-      final buffer = StringBuffer('FFmpeg failed with code $returnCode');
-      if (failStackTrace != null && failStackTrace.trim().isNotEmpty) buffer.write('\n\nStack trace:\n$failStackTrace');
-      if (logs != null && logs.trim().isNotEmpty) buffer.write('\n\nExecution logs:\n$logs');
-      debugPrint(buffer.toString());
-      throw Exception(buffer.toString());
+      final err = 'FFmpeg failed with code $returnCode${logs != null ? '\n$logs' : ''}';
+      debugPrint(err);
+      throw Exception(err);
     } catch (_) {
       _deletePartialFile(outputPath, sourcePath: sourcePath);
       rethrow;
