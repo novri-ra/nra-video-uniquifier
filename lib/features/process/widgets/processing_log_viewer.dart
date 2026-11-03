@@ -25,6 +25,9 @@ class ProcessingLogViewer extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final cardColor = isDark ? AppColors.surface : AppColors.white;
+        final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
         final isBounded = constraints.hasBoundedHeight;
         final logBox = _TerminalLogBox(logs: displayLogs);
 
@@ -32,19 +35,19 @@ class ProcessingLogViewer extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: cardColor,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.surfaceContainerHighest),
+            border: Border.all(color: borderColor),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _TelemetryRow(label: 'SOURCE', value: '$fileName ($duration)'),
-              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              Divider(color: borderColor, height: 16),
               _TelemetryRow(label: 'EXECUTION TIME', value: '$executionTime / Est. $estimatedRemaining'),
-              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              Divider(color: borderColor, height: 16),
               const _SandboxStateRow(),
-              const Divider(color: AppColors.surfaceContainerHighest, height: 16),
+              Divider(color: borderColor, height: 16),
               if (isBounded)
                 Expanded(child: logBox)
               else
@@ -183,21 +186,26 @@ class _TerminalLogBoxState extends State<_TerminalLogBox> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final boxBg = isDark ? AppColors.surfaceContainerLowest : AppColors.offWhiteCanvas;
+    final boxBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final logTextColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
+        color: boxBg,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: boxBorder),
       ),
       child: SingleChildScrollView(
         controller: _scrollController,
         physics: const ClampingScrollPhysics(),
         child: Text(
           widget.logs,
-          style: const TextStyle(
-            color: AppColors.onSurfaceVariant,
+          style: TextStyle(
+            color: logTextColor,
             fontSize: 9,
             fontFamily: 'monospace',
           ),

@@ -472,8 +472,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.text('PENGATURAN'), findsOneWidget);
-      expect(find.text('BAHASA'), findsOneWidget);
+      expect(find.text('SETTINGS'), findsOneWidget);
+      expect(find.text('LANGUAGE'), findsOneWidget);
 
       // Tap leading back button in SettingsScreen pops back to previous screen
       final backButton = find.byTooltip('Back');
@@ -482,7 +482,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.text('PENGATURAN'), findsNothing);
+      expect(find.text('SETTINGS'), findsNothing);
       expect(find.text('WORKSTATION PROFILE'), findsOneWidget);
     });
 

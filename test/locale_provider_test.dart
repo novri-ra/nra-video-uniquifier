@@ -15,24 +15,24 @@ void main() {
   });
 
   group('LocaleProvider and i18n Localization Tests', () {
-    test('Default language code is id and persists to SharedPreferences', () async {
+    test('Default language code is en and persists to SharedPreferences', () async {
       final provider = LocaleProvider();
-      expect(provider.languageCode, equals('id'));
-      expect(provider.currentLocale.languageCode, equals('id'));
-
-      await provider.changeLanguage('en');
       expect(provider.languageCode, equals('en'));
-      expect(await SettingsService.getAppLanguageCode(), equals('en'));
+      expect(provider.currentLocale.languageCode, equals('en'));
 
       await provider.changeLanguage('id');
       expect(provider.languageCode, equals('id'));
       expect(await SettingsService.getAppLanguageCode(), equals('id'));
+
+      await provider.changeLanguage('en');
+      expect(provider.languageCode, equals('en'));
+      expect(await SettingsService.getAppLanguageCode(), equals('en'));
     });
 
     test('Invalid language code is ignored', () async {
       final provider = LocaleProvider();
       await provider.changeLanguage('fr');
-      expect(provider.languageCode, equals('id'));
+      expect(provider.languageCode, equals('en'));
     });
 
     testWidgets('AppTitle remains static NRA Video Uniquifier in both ID and EN', (tester) async {
@@ -73,6 +73,10 @@ void main() {
       }
 
       await tester.pumpWidget(buildLocalizedApp());
+      await tester.pumpAndSettle();
+
+      // Switch to ID first to test Indonesian strings
+      await localeProvider.changeLanguage('id');
       await tester.pumpAndSettle();
 
       // ID Assertions

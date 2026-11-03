@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/bento_metric_grid.dart';
@@ -52,11 +51,25 @@ class DashboardScreen extends StatelessWidget {
 class _GreetingHeaderSection extends StatelessWidget {
   const _GreetingHeaderSection();
 
+  String _getTimeGreeting(int hour) {
+    if (hour >= 5 && hour < 12) return 'Good Morning, Creator';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon, Creator';
+    if (hour >= 17 && hour < 21) return 'Good Evening, Creator';
+    return 'Good Night, Creator';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context);
+    final hour = DateTime.now().hour;
+    final greeting = _getTimeGreeting(hour);
+    final isHw = context.select<UniquifierProvider, bool>((p) => p.hardwareAcceleration);
+
+    final statusColor = isHw
+        ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
+        : (isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant);
+    final statusText = isHw ? 'Hardware Engine Active' : 'CPU Efficiency Engine';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -98,7 +111,7 @@ class _GreetingHeaderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n?.greetingTitle ?? 'Welcome, Creator',
+                  greeting,
                   style: TextStyle(
                     color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
                     fontSize: 14,
@@ -112,15 +125,15 @@ class _GreetingHeaderSection extends StatelessWidget {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                        color: statusColor,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      l10n?.gpuStatusReady ?? 'Vulkan NCNN Ready',
+                      '• $statusText',
                       style: TextStyle(
-                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                        color: statusColor,
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'monospace',

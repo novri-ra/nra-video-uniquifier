@@ -3,7 +3,7 @@ import '../services/settings_service.dart';
 
 /// Provider for dynamic application language switching and persistence.
 class LocaleProvider extends ChangeNotifier {
-  Locale _currentLocale = const Locale('id');
+  Locale _currentLocale = const Locale('en');
 
   LocaleProvider() {
     _loadSavedLocale();

@@ -167,7 +167,7 @@ class _OptionRowContent extends StatelessWidget {
                   ),
                   if (warningTag != null) ...[
                     const SizedBox(width: 6),
-                    _WarningBadge(label: warningTag!),
+                    _WarningBadge(label: warningTag!, isDark: isDark),
                   ],
                 ],
               ),
@@ -218,23 +218,39 @@ class _RadioIndicator extends StatelessWidget {
 
 class _WarningBadge extends StatelessWidget {
   final String label;
-  const _WarningBadge({required this.label});
+  final bool isDark;
+  const _WarningBadge({required this.label, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = isDark
+        ? AppColors.vividCoral.withValues(alpha: 0.20)
+        : AppColors.vividCoral.withValues(alpha: 0.12);
+    final borderColor = isDark
+        ? AppColors.vividCoral.withValues(alpha: 0.40)
+        : AppColors.vividCoral.withValues(alpha: 0.30);
+    const textColor = AppColors.vividCoral;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
       decoration: BoxDecoration(
-        color: AppColors.errorContainer.withValues(alpha: 0.3),
+        color: bgColor,
         borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
+        border: Border.all(color: borderColor),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.warning, color: AppColors.error, size: 9),
+          const Icon(Icons.warning, color: textColor, size: 9),
           const SizedBox(width: 2),
-          Text(label, style: const TextStyle(color: AppColors.error, fontSize: 9, fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: textColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
