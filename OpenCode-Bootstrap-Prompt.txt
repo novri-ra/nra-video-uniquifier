@@ -1188,22 +1188,21 @@ Mark run complete: `raw/run.md` → `Mode: complete`.
 
 Reply to user in Bahasa Indonesia (Terse Caveman rule):
 
+PENTING: Jangan menyalin teks di dalam tanda kurung (). Isi ringkasan `summary` HANYA dengan tindakan nyata yang baru saja kamu eksekusi (file apa yang dibuat/diubah).
+
 ```
 === EXECUTION SUMMARY ===
 status: done | failed
 summary:
-  - <Detail langkah 1: misal "Memindai 89 file Dart.">
-  - <Detail langkah 2: misal "Mendeteksi 3 P1 dan 2 P2 issues.">
-  - <Detail langkah 3: misal "Mengabaikan AUDIT-001 karena sudah ada di fix report.">
-  - <Detail langkah 4: misal "Membuat 04-audit.md dan update HANDOFF.md.">
-report: 0ai_context/reports/<next_n>-<slug>.md
-target_audit: <AUDIT-ID>
-task_1_status: true | false
-task_2_status: true | false
-tests_status: <pass/fail count, analyze status>
+  - (Tuliskan aksi nyata pertama yang kamu lakukan)
+  - (Tuliskan aksi nyata kedua yang kamu lakukan)
+  - (Tuliskan aksi nyata ketiga yang kamu lakukan)
+phases_completed: (jumlah langkah) / (total langkah)
+report: 0ai_context/reports/<next_n>-<slug>.md | none
+tests_status: (hasil analyze/test)
 git_status:
-<output dari perintah git status --short>
-next: <1 kalimat aksi selanjutnya>
+(Jalankan git status --short dan tempel output aslinya)
+next: (Tuliskan saran 1 kalimat)
 === END SUMMARY ===
 
 === MAPPING SELESAI ===
