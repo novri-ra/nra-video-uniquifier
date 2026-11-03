@@ -1,27 +1,25 @@
 {
   "name": "nra_video_uniquifier",
-  "version": "2.0.0+72",
-  "generated_at": "2026-11-04T01:38:00+07:00",
-  "commit": "de2fc36f1994ecdb35df3b0a3d989517554a9630",
+  "version": "2.0.0",
+  "generated_at": "2026-11-04T00:00:00Z",
+  "commit": "c1db18f1261bacb0580d8319cdc47413c9598e12",
   "stack": {
-    "detected": ["Dart", "Kotlin", "Swift", "C++", "JavaScript"],
-    "primary": "Dart"
+    "detected": ["dart", "flutter"],
+    "primary": "dart"
   },
   "modules": [
-    "core/models",
     "core/providers",
     "core/services",
     "core/theme",
     "features/dashboard",
     "features/process",
-    "features/batch",
     "features/history",
-    "features/microstock",
     "features/settings",
-    "shared/widgets"
+    "features/microstock"
   ],
-  "reports": ["01-audit.md", "02-out-of-scope.md"],
+  "reports": [
+    "01-audit.md"
+  ],
   "handoff": "HANDOFF.md",
-  "prompt_spec": "OPENCODE-PROMPT-SPEC.md",
   "run_mode": "BOOTSTRAP"
 }

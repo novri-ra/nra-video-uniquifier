@@ -3,63 +3,60 @@
 ## 1. Repository Identity
 - Name: `nra_video_uniquifier`
 - Root: `C:/Users/Administrator/Saved Games/_Project/nra_video_uniquifier`
-- Primary language: `Dart`
+- Primary language: `dart`
 - Stack: `Flutter 3.47.8 / Dart 3.13.7`
 
 ## 2. Working Tree State
 - Branch: `development`
-- Head commit: `de2fc36f1994ecdb35df3b0a3d989517554a9630`
+- Head commit: `c1db18f1261bacb0580d8319cdc47413c9598e12`
 - Clean tree: yes
 - Pre-existing changes: none
 
 ## 3. Git History Snapshot (14 days)
-Top commits:
-- `de2fc36 2026-11-04 feat(webhook): add Google Sheets webhook deployment guide and Apps Script for telemetry`
-- `82a164f 2026-11-03 delete: Remove archived sprint reports and project context documentation`
-- `acf834a 2026-11-03 feat: Add sprint reports for sprints 91 to 97 and archive historical reports`
-- `b175c20 2026-11-03 fix(history): isolate exports, fix thumbnails, clean workspace, and target arm64 single build`
-- `e6b62aa 2026-11-03 fix(process): correct pipeline step label contrast and apply vivid coral accent to active step line`
-- `4d35c82 2026-11-03 feat(process): wire real processing stage tracker step index in processing screen`
-- `ce0df20 2026-11-03 fix(theme): update pipeline stage step text styling for editorial design language compliance`
-- `04ec471 2026-11-03 feat(l10n): add localized strings for processing stage tracker and engine state strip`
-- `aa487eb 2026-11-03 test: add unit and widget test suite for processing stage tracker in dark and light modes`
-- `0a84d49 2026-11-03 feat(ui): replace static text step tracker with dynamic 5-stage progress indicator`
+Recent Commits:
+- c1db18f chore(ai): remove 0ai_context completely for fresh bootstrap
+- eae9ca1 docs(changelog): record initial baseline and project context initialization
+- 4945417 docs(context): regenerate context packet and audit report
+- e231459 docs(changelog): record initial baseline and project context initialization
+- cfae1ca docs(context): regenerate context packet and audit report
+- 7d997f7 docs(context): regenerate context packet and audit report
+- 341f2a3 docs(context): regenerate context packet and audit report
+- 78c3b73 docs(context): regenerate context packet and audit report
+- 4a53da2 docs(context): regenerate context packet and audit report
+- a4a974b docs(context): regenerate context packet and audit report
 
-Top changed files:
-- `46 0ai_context/STATE.md`
-- `34 lib/core/services/ffmpeg_service.dart`
-- `32 test/ffmpeg_service_test.dart`
-- `26 0ai_context/reports/INDEX.md`
-- `25 lib/features/process/screens/processing_screen.dart`
-- `25 test/widget_test.dart`
-- `24 lib/core/providers/uniquifier_provider.dart`
-- `20 lib/core/services/settings_service.dart`
-- `18 lib/core/services/filter_builders.dart`
-- `17 lib/features/process/widgets/modifiers_card.dart`
+Top Churn Files:
+- 4 OpenCode-Bootstrap-Prompt.txt
+- 3 0ai_context/OPENCODE-PROMPT-SPEC.md
+- 2 lib/core/services/notification_service.dart
+- 2 lib/core/services/ffmpeg_service.dart
+- 2 lib/core/services/microstock_news_service.dart
+- 2 CHANGELOG.md
+- 2 lib/core/providers/uniquifier_provider.dart
+- 2 lib/core/services/device_capability_service.dart
+- 2 lib/features/process/screens/processing_screen.dart
+- 2 test/notification_service_test.dart
 
 ## 4. Health Summary
-- Analyze: exit 0, No issues found!
+- Analyze: exit 0 (0 issues found)
 - Test: 173/173 passed
-- Format: 89 files unformatted (exit 1)
+- Format: 0 files unformatted
 
 ## 5. Graph Index Health
 - Project: `C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier`
 - Status: ready
-- Revision: `de2fc36f1994ecdb35df3b0a3d989517554a9630`
-- Nodes: 1671; Edges: 4755; Files: 185
+- Revision: `c1db18f1261bacb0580d8319cdc47413c9598e12`
+- Nodes: 1660; Edges: 4607; Files: 185
 
 ## 6. Active Milestones & Goals
-- Microstock automation and telemetry sync via Google Apps Script webhook
-- UI polishing and stage tracking adherence to Editorial Architecture Design Tokens
-- Maintaining 100% test pass rate across unit and responsive smoke tests
+- Release v2.0.0 baseline preparation and production stabilization.
 
 ## 7. In-Flight Work
-- Context mapping and baseline audit documentation under `0ai_context/`
+- Context mapping, documentation hardening, and codebase health verification.
 
 ## 8. Completed Work
-- Dynamic 5-stage pipeline progress indicator (Sprint 96)
-- Webhook deployment and live Apps Script integration for metadata vault telemetry
-- Single-architecture arm64 release configuration and workspace cleanup
+- Verified all 173 test cases across UI widgets and FFmpeg services.
+- Confirmed zero static analysis issues across Flutter codebase.
 
 ## 9. Blockers & Impediments
 None currently blocking.
@@ -71,21 +68,19 @@ None recorded.
 None recorded.
 
 ## 12. Structural Debt
-- High fan-in symbols: `AppColors` (169), `AppLocalizations.of` (98), `SettingsService` (50), `UniquifierProvider` (31), `TargetResolution` (26)
-- Co-change coupling pairs (score 1.0): `uniquifier_provider.dart` ↔ `settings_service_test.dart`, `ffmpeg_service.dart` ↔ `variation_generator.dart`, `ncnn_sr_jni.cpp` ↔ `ffmpeg_service.dart`
-- Cycles: 0 cycles detected
-- Monolithic files: `test/ffmpeg_service_test.dart` (737 LOC), `test/widget_test.dart` (575 LOC), `lib/l10n/app_localizations.dart` (489 LOC)
+- High fan-in symbols: `AppColors` (169), `SettingsService` (50), `AppLocalizations` (27), `TargetResolution` (19), `UpscaleEngine` (17), `FfmpegService` (12), `UniquifierProvider` (10).
+- God-classes: `FfmpegService` (699 lines), `UniquifierProvider` (605 lines).
 
 ## 13. Security & Safety Risks
-- Hardcoded external storage paths (`/storage/emulated/0/Movies/Uniquifier`) in `lib/core/services/ffmpeg_service.dart:149` and `lib/core/services/history_service.dart:46`
-- Silent exception swallowing (`catch (_) {}`) across critical service paths (`storage_service.dart:41`, `ffmpeg_service.dart:293`, `uniquifier_provider.dart:138`)
+- AUDIT-20261104-001 (P1): `lib/core/services/ffmpeg_service.dart:227` — Swallowed exception in media processing.
+- AUDIT-20261104-002 (P1): `lib/core/providers/uniquifier_provider.dart:97` — Unhandled exception during provider init.
 
 ## 14. Missing / Unverified
 None recorded.
 
 ## 15. Deferred Tasks & Shortcuts
-- StatFS free space check on Android uses temp directory write test shortcut in `StorageService.hasEnoughSpace`
+None currently deferred.
 
 ## 16. Append-Only Chronology
 ### 2026-11-04
-- Executed context mapping run v6.0; captured health baseline (173/173 tests passing, format gate failure on 89 files)
+- Context bootstrap run completed cleanly with full test pass.

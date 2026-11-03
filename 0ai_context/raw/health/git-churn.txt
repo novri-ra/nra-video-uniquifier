@@ -1,0 +1,10 @@
+﻿4 OpenCode-Bootstrap-Prompt.txt
+3 0ai_context/OPENCODE-PROMPT-SPEC.md
+2 lib/core/services/notification_service.dart
+2 lib/core/services/ffmpeg_service.dart
+2 lib/core/services/microstock_news_service.dart
+2 CHANGELOG.md
+2 lib/core/providers/uniquifier_provider.dart
+2 lib/core/services/device_capability_service.dart
+2 lib/features/process/screens/processing_screen.dart
+2 test/notification_service_test.dart

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "AUDIT-20261104-001",
+    "severity": "P1",
+    "category": "correctness",
+    "location": "lib/core/services/ffmpeg_service.dart:227",
+    "impact": "Empty catch block suppresses underlying execution or filesystem errors without telemetry or logging.",
+    "fix": "Add error logging or structured failure propagation to error handler.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  },
+  {
+    "id": "AUDIT-20261104-002",
+    "severity": "P1",
+    "category": "correctness",
+    "location": "lib/core/providers/uniquifier_provider.dart:97",
+    "impact": "Empty catch block silently ignores provider initialization failures.",
+    "fix": "Log caught exception or set an error state on provider.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  },
+  {
+    "id": "AUDIT-20261104-003",
+    "severity": "P2",
+    "category": "quality",
+    "location": "lib/core/services/ffmpeg_service.dart:1",
+    "impact": "Large service file exceeding 600 lines creates maintainability and cognitive overhead.",
+    "fix": "Refactor FFmpeg command builders and execution runners into modular helper classes.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  },
+  {
+    "id": "AUDIT-20261104-004",
+    "severity": "P2",
+    "category": "quality",
+    "location": "lib/core/providers/uniquifier_provider.dart:1",
+    "impact": "God-object provider exceeding 600 lines manages excessive state responsibilities.",
+    "fix": "Split processing workflow state from general configuration state.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  },
+  {
+    "id": "AUDIT-20261104-005",
+    "severity": "P2",
+    "category": "quality",
+    "location": "lib/features/process/screens/success_screen.dart:1",
+    "impact": "UI screen exceeding 500 lines mixes layout composition with action handlers.",
+    "fix": "Decompose into smaller reusable presentation widgets.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  },
+  {
+    "id": "AUDIT-20261104-006",
+    "severity": "P3",
+    "category": "quality",
+    "location": "lib/core/providers/locale_provider.dart:22",
+    "impact": "Swallowed exception when reading stored locale fallback defaults.",
+    "fix": "Add debugPrint or fallback telemetry for invalid locale decoding.",
+    "scope": "requires-source-edit",
+    "since": "new"
+  }
+]
