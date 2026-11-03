@@ -71,7 +71,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     if (!mounted) return;
     final online = _connectivity.isOnline.value;
     setState(() {
-      _syncStatusText = online ? 'Updated just now' : 'Offline Cache Mode';
+      _syncStatusText = online ? 'LIVE • Auto-Synced' : 'Offline Cache Mode';
     });
   }
 

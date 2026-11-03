@@ -71,6 +71,9 @@ class _TelemetryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final valueColor = isDark ? AppColors.onSurfaceVariant : AppColors.textDark;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -89,10 +92,11 @@ class _TelemetryRow extends StatelessWidget {
             textAlign: TextAlign.end,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.onSurfaceVariant,
+            style: TextStyle(
+              color: valueColor,
               fontSize: 11,
               fontFamily: 'monospace',
+              fontWeight: isDark ? FontWeight.w400 : FontWeight.w600,
             ),
           ),
         ),
@@ -106,6 +110,9 @@ class _SandboxStateRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final stateColor = isDark ? AppColors.onSurfaceVariant.withValues(alpha: 0.9) : AppColors.forestDeep;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -122,15 +129,16 @@ class _SandboxStateRow extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.memory, color: AppColors.primaryContainer, size: 13),
+              Icon(Icons.memory, color: isDark ? AppColors.primaryContainer : AppColors.forestDeep, size: 13),
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
                   'CPU Core Efficiency • On-Device',
                   style: TextStyle(
-                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.9),
+                    color: stateColor,
                     fontSize: 11,
                     fontFamily: 'monospace',
+                    fontWeight: isDark ? FontWeight.w400 : FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

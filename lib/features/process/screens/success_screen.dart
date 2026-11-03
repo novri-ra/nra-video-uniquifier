@@ -94,17 +94,26 @@ class _SuccessHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final title = l10n?.videoSavedTitle ?? 'Video Saved!';
     final desc = l10n?.videoSavedDesc ?? 'Exported to public Movies/Uniquifier gallery';
+
+    final cardBg = isDark ? AppColors.surface : AppColors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final titleColor = isDark ? AppColors.white : AppColors.textDark;
+    final descColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final circleBg = isDark ? AppColors.surfaceContainer : AppColors.lightSurfaceContainer;
+    final circleBorder = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final iconColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
@@ -113,23 +122,31 @@ class _SuccessHeroCard extends StatelessWidget {
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.surfaceContainer,
-              border: Border.all(color: AppColors.primaryContainer),
+              color: circleBg,
+              border: Border.all(color: circleBorder),
             ),
-            child: const Icon(Icons.check_circle, color: AppColors.primaryContainer, size: 32),
+            child: Icon(Icons.check_circle, color: iconColor, size: 32),
           ),
           const SizedBox(height: 12),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
+          Text(title, style: TextStyle(color: titleColor, fontSize: 22, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text(desc, style: const TextStyle(color: AppColors.onSurfaceVariant, fontSize: 12)),
+          Text(desc, style: TextStyle(color: descColor, fontSize: 12)),
           const SizedBox(height: 12),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 1),
+          Divider(color: borderColor, height: 1),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('SANDBOX HASH:', style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, fontFamily: 'monospace')),
-              Text('0x9F41..C7E0 (MODIFIED)', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace')),
+              Text('SANDBOX HASH:', style: TextStyle(color: descColor, fontSize: 10, fontFamily: 'monospace')),
+              Text(
+                '0x9F41..C7E0 (MODIFIED)',
+                style: TextStyle(
+                  color: isDark ? AppColors.primaryContainer : AppColors.forestDeep,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace',
+                ),
+              ),
             ],
           ),
         ],
@@ -151,26 +168,34 @@ class _SuccessManifestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surface : AppColors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _ManifestHeader(),
+          _ManifestHeader(isDark: isDark),
           const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ThumbnailReadyBadge(thumbnailPath: thumbnailPath),
+              _ThumbnailReadyBadge(thumbnailPath: thumbnailPath, isDark: isDark),
               const SizedBox(width: 12),
               Expanded(
-                child: _ManifestDetailsColumn(fileName: fileName, directoryPath: directoryPath),
+                child: _ManifestDetailsColumn(
+                  fileName: fileName,
+                  directoryPath: directoryPath,
+                  isDark: isDark,
+                ),
               ),
             ],
           ),
@@ -181,15 +206,32 @@ class _SuccessManifestCard extends StatelessWidget {
 }
 
 class _ManifestHeader extends StatelessWidget {
-  const _ManifestHeader();
+  final bool isDark;
+  const _ManifestHeader({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('EXPORT MANIFEST', style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10, letterSpacing: 0.8, fontFamily: 'monospace')),
-        Text('GALLERY INDEXED', style: TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontFamily: 'monospace')),
+        Text(
+          'EXPORT MANIFEST',
+          style: TextStyle(
+            color: isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75),
+            fontSize: 10,
+            letterSpacing: 0.8,
+            fontFamily: 'monospace',
+          ),
+        ),
+        Text(
+          'GALLERY INDEXED',
+          style: TextStyle(
+            color: isDark ? AppColors.primaryContainer : AppColors.forestDeep,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'monospace',
+          ),
+        ),
       ],
     );
   }
@@ -198,19 +240,41 @@ class _ManifestHeader extends StatelessWidget {
 class _ManifestDetailsColumn extends StatelessWidget {
   final String fileName;
   final String directoryPath;
+  final bool isDark;
 
-  const _ManifestDetailsColumn({required this.fileName, required this.directoryPath});
+  const _ManifestDetailsColumn({
+    required this.fileName,
+    required this.directoryPath,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final fileNameColor = isDark ? Colors.white : AppColors.textDark;
+    final dirColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final metaColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(fileName, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'monospace'), maxLines: 1, overflow: TextOverflow.ellipsis),
+        Text(
+          fileName,
+          style: TextStyle(color: fileNameColor, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         const SizedBox(height: 2),
-        Text(directoryPath, style: const TextStyle(color: AppColors.primaryContainer, fontSize: 10, fontFamily: 'monospace'), maxLines: 2, overflow: TextOverflow.ellipsis),
+        Text(
+          directoryPath,
+          style: TextStyle(color: dirColor, fontSize: 10, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
         const SizedBox(height: 8),
-        const Text('Metadata stripped • PTS & Audio shifted • Micro-cropped • Color EQ', style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 10)),
+        Text(
+          'Metadata stripped • PTS & Audio shifted • Micro-cropped • Color EQ',
+          style: TextStyle(color: metaColor, fontSize: 10),
+        ),
       ],
     );
   }
@@ -218,20 +282,23 @@ class _ManifestDetailsColumn extends StatelessWidget {
 
 class _ThumbnailReadyBadge extends StatelessWidget {
   final String? thumbnailPath;
-  const _ThumbnailReadyBadge({this.thumbnailPath});
+  final bool isDark;
+  const _ThumbnailReadyBadge({this.thumbnailPath, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final hasThumb = thumbnailPath != null && File(thumbnailPath!).existsSync();
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final badgeColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
 
     return Container(
       width: 80,
       height: 80,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: isDark ? AppColors.surfaceContainerLow : AppColors.offWhiteCanvas,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: borderColor),
       ),
       child: Stack(
         fit: StackFit.expand,
@@ -246,10 +313,18 @@ class _ThumbnailReadyBadge extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                color: AppColors.surfaceContainerLowest.withValues(alpha: 0.9),
-                border: Border.all(color: AppColors.primaryContainer),
+                color: isDark ? AppColors.surfaceContainerLowest.withValues(alpha: 0.9) : AppColors.white.withValues(alpha: 0.9),
+                border: Border.all(color: badgeColor),
               ),
-              child: const Text('READY', style: TextStyle(color: AppColors.primaryContainer, fontSize: 9, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
+              child: Text(
+                'READY',
+                style: TextStyle(
+                  color: badgeColor,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace',
+                ),
+              ),
             ),
           ),
         ],

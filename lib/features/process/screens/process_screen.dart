@@ -164,15 +164,24 @@ class _OfflineGuaranteeNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
+
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.verified_user, color: AppColors.primaryContainer, size: 14),
-        SizedBox(width: 6),
+        Icon(Icons.verified_user, color: iconColor, size: 14),
+        const SizedBox(width: 6),
         Flexible(
           child: Text(
             '100% on-device processing • No data leaves device',
-            style: TextStyle(color: AppColors.onSurfaceVariant, fontSize: 11, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 11,
+              fontFamily: 'monospace',
+              fontWeight: isDark ? FontWeight.w500 : FontWeight.w700,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -200,19 +209,20 @@ class _ProcessActionButton extends StatelessWidget {
 
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: enabled ? AppColors.primaryContainer : AppColors.surfaceContainerHigh,
-        foregroundColor: enabled ? AppColors.onPrimary : AppColors.outline,
+        backgroundColor: enabled ? AppColors.forestDeep : AppColors.surfaceContainerHigh,
+        foregroundColor: enabled ? AppColors.white : AppColors.outline,
         minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         elevation: 0,
       ),
       onPressed: enabled ? onPressed : null,
-      icon: const Icon(Icons.bolt, size: 20),
+      icon: const Icon(Icons.bolt, size: 20, color: AppColors.white),
       label: Text(
         labelText,
         style: const TextStyle(
+          color: AppColors.white,
           fontSize: 14,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
           letterSpacing: 1.2,
           fontFamily: 'monospace',
         ),

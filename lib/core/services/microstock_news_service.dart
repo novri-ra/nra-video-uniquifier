@@ -123,6 +123,7 @@ class MicrostockNewsService {
     final results = <MicrostockNewsArticle>[];
     try {
       final futures = await Future.wait([
+        _fetchGoogleNewsRss(),
         _fetchRss2Json(),
         _fetchReddit('microstock'),
         _fetchReddit('stockphotography'),
@@ -133,6 +134,71 @@ class MicrostockNewsService {
       results.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
     } catch (_) {}
     return results;
+  }
+
+  static Future<List<MicrostockNewsArticle>> _fetchGoogleNewsRss() async {
+    try {
+      final uri = Uri.parse(
+        'https://news.google.com/rss/search?q=microstock+contributor+OR+shutterstock+contributor&hl=en-US&gl=US&ceid=US:en',
+      );
+      final raw = customHttpGet != null ? await customHttpGet!(uri) : await _defaultHttpGet(uri);
+      if (raw.isEmpty) return [];
+      return parseRssXmlFeed(raw);
+    } catch (_) {}
+    return [];
+  }
+
+  /// Parses standard RSS 2.0 XML channel items into MicrostockNewsArticle models.
+  static List<MicrostockNewsArticle> parseRssXmlFeed(String xml) {
+    final articles = <MicrostockNewsArticle>[];
+    final itemRegex = RegExp(r'<item>(.*?)<\/item>', dotAll: true, caseSensitive: false);
+    final titleRegex = RegExp(r'<title>(.*?)<\/title>', dotAll: true, caseSensitive: false);
+    final linkRegex = RegExp(r'<link>(.*?)<\/link>', dotAll: true, caseSensitive: false);
+    final descRegex = RegExp(r'<description>(.*?)<\/description>', dotAll: true, caseSensitive: false);
+    final pubRegex = RegExp(r'<pubDate>(.*?)<\/pubDate>', dotAll: true, caseSensitive: false);
+    final sourceRegex = RegExp(r'<source[^>]*>(.*?)<\/source>', dotAll: true, caseSensitive: false);
+
+    for (final match in itemRegex.allMatches(xml)) {
+      final itemBlock = match.group(1) ?? '';
+      final titleMatch = titleRegex.firstMatch(itemBlock);
+      final linkMatch = linkRegex.firstMatch(itemBlock);
+      final descMatch = descRegex.firstMatch(itemBlock);
+      final pubMatch = pubRegex.firstMatch(itemBlock);
+      final sourceMatch = sourceRegex.firstMatch(itemBlock);
+
+      final title = parseRssContent(titleMatch?.group(1) ?? '');
+      if (title.isEmpty) continue;
+      final link = (linkMatch?.group(1) ?? '').trim();
+      final desc = parseRssContent(descMatch?.group(1) ?? '');
+      final pubRaw = (pubMatch?.group(1) ?? '').trim();
+      final source = (sourceMatch?.group(1) ?? 'Google News Intel').trim();
+
+      articles.add(
+        MicrostockNewsArticle(
+          id: 'gn-${title.hashCode}',
+          title: title,
+          summary: desc.length > 150 ? '${desc.substring(0, 150)}...' : desc,
+          source: source,
+          category: 'MARKET INTEL',
+          publishedDate: pubRaw.isNotEmpty ? pubRaw : '2026-11-03',
+          sourceUrl: link.isNotEmpty ? link : 'https://news.google.com',
+          tags: ['#Microstock', '#MarketIntel', '#$source'],
+          readTime: '3 min read',
+          keyTakeaways: 'Market trend movement, contributor payout policies, and platform guidelines.',
+          technicalSpecs: const [
+            'Resolution: 4K UHD & 1080p',
+            'Cadence: 30 / 60 FPS CFR',
+            'Color: Rec.709 compliant',
+          ],
+          contributorChecklist: const [
+            'Adhere to commercial stock standards.',
+            'Maintain pristine metadata tagging.',
+          ],
+          fullContent: desc.isNotEmpty ? desc : title,
+        ),
+      );
+    }
+    return articles;
   }
 
   static Future<List<MicrostockNewsArticle>> _fetchRss2Json() async {

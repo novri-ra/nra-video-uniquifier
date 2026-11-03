@@ -47,6 +47,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 91 | `91-home-sync-and-device-deployment.md` | Workspace Sync di Rumah, Verifikasi Kunci Warna Editorial, Quality Gates, Rebuild Release APK & Install ke Fisik Realme 3 Pro via ADB |
 | 92 | `92-generalize-actions-and-settings-defaults.md` | Generalisasi Tombol Ekspor, Default English & System Theme, Kontras Teks Merah 4K UHD Light Mode, Header Sapaan Dinamis, dan Polish UI |
 | 93 | `93-comprehensive-localization-cleanup.md` | Audit Lokalisasi 100%: Eliminasi Hardcoded Strings & Pasangan Kunci Lengkap EN/ID |
+| 94 | `94-comprehensive-ui-contrast-and-live-news.md` | Perbaikan Menyeluruh Kontras Teks/Tombol, Light Mode Layar Proses & Sukses, serta Live Fetch Berita Intel via Webfetch |
 
 ---
 
