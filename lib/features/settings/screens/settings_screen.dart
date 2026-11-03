@@ -380,7 +380,7 @@ class _AppInfoCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('NRA Video Uniquifier v1.4.0', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w700)),
+              Text('NRA Video Uniquifier v2.0.0', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
               Text('Anti-Fingerprint Evasion Engine', style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace')),
             ],
