@@ -112,42 +112,21 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 78,
-            height: 78,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                if (widget.isClean)
-                  BoxShadow(
-                    color: emerald.withValues(alpha: 0.25),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-              ],
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: widget.isClean ? 1.0 : 0.0,
-                  strokeWidth: 4.5,
-                  backgroundColor: emerald.withValues(alpha: 0.15),
-                  color: emerald,
+          _BentoGaugeRing(
+            value: widget.isClean ? 1.0 : 0.0,
+            text: widget.isClean ? '100%' : '0%',
+            ringColor: emerald,
+            textColor: emerald,
+            shadows: [
+              if (widget.isClean)
+                BoxShadow(
+                  color: emerald.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  spreadRadius: 1,
                 ),
-                Text(
-                  widget.isClean ? '100%' : '0%',
-                  style: const TextStyle(
-                    color: emerald,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             'EXIF CLEAN',
             style: TextStyle(
@@ -182,6 +161,18 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
     );
   }
 
+  BoxDecoration _cardDecoration(Color bgColor, Color borderColor, Color activeColor) {
+    return BoxDecoration(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: widget.isClean ? activeColor.withValues(alpha: 0.35) : borderColor),
+      boxShadow: [
+        if (!widget.isDark)
+          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
@@ -202,15 +193,7 @@ class _BentoHygieneCardState extends State<_BentoHygieneCard> {
         duration: const Duration(milliseconds: 100),
         child: Container(
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: widget.isClean ? emerald.withValues(alpha: 0.35) : borderColor),
-            boxShadow: [
-              if (!widget.isDark)
-                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
-            ],
-          ),
+          decoration: _cardDecoration(bgColor, borderColor, emerald),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -270,31 +253,13 @@ class _BentoStorageCard extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 78,
-            height: 78,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: freeFraction,
-                  strokeWidth: 4.5,
-                  backgroundColor: ringColor.withValues(alpha: 0.15),
-                  color: ringColor,
-                ),
-                Text(
-                  '$percent%',
-                  style: const TextStyle(
-                    color: cyan,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
-                    fontFamily: 'monospace',
-                  ),
-                ),
-              ],
-            ),
+          _BentoGaugeRing(
+            value: freeFraction,
+            text: '$percent%',
+            ringColor: ringColor,
+            textColor: cyan,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             'AVAILABLE',
             style: TextStyle(
@@ -354,6 +319,59 @@ class _BentoStorageCard extends StatelessWidget {
           _buildCenterVisual(),
           const Spacer(),
           _buildFooter(titleColor),
+        ],
+      ),
+    );
+  }
+}
+
+class _BentoGaugeRing extends StatelessWidget {
+  final double value;
+  final String text;
+  final Color ringColor;
+  final Color textColor;
+  final List<BoxShadow>? shadows;
+
+  const _BentoGaugeRing({
+    required this.value,
+    required this.text,
+    required this.ringColor,
+    required this.textColor,
+    this.shadows,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 84,
+      height: 84,
+      decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: shadows),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CircularProgressIndicator(
+            value: value,
+            strokeWidth: 4.0,
+            backgroundColor: ringColor.withValues(alpha: 0.15),
+            color: ringColor,
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                    color: textColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

@@ -40,6 +40,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 85 | `85-super-deep-advanced-audit.md` | Super Deep Advanced Forensic Audit: Kode, Stabilitas Async, Viewport 320dp, & Cache Profiling |
 | 85 | `85-notification-fix-and-channel-binding.md` | Perbaikan Notifikasi Sistem Android 13+ Channel Binding, ProGuard Rules, & Button Trigger |
 | 86 | `86-audit-remediation-complete.md` | Remediasi Penuh Temuan Audit Sprint 85: Unmounted setState, RenderFlex 320dp/1.3x Font, & Bounded LRU Cache |
+| 87 | `87-bento-gauge-clipping-fix.md` | Perbaikan Total Clipping Angka Bento Gauge (100% & 52%), Verifikasi ADB Device, dan Deploy APK |
 
 ---
 
