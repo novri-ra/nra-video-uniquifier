@@ -1,0 +1,6 @@
+﻿c1db18f 2026-11-04 chore(ai): remove 0ai_context completely for fresh bootstrap
+1ebee61 2026-11-04 style(lint): apply curly braces to flow control structures
+02364b4 2026-11-04 fix(prompt): prevent literal placeholder in execution summary template
+30b8454 2026-11-04 feat(output): enforce detailed bullet-point execution summary
+3e03bb9 2026-11-04 chore(test): auto-cleanup staged artifacts and update gitignore
+b6e9d29 2026-11-04 chore: Initial clean commit - NRA Video Uniquifier v2.0.0 (Context AI System configured)

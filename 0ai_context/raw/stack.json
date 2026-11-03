@@ -1,0 +1,13 @@
+{
+  "primary": "dart",
+  "detected": ["dart", "flutter"],
+  "commands": {
+    "analyze": "dart analyze",
+    "test": "flutter test",
+    "format": "dart format --set-exit-if-changed ."
+  },
+  "pins": {},
+  "graph_project": "C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier",
+  "mcp_support": "full",
+  "tier": "small"
+}
