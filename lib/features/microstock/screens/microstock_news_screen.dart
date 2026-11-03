@@ -51,6 +51,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   }
 
   Future<void> _loadNewsFeed({bool forceRefresh = false}) async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final list = await MicrostockNewsService.loadNews(forceRefresh: forceRefresh);
@@ -67,6 +68,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   }
 
   void _updateSyncStatus() {
+    if (!mounted) return;
     final online = _connectivity.isOnline.value;
     setState(() {
       _syncStatusText = online ? 'Updated just now' : 'Offline Cache Mode';
@@ -111,75 +113,75 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
         onRefresh: () => _loadNewsFeed(forceRefresh: true),
         color: const Color(0xFF6C5CE7),
         child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _FeedHeader(
-                      syncStatusText: _syncStatusText,
-                      isOnline: online,
-                      isDark: isDark,
-                      onRefresh: () => _loadNewsFeed(forceRefresh: true),
-                    ),
-                    const SizedBox(height: 12),
-                    NewsSearchAndFilterBar(
-                      selectedChip: _selectedChip,
-                      isDark: isDark,
-                      onSearchChanged: (q) => setState(() => _searchQuery = q),
-                      onChipSelected: (c) => setState(() => _selectedChip = c),
-                    ),
-                  ],
-                ),
-              ),
+            _buildSliverHeader(isDark, online),
+            _buildSliverBody(isDark, online, displayList),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSliverHeader(bool isDark, bool online) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _FeedHeader(
+              syncStatusText: _syncStatusText,
+              isOnline: online,
+              isDark: isDark,
+              onRefresh: () => _loadNewsFeed(forceRefresh: true),
             ),
-            if (_isLoading && _allArticles.isEmpty)
-              const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6C5CE7)),
-                ),
-              )
-            else if (displayList.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.search_off_rounded, size: 48, color: isDark ? Colors.white24 : Colors.black26),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Tidak ada berita atau panduan sesuai filter',
-                        style: TextStyle(
-                          color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 108),
-                sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      return MicrostockNewsCard(
-                        article: displayList[index],
-                        isDark: isDark,
-                        isOnline: online,
-                      );
-                    },
-                    childCount: displayList.length,
-                  ),
-                ),
-              ),
+            const SizedBox(height: 12),
+            NewsSearchAndFilterBar(
+              selectedChip: _selectedChip,
+              isDark: isDark,
+              onSearchChanged: (q) => setState(() => _searchQuery = q),
+              onChipSelected: (c) => setState(() => _selectedChip = c),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSliverBody(bool isDark, bool online, List<MicrostockNewsArticle> displayList) {
+    if (_isLoading && _allArticles.isEmpty) {
+      return const SliverFillRemaining(
+        child: Center(child: CircularProgressIndicator(color: Color(0xFF6C5CE7))),
+      );
+    }
+    if (displayList.isEmpty) {
+      return _buildEmptyState(isDark);
+    }
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 108),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => MicrostockNewsCard(article: displayList[index], isDark: isDark, isOnline: online),
+          childCount: displayList.length,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(bool isDark) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.search_off_rounded, size: 48, color: isDark ? Colors.white24 : Colors.black26),
+            const SizedBox(height: 12),
+            Text(
+              'Tidak ada berita atau panduan sesuai filter',
+              style: TextStyle(color: isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant, fontSize: 13),
+            ),
           ],
         ),
       ),

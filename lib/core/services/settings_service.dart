@@ -355,11 +355,14 @@ class SettingsService {
         final entries = tempDir.listSync(followLinks: false);
         for (final entry in entries) {
           if (entry is File) {
-            final name = entry.path.split(RegExp(r'[/\\]')).last;
-            if (name.startsWith('staged_') || name.startsWith('thumb_')) {
-              freedBytes += entry.lengthSync();
-              entry.deleteSync();
-            }
+            try {
+              final name = entry.path.split(RegExp(r'[/\\]')).last;
+              if (name.startsWith('staged_') || name.startsWith('thumb_')) {
+                final len = entry.lengthSync();
+                entry.deleteSync();
+                freedBytes += len;
+              }
+            } catch (_) {}
           }
         }
       }

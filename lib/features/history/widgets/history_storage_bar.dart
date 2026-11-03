@@ -22,8 +22,9 @@ class HistoryHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const _HistoryHeaderTitle(),
+        const Flexible(child: _HistoryHeaderTitle()),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '$itemCount Files • $totalSize',
@@ -56,10 +57,14 @@ class _HistoryHeaderTitle extends StatelessWidget {
     final badgeText = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          'Recent Exports',
-          style: TextStyle(color: titleColor, fontSize: 16, fontWeight: FontWeight.w600),
+        Flexible(
+          child: Text(
+            'Recent Exports',
+            style: TextStyle(color: titleColor, fontSize: 16, fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
         const SizedBox(width: 8),
         Container(
@@ -134,33 +139,50 @@ class _StorageTopRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
-    final usedColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
     final freeColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+    final freeLabel = deviceStorage != null ? '${deviceStorage!.freeSize} FREE' : 'DEVICE STORAGE';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Icon(Icons.storage, color: iconColor, size: 14),
-            const SizedBox(width: 6),
-            Text('Sandbox: ', style: TextStyle(color: titleColor, fontSize: 11)),
-            Text(
-              '$totalSize used',
-              style: TextStyle(
-                color: usedColor,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'monospace',
-              ),
+        Flexible(child: _SandboxUsedLabel(totalSize: totalSize, isDark: isDark)),
+        const SizedBox(width: 8),
+        Text(freeLabel, style: TextStyle(color: freeColor, fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}
+
+class _SandboxUsedLabel extends StatelessWidget {
+  final String totalSize;
+  final bool isDark;
+  const _SandboxUsedLabel({required this.totalSize, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final usedColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
+    final iconColor = isDark ? AppColors.outline : const Color(0xFF6C5CE7);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.storage, color: iconColor, size: 14),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text.rich(
+            TextSpan(
+              text: 'Sandbox: ',
+              style: TextStyle(color: titleColor, fontSize: 11),
+              children: [
+                TextSpan(
+                  text: '$totalSize used',
+                  style: TextStyle(color: usedColor, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+                ),
+              ],
             ),
-          ],
-        ),
-        Text(
-          deviceStorage != null ? '${deviceStorage!.freeSize} FREE' : 'DEVICE STORAGE',
-          style: TextStyle(color: freeColor, fontSize: 10, fontFamily: 'monospace', fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -210,10 +232,14 @@ class _StorageBottomTags extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          'V-SANDBOX ISOLATION: ACTIVE',
-          style: TextStyle(color: tagColor, fontSize: 9, fontFamily: 'monospace', fontWeight: FontWeight.w600),
+        Flexible(
+          child: Text(
+            'V-SANDBOX ISOLATION: ACTIVE',
+            style: TextStyle(color: tagColor, fontSize: 9, fontFamily: 'monospace', fontWeight: FontWeight.w600),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
           'ZERO NETWORK LEAK',
           style: TextStyle(color: tagColor, fontSize: 9, fontFamily: 'monospace', fontWeight: FontWeight.w600),

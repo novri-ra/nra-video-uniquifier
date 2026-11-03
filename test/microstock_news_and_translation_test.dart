@@ -101,6 +101,17 @@ void main() {
       expect(res, contains('Rec.709'));
       expect(res, isNot(contains('&quot;')));
     });
+
+    test('bounded LRU cache evicts oldest entry when exceeding maxMemoryEntries (500)', () async {
+      TranslationService.clearMemoryCache();
+      TranslationService.mockTranslator = (text, lang) async => 'Trans: $text';
+
+      for (int i = 0; i < 505; i++) {
+        await TranslationService.translateText('sample paragraph query index $i');
+      }
+
+      expect(TranslationService.memoryCacheSize, equals(TranslationService.maxMemoryEntries));
+    });
   });
 
   group('Sprint 79: Hybrid Feed Integration (RSS2JSON + Reddit Intel)', () {

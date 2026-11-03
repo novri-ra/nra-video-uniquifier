@@ -78,32 +78,13 @@ class _ResolutionOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = value == selectedValue;
-    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
-    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
-    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isSelected ? activeBg : inactiveBg,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: isSelected ? activeBorder : inactiveBorder,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: [
-            if (!isDark && !isSelected)
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-          ],
-        ),
+        decoration: _decoration(isSelected),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -120,6 +101,27 @@ class _ResolutionOptionTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  BoxDecoration _decoration(bool isSelected) {
+    final activeBg = isDark ? AppColors.surfaceContainerHigh : const Color(0xFFF5F3FF);
+    final inactiveBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final activeBorder = isDark ? AppColors.primaryContainer : const Color(0xFF6C5CE7);
+    final inactiveBorder = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+
+    return BoxDecoration(
+      color: isSelected ? activeBg : inactiveBg,
+      borderRadius: BorderRadius.circular(6),
+      border: Border.all(color: isSelected ? activeBorder : inactiveBorder, width: isSelected ? 2 : 1),
+      boxShadow: [
+        if (!isDark && !isSelected)
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+      ],
     );
   }
 }
@@ -152,12 +154,15 @@ class _OptionRowContent extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (warningTag != null) ...[

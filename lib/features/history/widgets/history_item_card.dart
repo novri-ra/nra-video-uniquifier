@@ -107,11 +107,6 @@ class _ItemInfoColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
     final dateColor = isDark ? AppColors.onSurfaceVariant : const Color(0xFF4B5563);
-    final readyBg = isDark
-        ? AppColors.primaryContainer.withValues(alpha: 0.12)
-        : const Color(0xFF10B981).withValues(alpha: 0.12);
-    final readyColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
-    final readyBorder = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,33 +121,56 @@ class _ItemInfoColumn extends StatelessWidget {
         Text(
           '${item.formattedDate} • ${item.formattedSize}',
           style: TextStyle(color: dateColor, fontSize: 10, fontFamily: 'monospace'),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 6),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              decoration: BoxDecoration(
-                color: readyBg,
-                border: Border.all(color: readyBorder),
-                borderRadius: BorderRadius.circular(3),
-              ),
-              child: Text(
-                'READY',
-                style: TextStyle(
-                  color: readyColor,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                ),
-              ),
+        _ItemStatusRow(isDark: isDark, dateColor: dateColor),
+      ],
+    );
+  }
+}
+
+class _ItemStatusRow extends StatelessWidget {
+  final bool isDark;
+  final Color dateColor;
+  const _ItemStatusRow({required this.isDark, required this.dateColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final readyBg = isDark
+        ? AppColors.primaryContainer.withValues(alpha: 0.12)
+        : const Color(0xFF10B981).withValues(alpha: 0.12);
+    final readyColor = isDark ? AppColors.primaryContainer : const Color(0xFF047857);
+    final readyBorder = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: readyBg,
+            border: Border.all(color: readyBorder),
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: Text(
+            'READY',
+            style: TextStyle(
+              color: readyColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'monospace',
             ),
-            const SizedBox(width: 6),
-            Text(
-              'H.264 • MODIFIED',
-              style: TextStyle(color: dateColor, fontSize: 9, fontFamily: 'monospace'),
-            ),
-          ],
+          ),
+        ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            'H.264 • MODIFIED',
+            style: TextStyle(color: dateColor, fontSize: 9, fontFamily: 'monospace'),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
