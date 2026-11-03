@@ -69,7 +69,8 @@ class HistoryService {
           final name = entry.path.split(RegExp(r'[/\\]')).last;
           if (name.startsWith('.') || name.contains('.trashed-')) continue;
           final lower = name.toLowerCase();
-          if ((lower.endsWith('.mp4') || lower.endsWith('.mov')) && seenPaths.add(entry.path)) {
+          final isVideo = lower.endsWith('.mp4') || lower.endsWith('.mov');
+          if (isVideo && seenPaths.add(entry.path)) {
             final stat = await entry.stat();
             if (stat.size > 0) {
               results.add(VideoExportItem(

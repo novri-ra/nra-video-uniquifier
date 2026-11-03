@@ -1,44 +1,17 @@
-# Index of Technical Reports (Sprint 01 – Sprint 70)
+# Index of Technical Reports
 
 Index of sprint technical reports for `nra_video_uniquifier`.
 
 ## Structure Overview
-- **Active Reports (`0ai_context/reports/`)**: The active sprint reports.
-  - `64-hardware-profiler-background-resilience-and-icons.md`: Dynamic hardware profiling, background wakelock resilience, and icon branding.
-  - `65-master-engine-and-ux-optimization.md`: 100% engine load, FastStart, even dimension guard, CFR mode, studio audio 192k, PopScope, batch queue resilience, storage health guard.
-  - `66-workspace-cleanup-and-release-deployment.md`: Workspace cleanup, report archiving, main branch merge, obfuscated release APK build, and ADB device installation.
-  - `67-responsive-terminal-log-layout.md`: Dynamic flex height for terminal log viewer, auto-scroll stream, main branch merge, and ADB release deployment.
-  - `68-notification-dispatch-and-fps-slider.md`: Android notification channel registration, live progress dispatch, and target framerate control (24/30/60 FPS).
-  - `69-advanced-anti-detection-pipeline.md`: Audio spectral shift, dynamic micro-speed warp, Ken Burns micro-zoom, non-linear gamma curve, and aggressive preset integration.
-  - `70-language-selection-and-localization.md`: Reactive and persistent i18n & localization (ID & EN) with static brand name "NRA Video Uniquifier".
-- **Archived Reports (`0ai_context/reports/archive/`)**: Historical reports for Sprint 01 through Sprint 63.
+- **Active Reports (`0ai_context/reports/`)**: Modern active sprint reports (Sprint 86+).
+- **Archived Reports (`0ai_context/reports/archive/`)**: Historical sprint reports (Sprint 01 – Sprint 85).
 
 ---
 
-## Active Reports
+## Active Reports (Sprint 86+)
 
 | Sprint | File | Focus / Milestone |
 |---|---|---|
-| 64 | `64-hardware-profiler-background-resilience-and-icons.md` | Profiling Hardware Dinamis, Resiliensi Background WakeLock, Persistensi Settings, dan Integrasi Ikon |
-| 65 | `65-master-engine-and-ux-optimization.md` | Master Engine Optimization (100% Load, FastStart, Even-Dim Guard, VFR/CFR, AAC 192k, PopScope, Batch Queue, Storage Health, Preset Chips) |
-| 66 | `66-workspace-cleanup-and-release-deployment.md` | Workspace Hygiene, Arsip Laporan Historis, Merge Main, Build Release APK & Deployment ADB |
-| 67 | `67-responsive-terminal-log-layout.md` | Layout Responsif Terminal Log (Dynamic Flex-Fill ke Tombol Cancel) & Deployment APK |
-| 68 | `68-notification-dispatch-and-fps-slider.md` | Root Cause Fix Notifikasi Sistem Android & Slider Pengaturan FPS Manual (24/30/60 FPS) |
-| 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
-| 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
-| 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
-| 75 | `75-dynamic-bento-dashboard.md` | Visual Overhaul Bento Dashboard: Full Dynamic Reactive Binding (Storage Disk Space, Live Batch Counter, Target Specs Sync, Auto-Calendar 60-90 Days Lead Time, & Interactive Keyword Chips) |
-| 76 | `76-microstock-news-and-auto-translate.md` | Tab Microstock Intel & News: Real-Time Network Status (Online/Offline), Local Offline Cache Persistence, Auto-Reload on Reconnect, dan Fitur Auto-Translate ID/EN |
-| 77 | `77-article-reader-and-pipeline-fixes.md` | In-App Microstock Article Reader Modal, Preset Navigation Tab Retention, 2K/4K Hardware Decoder Stutter Safeguard, dan Custom Crop/Trim Sliders |
-| 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader: Artikel Mendalam, Format Terstruktur (Key Takeaways, Specs, Checklist), dan Parser Konten Lengkap |
-| 79 | `79-hybrid-news-and-full-translation.md` | Integrasi Sumber Berita Hibrida (RSS-to-JSON + Reddit Microstock Community Intel) & Mesin Terjemahan Utuh Multi-Paragraf |
-| 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Scripts Google Sheets Webhook, UI Search Bar + Adaptive Learning Chips Carousel (YouTube-Style), dan Telemetri Minat Pengguna & Penanaman Metadata Video |
-| 81 | `81-dashboard-redesign-and-history-cleanup.md` | Relokasi Script 0ai_context, Engine Terjemahan Natural Berglosarium, Pembersihan Berkas Trashed/Delete Error di History, dan Redesain UI Modern Dashboard |
-| 82 | `82-live-sheets-and-bento-visuals.md` | Live Google Sheets Webhook Integration, Dynamic Bento Visual Gauges, Instant History Deletion State Eviction, and Production Release Merge |
-| 83 | `83-bento-cards-layout-fix.md` | Perbaikan Total Tata Letak Bento Cards: Eliminasi Teks Bertumpuk, Perbesar Elemen Tengah, dan Rapikan Hierarki Visual |
-| 84 | `84-bento-gauge-expansion-and-release.md` | Perbesar Diameter Ring Gauge 30% Lebih Lapang, Quality Gates, Merge ke Main, dan Build & Install Release APK via ADB |
-| 85 | `85-super-deep-advanced-audit.md` | Super Deep Advanced Forensic Audit: Kode, Stabilitas Async, Viewport 320dp, & Cache Profiling |
-| 85 | `85-notification-fix-and-channel-binding.md` | Perbaikan Notifikasi Sistem Android 13+ Channel Binding, ProGuard Rules, & Button Trigger |
 | 86 | `86-audit-remediation-complete.md` | Remediasi Penuh Temuan Audit Sprint 85: Unmounted setState, RenderFlex 320dp/1.3x Font, & Bounded LRU Cache |
 | 87 | `87-bento-gauge-clipping-fix.md` | Perbaikan Total Clipping Angka Bento Gauge (100% & 52%), Verifikasi ADB Device, dan Deploy APK |
 | 88 | `88-notification-audit-and-bento-110dp.md` | Forensic Audit Notifikasi Android 13+ (POST_NOTIFICATIONS & Channel v2) dan Skala Elemen Visual Bento 110dp |
@@ -49,10 +22,11 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 93 | `93-comprehensive-localization-cleanup.md` | Audit Lokalisasi 100%: Eliminasi Hardcoded Strings & Pasangan Kunci Lengkap EN/ID |
 | 94 | `94-comprehensive-ui-contrast-and-live-news.md` | Perbaikan Menyeluruh Kontras Teks/Tombol, Light Mode Layar Proses & Sukses, serta Live Fetch Berita Intel via Webfetch |
 | 96 | `96-pipeline-step-indicator-contrast.md` | Perbaikan Kontras Teks Pipeline Step Indicator & Pewarnaan Garis Tahapan dengan Vivid Coral Loading Accent |
+| 97 | `97-export-isolation-and-workspace-hygiene.md` | Isolasi Folder Ekspor (/Movies/Uniquifier/), Generator Thumbnail Video Andal, Workspace Cleanup, dan Single-Target Build (arm64-v8a Only) |
 
 ---
 
-## Archived Reports (Sprint 01 – Sprint 63 in `archive/`)
+## Archived Reports (Sprint 01 – Sprint 85 in `archive/`)
 
 | Sprint | File | Milestone / Summary |
 |---|---|---|
@@ -120,5 +94,26 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 61 | `61-anti-vdna-evasion-enhancement.md` | Anti-vDNA Visual Fingerprint Hardening & TikTok Detection Evasion Pipeline |
 | 62 | `62-real-ncnn-vulkan-ai-upscale-and-lossless-clarity.md` | Real Bundled Real-ESRGAN NCNN Vulkan Weights & Crystal-Clear 2K/4K Upscale Pipeline |
 | 63 | `63-deep-ui-sync-and-pipeline-optimization-audit.md` | Deep UI Synchronization, Two-Way Binding & Engine Pipeline Optimization Audit |
-| 88 | `88-notification-audit-and-bento-110dp.md` | Audit Notifikasi Android 13+ Channel v2 & Pembesaran Visual Gauge Bento 110dp |
-| 89 | `89-editorial-craft-theme-redesign.md` | Redesain Anti-Slop Editorial Palet Forest Emerald & Obsidian Ochre, Emil Tactile Interactions, & Header Bento 16dp |
+| 64 | `64-hardware-profiler-background-resilience-and-icons.md` | Profiling Hardware Dinamis, Resiliensi Background WakeLock, Persistensi Settings, dan Integrasi Ikon |
+| 65 | `65-master-engine-and-ux-optimization.md` | Master Engine Optimization (100% Load, FastStart, Even-Dim Guard, VFR/CFR, AAC 192k, PopScope, Batch Queue, Storage Health, Preset Chips) |
+| 66 | `66-workspace-cleanup-and-release-deployment.md` | Workspace Hygiene, Arsip Laporan Historis, Merge Main, Build Release APK & Deployment ADB |
+| 67 | `67-responsive-terminal-log-layout.md` | Layout Responsif Terminal Log (Dynamic Flex-Fill ke Tombol Cancel) & Deployment APK |
+| 68 | `68-notification-dispatch-and-fps-slider.md` | Root Cause Fix Notifikasi Sistem Android & Slider Pengaturan FPS Manual (24/30/60 FPS) |
+| 69 | `69-advanced-anti-detection-pipeline.md` | Pipeline Anti-Detection Tingkat Lanjut (Audio Spectral Shift, Micro-Speed Warp, Ken Burns Micro-Zoom, & Kurva Gamma Non-Linier) |
+| 70 | `70-language-selection-and-localization.md` | Fitur Pemilihan Bahasa (i18n) Reaktif & Persisten (ID & EN) dengan Nama Brand Statis |
+| 71 | `71-bento-dashboard-and-floating-navbar.md` | Perombakan UI/UX Modern: Bento Grid Dashboard, Floating Capsule Navbar, Grouped Inset Settings, & Sistem Tema Dinamis |
+| 72 | `72-floating-hero-navbar-and-asset-icons.md` | Floating Capsule Navbar Polish, Asset Ikon Custom, dan Optimasi Layout |
+| 73 | `73-four-slot-navbar-and-light-theme-contrast-fix.md` | Floating Navbar 4-Slot (Studio, History, Intel, Settings) & Light Theme Contrast Fix |
+| 74 | `74-light-theme-remediation-and-settings-contrast.md` | Remediasi Light Theme Inset Settings Sheet & Kontras Navigasi |
+| 75 | `75-dynamic-bento-dashboard.md` | Visual Overhaul Bento Dashboard: Full Dynamic Reactive Binding & Auto-Calendar |
+| 76 | `76-microstock-news-and-auto-translate.md` | Tab Microstock Intel & News: Real-Time Network Status & Auto-Translate ID/EN |
+| 77 | `77-article-reader-and-pipeline-fixes.md` | In-App Microstock Article Reader Modal & 2K/4K Hardware Safeguards |
+| 78 | `78-rich-article-reader-content.md` | Transformasi Full-Content Microstock Intel Reader |
+| 79 | `79-hybrid-news-and-full-translation.md` | Integrasi Sumber Berita Hibrida & Mesin Terjemahan Utuh Multi-Paragraf |
+| 80 | `80-adaptive-chips-and-sheets-telemetry.md` | Google Sheets Webhook, UI Adaptive Learning Chips Carousel, & Telemetri Minat |
+| 81 | `81-dashboard-redesign-and-history-cleanup.md` | Relokasi Script 0ai_context, Engine Terjemahan Natural Berglosarium, & Pembersihan Trashed Files |
+| 82 | `82-live-sheets-and-bento-visuals.md` | Live Google Sheets Webhook Integration, Dynamic Bento Visual Gauges, & Instant History Deletion |
+| 83 | `83-bento-cards-layout-fix.md` | Perbaikan Total Tata Letak Bento Cards: Eliminasi Teks Bertumpuk |
+| 84 | `84-bento-gauge-expansion-and-release.md` | Perbesar Diameter Ring Gauge 30% Lebih Lapang & Build Release |
+| 85 | `85-notification-fix-and-channel-binding.md` | Perbaikan Notifikasi Sistem Android 13+ Channel Binding & Button Trigger |
+| 85 | `85-super-deep-advanced-audit.md` | Super Deep Advanced Forensic Audit: Kode, Stabilitas Async, Viewport 320dp, & Cache Profiling |
