@@ -80,7 +80,7 @@ class _HeaderRow extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final iconColor = isDark ? AppColors.onSurfaceVariant : AppColors.forestDeep;
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final subColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final subColor = isDark ? AppColors.outline : AppColors.textDark.withValues(alpha: 0.75);
     final linkColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Row(

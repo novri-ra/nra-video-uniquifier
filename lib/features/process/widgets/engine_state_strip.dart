@@ -48,7 +48,7 @@ class _EngineStatusLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75);
 
     return Row(
       children: [
@@ -72,8 +72,8 @@ class _RenderEstimateLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
-    final iconColor = AppColors.outline;
+    final textColor = isDark ? AppColors.onSurfaceVariant : AppColors.textDark.withValues(alpha: 0.75);
+    final iconColor = isDark ? AppColors.outline : AppColors.forestDeep;
 
     return Row(
       children: [

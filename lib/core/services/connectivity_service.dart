@@ -39,13 +39,19 @@ class ConnectivityService {
 
     bool online = false;
     try {
-      final result = await InternetAddress.lookup('dns.google')
-          .timeout(const Duration(seconds: 3));
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        online = true;
-      }
+      final socket = await Socket.connect('1.1.1.1', 53, timeout: const Duration(seconds: 2));
+      socket.destroy();
+      online = true;
     } catch (_) {
-      online = false;
+      try {
+        final result = await InternetAddress.lookup('dns.google')
+            .timeout(const Duration(seconds: 2));
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          online = true;
+        }
+      } catch (_) {
+        online = false;
+      }
     }
 
     if (isOnline.value != online) {

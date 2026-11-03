@@ -26,7 +26,7 @@ class SettingToggleRow extends StatelessWidget {
     final iconColor = isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
     final linkColor = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
-    final outlineColor = isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant;
+    final outlineColor = isDark ? AppColors.outline : AppColors.textDark.withValues(alpha: 0.75);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
