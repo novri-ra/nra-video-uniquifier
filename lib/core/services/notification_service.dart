@@ -17,14 +17,17 @@ class NotificationService {
 
   static const int progressNotificationId = 101;
   static const int completeNotificationId = 8802;
+  static const int testNotificationId = 7777;
 
+  static const String mainChannelId = 'nra_uniquifier_channel';
   static const String processChannelId = 'nra_video_processing_channel';
-  static const String completeChannelId = 'video_complete_channel';
+  static const String completeChannelId = 'nra_uniquifier_channel';
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
 
   /// Explicit initialization entry point required on application bootstrap.
+  @pragma('vm:entry-point')
   static Future<void> initialize() async {
     await init();
     if (_canRun && _testOverride != true) {
@@ -41,12 +44,12 @@ class NotificationService {
         body: 'NRA Video Uniquifier siap',
         notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
-            processChannelId,
-            'Pemrosesan Video NRA',
-            channelDescription: 'Menampilkan progres rendering dan status video',
-            importance: Importance.low,
-            priority: Priority.low,
-            icon: '@drawable/notification_icon',
+            mainChannelId,
+            'NRA Uniquifier Processing',
+            channelDescription: 'Notifikasi status proses video dan ekspor aset',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
             ongoing: false,
             autoCancel: true,
           ),
@@ -56,38 +59,43 @@ class NotificationService {
     } catch (_) {}
   }
 
+  /// Registers official notification channels with Android OS.
+  static Future<void> _createNotificationChannels(AndroidFlutterLocalNotificationsPlugin plugin) async {
+    const channel = AndroidNotificationChannel(
+      mainChannelId,
+      'NRA Uniquifier Processing',
+      description: 'Notifikasi status proses video dan ekspor aset',
+      importance: Importance.max,
+      playSound: true,
+      enableVibration: true,
+    );
+    await plugin.createNotificationChannel(channel);
+    await plugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        processChannelId,
+        'Pemrosesan Video NRA',
+        description: 'Menampilkan progres rendering dan status video',
+        importance: Importance.low,
+        playSound: false,
+        enableVibration: false,
+        showBadge: false,
+      ),
+    );
+  }
+
   /// Initializes notification plugin and sets up platform notification channels.
+  @pragma('vm:entry-point')
   static Future<void> init() async {
     if (_initialized || !_canRun) return;
     try {
-      const androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
+      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const initSettings = InitializationSettings(android: androidSettings);
       await _plugin.initialize(settings: initSettings);
 
       final androidPlugin = _plugin
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin != null) {
-        await androidPlugin.createNotificationChannel(
-          const AndroidNotificationChannel(
-            processChannelId,
-            'Pemrosesan Video NRA',
-            description: 'Menampilkan progres rendering dan status video',
-            importance: Importance.low,
-            playSound: false,
-            enableVibration: false,
-            showBadge: false,
-          ),
-        );
-        await androidPlugin.createNotificationChannel(
-          const AndroidNotificationChannel(
-            completeChannelId,
-            'Video Processing Complete',
-            description: 'Alerts when video processing finishes',
-            importance: Importance.high,
-            playSound: true,
-            enableVibration: true,
-          ),
-        );
+        await _createNotificationChannels(androidPlugin);
       }
       _initialized = true;
     } catch (e) {
@@ -96,6 +104,7 @@ class NotificationService {
   }
 
   /// Requests notification permission on Android 13+ (POST_NOTIFICATIONS).
+  @pragma('vm:entry-point')
   static Future<bool> requestPermission() async {
     try {
       if (_canRun) {
@@ -120,7 +129,7 @@ class NotificationService {
       channelDescription: 'Menampilkan progres rendering dan status video',
       importance: Importance.low,
       priority: Priority.low,
-      icon: '@drawable/notification_icon',
+      icon: '@mipmap/ic_launcher',
       showProgress: true,
       maxProgress: maxProgress,
       progress: progress,
@@ -131,6 +140,7 @@ class NotificationService {
   }
 
   /// Shows or updates ongoing progress notification with progress bar.
+  @pragma('vm:entry-point')
   static Future<void> showProgressNotification({
     int id = progressNotificationId,
     required int progress,
@@ -166,6 +176,7 @@ class NotificationService {
   }
 
   /// Cancels ongoing progress notification.
+  @pragma('vm:entry-point')
   static Future<void> cancelProgressNotification([int id = progressNotificationId]) async {
     _lastProgressPercent = -1;
     _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -176,6 +187,7 @@ class NotificationService {
   }
 
   /// Shows high-priority completion notification with sound and vibration alert.
+  @pragma('vm:entry-point')
   static Future<void> showCompleteNotification({
     int id = completeNotificationId,
     required String title,
@@ -192,12 +204,12 @@ class NotificationService {
     } catch (_) {}
 
     final androidDetails = AndroidNotificationDetails(
-      completeChannelId,
-      'Video Processing Complete',
-      channelDescription: 'Alerts when video processing finishes',
-      importance: Importance.high,
+      mainChannelId,
+      'NRA Uniquifier Processing',
+      channelDescription: 'Notifikasi status proses video dan ekspor aset',
+      importance: Importance.max,
       priority: Priority.high,
-      icon: '@drawable/notification_icon',
+      icon: '@mipmap/ic_launcher',
       playSound: playSound,
       enableVibration: true,
       autoCancel: true,
@@ -210,6 +222,35 @@ class NotificationService {
         title: title,
         body: body,
         notificationDetails: NotificationDetails(android: androidDetails),
+      );
+    } catch (_) {}
+  }
+
+  /// Instant test notification trigger for diagnostics and verification.
+  @pragma('vm:entry-point')
+  static Future<void> showTestNotification({
+    String title = 'NRA Video Uniquifier Test',
+    String body = 'Sistem notifikasi dan channel Android aktif sempurna!',
+  }) async {
+    if (!_canRun) return;
+    await init();
+    const androidDetails = AndroidNotificationDetails(
+      mainChannelId,
+      'NRA Uniquifier Processing',
+      channelDescription: 'Notifikasi status proses video dan ekspor aset',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      playSound: true,
+      enableVibration: true,
+      autoCancel: true,
+    );
+    try {
+      await _plugin.show(
+        id: testNotificationId,
+        title: title,
+        body: body,
+        notificationDetails: const NotificationDetails(android: androidDetails),
       );
     } catch (_) {}
   }

@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
+
+class AppInfoCard extends StatelessWidget {
+  const AppInfoCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLowest : Colors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.lightOutlineVariant;
+    final badgeBg = isDark ? AppColors.surfaceContainer : const Color(0xFFF3F4F6);
+    final titleColor = isDark ? AppColors.onSurface : const Color(0xFF111827);
+    final subColor = isDark ? AppColors.outline : const Color(0xFF4B5563);
+    final badgeColor = isDark ? AppColors.primaryContainer : const Color(0xFF10B981);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('NRA Video Uniquifier v2.0.0', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text('Anti-Fingerprint Evasion Engine', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: subColor, fontSize: 10, fontFamily: 'monospace')),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: badgeBg,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: borderColor),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.verified_user, color: badgeColor, size: 14),
+                const SizedBox(width: 4),
+                Text('OFFLINE PRIVACY', style: TextStyle(color: badgeColor, fontSize: 10, fontWeight: FontWeight.w700, fontFamily: 'monospace')),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

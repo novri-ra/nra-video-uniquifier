@@ -33,6 +33,7 @@
 
 # Flutter Local Notifications
 -keep class com.dexterous.flutterlocalnotifications.** { *; }
+-dontwarn com.dexterous.flutterlocalnotifications.**
 
 # File Picker Plugin
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
