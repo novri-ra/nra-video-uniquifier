@@ -1,4 +1,0 @@
-Baca HANDOFF.md dan patuhi OPENCODE-PROMPT-SPEC.md.
-Tugasmu: Berikan rekomendasi langkah pertama untuk memperbaiki proyek ini, dan hasilkan satu prompt OpenCode atomic sesuai format SPEC.
-Jangan berhalusinasi. Jangan mengarang file path.
-Pastikan prompt yang kamu buat menyertakan verifikasi `git diff -w --exit-code` jika mengubah file kode.
