@@ -59,20 +59,20 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(
-            height: 44,
+            height: 54,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _WaveBar(height: 18),
+                _WaveBar(height: 24),
                 SizedBox(width: 5),
-                _WaveBar(height: 32),
+                _WaveBar(height: 40),
                 SizedBox(width: 5),
-                _WaveBar(height: 42),
+                _WaveBar(height: 52),
                 SizedBox(width: 5),
-                _WaveBar(height: 26),
+                _WaveBar(height: 34),
                 SizedBox(width: 5),
-                _WaveBar(height: 36),
+                _WaveBar(height: 46),
               ],
             ),
           ),
@@ -117,6 +117,16 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
     );
   }
 
+  BoxDecoration _cardDecoration(Color bg, Color border) => BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: border),
+        boxShadow: [
+          if (!widget.isDark)
+            BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.surfaceContainerLow : Colors.white;
@@ -134,16 +144,8 @@ class _BentoEngineCardState extends State<BentoEngineCard> {
         scale: _pressed ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              if (!widget.isDark)
-                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
-            ],
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: _cardDecoration(bgColor, borderColor),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -167,7 +169,7 @@ class _WaveBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 7,
+      width: 8,
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),

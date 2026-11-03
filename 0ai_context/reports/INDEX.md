@@ -41,6 +41,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 85 | `85-notification-fix-and-channel-binding.md` | Perbaikan Notifikasi Sistem Android 13+ Channel Binding, ProGuard Rules, & Button Trigger |
 | 86 | `86-audit-remediation-complete.md` | Remediasi Penuh Temuan Audit Sprint 85: Unmounted setState, RenderFlex 320dp/1.3x Font, & Bounded LRU Cache |
 | 87 | `87-bento-gauge-clipping-fix.md` | Perbaikan Total Clipping Angka Bento Gauge (100% & 52%), Verifikasi ADB Device, dan Deploy APK |
+| 88 | `88-notification-audit-and-bento-110dp.md` | Forensic Audit Notifikasi Android 13+ (POST_NOTIFICATIONS & Channel v2) dan Skala Elemen Visual Bento 110dp |
 
 ---
 
