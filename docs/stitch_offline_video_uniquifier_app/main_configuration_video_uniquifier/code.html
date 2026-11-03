@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Uniquifier</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-highest": "#353437",
+            "on-primary-fixed-variant": "#005236",
+            "on-tertiary-fixed": "#1b1b21",
+            "secondary-fixed": "#4dffb2",
+            "inverse-primary": "#006c4a",
+            "on-secondary-container": "#005f3d",
+            "surface-tint": "#00e29e",
+            "secondary-container": "#00e296",
+            "on-surface": "#e5e1e4",
+            "surface-variant": "#353437",
+            "surface-bright": "#39393b",
+            "tertiary-fixed": "#e4e1ea",
+            "primary-container": "#00f0a8",
+            "inverse-on-surface": "#313032",
+            "on-tertiary": "#303036",
+            "on-primary": "#003824",
+            "tertiary-fixed-dim": "#c8c5cd",
+            "primary-fixed": "#46ffb8",
+            "primary": "#b7ffd9",
+            "surface-container-lowest": "#0e0e10",
+            "on-secondary-fixed-variant": "#005234",
+            "on-tertiary-fixed-variant": "#47464d",
+            "secondary": "#4dffb2",
+            "on-secondary": "#003822",
+            "surface": "#131315",
+            "surface-container-low": "#1c1b1d",
+            "error": "#ffb4ab",
+            "on-surface-variant": "#b9cbbf",
+            "tertiary": "#f1eef7",
+            "on-background": "#e5e1e4",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#002112",
+            "on-tertiary-container": "#5b5a61",
+            "background": "#131315",
+            "surface-container-high": "#2a2a2c",
+            "outline": "#84958a",
+            "surface-dim": "#131315",
+            "secondary-fixed-dim": "#00e296",
+            "on-error": "#690005",
+            "on-primary-fixed": "#002114",
+            "outline-variant": "#3b4a41",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#d4d2da",
+            "primary-fixed-dim": "#00e29e",
+            "inverse-surface": "#e5e1e4",
+            "on-primary-container": "#006847",
+            "surface-container": "#201f21"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "space-md": "1rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "label-sm": ["JetBrains Mono"],
+            "body-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "label-md": ["JetBrains Mono"],
+            "headline-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-xs": ["JetBrains Mono"],
+            "headline-lg-mobile": ["Inter"],
+            "headline-md": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0a0a0c;
+      color: #e5e1e4;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Viewport Canvas Container -->
+<div class="w-full max-w-[420px] min-h-screen flex flex-col bg-surface-container-lowest border-x border-surface-container-highest/20 relative pb-20">
+<!-- OS Status Bar Simulation -->
+<div class="w-full h-8 px-5 flex justify-between items-center text-on-surface-variant font-label-xs text-label-xs select-none">
+<span>09:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined !text-[14px]">signal_cellular_alt</span>
+<span class="material-symbols-outlined !text-[14px]">airplanemode_active</span>
+<span class="material-symbols-outlined !text-[14px]">battery_charging_full</span>
+</div>
+</div>
+<!-- TopAppBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-space-md py-space-sm h-14 bg-surface border-b border-surface-container-highest">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" data-icon="terminal">terminal</span>
+<h1 class="text-headline-sm font-headline-sm tracking-tight text-on-surface uppercase">Video Uniquifier</h1>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 bg-surface-container border border-surface-container-highest rounded">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="material-symbols-outlined text-primary-container !text-[13px]" data-icon="lock">lock</span>
+<span class="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">OFFLINE</span>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 px-gutter py-space-md flex flex-col gap-space-md">
+<!-- Section: Video Picker (Selected State) -->
+<section class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs px-1">
+<span>SOURCE FILE</span>
+<span class="text-primary-container font-label-xs text-label-xs">READY FOR TRANSCODE</span>
+</div>
+<!-- Video Card -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded p-space-sm flex flex-col gap-2 relative">
+<div class="flex items-center gap-3">
+<!-- Video Thumbnail Frame -->
+<div class="relative w-16 h-20 rounded bg-surface-container-high border border-surface-container-highest overflow-hidden flex-shrink-0 flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A cinematic dark neon cyberpunk street view frozen on an ultra-sharp mobile video preview frame with high-contrast electric mint reflections and deep black shadows. The scene feels industrial, crisp, technical, and precisely framed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtLm-kWyKvSO2pwHKO90oxxOfILOct-iitI8mFznqxl_V_YnaMOpNug6903lNi2SSbidAXIP_fNoWnCoD6-XHcw_nIYf3qjwPAzhXNaWaH4JskDOEPm0SfIP_B4sVc7FeumSZ_BQPtSNXKLgT-KOb9zoTBmuUHhFsESdC8a_YMIkArt5YLr6cfbFxdm3uwL5a19wV4AWJbPhqre3RYeJPMEtLD4B_8htjeM3OQKda7"/>
+<!-- Duration Badge overlay -->
+<div class="absolute bottom-1 right-1 bg-surface-container-lowest/90 px-1 py-0.5 rounded border border-surface-container-highest text-on-surface font-label-xs text-label-xs leading-none">
+                0:15
+              </div>
+<div class="absolute top-1 left-1 text-primary-container">
+<span class="material-symbols-outlined !text-[14px]">videocam</span>
+</div>
+</div>
+<!-- Metadata Column -->
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-body-md text-on-surface truncate">video_01.mp4</span>
+</div>
+<p class="font-label-xs text-label-xs text-on-surface-variant mt-0.5 tracking-tight truncate">
+                1080×1920 • 24.8 MB • H.264
+              </p>
+<div class="flex items-center gap-1.5 mt-2">
+<span class="px-1.5 py-0.5 bg-surface-container border border-surface-container-highest rounded text-on-surface-variant font-label-xs text-label-xs">
+                  60 FPS
+                </span>
+<span class="px-1.5 py-0.5 bg-surface-container border border-surface-container-highest rounded text-on-surface-variant font-label-xs text-label-xs">
+                  AAC 48kHz
+                </span>
+</div>
+</div>
+<!-- Clear Action -->
+<button aria-label="Clear video selection" class="w-8 h-8 rounded flex items-center justify-center bg-surface-container hover:border-surface-container-highest text-on-surface-variant hover:text-on-surface border border-transparent active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined !text-[16px]">close</span>
+</button>
+</div>
+<!-- Bottom Action Hint -->
+<div class="pt-2 border-t border-surface-container-highest/40 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined !text-[12px]">refresh</span>
+              Tap to replace source file
+            </span>
+<span class="text-primary-container">SHA-256: 8f42…d1</span>
+</div>
+</div>
+</section>
+<!-- Section: Processing Settings -->
+<section class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs px-1 uppercase tracking-wider">
+<span>Processing Settings</span>
+<span>4 Modifiers</span>
+</div>
+<!-- Settings Grouped List Card -->
+<div class="bg-surface-container-low border border-surface-container-highest rounded divide-y divide-surface-container-highest/60 overflow-hidden">
+<!-- Toggle 1: Remove Metadata -->
+<div class="p-space-sm flex items-center justify-between hover:bg-surface-container/50 transition-colors">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container mt-0.5 !text-[16px]">fingerprint</span>
+<div>
+<p class="font-headline-sm text-body-md text-on-surface">Remove Metadata</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cleans GPS &amp; device info</p>
+</div>
+</div>
+<!-- Switch Track: ON -->
+<button aria-checked="true" class="w-12 h-6 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer transition-colors duration-150" role="switch" type="button">
+<span class="w-[18px] h-[18px] rounded-full bg-surface-container-lowest block"></span>
+</button>
+</div>
+<!-- Toggle 2: Modify Audio -->
+<div class="p-space-sm flex items-center justify-between hover:bg-surface-container/50 transition-colors">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container mt-0.5 !text-[16px]">graphic_eq</span>
+<div>
+<p class="font-headline-sm text-body-md text-on-surface">Modify Audio</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Shift pitch by 0.5%</p>
+</div>
+</div>
+<!-- Switch Track: ON -->
+<button aria-checked="true" class="w-12 h-6 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer transition-colors duration-150" role="switch" type="button">
+<span class="w-[18px] h-[18px] rounded-full bg-surface-container-lowest block"></span>
+</button>
+</div>
+<!-- Toggle 3: Modify Visuals -->
+<div class="p-space-sm flex items-center justify-between hover:bg-surface-container/50 transition-colors">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container mt-0.5 !text-[16px]">crop</span>
+<div>
+<p class="font-headline-sm text-body-md text-on-surface">Modify Visuals</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Micro-crop &amp; color tweak</p>
+</div>
+</div>
+<!-- Switch Track: ON -->
+<button aria-checked="true" class="w-12 h-6 rounded-full bg-primary-container p-0.5 flex items-center justify-end cursor-pointer transition-colors duration-150" role="switch" type="button">
+<span class="w-[18px] h-[18px] rounded-full bg-surface-container-lowest block"></span>
+</button>
+</div>
+<!-- Toggle 4: Upscale to 1080p -->
+<div class="p-space-sm flex items-center justify-between hover:bg-surface-container/50 transition-colors">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-on-surface-variant mt-0.5 !text-[16px]">hd</span>
+<div>
+<p class="font-headline-sm text-body-md text-on-surface">Upscale to 1080p</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Lanczos algorithm</p>
+</div>
+</div>
+<!-- Switch Track: OFF -->
+<button aria-checked="false" class="w-12 h-6 rounded-full bg-surface-container border border-surface-container-highest p-0.5 flex items-center justify-start cursor-pointer transition-colors duration-150" role="switch" type="button">
+<span class="w-[18px] h-[18px] rounded-full bg-on-surface-variant/60 block"></span>
+</button>
+</div>
+</div>
+</section>
+<!-- Mini Engine State Strip -->
+<div class="bg-surface-container-lowest border border-surface-container-highest/60 rounded p-space-sm flex items-center justify-between font-label-xs text-label-xs">
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary-container !text-[14px]">memory</span>
+<span>GPU Accel: Metal / GLES</span>
+</div>
+<span class="text-on-surface-variant">Est. Render: ~2.4s</span>
+</div>
+<!-- Bottom Action Section -->
+<section class="mt-auto flex flex-col gap-3 pt-2">
+<!-- Offline Sandbox Security Guarantee -->
+<div class="flex items-center justify-center gap-1.5 text-on-surface-variant font-label-xs text-label-xs py-1">
+<span class="material-symbols-outlined text-primary-container !text-[14px]">verified_user</span>
+<span>100% on-device processing • No data leaves device</span>
+</div>
+<!-- Primary Action Button -->
+<button class="w-full h-12 bg-primary-container hover:bg-secondary-container active:scale-[0.99] text-on-primary font-headline-sm text-body-md rounded font-semibold flex items-center justify-center gap-2 transition-all shadow-none">
+<span class="material-symbols-outlined !text-[18px]">bolt</span>
+<span>Process Video</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-16 px-space-md bg-surface-container-lowest border-t border-surface-container-highest">
+<!-- Tab 1: Process (Active Match for Current Screen) -->
+<button class="flex flex-col items-center justify-center text-primary-container py-1 px-3 border-b-2 border-primary-container font-label-xs text-label-xs">
+<span class="material-symbols-outlined" data-icon="video_settings">video_settings</span>
+<span class="mt-0.5">Process</span>
+</button>
+<!-- Tab 2: Presets -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 font-label-xs text-label-xs hover:text-primary-container transition-colors duration-150 active:scale-95">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+<span class="mt-0.5">Presets</span>
+</button>
+<!-- Tab 3: Inspect -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant py-1 px-3 font-label-xs text-label-xs hover:text-primary-container transition-colors duration-150 active:scale-95">
+<span class="material-symbols-outlined" data-icon="data_object">data_object</span>
+<span class="mt-0.5">Inspect</span>
+</button>
+</nav>
+<!-- Home Indicator Strip (OS Navigation) -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-surface-container-highest/60 rounded-full z-50 pointer-events-none"></div>
+</div>
+</body></html>

@@ -1,0 +1,9 @@
+v1.0.0 — Initial Release
+
+• 100% offline video uniquification — no network required
+• Anti-fingerprint evasion: crop, tilt, grain, audio masking, metadata scrub
+• Batch processing for multiple videos at once
+• H.264 and H.265 codec selection, up to 4K output
+• Live progress notifications with completion alerts
+
+Note: Some device-specific hardware features may vary.

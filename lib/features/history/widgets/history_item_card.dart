@@ -1,0 +1,355 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../../../core/services/ffmpeg_service.dart';
+import '../../../../core/services/history_service.dart';
+import '../../../../core/theme/app_theme.dart';
+
+class HistoryItemCard extends StatelessWidget {
+  final VideoExportItem item;
+  final VoidCallback onTap;
+  final VoidCallback onShare;
+  final VoidCallback onDelete;
+
+  const HistoryItemCard({
+    super.key,
+    required this.item,
+    required this.onTap,
+    required this.onShare,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
+    final borderColor = isDark
+        ? AppColors.surfaceContainerHighest
+        : AppColors.lightOutlineVariant;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+          ],
+        ),
+        child: Row(
+          children: [
+            _ThumbnailBadge(item: item, isDark: isDark),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _ItemInfoColumn(item: item, isDark: isDark),
+            ),
+            _ItemActionButtons(
+              onShare: onShare,
+              onDelete: onDelete,
+              isDark: isDark,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThumbnailBadge extends StatefulWidget {
+  final VideoExportItem item;
+  final bool isDark;
+  const _ThumbnailBadge({required this.item, required this.isDark});
+
+  @override
+  State<_ThumbnailBadge> createState() => _ThumbnailBadgeState();
+}
+
+class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
+  String? _thumbPath;
+  bool _isExtracting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resolveThumbnail();
+  }
+
+  @override
+  void didUpdateWidget(covariant _ThumbnailBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.item.file.path != widget.item.file.path) {
+      _resolveThumbnail();
+    }
+  }
+
+  Future<void> _resolveThumbnail() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final thumbDir = Directory('${tempDir.path}/thumbnails');
+      if (!await thumbDir.exists()) await thumbDir.create(recursive: true);
+
+      final baseName = widget.item.fileName.replaceAll(
+        RegExp(r'[^\w\.-]'),
+        '_',
+      );
+      final expectedPath = '${thumbDir.path}/thumb_$baseName.jpg';
+
+      if (await File(expectedPath).exists()) {
+        if (mounted) setState(() => _thumbPath = expectedPath);
+        return;
+      }
+
+      if (_isExtracting) return;
+      _isExtracting = true;
+      final extracted = await FfmpegService.extractThumbnail(
+        widget.item.file.path,
+        targetPath: expectedPath,
+      );
+      if (mounted && extracted != null && await File(extracted).exists()) {
+        setState(() => _thumbPath = extracted);
+      }
+    } catch (_) {
+    } finally {
+      _isExtracting = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final thumbBg = widget.isDark
+        ? AppColors.obsidianDark
+        : AppColors.offWhiteCanvas;
+    final borderColor = widget.isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final iconColor = widget.isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final checkColor = widget.isDark
+        ? AppColors.mintSage
+        : AppColors.forestDeep;
+
+    final hasThumb = _thumbPath != null && File(_thumbPath!).existsSync();
+
+    return Container(
+      width: 72,
+      height: 52,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: thumbBg,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (hasThumb)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Image.file(
+                File(_thumbPath!),
+                key: ValueKey(_thumbPath),
+                cacheWidth: 200,
+                cacheHeight: 150,
+                fit: BoxFit.cover,
+                width: 72,
+                height: 52,
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Icon(Icons.videocam, color: iconColor, size: 24),
+                ),
+              ),
+            )
+          else
+            Center(child: Icon(Icons.videocam, color: iconColor, size: 24)),
+          Positioned(
+            top: 3,
+            left: 3,
+            child: Icon(Icons.check_circle, color: checkColor, size: 13),
+          ),
+          Positioned(
+            bottom: 3,
+            right: 3,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+              decoration: BoxDecoration(
+                color:
+                    (widget.isDark
+                            ? AppColors.obsidianBase
+                            : AppColors.obsidianDark)
+                        .withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: const Text(
+                'MP4',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ItemInfoColumn extends StatelessWidget {
+  final VideoExportItem item;
+  final bool isDark;
+  const _ItemInfoColumn({required this.item, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final dateColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          item.fileName,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '${item.formattedDate} • ${item.formattedSize}',
+          style: TextStyle(
+            color: dateColor,
+            fontSize: 10,
+            fontFamily: 'monospace',
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 6),
+        _ItemStatusRow(isDark: isDark, dateColor: dateColor),
+      ],
+    );
+  }
+}
+
+class _ItemStatusRow extends StatelessWidget {
+  final bool isDark;
+  final Color dateColor;
+  const _ItemStatusRow({required this.isDark, required this.dateColor});
+
+  @override
+  Widget build(BuildContext context) {
+    final readyColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final readyBg = readyColor.withValues(alpha: 0.12);
+    final readyBorder = readyColor.withValues(alpha: 0.35);
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: readyBg,
+            border: Border.all(color: readyBorder),
+            borderRadius: BorderRadius.circular(3),
+          ),
+          child: Text(
+            'READY',
+            style: TextStyle(
+              color: readyColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            'H.264 • MODIFIED',
+            style: TextStyle(
+              color: dateColor,
+              fontSize: 9,
+              fontFamily: 'monospace',
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ItemActionButtons extends StatelessWidget {
+  final VoidCallback onShare;
+  final VoidCallback onDelete;
+  final bool isDark;
+
+  const _ItemActionButtons({
+    required this.onShare,
+    required this.onDelete,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final btnBg = isDark
+        ? AppColors.surfaceContainer
+        : AppColors.hairlineBorder;
+    final btnBorder = isDark
+        ? AppColors.outlineVariant
+        : AppColors.lightOutlineVariant;
+    final shareColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    const deleteColor = AppColors.vividCoral;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.share, size: 16),
+          color: shareColor,
+          tooltip: 'Share',
+          style: IconButton.styleFrom(
+            backgroundColor: btnBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: btnBorder),
+            ),
+            minimumSize: const Size(48, 48),
+            fixedSize: const Size(48, 48),
+          ),
+          onPressed: onShare,
+        ),
+        const SizedBox(width: 8),
+        IconButton(
+          icon: const Icon(Icons.delete_outline, size: 16),
+          color: deleteColor,
+          tooltip: 'Delete',
+          style: IconButton.styleFrom(
+            backgroundColor: btnBg,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: btnBorder),
+            ),
+            minimumSize: const Size(48, 48),
+            fixedSize: const Size(48, 48),
+          ),
+          onPressed: onDelete,
+        ),
+      ],
+    );
+  }
+}

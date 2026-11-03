@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Uniquifier - Advanced Upscale Settings</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "inverse-surface": "#e5e1e4",
+            "surface-dim": "#131315",
+            "secondary-container": "#00e296",
+            "tertiary-container": "#d4d2da",
+            "inverse-primary": "#006c4a",
+            "on-surface": "#e5e1e4",
+            "on-primary-fixed-variant": "#005236",
+            "outline": "#84958a",
+            "inverse-on-surface": "#313032",
+            "on-tertiary-container": "#5b5a61",
+            "secondary-fixed": "#4dffb2",
+            "surface-bright": "#39393b",
+            "outline-variant": "#3b4a41",
+            "on-tertiary-fixed": "#1b1b21",
+            "background": "#131315",
+            "on-error": "#690005",
+            "secondary": "#4dffb2",
+            "on-secondary-container": "#005f3d",
+            "tertiary": "#f1eef7",
+            "on-primary": "#003824",
+            "surface-container-low": "#1c1b1d",
+            "surface-container-highest": "#353437",
+            "primary-fixed": "#46ffb8",
+            "surface-container": "#201f21",
+            "surface-container-high": "#2a2a2c",
+            "on-primary-fixed": "#002114",
+            "on-secondary-fixed": "#002112",
+            "error-container": "#93000a",
+            "on-tertiary": "#303036",
+            "on-secondary": "#003822",
+            "on-error-container": "#ffdad6",
+            "primary-container": "#00f0a8",
+            "secondary-fixed-dim": "#00e296",
+            "surface": "#131315",
+            "on-background": "#e5e1e4",
+            "on-surface-variant": "#b9cbbf",
+            "tertiary-fixed": "#e4e1ea",
+            "on-secondary-fixed-variant": "#005234",
+            "tertiary-fixed-dim": "#c8c5cd",
+            "surface-tint": "#00e29e",
+            "on-primary-container": "#006847",
+            "on-tertiary-fixed-variant": "#47464d",
+            "primary-fixed-dim": "#00e29e",
+            "error": "#ffb4ab",
+            "primary": "#b7ffd9",
+            "surface-variant": "#353437",
+            "surface-container-lowest": "#0e0e10"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.5rem",
+            "space-md": "1rem",
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "headline-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "label-xs": ["JetBrains Mono"],
+            "headline-lg": ["Inter"],
+            "label-md": ["JetBrains Mono"],
+            "body-lg": ["Inter"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"],
+            "body-sm": ["Inter"]
+          },
+          "fontSize": {
+            "headline-sm": ["16px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "fontWeight": "700" }],
+            "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased font-body-md min-h-screen relative overflow-hidden flex justify-center">
+<!-- Mobile Viewport Simulator Shell -->
+<div class="w-full max-w-md h-screen relative bg-surface flex flex-col overflow-hidden">
+<!-- Top App Bar (Shared Anchor Blueprint) -->
+<header class="flex justify-between items-center w-full px-space-md py-space-sm h-14 bg-surface dark:bg-surface border-b border-surface-container-highest dark:border-surface-container-highest z-10 flex-shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-xl" data-icon="terminal">terminal</span>
+<span class="text-headline-sm font-headline-sm tracking-tight text-on-surface dark:text-on-surface uppercase">Video Uniquifier</span>
+</div>
+<div class="flex items-center gap-1.5 px-2 py-0.5 bg-surface-container-high border border-surface-container-highest rounded">
+<span class="material-symbols-outlined text-primary-container text-xs" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-label-xs text-label-xs text-on-surface tracking-wider">OFFLINE</span>
+</div>
+</header>
+<!-- Dimmed Background Workspace Canvas -->
+<main class="flex-1 overflow-y-auto px-space-md py-space-md space-y-space-md opacity-35 filter pointer-events-none select-none">
+<!-- Video Input Target Placeholder -->
+<div class="w-full border border-dashed border-surface-container-highest bg-surface-container-low p-space-md flex flex-col items-center justify-center rounded">
+<span class="material-symbols-outlined text-outline text-3xl mb-1" data-icon="video_file">video_file</span>
+<div class="text-headline-sm font-headline-sm text-on-surface">raw_stream_098.mp4</div>
+<div class="font-label-xs text-label-xs text-on-surface-variant mt-1">1080x1920 • 60 FPS • H.264 • 48.2 MB</div>
+</div>
+<!-- Video Canvas Container -->
+<div class="w-full bg-surface-container-low border border-surface-container-highest rounded overflow-hidden">
+<div class="h-44 bg-surface-container flex items-center justify-center relative">
+<div class="font-label-xs text-label-xs text-outline flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="videocam">videocam</span>
+            FRAME PREVIEW BUFFER ACTIVE
+          </div>
+<div class="absolute bottom-2 left-2 px-1.5 py-0.5 bg-surface-container-lowest border border-surface-container-highest font-label-xs text-label-xs text-primary-container">
+            CUDA 0x7E2
+          </div>
+</div>
+</div>
+<!-- Parameter Card Mock -->
+<div class="p-space-md bg-surface-container-low border border-surface-container-highest rounded space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-headline-sm font-headline-sm text-on-surface">Hash Scramble Engine</span>
+<span class="font-label-xs text-label-xs text-primary-container">ACTIVE</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-2/3"></div>
+</div>
+<div class="flex justify-between font-label-xs text-label-xs text-on-surface-variant">
+<span>Metadata Strip: Level 3</span>
+<span>Noise Mod: +0.4%</span>
+</div>
+</div>
+<!-- Quick Action Controls Mock -->
+<div class="grid grid-cols-2 gap-2">
+<div class="p-2.5 bg-surface-container-low border border-surface-container-highest text-left">
+<div class="font-label-xs text-label-xs text-outline">BITRATE MODE</div>
+<div class="text-body-md font-body-md text-on-surface mt-0.5">VBR 2-Pass</div>
+</div>
+<div class="p-2.5 bg-surface-container-low border border-surface-container-highest text-left">
+<div class="font-label-xs text-label-xs text-outline">AUDIO CHANNELS</div>
+<div class="text-body-md font-body-md text-on-surface mt-0.5">Dual-Mono Mod</div>
+</div>
+</div>
+</main>
+<!-- Semi-Transparent Dark Backdrop Scrim -->
+<div class="absolute inset-0 bg-surface-container-lowest/80 z-40 transition-opacity"></div>
+<!-- Advanced Settings Modal (Bottom Sheet Overlay) -->
+<section class="absolute bottom-0 inset-x-0 z-50 bg-surface-container-low border-t border-x border-surface-container-highest rounded-t-xl flex flex-col max-h-[92vh]">
+<!-- Drag Indicator Pill -->
+<div class="w-full pt-3 pb-2 flex justify-center items-center cursor-grab active:cursor-grabbing">
+<div class="w-10 h-1 bg-surface-container-highest rounded-full"></div>
+</div>
+<!-- Bottom Sheet Header -->
+<div class="px-space-md pt-1 pb-space-sm flex items-start justify-between border-b border-surface-container-high">
+<div class="pr-2">
+<h2 class="text-headline-md font-headline-md text-on-surface tracking-tight">Advanced Upscale Settings</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-0.5">Configure render engine target resolution & hardware allocation</p>
+</div>
+<button aria-label="Close modal" class="flex-shrink-0 w-8 h-8 rounded bg-surface-container border border-surface-container-highest text-on-surface flex items-center justify-center hover:text-primary-container active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="close">close</span>
+</button>
+</div>
+<!-- Bottom Sheet Body -->
+<div class="px-space-md py-space-md space-y-space-md overflow-y-auto">
+<!-- Resolution Radio Selection Cards -->
+<fieldset class="space-y-2.5">
+<legend class="font-label-xs text-label-xs text-outline uppercase tracking-wider mb-1 block">Output Target Pipeline</legend>
+<!-- Option 1: 720p HD -->
+<label class="group relative flex items-center justify-between p-3.5 bg-surface-container border border-surface-container-highest rounded hover:border-outline cursor-pointer transition-colors">
+<div class="flex items-center gap-3 pr-2">
+<!-- Radio indicator unselected -->
+<div class="w-4 h-4 rounded-full border border-outline flex items-center justify-center bg-surface-container-high flex-shrink-0 group-hover:border-on-surface">
+<div class="w-1.5 h-1.5 rounded-full bg-transparent"></div>
+</div>
+<input class="sr-only" name="upscale_resolution" type="radio" value="720p"/>
+<div>
+<div class="text-body-md font-headline-sm text-on-surface">720p HD (Fastest)</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Best for older devices</div>
+</div>
+</div>
+<span class="font-label-xs text-label-xs text-outline uppercase flex-shrink-0">1280×720</span>
+</label>
+<!-- Option 2: 1080p Full HD (Selected by default) -->
+<label class="relative flex items-center justify-between p-3.5 bg-surface-container-high border-2 border-primary-container rounded cursor-pointer transition-colors shadow-[0_0_12px_rgba(0,240,168,0.08)]">
+<div class="flex items-center gap-3 pr-2">
+<!-- Radio indicator selected -->
+<div class="w-4 h-4 rounded-full border-2 border-primary-container flex items-center justify-center bg-surface-container-lowest flex-shrink-0">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+<input checked="" class="sr-only" name="upscale_resolution" type="radio" value="1080p"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface font-semibold">1080p Full HD (Recommended)</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Optimal quality & balance • Lanczos filter</div>
+</div>
+</div>
+<span class="font-label-xs text-label-xs text-primary-container bg-primary-container/10 border border-primary-container/30 px-1.5 py-0.5 rounded flex-shrink-0 font-medium">1920×1080</span>
+</label>
+<!-- Option 3: 2K QHD -->
+<label class="group relative flex items-center justify-between p-3.5 bg-surface-container border border-surface-container-highest rounded hover:border-outline cursor-pointer transition-colors">
+<div class="flex items-center gap-3 pr-2">
+<!-- Radio indicator unselected -->
+<div class="w-4 h-4 rounded-full border border-outline flex items-center justify-center bg-surface-container-high flex-shrink-0 group-hover:border-on-surface">
+<div class="w-1.5 h-1.5 rounded-full bg-transparent"></div>
+</div>
+<input class="sr-only" name="upscale_resolution" type="radio" value="2k"/>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-body-md font-headline-sm text-on-surface">2K QHD (May lag)</span>
+<!-- Warning Pill Badge -->
+<span class="font-label-xs text-label-xs text-error bg-error-container/30 border border-error/40 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[10px]" data-icon="warning">warning</span>
+                    HIGH THERMAL
+                  </span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Requires heavy CPU usage</div>
+</div>
+</div>
+<span class="font-label-xs text-label-xs text-outline uppercase flex-shrink-0">2560×1440</span>
+</label>
+</fieldset>
+<!-- Hardware Acceleration Toggle Module -->
+<div class="p-3.5 bg-surface-container border border-surface-container-highest rounded flex items-center justify-between gap-3">
+<div class="flex-1 pr-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-container text-base" data-icon="memory">memory</span>
+<span class="text-body-md font-headline-sm text-on-surface">Hardware Acceleration</span>
+</div>
+<p class="font-label-xs text-label-xs text-on-surface-variant mt-1">Force OpenGLES/Metal Shader Pipeline</p>
+</div>
+<!-- Custom Flat Switch Component (Active) -->
+<button aria-checked="true" class="w-12 h-6 bg-primary-container border border-primary-container rounded-full p-0.5 flex items-center justify-end cursor-pointer flex-shrink-0 transition-colors" role="switch" type="button">
+<span class="w-[18px] h-[18px] bg-surface-container-lowest rounded-full block"></span>
+</button>
+</div>
+<!-- Real-Time Sandbox Status Micro-Data Strip -->
+<div class="p-2.5 bg-surface-container-lowest border border-surface-container-high rounded flex items-center justify-between font-label-xs text-label-xs text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+            SHADERS CACHED: 42/42
+          </span>
+<span class="text-outline">LATENCY ~14ms</span>
+</div>
+</div>
+<!-- Modal Bottom Fixed Action -->
+<div class="px-space-md py-space-md border-t border-surface-container-high bg-surface-container-low flex flex-col gap-2">
+<button class="w-full bg-primary-container hover:bg-secondary-container active:scale-[0.99] text-surface-container-lowest font-headline-sm py-3.5 px-space-md rounded-lg flex items-center justify-center gap-2 transition-all font-semibold" type="button">
+<span>Apply Settings</span>
+<span class="material-symbols-outlined text-lg" data-icon="check">check</span>
+</button>
+</div>
+</section>
+</div>
+</body></html>

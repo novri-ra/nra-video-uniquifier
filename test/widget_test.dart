@@ -1,0 +1,724 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nra_video_uniquifier/core/providers/batch_queue_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/theme_provider.dart';
+import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
+import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
+import 'package:nra_video_uniquifier/features/profile/screens/profile_placeholder_screen.dart';
+import 'package:nra_video_uniquifier/main.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/processing_log_viewer.dart';
+import 'package:nra_video_uniquifier/features/process/screens/processing_screen.dart';
+import 'package:nra_video_uniquifier/features/process/screens/error_screen.dart';
+import 'package:nra_video_uniquifier/features/process/widgets/processing_radar_indicator.dart';
+import 'package:nra_video_uniquifier/features/settings/screens/settings_screen.dart';
+import 'package:nra_video_uniquifier/shared/widgets/top_app_bar.dart';
+import 'package:nra_video_uniquifier/shared/widgets/floating_capsule_nav_bar.dart';
+import 'package:nra_video_uniquifier/features/history/widgets/history_item_card.dart';
+import 'package:nra_video_uniquifier/features/history/screens/recent_history_screen.dart';
+import 'package:nra_video_uniquifier/features/dashboard/widgets/bento_metric_grid.dart';
+import 'package:nra_video_uniquifier/core/services/history_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+  Widget createTestWidget({required Size surfaceSize, int tabIndex = 2}) {
+    final provider = UniquifierProvider()..setTabIndex(tabIndex);
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider.value(value: provider),
+        ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
+      ],
+      child: MaterialApp(
+        home: MediaQuery(
+          data: MediaQueryData(size: surfaceSize),
+          child: const RootNavigationScreen(),
+        ),
+      ),
+    );
+  }
+
+  group('Video Uniquifier - Multi-Resolution Responsive Smoke Tests', () {
+    testWidgets('Renders cleanly on Small Phone (320x480) without overflow', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 480);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        createTestWidget(surfaceSize: const Size(320, 480)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
+      expect(find.text('SOURCE FILE'), findsOneWidget);
+      expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'Renders cleanly on Standard FHD (1080x1920) without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 1920);
+        tester.view.devicePixelRatio = 2.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(
+          createTestWidget(surfaceSize: const Size(540, 960)),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
+        expect(find.text('SOURCE FILE'), findsOneWidget);
+        expect(find.byIcon(Icons.bolt), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets('Renders cleanly on Tablet / LDPlayer 9 Landscape (1280x800)', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(1280, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        createTestWidget(surfaceSize: const Size(1280, 800)),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('NRA VIDEO UNIQUIFIER'), findsOneWidget);
+      expect(find.text('SOURCE FILE'), findsOneWidget);
+      expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets(
+      'ProcessingLogViewer truncates excessively long filename without overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 480);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: SizedBox(
+                  width: 300,
+                  child: ProcessingLogViewer(
+                    fileName:
+                        'VeryLongVideoFileName_2026_Final_Render_Version_Ultra_Special_Export_Sample_Video_Archive.mp4',
+                    duration: '01:45:20',
+                    executionTime: '01:23s',
+                    estimatedRemaining: '00:12s rem',
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('SOURCE'), findsOneWidget);
+        expect(find.text('EXECUTION TIME'), findsOneWidget);
+        expect(find.text('SANDBOX STATE'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'ModifiersCard displays dynamic title and subtitle for resolution state',
+      (tester) async {
+        final testProvider = UniquifierProvider();
+
+        await tester.pumpWidget(
+          ChangeNotifierProvider.value(
+            value: testProvider,
+            child: MaterialApp(
+              home: Scaffold(
+                body: ModifiersCard(
+                  provider: testProvider,
+                  onOpenAdvanced: () {},
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Initial state: 1080p
+        expect(find.text('Upscale to 1080p'), findsOneWidget);
+        expect(find.text('Lanczos algorithm (1920x1080)'), findsOneWidget);
+        expect(find.text('Denoise & Clarity'), findsOneWidget);
+        expect(find.text('Deep Evasion'), findsOneWidget);
+        expect(find.text('Horizontal Flip'), findsOneWidget);
+        expect(find.text('Audio Masking'), findsOneWidget);
+        expect(find.text('Auto-Trim'), findsOneWidget);
+
+        // Change to 2K
+        testProvider.setUpscaleTarget('2k');
+        await tester.pumpAndSettle();
+        expect(find.text('Upscale to 2K'), findsOneWidget);
+        expect(find.text('Lanczos algorithm (2560x1440)'), findsOneWidget);
+
+        // Change to 4K
+        testProvider.setUpscaleTarget('4k');
+        await tester.pumpAndSettle();
+        expect(find.text('Upscale to 4K'), findsOneWidget);
+        expect(find.text('Lanczos algorithm (3840x2160)'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'D2-01: Double-tap on start action button triggers exactly one route push',
+      (tester) async {
+        final uniquifierProvider = UniquifierProvider()..setTabIndex(2);
+        final batchQueueProvider = BatchQueueProvider();
+
+        uniquifierProvider.setVideoFile(
+          path: '/dummy/path/video.mp4',
+          name: 'video.mp4',
+          sizeBytes: 1024,
+        );
+
+        int pushCount = 0;
+        final observer = _TestNavigatorObserver(onPushed: () => pushCount++);
+
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: uniquifierProvider),
+              ChangeNotifierProvider.value(value: batchQueueProvider),
+            ],
+            child: MaterialApp(
+              navigatorObservers: [observer],
+              home: const RootNavigationScreen(),
+            ),
+          ),
+        );
+        await tester.pump();
+
+        final button = find.text('START UNIQUIFYING');
+        expect(button, findsOneWidget);
+        await tester.ensureVisible(button);
+
+        // Tap twice rapidly
+        await tester.tap(button, warnIfMissed: false);
+        await tester.tap(button, warnIfMissed: false);
+        await tester.pump();
+
+        // Observer records 1 for initial route + 1 for ProcessingScreen push = 2 total pushes
+        expect(pushCount, equals(2));
+      },
+    );
+
+    testWidgets(
+      'D3-02: Preset profile chips update provider toggles per preset definition',
+      (tester) async {
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+            ],
+            child: const MaterialApp(home: SettingsScreen()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Tap TikTok / Reels Aggressive
+        final tikTokChip = find.text('TikTok / Reels Aggressive');
+        expect(tikTokChip, findsOneWidget);
+        await tester.tap(tikTokChip);
+        await tester.pumpAndSettle();
+        expect(provider.modifyVisuals, isTrue);
+        expect(provider.enableEnhanceAndDenoise, isFalse);
+        expect(provider.enableAutoTrim, isTrue);
+
+        // Tap Cinematic 2K / 4K Clean
+        final maxChip = find.text('Cinematic 2K / 4K Clean');
+        expect(maxChip, findsOneWidget);
+        await tester.tap(maxChip);
+        await tester.pumpAndSettle();
+        expect(provider.upscale1080p, isTrue);
+        expect(provider.selectedUpscaleTarget, equals('2k'));
+        expect(provider.enableHorizontalFlip, isFalse);
+
+        // Tap Ultra-Light / Quick Export
+        final stealthChip = find.text('Ultra-Light / Quick Export');
+        expect(stealthChip, findsOneWidget);
+        await tester.tap(stealthChip);
+        await tester.pumpAndSettle();
+        expect(provider.modifyAudio, isFalse);
+        expect(provider.modifyVisuals, isFalse);
+        expect(provider.enableDeepAntiFingerprint, isFalse);
+      },
+    );
+
+    testWidgets(
+      'D4-02: Purge cache confirmation dialog cancels or confirms purge',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+            ],
+            child: const MaterialApp(home: SettingsScreen()),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final purgeButton = find.text('Purge Cache');
+        expect(purgeButton, findsOneWidget);
+        await tester.ensureVisible(purgeButton);
+
+        // Tap Purge -> Dialog opens
+        await tester.tap(purgeButton);
+        await tester.pumpAndSettle();
+        expect(find.text('Purge cache?'), findsOneWidget);
+
+        // Tap Cancel -> Dialog closes
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+        expect(find.text('Purge cache?'), findsNothing);
+
+        // Tap Purge -> Dialog opens again
+        await tester.tap(purgeButton);
+        await tester.pumpAndSettle();
+        expect(find.text('Purge cache?'), findsOneWidget);
+
+        // Tap Purge button in dialog -> Confirms
+        final confirmButton = find.widgetWithText(TextButton, 'Purge');
+        await tester.tap(confirmButton);
+        await tester.pumpAndSettle();
+        expect(find.text('Purge cache?'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'D4-01: Touch target sizes for TopAppBar and HistoryItemCard meet >= 48x48dp',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              appBar: TopAppBar(title: 'TEST', onSettingsTap: () {}),
+              body: HistoryItemCard(
+                item: VideoExportItem(
+                  file: File('/dummy.mp4'),
+                  fileName: 'dummy.mp4',
+                  bytes: 1024,
+                  modified: DateTime.now(),
+                ),
+                onTap: () {},
+                onShare: () {},
+                onDelete: () {},
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final settingsTarget = tester.getSize(find.byTooltip('Settings'));
+        expect(settingsTarget.width, greaterThanOrEqualTo(48.0));
+        expect(settingsTarget.height, greaterThanOrEqualTo(48.0));
+
+        final shareTarget = tester.getSize(find.byTooltip('Share'));
+        expect(shareTarget.width, greaterThanOrEqualTo(48.0));
+        expect(shareTarget.height, greaterThanOrEqualTo(48.0));
+
+        final deleteTarget = tester.getSize(find.byTooltip('Delete'));
+        expect(deleteTarget.width, greaterThanOrEqualTo(48.0));
+        expect(deleteTarget.height, greaterThanOrEqualTo(48.0));
+      },
+    );
+
+    testWidgets(
+      'D4-03: SettingsScreen renders cleanly on 320x480 with textScaleFactor 2.0 without RenderFlex overflow',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 480);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+            ],
+            child: const MaterialApp(
+              home: MediaQuery(
+                data: MediaQueryData(
+                  size: Size(320, 480),
+                  textScaler: TextScaler.linear(2.0),
+                ),
+                child: SettingsScreen(),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'D2-02: ProcessingScreen ticker caps progress <= 15% before native completion',
+      (tester) async {
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          ChangeNotifierProvider.value(
+            value: provider,
+            child: const MaterialApp(home: ProcessingScreen()),
+          ),
+        );
+        // Advance 2 seconds into 4-second ticker
+        await tester.pump(const Duration(seconds: 2));
+
+        final radar = tester.widget<ProcessingRadarIndicator>(
+          find.byType(ProcessingRadarIndicator),
+        );
+        expect(radar.progress, lessThanOrEqualTo(0.15));
+
+        // Settle delayed mock engine timer
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+      },
+    );
+
+    testWidgets(
+      'D2-03: RecentHistoryScreen disposes safely mid-load without setState after dispose exception',
+      (tester) async {
+        await tester.pumpWidget(const MaterialApp(home: RecentHistoryScreen()));
+        // Immediately replace widget tree to dispose screen while async load is running
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'D6-02: ErrorScreen redacts absolute user paths from rendered summary',
+      (tester) async {
+        const sensitivePath = '/storage/emulated/0/Movies/private_video.mp4';
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: ErrorScreen(
+              errorDetails:
+                  'Failed to transcode: $sensitivePath: permission denied',
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('/storage/emulated/0/'), findsNothing);
+        expect(find.textContaining('<external storage>/...'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Sprint 73: 4-slot floating navbar routes to studio and history, settings back button pops',
+      (tester) async {
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+              ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
+            ],
+            child: const VideoUniquifierApp(),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        // 5 destinations in floating navbar
+        final navBar = find.byType(FloatingCapsuleNavBar);
+        expect(navBar, findsOneWidget);
+
+        // Verify 5 navigation items: Home, Intel, Studio, History, Profile
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.text('Intel'), findsOneWidget);
+        expect(
+          find.text('Studio'),
+          findsNothing,
+        ); // Hero action has no text under it
+        expect(find.text('History'), findsOneWidget);
+        expect(find.text('Profile'), findsOneWidget);
+
+        // Dashboard is mounted initially
+        expect(find.textContaining('SEASONAL WINDOW'), findsOneWidget);
+
+        // Slot 1: Tap Intel directly routes to MicrostockNewsScreen
+        await tester.tap(find.text('Intel'));
+        await tester.pumpAndSettle();
+        expect(find.text('MICROSTOCK INTEL & NEWS'), findsOneWidget);
+
+        // Slot 2: Tap '+' Studio hero action directly routes to ProcessScreen
+        await tester.tap(
+          find.byWidgetPredicate((widget) {
+            return widget is SvgPicture &&
+                widget.bytesLoader is SvgAssetLoader &&
+                (widget.bytesLoader as SvgAssetLoader).assetName ==
+                    'assets/plus-icon.svg';
+          }),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('SOURCE FILE'), findsOneWidget);
+
+        // Slot 3: Tap Bell/History directly routes to RecentHistoryScreen
+        await tester.tap(find.text('History'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+        expect(find.text('RECENT EXPORTS'), findsOneWidget);
+
+        // Slot 4: Tap Profile directly routes to ProfilePlaceholderScreen
+        await tester.tap(find.text('Profile'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 200));
+        expect(find.text('WORKSTATION PROFILE'), findsOneWidget);
+        expect(
+          find.textContaining('Microstock contributor portfolio'),
+          findsOneWidget,
+        );
+
+        // Tap gear icon in TopAppBar opens SettingsScreen
+        final gear = find.descendant(
+          of: find.byType(ProfilePlaceholderScreen),
+          matching: find.byTooltip('Settings'),
+        );
+        expect(gear, findsOneWidget);
+        await tester.ensureVisible(gear);
+        await tester.tap(gear, warnIfMissed: false);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.text('SETTINGS'), findsOneWidget);
+        expect(find.text('LANGUAGE'), findsOneWidget);
+
+        // Tap leading back button in SettingsScreen pops back to previous screen
+        final backButton = find.byTooltip('Back');
+        expect(backButton, findsOneWidget);
+        await tester.tap(backButton);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+
+        expect(find.text('SETTINGS'), findsNothing);
+        expect(find.text('WORKSTATION PROFILE'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Sprint 77: In-app article reader sheet opens on card tap and preset chip retains Studio tab',
+      (tester) async {
+        tester.view.physicalSize = const Size(1080, 2400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+
+        final provider = UniquifierProvider();
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+              ChangeNotifierProvider(create: (_) => BatchQueueProvider()),
+            ],
+            child: const VideoUniquifierApp(),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Navigate to Intel tab (slot 1)
+        await tester.tap(find.text('Intel'));
+        await tester.pumpAndSettle();
+        expect(find.text('MICROSTOCK INTEL & NEWS'), findsOneWidget);
+
+        // Verify search bar and YouTube-style keyword filter chips render
+        expect(find.byType(TextField), findsOneWidget);
+        expect(find.text('Cari panduan 4K, tren, kurasi...'), findsOneWidget);
+        expect(find.text('All'), findsOneWidget);
+        expect(find.text('Shutterstock'), findsOneWidget);
+
+        // Test keyword filter chip tap
+        await tester.tap(find.text('Shutterstock'));
+        await tester.pumpAndSettle();
+
+        // Test search filter input
+        await tester.enterText(find.byType(TextField), 'Adobe');
+        await tester.pump(const Duration(milliseconds: 350));
+        await tester.pumpAndSettle();
+
+        // Clear search
+        await tester.enterText(find.byType(TextField), '');
+        await tester.pump(const Duration(milliseconds: 350));
+        await tester.pumpAndSettle();
+
+        // Reset chip to All
+        await tester.tap(find.text('All'));
+        await tester.pumpAndSettle();
+
+        // Verify article card exists and tap it to open bottom reader sheet
+        final firstCard = find.text(
+          'Adobe Stock Releases 2026 Visual Trend Forecast',
+        );
+        expect(firstCard, findsOneWidget);
+        await tester.tap(firstCard);
+        await tester.pumpAndSettle();
+
+        // Article reader modal sheet is shown
+        expect(find.text('MICROSTOCK INTEL READER'), findsOneWidget);
+        expect(
+          find.textContaining('Adobe Stock has officially'),
+          findsOneWidget,
+        );
+        expect(find.text('KEY TAKEAWAYS / REKOMENDASI CEPAT'), findsOneWidget);
+        expect(find.text('PARAMETER TEKNIS REKOMENDASI'), findsOneWidget);
+        expect(
+          find.text('CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)'),
+          findsOneWidget,
+        );
+        expect(find.text('Buka Sumber'), findsOneWidget);
+
+        // Verify translation toggle in reader sheet
+        final translateBtn = find.text('Terjemahkan Artikel (ID)');
+        expect(translateBtn, findsOneWidget);
+        await tester.tap(translateBtn);
+        await tester.pumpAndSettle();
+        expect(find.text('Tampilkan Asli'), findsOneWidget);
+
+        // Revert back
+        await tester.tap(find.text('Tampilkan Asli'));
+        await tester.pumpAndSettle();
+        expect(find.text('Terjemahkan Artikel (ID)'), findsOneWidget);
+
+        // Close reader sheet
+        await tester.tap(find.byTooltip('Close reader'));
+        await tester.pumpAndSettle();
+        expect(find.text('MICROSTOCK INTEL READER'), findsNothing);
+
+        // Navigate to Studio tab (slot 2)
+        await tester.tap(
+          find.byWidgetPredicate((widget) {
+            return widget is SvgPicture &&
+                widget.bytesLoader is SvgAssetLoader &&
+                (widget.bytesLoader as SvgAssetLoader).assetName ==
+                    'assets/plus-icon.svg';
+          }),
+        );
+        await tester.pumpAndSettle();
+        expect(provider.currentTabIndex, equals(2));
+        expect(find.text('SOURCE FILE'), findsOneWidget);
+
+        // Tap preset chip 'TikTok / Reels' in Studio
+        final presetChip = find.text('TikTok / Reels');
+        expect(presetChip, findsOneWidget);
+        await tester.tap(presetChip);
+        await tester.pumpAndSettle();
+
+        // Navigation must stay in Studio tab (index 2), not kicked to Home (index 0)
+        expect(provider.currentTabIndex, equals(2));
+        expect(find.text('SOURCE FILE'), findsOneWidget);
+        expect(find.text('TikTok / Reels'), findsOneWidget);
+
+        // Verify custom sliders render
+        expect(find.text('ZOOM & FACE FOCUS (CROP)'), findsOneWidget);
+        expect(find.text('Top (Face)'), findsOneWidget);
+        expect(find.text('Center'), findsOneWidget);
+        expect(find.text('Bottom'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Sprint 82: Bento metric grid renders animated visual gauges cleanly',
+      (tester) async {
+        final provider = UniquifierProvider()..setTargetFps(60);
+        final queue = BatchQueueProvider();
+
+        await tester.pumpWidget(
+          MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => ThemeProvider()),
+              ChangeNotifierProvider(create: (_) => LocaleProvider()),
+              ChangeNotifierProvider.value(value: provider),
+              ChangeNotifierProvider.value(value: queue),
+            ],
+            child: const MaterialApp(
+              home: Scaffold(
+                body: SingleChildScrollView(child: BentoMetricGrid()),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Card 1: 100% EXIF Clean non-overlapping
+        expect(find.text('100%'), findsOneWidget);
+        expect(find.text('EXIF CLEAN'), findsOneWidget);
+
+        // Card 2: 60 FPS CFR equalizer & Codec lock
+        expect(find.text('60 FPS CFR'), findsOneWidget);
+        expect(find.text('60 FPS CFR • H.264'), findsOneWidget);
+        expect(find.textContaining('LOCKED'), findsOneWidget);
+
+        // Card 3: Storage Safe Buffer radial meter
+        expect(find.text('SANDBOX'), findsOneWidget);
+        expect(find.text('AVAILABLE'), findsOneWidget);
+
+        // Card 4: Asset Staging queue stacked cards & + button
+        expect(find.text('0'), findsOneWidget);
+        expect(find.text('SIAP ANTREAN'), findsOneWidget);
+        expect(find.byIcon(Icons.add), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'Sprint 82: RecentHistoryScreen mounts and renders header cleanly',
+      (tester) async {
+        await tester.pumpWidget(const MaterialApp(home: RecentHistoryScreen()));
+        await tester.pump();
+        expect(find.text('RECENT EXPORTS'), findsOneWidget);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump();
+      },
+    );
+  });
+}
+
+class _TestNavigatorObserver extends NavigatorObserver {
+  final VoidCallback onPushed;
+  _TestNavigatorObserver({required this.onPushed});
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    onPushed();
+  }
+}
