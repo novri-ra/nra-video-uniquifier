@@ -243,24 +243,29 @@ class _CentralModuleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? AppColors.surface : AppColors.white;
+    final borderColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: cardColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         children: [
           const _ModuleHeaderTag(),
-          const Divider(color: AppColors.surfaceContainerHighest, height: 20),
+          Divider(color: borderColor, height: 20),
           ProcessingRadarIndicator(progress: progress),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)?.processingVideo ?? 'Processing video...',
-            style: const TextStyle(
-              color: AppColors.onSurface,
+            style: TextStyle(
+              color: textColor,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -284,6 +289,9 @@ class _ModuleHeaderTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -301,16 +309,16 @@ class _ModuleHeaderTag extends StatelessWidget {
             Container(
               width: 6,
               height: 6,
-              decoration: const BoxDecoration(
-                color: AppColors.primaryContainer,
+              decoration: BoxDecoration(
+                color: activeColor,
                 shape: BoxShape.circle,
               ),
             ),
             const SizedBox(width: 4),
-            const Text(
+            Text(
               'ACTIVE',
               style: TextStyle(
-                color: AppColors.primaryContainer,
+                color: activeColor,
                 fontSize: 9,
                 fontWeight: FontWeight.w700,
                 fontFamily: 'monospace',

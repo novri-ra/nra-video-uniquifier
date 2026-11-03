@@ -270,27 +270,28 @@ class _SuccessActionButtons extends StatelessWidget {
       children: [
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryContainer,
-            foregroundColor: AppColors.onPrimary,
+            backgroundColor: AppColors.forestDeep,
+            foregroundColor: AppColors.white,
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             elevation: 0,
           ),
           onPressed: outputPath != null ? onShare : null,
-          icon: const Icon(Icons.share, size: 18),
-          label: const Text('Share to TikTok', style: TextStyle(fontWeight: FontWeight.w700)),
+          icon: const Icon(Icons.share_rounded, size: 18, color: AppColors.white),
+          label: const Text('Export & Share Video', style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.onSurface,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            backgroundColor: AppColors.white,
+            foregroundColor: AppColors.forestDeep,
+            side: const BorderSide(color: AppColors.forestDeep, width: 1.5),
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           ),
           onPressed: outputPath != null ? onOpen : null,
-          icon: const Icon(Icons.photo_library_outlined, size: 18),
-          label: const Text('Open Gallery'),
+          icon: const Icon(Icons.photo_library_outlined, size: 18, color: AppColors.forestDeep),
+          label: const Text('Open Gallery', style: TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w700)),
         ),
         const SizedBox(height: 10),
         TextButton.icon(

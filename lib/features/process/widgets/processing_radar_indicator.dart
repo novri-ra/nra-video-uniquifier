@@ -12,6 +12,10 @@ class ProcessingRadarIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final trackColor = isDark ? AppColors.surfaceContainerHighest : AppColors.hairlineBorder;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenHeight = MediaQuery.sizeOf(context).height;
@@ -25,7 +29,11 @@ class ProcessingRadarIndicator extends StatelessWidget {
             children: [
               CustomPaint(
                 size: Size(size, size),
-                painter: RadialProgressPainter(progress: progress),
+                painter: RadialProgressPainter(
+                  progress: progress,
+                  trackColor: trackColor,
+                  progressColor: AppColors.vividCoral,
+                ),
               ),
               Column(
                 mainAxisSize: MainAxisSize.min,
@@ -33,7 +41,7 @@ class ProcessingRadarIndicator extends StatelessWidget {
                   Text(
                     '${(progress * 100).toInt()}%',
                     style: TextStyle(
-                      color: AppColors.onSurface,
+                      color: textColor,
                       fontSize: size < 130 ? 24 : 30,
                       fontWeight: FontWeight.w700,
                     ),
@@ -59,8 +67,14 @@ class ProcessingRadarIndicator extends StatelessWidget {
 
 class RadialProgressPainter extends CustomPainter {
   final double progress;
+  final Color trackColor;
+  final Color progressColor;
 
-  const RadialProgressPainter({required this.progress});
+  const RadialProgressPainter({
+    required this.progress,
+    this.trackColor = AppColors.surfaceContainerHighest,
+    this.progressColor = AppColors.vividCoral,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -68,12 +82,12 @@ class RadialProgressPainter extends CustomPainter {
     final radius = (size.width - 16) / 2;
 
     final backgroundPaint = Paint()
-      ..color = AppColors.surfaceContainerHighest
+      ..color = trackColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8;
 
     final progressPaint = Paint()
-      ..color = AppColors.primaryContainer
+      ..color = progressColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round;
@@ -92,6 +106,8 @@ class RadialProgressPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant RadialProgressPainter oldDelegate) {
-    return oldDelegate.progress != progress;
+    return oldDelegate.progress != progress ||
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.progressColor != progressColor;
   }
 }

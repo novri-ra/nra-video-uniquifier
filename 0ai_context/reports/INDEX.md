@@ -45,6 +45,7 @@ Index of sprint technical reports for `nra_video_uniquifier`.
 | 89 | `89-editorial-craft-theme-redesign.md` | Anti-AI-Slop Editorial Design System, Forest Emerald & Obsidian Palette, Bento Header Relax, & Micro-Interactions |
 | 90 | `90-strict-color-lockdown.md` | Strict Color System Lockdown: Eliminasi Total Inline Hex/Material Colors & Penegakan 11 Token Kanonikal Editorial |
 | 91 | `91-home-sync-and-device-deployment.md` | Workspace Sync di Rumah, Verifikasi Kunci Warna Editorial, Quality Gates, Rebuild Release APK & Install ke Fisik Realme 3 Pro via ADB |
+| 92 | `92-generalize-actions-and-settings-defaults.md` | Generalisasi Tombol Ekspor, Default English & System Theme, Kontras Teks Merah 4K UHD Light Mode, Header Sapaan Dinamis, dan Polish UI |
 
 ---
 

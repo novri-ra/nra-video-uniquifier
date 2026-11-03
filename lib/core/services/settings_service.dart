@@ -235,7 +235,7 @@ class SettingsService {
 
   static Future<String> getAppLanguageCode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(keyAppLocale) ?? 'id';
+    return prefs.getString(keyAppLocale) ?? 'en';
   }
 
   static Future<void> setAppLanguageCode(String code) async {
