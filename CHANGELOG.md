@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): integrate html and image packages, expand article model with media/author attributes
+- feat(microstock): add direct photography RSS feeds (PetaPixel, Fstoppers) with DOM-based XML parsing
+- feat(microstock): implement append-merge article caching with 1-hour TTL background refresh
+- fix(microstock): eliminate truncated HTML tags and residual link leaks using real DOM fragment parser
+- docs(reports): add report 13-implement-phase1-model-feed-cache to reports index
 - fix(microstock): sanitize raw HTML entities and Google News RSS tags from article feed and reader sheet
 - fix(ui): resolve RenderFlex overflow errors on MicrostockNewsCard, MicrostockArticleSheet, and action toolbars
 - docs(reports): add report 11-fix-microstock-news-parser-and-overflow to reports index

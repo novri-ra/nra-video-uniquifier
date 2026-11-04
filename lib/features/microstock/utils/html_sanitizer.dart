@@ -1,4 +1,6 @@
-/// Utility for sanitizing HTML entities, stripping raw HTML tags, and removing feed remnants.
+import 'package:html/parser.dart' as html_parser;
+
+/// Utility for sanitizing HTML entities, stripping raw HTML tags, and removing feed remnants via DOM tree parsing.
 class HtmlSanitizer {
   /// Cleans raw HTML tags, decodes HTML entities, and strips residual feed URLs.
   static String clean(String input) {
@@ -13,7 +15,10 @@ class HtmlSanitizer {
     final match = contentRegex.firstMatch(input);
     var text = match != null ? match.group(1) ?? '' : input;
 
-    // 2. Normalize structural break tags into newlines
+    // Strip raw CDATA markers
+    text = text.replaceAll('<![CDATA[', '').replaceAll(']]>', '');
+
+    // 2. Normalize structural break tags into newlines before DOM parsing
     text = text
         .replaceAll(RegExp(r'<br\s*\/?>', caseSensitive: false), '\n')
         .replaceAll(RegExp(r'<\/p>', caseSensitive: false), '\n\n')
@@ -22,17 +27,31 @@ class HtmlSanitizer {
           '\n',
         );
 
-    // 3. First decode pass for HTML entities (converts &lt;a href=...&gt; into <a href=...>)
-    text = _decodeEntities(text);
+    // 3. First DOM tree parsing pass via package:html
+    final fragment = html_parser.parseFragment(text);
+    var cleanText = fragment.text ?? '';
 
-    // 4. Strip all HTML tags
-    text = text.replaceAll(RegExp(r'<[^>]*>'), '');
+    // 4. Handle double-encoded HTML (e.g. &lt;a href=...&gt; -> <a href=...>)
+    if (cleanText.contains('<') && cleanText.contains('>')) {
+      cleanText = cleanText
+          .replaceAll(RegExp(r'<br\s*\/?>', caseSensitive: false), '\n')
+          .replaceAll(RegExp(r'<\/p>', caseSensitive: false), '\n\n')
+          .replaceAll(
+            RegExp(r'<\/(?:div|li|tr|h[1-6])>', caseSensitive: false),
+            '\n',
+          );
+      final secondPass = html_parser.parseFragment(cleanText);
+      cleanText = secondPass.text ?? '';
+    }
 
-    // 5. Second decode pass in case of nested/double-encoded entities (e.g. &amp;quot;)
-    text = _decodeEntities(text);
+    // 5. Strip any unclosed or truncated HTML tags (e.g. residual "<a href=")
+    cleanText = cleanText.replaceAll(RegExp(r'<[^>]*>?'), '');
 
-    // 6. Strip Google News RSS link remnants and boilerplate
-    text = text
+    // 6. Decode any remaining obscure entities
+    cleanText = _decodeEntities(cleanText);
+
+    // 7. Strip Google News RSS link remnants and boilerplate
+    cleanText = cleanText
         .replaceAll(
           RegExp(
             r'https?:\/\/(?:news\.google\.com|www\.google\.com)\S*',
@@ -45,15 +64,16 @@ class HtmlSanitizer {
           '',
         );
 
-    // 7. Clean up whitespace: normalize spaces & tabs, cap consecutive newlines at 2
-    text = text
+    // 8. Clean up whitespace: normalize non-breaking spaces, spaces & tabs, cap consecutive newlines at 2
+    cleanText = cleanText
+        .replaceAll('\u00a0', ' ')
         .replaceAll(RegExp(r'[ \t]+'), ' ')
         .replaceAll(RegExp(r'\n[ \t]+'), '\n')
         .replaceAll(RegExp(r'[ \t]+\n'), '\n')
         .replaceAll(RegExp(r'\n{3,}'), '\n\n')
         .trim();
 
-    return text;
+    return cleanText;
   }
 
   static String _decodeEntities(String text) {

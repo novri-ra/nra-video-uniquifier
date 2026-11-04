@@ -13,6 +13,8 @@
 | 09 | 09-fix-phase2-touch-targets-semantics.md | 2026-11-04 | fix | Enforce >= 48x48dp touch targets and integrate Semantics, tooltips, and live progress announcements |
 | 10 | 10-refactor-p2-ffmpeg-service.md | 2026-11-04 | refactor | Refactor FfmpegService god-class into modular SRP helpers under lib/core/services/ffmpeg/ |
 | 11 | 11-fix-microstock-news-parser-and-overflow.md | 2026-11-04 | fix | Sanitize Microstock RSS HTML entities and tags, and fix RenderFlex overflow in card and reader |
+| 12 | 12-audit-microstock-news-architecture.md | 2026-11-04 | audit | Comprehensive architecture audit of Microstock Intel models, RSS parser, cache, and WebP pipeline |
+| 13 | 13-implement-phase1-model-feed-cache.md | 2026-11-04 | feature | Implement Phase 1 Microstock Intel: extended model, package:html DOM parser, direct RSS feeds, and 1h TTL append-merge cache |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
