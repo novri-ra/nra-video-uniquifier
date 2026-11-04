@@ -49,16 +49,20 @@ class ArticleTranslateButton extends StatelessWidget {
             else
               Icon(Icons.translate_rounded, size: 14, color: accent),
             const SizedBox(width: 6),
-            Text(
-              isTranslating
-                  ? 'Menerjemahkan...'
-                  : (isTranslated
-                        ? 'Tampilkan Asli'
-                        : 'Terjemahkan Artikel (ID)'),
-              style: TextStyle(
-                color: accent,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                isTranslating
+                    ? 'Menerjemahkan...'
+                    : (isTranslated
+                          ? 'Tampilkan Asli'
+                          : 'Terjemahkan Artikel (ID)'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

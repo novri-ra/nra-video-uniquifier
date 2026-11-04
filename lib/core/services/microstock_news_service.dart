@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/microstock/utils/html_sanitizer.dart';
 import 'connectivity_service.dart';
 import 'microstock_seed_data.dart';
 
@@ -376,24 +377,7 @@ class MicrostockNewsService {
   }
 
   /// Parses RSS/Atom entry content, extracting clean markdown text from CDATA or HTML.
-  static String parseRssContent(String rawXml) {
-    if (rawXml.isEmpty) return '';
-    final contentRegex = RegExp(
-      r'<content(?::encoded)?>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/content(?::encoded)?>',
-      dotAll: true,
-      caseSensitive: false,
-    );
-    final match = contentRegex.firstMatch(rawXml);
-    final rawText = match != null ? match.group(1) ?? '' : rawXml;
-    return rawText
-        .replaceAll(RegExp(r'<br\\s*\\/?>', caseSensitive: false), '\\n')
-        .replaceAll(RegExp(r'<\\/p>', caseSensitive: false), '\\n\\n')
-        .replaceAll(RegExp(r'<[^>]*>'), '')
-        .replaceAll('&nbsp;', ' ')
-        .replaceAll('&amp;', '&')
-        .replaceAll('&quot;', '"')
-        .trim();
-  }
+  static String parseRssContent(String rawXml) => HtmlSanitizer.clean(rawXml);
 
   /// Retrieves articles from local SharedPreferences cache.
   static Future<List<MicrostockNewsArticle>> getCachedNews() async {

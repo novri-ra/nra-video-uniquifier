@@ -4,6 +4,7 @@ import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../utils/html_sanitizer.dart';
 import 'microstock_article_content_blocks.dart';
 import 'microstock_article_footer_widgets.dart';
 
@@ -46,29 +47,34 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   List<String>? _translatedSpecs;
   List<String>? _translatedChecklist;
 
-  String get _displayTitle => (_isTranslated && _translatedTitle != null)
-      ? _translatedTitle!
-      : widget.article.title;
+  String get _displayTitle => HtmlSanitizer.clean(
+    (_isTranslated && _translatedTitle != null)
+        ? _translatedTitle!
+        : widget.article.title,
+  );
 
-  String get _displayContent => (_isTranslated && _translatedContent != null)
-      ? _translatedContent!
-      : (widget.article.fullContent.isNotEmpty
-            ? widget.article.fullContent
-            : widget.article.summary);
+  String get _displayContent => HtmlSanitizer.clean(
+    (_isTranslated && _translatedContent != null)
+        ? _translatedContent!
+        : (widget.article.fullContent.isNotEmpty
+              ? widget.article.fullContent
+              : widget.article.summary),
+  );
 
-  String get _displayTakeaways =>
-      (_isTranslated && _translatedTakeaways != null)
-      ? _translatedTakeaways!
-      : widget.article.keyTakeaways;
+  String get _displayTakeaways => HtmlSanitizer.clean(
+    (_isTranslated && _translatedTakeaways != null)
+        ? _translatedTakeaways!
+        : widget.article.keyTakeaways,
+  );
 
   List<String> get _displaySpecs => (_isTranslated && _translatedSpecs != null)
-      ? _translatedSpecs!
-      : widget.article.technicalSpecs;
+      ? _translatedSpecs!.map(HtmlSanitizer.clean).toList()
+      : widget.article.technicalSpecs.map(HtmlSanitizer.clean).toList();
 
   List<String> get _displayChecklist =>
       (_isTranslated && _translatedChecklist != null)
-      ? _translatedChecklist!
-      : widget.article.contributorChecklist;
+      ? _translatedChecklist!.map(HtmlSanitizer.clean).toList()
+      : widget.article.contributorChecklist.map(HtmlSanitizer.clean).toList();
 
   Future<void> _toggleTranslation() async {
     if (_isTranslated) {
@@ -311,26 +317,32 @@ class _HeaderBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.menu_book_rounded,
-                size: 18,
-                color: isDark ? AppColors.mintSage : AppColors.forestDeep,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'MICROSTOCK INTEL READER',
-                style: TextStyle(
-                  color: isDark
-                      ? AppColors.outline
-                      : AppColors.lightOnSurfaceVariant,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.8,
+          Expanded(
+            child: Row(
+              children: [
+                Icon(
+                  Icons.menu_book_rounded,
+                  size: 18,
+                  color: isDark ? AppColors.mintSage : AppColors.forestDeep,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'MICROSTOCK INTEL READER',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.outline
+                          : AppColors.lightOnSurfaceVariant,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 20),
@@ -363,14 +375,17 @@ class _ActionToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
       children: [
         ArticleTranslateButton(
           isTranslated: isTranslated,
           isTranslating: isTranslating,
           onTap: onTranslateToggle,
         ),
-        const Spacer(),
         TextButton.icon(
           onPressed: onOpenBrowser,
           icon: const Icon(Icons.open_in_browser_rounded, size: 15),

@@ -248,33 +248,41 @@ class _FeedHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Microstock Intel',
-              style: TextStyle(
-                color: titleColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Row(
-              children: [
-                _StatusDot(isOnline: isOnline),
-                const SizedBox(width: 6),
-                Text(
-                  syncStatusText,
-                  style: TextStyle(
-                    color: subtitleColor,
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                  ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Microstock Intel',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 3),
+              Row(
+                children: [
+                  _StatusDot(isOnline: isOnline),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      syncStatusText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: subtitleColor,
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         IconButton(
           icon: const Icon(Icons.sync_rounded, size: 20),

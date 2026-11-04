@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+- fix(microstock): sanitize raw HTML entities and Google News RSS tags from article feed and reader sheet
+- fix(ui): resolve RenderFlex overflow errors on MicrostockNewsCard, MicrostockArticleSheet, and action toolbars
+- docs(reports): add report 11-fix-microstock-news-parser-and-overflow to reports index
 - fix(a11y): expand interactive touch targets to 48x48dp for bento add queue, clear file, and accordion header (MAJ-01)
 - feat(a11y): add Semantics liveRegion, tooltips, and dynamic state labels for processing radar and accordion cards (MAJ-02)
 - docs(reports): add report 09-fix-phase2-touch-targets-semantics to reports index

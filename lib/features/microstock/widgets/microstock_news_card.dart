@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../utils/html_sanitizer.dart';
 import 'microstock_article_sheet.dart';
 
 /// News article card with inline auto-translation, source badges, and tag chips.
@@ -74,6 +75,22 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
     }
   }
 
+  String _cleanDate(String dateStr) {
+    final clean = HtmlSanitizer.clean(dateStr);
+    if (clean.length <= 12) return clean;
+    final rfcMatch = RegExp(
+      r'(\d{1,2}\s+[A-Za-z]{3}\s+\d{4})',
+    ).firstMatch(clean);
+    if (rfcMatch != null) {
+      return rfcMatch.group(1)!;
+    }
+    final parts = clean.split(' ');
+    if (parts.length >= 4 && parts[0].endsWith(',')) {
+      return '${parts[1]} ${parts[2]} ${parts[3]}';
+    }
+    return clean.length > 16 ? '${clean.substring(0, 16)}..' : clean;
+  }
+
   @override
   Widget build(BuildContext context) {
     final bgColor = widget.isDark ? AppColors.obsidianDark : AppColors.white;
@@ -90,12 +107,16 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
         ? AppColors.mintSage
         : AppColors.forestDeep;
 
-    final displayTitle = (_isTranslated && _translatedTitle != null)
-        ? _translatedTitle!
-        : widget.article.title;
-    final displaySummary = (_isTranslated && _translatedSummary != null)
-        ? _translatedSummary!
-        : widget.article.summary;
+    final displayTitle = HtmlSanitizer.clean(
+      (_isTranslated && _translatedTitle != null)
+          ? _translatedTitle!
+          : widget.article.title,
+    );
+    final displaySummary = HtmlSanitizer.clean(
+      (_isTranslated && _translatedSummary != null)
+          ? _translatedSummary!
+          : widget.article.summary,
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -133,19 +154,28 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                       isDark: widget.isDark,
                     ),
                     const SizedBox(width: 6),
-                    _SourceBadge(
-                      source: widget.article.source,
-                      isDark: widget.isDark,
+                    Flexible(
+                      child: _SourceBadge(
+                        source: widget.article.source,
+                        isDark: widget.isDark,
+                      ),
                     ),
-                    const Spacer(),
-                    Text(
-                      widget.article.publishedDate,
-                      style: TextStyle(
-                        color: widget.isDark
-                            ? AppColors.outline
-                            : AppColors.lightOnSurfaceVariant,
-                        fontSize: 10,
-                        fontFamily: 'monospace',
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          _cleanDate(widget.article.publishedDate),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: widget.isDark
+                                ? AppColors.outline
+                                : AppColors.lightOnSurfaceVariant,
+                            fontSize: 10,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -220,6 +250,7 @@ class _CategoryBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final cleanCategory = HtmlSanitizer.clean(category);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
       decoration: BoxDecoration(
@@ -227,7 +258,9 @@ class _CategoryBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        category.toUpperCase(),
+        cleanCategory.toUpperCase(),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: accent,
           fontSize: 9,
@@ -255,10 +288,13 @@ class _SourceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _getSourceColor();
-    final isReddit = source.contains('Reddit');
+    final cleanSource = HtmlSanitizer.clean(source);
+    final isReddit = cleanSource.contains('Reddit');
     final label = isReddit
         ? 'Reddit Community'
-        : (source.length > 18 ? '${source.substring(0, 16)}..' : source);
+        : (cleanSource.length > 18
+              ? '${cleanSource.substring(0, 16)}..'
+              : cleanSource);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -276,12 +312,16 @@ class _SourceBadge extends StatelessWidget {
             color: color,
           ),
           const SizedBox(width: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 8.5,
-              fontWeight: FontWeight.w700,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: color,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -309,6 +349,7 @@ class _TagsRow extends StatelessWidget {
       spacing: 6,
       runSpacing: 4,
       children: tags.map((tag) {
+        final cleanTag = HtmlSanitizer.clean(tag);
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
@@ -316,7 +357,7 @@ class _TagsRow extends StatelessWidget {
             borderRadius: BorderRadius.circular(4),
           ),
           child: Text(
-            tag,
+            cleanTag.startsWith('#') ? cleanTag : '#$cleanTag',
             style: TextStyle(
               color: textColor,
               fontSize: 9,
@@ -373,13 +414,17 @@ class _TranslateButton extends StatelessWidget {
                   color: accentColor,
                 ),
               const SizedBox(width: 4),
-              Text(
-                isTranslated ? 'Tampilkan Asli' : 'Terjemahkan (ID)',
-                style: TextStyle(
-                  color: accentColor,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
+              Flexible(
+                child: Text(
+                  isTranslated ? 'Tampilkan Asli' : 'Terjemahkan (ID)',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: accentColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ),
             ],
