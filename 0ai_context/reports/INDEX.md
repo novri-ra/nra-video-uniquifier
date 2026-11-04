@@ -22,6 +22,8 @@
 | 19 | 19-implement-p2-phase2-uniquifier-provider-mixins.md | 2026-11-04 | refactor | Refactor P2 UniquifierProvider into Facade + 4 Domain Mixins (media, modifiers, preset, progress), shrinking provider from 614 to 159 LOC |
 | 20 | 20-audit-article-full-content-empty-bug.md | 2026-11-04 | audit | Audit: article body empty (title-only), synthetic badge on external RSS, hero banner missing — root causes and remediation plan |
 | 21 | 21-implement-article-reader-extractor-fix.md | 2026-11-04 | fix | Implement on-demand ArticleReaderExtractor, external source footer badge distinction, and hero banner fallback |
+| 22 | 22-audit-history-delete-persistence-bug.md | 2026-11-05 | audit | Audit: history video delete persistence bug — cosmetic UI removal vs physical disk scan and Android storage I/O |
+| 23 | 23-implement-history-delete-persistence-fix.md | 2026-11-05 | fix | Implement history video delete persistence fix, strict post-delete verification, MediaStore sync, and storage runtime permission prompt |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

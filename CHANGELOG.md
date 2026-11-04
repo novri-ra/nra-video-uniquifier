@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+- fix(history): add runtime storage permission prompt for Android Scoped Storage compliance
+- fix(history): enforce strict post-delete disk verification in HistoryService
+- fix(history): eliminate cosmetic UI removal when physical deletion fails
+- fix(history): trigger MediaStore index rescan upon file deletion
+- docs(reports): add report 22 (audit) and report 23 (implementation fix) to reports index
 - fix(microstock): build on-demand ArticleReaderExtractor for thin RSS article content and og:image fallback
 - fix(microstock): guard ArticleFooterSourceBox to distinguish external RSS sources from verified guidelines
 - fix(microstock): strip legacy [Read More] artifacts from reader view
