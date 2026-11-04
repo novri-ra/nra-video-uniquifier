@@ -8,6 +8,8 @@
 | 04 | 04-implement-visual-evasion.md | 2026-11-04 | fix | Implement visual evasion upgrades (canvas crop, sinusoidal zoompan, RGB curves) |
 | 05 | 05-implement-audio-metadata-evasion.md | 2026-11-04 | fix | Implement audio mutation (±4% pitch, chorus phase) and randomized MP4 metadata profiles |
 | 06 | 06-fix-history-delete-multiselect.md | 2026-11-04 | fix | Implement physical disk file deletion and multi-select batch deletion in export history |
+| 07 | 07-audit-ui-ux-standards.md | 2026-11-04 | audit | Deep UI/UX audit against WCAG 2.2, HIG, Material 3, contrast ratios, and touch targets |
+| 08 | 08-fix-phase1-ui-contrast.md | 2026-11-04 | fix | Fix CRIT-01 and CRIT-02 color contrast issues on disabled action button and pastel badges |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+- fix(ui): resolve critical light mode contrast failures on disabled process action button (CRIT-01)
+- fix(ui): add theme-adaptive accent tokens for preset badges and offline indicator to satisfy WCAG 2.2 AA (CRIT-02)
+- docs(reports): add report 07-audit-ui-ux-standards and report 08-fix-phase1-ui-contrast to reports index
 - feat(history): add physical file deletion on disk and automatic thumbnail cache cleanup
 - feat(history): implement multi-select mode with batch deletion, select all, and confirmation dialog
 - test(history): add unit tests for batch file deletion (174/174 passed)
