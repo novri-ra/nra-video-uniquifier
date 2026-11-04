@@ -142,5 +142,39 @@ void main() {
         expect(missingDeleted, isTrue);
       },
     );
+
+    test(
+      'deleteItems and deleteExportItems delete batch files on disk',
+      () async {
+        final f1 = File('${Directory.systemTemp.path}/batch_del_1.tmp')
+          ..writeAsStringSync('1');
+        final f2 = File('${Directory.systemTemp.path}/batch_del_2.tmp')
+          ..writeAsStringSync('2');
+        final f3 = File('${Directory.systemTemp.path}/batch_del_3.tmp')
+          ..writeAsStringSync('3');
+
+        expect(await f1.exists(), isTrue);
+        expect(await f2.exists(), isTrue);
+        expect(await f3.exists(), isTrue);
+
+        final deletedCount = await HistoryService.deleteItems([f1, f2]);
+        expect(deletedCount, equals(2));
+        expect(await f1.exists(), isFalse);
+        expect(await f2.exists(), isFalse);
+        expect(await f3.exists(), isTrue);
+
+        final item3 = VideoExportItem(
+          file: f3,
+          fileName: 'batch_del_3.tmp',
+          bytes: 1,
+          modified: DateTime.now(),
+        );
+        final itemDeletedCount = await HistoryService.deleteExportItems([
+          item3,
+        ]);
+        expect(itemDeletedCount, equals(1));
+        expect(await f3.exists(), isFalse);
+      },
+    );
   });
 }

@@ -6,12 +6,24 @@ class HistoryHeader extends StatelessWidget {
   final int itemCount;
   final String totalSize;
   final VoidCallback onRefresh;
+  final bool isSelectionMode;
+  final int selectedCount;
+  final VoidCallback? onToggleSelectionMode;
+  final VoidCallback? onSelectAll;
+  final bool isAllSelected;
+  final VoidCallback? onDeleteSelected;
 
   const HistoryHeader({
     super.key,
     required this.itemCount,
     required this.totalSize,
     required this.onRefresh,
+    this.isSelectionMode = false,
+    this.selectedCount = 0,
+    this.onToggleSelectionMode,
+    this.onSelectAll,
+    this.isAllSelected = false,
+    this.onDeleteSelected,
   });
 
   @override
@@ -20,6 +32,78 @@ class HistoryHeader extends StatelessWidget {
     final metaColor = isDark
         ? AppColors.onSurfaceVariant
         : AppColors.lightOnSurfaceVariant;
+
+    if (isSelectionMode) {
+      final borderCol = isDark
+          ? AppColors.outlineVariant
+          : AppColors.lightOutlineVariant;
+      final bgCol = isDark
+          ? AppColors.surfaceContainerHigh
+          : AppColors.hairlineBorder;
+      final textCol = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+      final accentCol = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: bgCol,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderCol),
+        ),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.close, size: 18),
+              color: textCol,
+              tooltip: 'Batal',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: onToggleSelectionMode,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '$selectedCount Terpilih',
+              style: TextStyle(
+                color: textCol,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+                fontFamily: 'monospace',
+              ),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: onSelectAll,
+              icon: Icon(
+                isAllSelected ? Icons.deselect : Icons.select_all,
+                size: 16,
+                color: accentCol,
+              ),
+              label: Text(
+                isAllSelected ? 'Batal Semua' : 'Pilih Semua',
+                style: TextStyle(
+                  color: accentCol,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                minimumSize: const Size(36, 32),
+              ),
+            ),
+            const SizedBox(width: 4),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 18),
+              color: selectedCount > 0 ? AppColors.vividCoral : metaColor,
+              tooltip: 'Hapus Terpilih',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+              onPressed: selectedCount > 0 ? onDeleteSelected : null,
+            ),
+          ],
+        ),
+      );
+    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -40,10 +124,22 @@ class HistoryHeader extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.refresh, size: 18),
               color: metaColor,
+              tooltip: 'Refresh',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
               onPressed: onRefresh,
             ),
+            if (itemCount > 0 && onToggleSelectionMode != null) ...[
+              const SizedBox(width: 4),
+              IconButton(
+                icon: const Icon(Icons.checklist_rtl_rounded, size: 18),
+                color: metaColor,
+                tooltip: 'Pilih Banyak',
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                onPressed: onToggleSelectionMode,
+              ),
+            ],
           ],
         ),
       ],

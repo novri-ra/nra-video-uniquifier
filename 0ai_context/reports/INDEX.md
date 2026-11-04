@@ -7,6 +7,7 @@
 | 03 | 03-audit-tiktok-evasion-and-fix-p3.md | 2026-11-04 | audit | P3 Locale Provider fix and TikTok video/audio/metadata evasion pipeline audit |
 | 04 | 04-implement-visual-evasion.md | 2026-11-04 | fix | Implement visual evasion upgrades (canvas crop, sinusoidal zoompan, RGB curves) |
 | 05 | 05-implement-audio-metadata-evasion.md | 2026-11-04 | fix | Implement audio mutation (±4% pitch, chorus phase) and randomized MP4 metadata profiles |
+| 06 | 06-fix-history-delete-multiselect.md | 2026-11-04 | fix | Implement physical disk file deletion and multi-select batch deletion in export history |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

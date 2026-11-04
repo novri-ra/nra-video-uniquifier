@@ -10,6 +10,9 @@ class HistoryItemCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onShare;
   final VoidCallback onDelete;
+  final bool isSelectionMode;
+  final bool isSelected;
+  final VoidCallback? onLongPress;
 
   const HistoryItemCard({
     super.key,
@@ -17,25 +20,36 @@ class HistoryItemCard extends StatelessWidget {
     required this.onTap,
     required this.onShare,
     required this.onDelete,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardBg = isDark ? AppColors.surfaceContainerLow : Colors.white;
-    final borderColor = isDark
+    final defaultBorderColor = isDark
         ? AppColors.surfaceContainerHighest
         : AppColors.lightOutlineVariant;
+    final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final borderColor = (isSelectionMode && isSelected)
+        ? accentColor
+        : defaultBorderColor;
 
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: borderColor),
+          border: Border.all(
+            color: borderColor,
+            width: (isSelectionMode && isSelected) ? 1.5 : 1.0,
+          ),
           boxShadow: [
             if (!isDark)
               BoxShadow(
@@ -52,11 +66,27 @@ class HistoryItemCard extends StatelessWidget {
             Expanded(
               child: _ItemInfoColumn(item: item, isDark: isDark),
             ),
-            _ItemActionButtons(
-              onShare: onShare,
-              onDelete: onDelete,
-              isDark: isDark,
-            ),
+            if (isSelectionMode)
+              SizedBox(
+                width: 48,
+                height: 48,
+                child: Center(
+                  child: Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => onTap(),
+                    activeColor: accentColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              )
+            else
+              _ItemActionButtons(
+                onShare: onShare,
+                onDelete: onDelete,
+                isDark: isDark,
+              ),
           ],
         ),
       ),

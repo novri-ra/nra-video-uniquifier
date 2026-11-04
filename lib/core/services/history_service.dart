@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:storage_space/storage_space.dart';
 
@@ -107,16 +108,51 @@ class HistoryService {
     return foundFiles;
   }
 
+  static Future<void> _cleanupThumbnail(File videoFile) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final name = videoFile.path.split(RegExp(r'[/\\]')).last;
+      final baseName = name.replaceAll(RegExp(r'[^\w\.-]'), '_');
+      final thumbFile = File('${tempDir.path}/thumbnails/thumb_$baseName.jpg');
+      if (await thumbFile.exists()) {
+        await thumbFile.delete();
+      }
+    } catch (e) {
+      debugPrint(
+        '[HistoryService] Thumbnail cleanup skipped for ${videoFile.path}: $e',
+      );
+    }
+  }
+
   static Future<bool> deleteItem(File file) async {
     try {
-      if (await file.exists()) {
-        await file.delete();
-        return true;
+      final target = File(file.path);
+      if (await target.exists()) {
+        await target.delete();
       }
-      return true; // Already gone from disk; clean from state gracefully
-    } catch (_) {
+      await _cleanupThumbnail(target);
+      return true; // Already gone or successfully deleted from disk
+    } catch (e, stackTrace) {
+      debugPrint(
+        '[HistoryService] Failed to delete file ${file.path}: $e\n$stackTrace',
+      );
       return false;
     }
+  }
+
+  static Future<int> deleteItems(List<File> files) async {
+    int deletedCount = 0;
+    for (final file in files) {
+      final success = await deleteItem(file);
+      if (success) {
+        deletedCount++;
+      }
+    }
+    return deletedCount;
+  }
+
+  static Future<int> deleteExportItems(List<VideoExportItem> items) async {
+    return deleteItems(items.map((i) => i.file).toList());
   }
 
   static Future<StorageSpace?> getDeviceStorage() async {

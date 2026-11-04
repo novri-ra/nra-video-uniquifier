@@ -1,5 +1,9 @@
 # Changelog
 ## [Unreleased]
+- feat(history): add physical file deletion on disk and automatic thumbnail cache cleanup
+- feat(history): implement multi-select mode with batch deletion, select all, and confirmation dialog
+- test(history): add unit tests for batch file deletion (174/174 passed)
+- docs(reports): add report 06-fix-history-delete-multiselect to reports index
 - fix(evasion): resolve TikTok unoriginal content detection by adding foreground canvas spatial crop, continuous sinusoidal zoompan, and dynamic RGB curves (Report 04)
 - feat(evasion): harden acoustic and container fingerprints via ±4.0% pitch shift, stereo phase dispersion, randomized device metadata profiles, and stitchable=1 encoder flags (Report 05)
 - fix(core): resolve P3 swallowed exception in LocaleProvider (AUDIT-20261104-006)
