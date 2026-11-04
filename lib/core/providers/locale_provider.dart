@@ -19,7 +19,9 @@ class LocaleProvider extends ChangeNotifier {
         _currentLocale = Locale(code);
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e, stackTrace) {
+      debugPrint('[LocaleProvider] Gagal memuat locale: $e\n$stackTrace');
+    }
   }
 
   Future<void> changeLanguage(String code) async {

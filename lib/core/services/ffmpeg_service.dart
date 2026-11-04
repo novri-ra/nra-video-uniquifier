@@ -54,6 +54,11 @@ class FfmpegService {
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
   }) {
+    final vars =
+        variations ??
+        (enableDeepAntiFingerprint
+            ? VariationGenerator.generate()
+            : VideoVariations.fallback);
     final buffer = StringBuffer('-y');
     _writeInputOptions(
       buffer,
@@ -64,7 +69,7 @@ class FfmpegService {
       thermalThrottle,
       introTrimOffset,
     );
-    if (removeMetadata) _writeMetadataTags(buffer);
+    if (removeMetadata) _writeMetadataTags(buffer, vars.deviceProfile);
     _writeFilterAndCodecOptions(
       buffer: buffer,
       modifyVisuals: modifyVisuals,
@@ -85,7 +90,7 @@ class FfmpegService {
       enableFrameSkip: enableFrameSkip,
       enableChromaShift: enableChromaShift,
       modifyAudio: modifyAudio,
-      variations: variations,
+      variations: vars,
       targetFps: targetFps,
       saturationLevel: saturationLevel,
       cropZoomScale: cropZoomScale,
@@ -120,11 +125,14 @@ class FfmpegService {
     buffer.write(' -i "${_escapePath(inputPath)}"');
   }
 
-  static void _writeMetadataTags(StringBuffer buffer) {
+  static void _writeMetadataTags(
+    StringBuffer buffer, [
+    DeviceProfile profile = DeviceProfile.defaultProfile,
+  ]) {
     buffer.write(
       ' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact'
-      ' -metadata make="Apple" -metadata model="iPhone 15 Pro Max" -metadata encoder="Apple QuickTime"'
-      ' -metadata:s:v:0 handler_name="Core Media Video" -metadata:s:a:0 handler_name="Core Media Audio"',
+      ' -metadata make="${profile.make}" -metadata model="${profile.model}" -metadata encoder="${profile.encoder}"'
+      ' -metadata:s:v:0 handler_name="${profile.videoHandler}" -metadata:s:a:0 handler_name="${profile.audioHandler}"',
     );
   }
 
@@ -204,6 +212,7 @@ class FfmpegService {
       FilterBuilders.buildAudioFilter(
         hasAudio: hasAudioProcess,
         hasVisual: hasVisual,
+        modifyAudio: modifyAudio,
         enableDeepAntiFingerprint: enableDeepAntiFingerprint,
         enableAggressiveAudio: enableAggressiveAudio,
         muteOriginalAudio: muteOriginalAudio,
