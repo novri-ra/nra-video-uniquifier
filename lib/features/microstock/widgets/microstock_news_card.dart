@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
@@ -147,6 +148,16 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if ((widget.article.localImagePath != null &&
+                        widget.article.localImagePath!.isNotEmpty) ||
+                    (widget.article.imageUrl != null &&
+                        widget.article.imageUrl!.isNotEmpty)) ...[
+                  _CardImageThumbnail(
+                    article: widget.article,
+                    isDark: widget.isDark,
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 Row(
                   children: [
                     _CategoryBadge(
@@ -430,6 +441,64 @@ class _TranslateButton extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _CardImageThumbnail extends StatelessWidget {
+  final MicrostockNewsArticle article;
+  final bool isDark;
+
+  const _CardImageThumbnail({required this.article, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final localPath = article.localImagePath;
+    final hasLocal =
+        localPath != null &&
+        localPath.isNotEmpty &&
+        File(localPath).existsSync();
+
+    Widget imageWidget;
+    if (hasLocal) {
+      imageWidget = Image.file(
+        File(localPath),
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+      );
+    } else if (article.imageUrl != null && article.imageUrl!.isNotEmpty) {
+      imageWidget = Image.network(
+        article.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildPlaceholder();
+        },
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: AspectRatio(aspectRatio: 16 / 9, child: imageWidget),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: isDark
+          ? AppColors.surfaceContainerHigh
+          : AppColors.lightSurfaceContainer,
+      alignment: Alignment.center,
+      child: Icon(
+        Icons.image_outlined,
+        size: 28,
+        color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
       ),
     );
   }

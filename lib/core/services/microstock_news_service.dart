@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/microstock/services/article_image_service.dart';
 import '../../features/microstock/utils/html_sanitizer.dart';
 import 'connectivity_service.dart';
 import 'microstock_seed_data.dart';
@@ -176,6 +177,7 @@ class MicrostockNewsService {
           );
         }
       }
+      triggerBackgroundDownload(cached);
       return cached;
     }
 
@@ -184,10 +186,16 @@ class MicrostockNewsService {
         final online = await fetchAndCacheNews();
         if (online.isNotEmpty) return online;
       } catch (_) {
-        if (cached.isNotEmpty) return cached;
+        if (cached.isNotEmpty) {
+          triggerBackgroundDownload(cached);
+          return cached;
+        }
       }
     }
-    if (cached.isNotEmpty) return cached;
+    if (cached.isNotEmpty) {
+      triggerBackgroundDownload(cached);
+      return cached;
+    }
 
     final seed = getSeedArticles();
     await saveNewsToCache(seed);
@@ -199,12 +207,14 @@ class MicrostockNewsService {
     if (mockFetchHandler != null) {
       final mocked = await mockFetchHandler!();
       await saveNewsToCache(mocked);
+      triggerBackgroundDownload(mocked);
       return mocked;
     }
 
     final hybrid = await fetchHybridNews();
     final articles = hybrid.isNotEmpty ? hybrid : getSeedArticles();
     await saveNewsToCache(articles);
+    triggerBackgroundDownload(articles);
     return articles;
   }
 
@@ -656,7 +666,14 @@ class MicrostockNewsService {
       for (final a in articles) {
         final key = a.sourceUrl.isNotEmpty ? a.sourceUrl : a.id;
         if (key.isNotEmpty) {
-          final updated = a.cachedAt == null ? a.copyWith(cachedAt: now) : a;
+          final existingArticle = mergedMap[key];
+          var updated = a.cachedAt == null ? a.copyWith(cachedAt: now) : a;
+          if (updated.localImagePath == null &&
+              existingArticle?.localImagePath != null) {
+            updated = updated.copyWith(
+              localImagePath: existingArticle!.localImagePath,
+            );
+          }
           mergedMap[key] = updated;
         }
       }
@@ -681,6 +698,54 @@ class MicrostockNewsService {
       return prefs.getString(_lastFetchedKey);
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Triggers non-blocking background image download and WebP conversion for articles with remote image URLs.
+  static void triggerBackgroundDownload(List<MicrostockNewsArticle> articles) {
+    unawaited(_downloadImagesForArticles(articles).catchError((_) {}));
+  }
+
+  static Future<void> _downloadImagesForArticles(
+    List<MicrostockNewsArticle> articles,
+  ) async {
+    final targets = articles
+        .where(
+          (a) =>
+              a.imageUrl != null &&
+              a.imageUrl!.startsWith('http') &&
+              (a.localImagePath == null || a.localImagePath!.isEmpty),
+        )
+        .toList();
+
+    if (targets.isEmpty) return;
+
+    bool anyUpdated = false;
+    final cached = await getCachedNews();
+    final cacheMap = {
+      for (final a in cached) (a.sourceUrl.isNotEmpty ? a.sourceUrl : a.id): a,
+    };
+
+    for (final article in targets) {
+      final key = article.sourceUrl.isNotEmpty ? article.sourceUrl : article.id;
+      final current = cacheMap[key] ?? article;
+      if (current.localImagePath != null &&
+          current.localImagePath!.isNotEmpty) {
+        continue;
+      }
+
+      final localPath = await ArticleImageService.downloadAndCacheImage(
+        current.imageUrl!,
+        current.id,
+      );
+      if (localPath != null && localPath.isNotEmpty) {
+        cacheMap[key] = current.copyWith(localImagePath: localPath);
+        anyUpdated = true;
+      }
+    }
+
+    if (anyUpdated) {
+      await saveNewsToCache(cacheMap.values.toList());
     }
   }
 

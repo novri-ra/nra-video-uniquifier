@@ -1,5 +1,9 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): build ArticleImageService with background Isolate WebP compression and local disk caching
+- feat(microstock): add responsive 16:9 WebP thumbnails to MicrostockNewsCard and hero banners to MicrostockArticleSheet
+- feat(microstock): implement non-blocking background image download and localImagePath cache preservation
+- docs(reports): add report 14-implement-phase2-image-webp-isolate to reports index
 - feat(microstock): integrate html and image packages, expand article model with media/author attributes
 - feat(microstock): add direct photography RSS feeds (PetaPixel, Fstoppers) with DOM-based XML parsing
 - feat(microstock): implement append-merge article caching with 1-hour TTL background refresh

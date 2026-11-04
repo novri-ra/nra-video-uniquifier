@@ -15,6 +15,7 @@
 | 11 | 11-fix-microstock-news-parser-and-overflow.md | 2026-11-04 | fix | Sanitize Microstock RSS HTML entities and tags, and fix RenderFlex overflow in card and reader |
 | 12 | 12-audit-microstock-news-architecture.md | 2026-11-04 | audit | Comprehensive architecture audit of Microstock Intel models, RSS parser, cache, and WebP pipeline |
 | 13 | 13-implement-phase1-model-feed-cache.md | 2026-11-04 | feature | Implement Phase 1 Microstock Intel: extended model, package:html DOM parser, direct RSS feeds, and 1h TTL append-merge cache |
+| 14 | 14-implement-phase2-image-webp-isolate.md | 2026-11-04 | feature | Implement Phase 2 Microstock Intel: ArticleImageService, pure Dart WebP downscale in Isolate.run, offline cache, card thumbnails and reader hero banners |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
