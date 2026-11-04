@@ -110,32 +110,59 @@ class HistoryService {
     return foundFiles;
   }
 
-  /// Checks whether storage or media permissions are granted.
+  /// Returns whether the device is running on Android 11+ (API 30+).
+  static bool get isAndroid11OrHigher {
+    if (!Platform.isAndroid) return false;
+    try {
+      final osVersion = Platform.operatingSystemVersion;
+      final apiMatch = RegExp(
+        r'API\s*(\d+)',
+        caseSensitive: false,
+      ).firstMatch(osVersion);
+      if (apiMatch != null) {
+        final api = int.tryParse(apiMatch.group(1) ?? '');
+        if (api != null) return api >= 30;
+      }
+      final verMatch = RegExp(
+        r'(?:Android\s*)?(\d+)',
+        caseSensitive: false,
+      ).firstMatch(osVersion);
+      if (verMatch != null) {
+        final ver = int.tryParse(verMatch.group(1) ?? '');
+        if (ver != null) return ver >= 11;
+      }
+    } catch (_) {}
+    return true; // Default to true on modern Android
+  }
+
+  /// Checks whether storage permissions are granted.
+  /// On Android 11+ (API 30+), MANAGE_EXTERNAL_STORAGE is required for deleting
+  /// files from public shared storage (/storage/emulated/0/Movies).
   static Future<bool> hasStoragePermission() async {
     if (!Platform.isAndroid) return true;
     try {
-      if (await Permission.videos.isGranted) return true;
-      if (await Permission.storage.isGranted) return true;
-      if (await Permission.manageExternalStorage.isGranted) return true;
+      if (isAndroid11OrHigher) {
+        return await Permission.manageExternalStorage.isGranted;
+      } else {
+        return await Permission.storage.isGranted;
+      }
     } catch (_) {
       return true;
     }
-    return false;
   }
 
-  /// Requests storage/media permissions with multiple fallback levels.
+  /// Requests storage/media permissions with appropriate Android version handling.
   static Future<bool> requestStoragePermission() async {
     if (!Platform.isAndroid) return true;
     try {
-      final statuses = await [Permission.storage, Permission.videos].request();
-
-      final isGranted =
-          statuses[Permission.storage]?.isGranted == true ||
-          statuses[Permission.videos]?.isGranted == true;
-      if (isGranted) return true;
-
-      if (await Permission.manageExternalStorage.isGranted) return true;
-      return false;
+      if (isAndroid11OrHigher) {
+        final status = await Permission.manageExternalStorage.request();
+        if (status.isGranted) return true;
+        return await Permission.manageExternalStorage.isGranted;
+      } else {
+        final status = await Permission.storage.request();
+        return status.isGranted;
+      }
     } catch (_) {
       return false;
     }
@@ -204,9 +231,25 @@ class HistoryService {
   ) async {
     final deletedPaths = <String>[];
     for (final item in items) {
-      final success = await deleteItem(item.file);
-      if (success) {
-        deletedPaths.add(item.file.path);
+      try {
+        final f = File(item.file.path);
+        if (await f.exists()) {
+          await f.delete();
+          if (!await f.exists()) {
+            deletedPaths.add(item.file.path);
+            await MediaScannerService.scanFile(item.file.path);
+            await _cleanupThumbnail(f);
+          } else {
+            debugPrint(
+              '[HistoryService] Physical delete failed, file still exists: ${item.file.path}',
+            );
+          }
+        } else {
+          // File was already removed from disk
+          deletedPaths.add(item.file.path);
+        }
+      } catch (e) {
+        debugPrint('Gagal menghapus file: ${item.file.path}, err:$e');
       }
     }
     return deletedPaths;

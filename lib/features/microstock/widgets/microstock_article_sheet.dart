@@ -102,8 +102,12 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   @override
   void initState() {
     super.initState();
-    if (_isSyntheticArticle && _needsExtraction) {
-      _tryExtractContent();
+    if (_isSyntheticArticle &&
+        _needsExtraction &&
+        widget.article.sourceUrl.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _tryExtractContent();
+      });
     }
   }
 
@@ -298,7 +302,7 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
                 onDecreaseFont: _decreaseFontSize,
               ),
               LinearProgressIndicator(
-                value: _scrollProgress,
+                value: _isExtracting ? null : _scrollProgress,
                 minHeight: 2.5,
                 backgroundColor: progressTrack,
                 valueColor: AlwaysStoppedAnimation<Color>(progressAccent),

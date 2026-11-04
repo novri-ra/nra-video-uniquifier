@@ -220,10 +220,15 @@ class ArticleReaderExtractor {
     'noscript',
     'iframe',
     'form',
+    'aside',
     '.advertisement',
     '.ad',
     '.ad-container',
     '.pixelmeter',
+    '.pp-pixelmeter-widget',
+    '.banners',
+    '.banners-desktop',
+    '.banners-below-header',
     '.affiliate-disclosure',
     '.social-share',
     '.sharedaddy',
@@ -272,6 +277,10 @@ class ArticleReaderExtractor {
       for (final el in elements) {
         el.remove();
       }
+    }
+    // Remove third-party ad scripts like freestar
+    for (final el in container.querySelectorAll('script[src*="freestar"]')) {
+      el.remove();
     }
 
     // 4. Extract narrative elements sequentially: p, h2, h3, h4, ul, ol, blockquote

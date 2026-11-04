@@ -1,5 +1,11 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): reactive on-demand full article extraction with dynamic progress indicator
+- fix(microstock): strip aside, banners, and freestar advertising clutter before DOM parsing
+- fix(history): persist storage permission prompt via SharedPreferences to limit dialog to 1 occurrence
+- fix(history): remove redundant permission checks during single and bulk delete actions
+- fix(history): implement resilient per-file iteration for bulk video deletion with MediaScanner synchronization
+- docs(reports): add report 27 (comprehensive news reader and storage management fix) to reports index
 - feat(microstock): add DOM pre-cleaning to strip advertisements, social widgets, and noise from article reader
 - feat(microstock): support multi-element narrative extraction (headings h2-h4, bullet lists ul/ol/li, blockquotes)
 - feat(microstock): implement rich semantic block rendering in MicrostockArticleSheet

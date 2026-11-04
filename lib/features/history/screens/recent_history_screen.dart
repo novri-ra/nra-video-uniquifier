@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:storage_space/storage_space.dart';
 import '../../../core/services/history_service.dart';
 import '../../../core/theme/app_theme.dart';
@@ -18,7 +19,8 @@ class RecentHistoryScreen extends StatefulWidget {
   State<RecentHistoryScreen> createState() => _RecentHistoryScreenState();
 }
 
-class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
+class _RecentHistoryScreenState extends State<RecentHistoryScreen>
+    with WidgetsBindingObserver {
   List<VideoExportItem> _items = [];
   StorageSpace? _deviceStorage;
   bool _isLoading = true;
@@ -29,17 +31,42 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadHistory();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkStoragePermissionOnMount();
     });
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      _loadHistory();
+    }
+  }
+
   Future<void> _checkStoragePermissionOnMount() async {
     if (!mounted || !Platform.isAndroid) return;
     final hasPermission = await HistoryService.hasStoragePermission();
-    if (!hasPermission && mounted) {
-      _showStoragePermissionDialog();
+    if (hasPermission) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final hasPrompted = prefs.getBool('has_prompted_manage_storage') ?? false;
+      if (!hasPrompted && mounted) {
+        await prefs.setBool('has_prompted_manage_storage', true);
+        if (mounted) {
+          _showStoragePermissionDialog();
+        }
+      }
+    } catch (_) {
+      // Fallback: If SharedPreferences fails, do not spam dialog
     }
   }
 
@@ -60,7 +87,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Izin Akses Penyimpanan',
+                'Izin Kelola Berkas',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -71,7 +98,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
           ],
         ),
         content: const Text(
-          'NRA Video Uniquifier memerlukan izin akses penyimpanan untuk memindai, membuka, dan menghapus riwayat video hasil ekspor dari perangkat secara permanen.',
+          'Untuk memindai, mengelola, dan menghapus video ekspor dari folder publik secara permanen, Android memerlukan izin "Akses Semua Berkas" (All Files Access).\n\nAktifkan izin ini pada menu pengaturan yang akan terbuka.',
           style: TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 13,
@@ -100,7 +127,16 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
                   onGranted?.call();
                 }
               } else if (mounted) {
-                _showOpenSettingsPrompt();
+                // If not directly granted (e.g. redirected to settings switch), check again or prompt settings
+                final recheck = await HistoryService.hasStoragePermission();
+                if (recheck) {
+                  if (mounted) {
+                    _loadHistory();
+                    onGranted?.call();
+                  }
+                } else if (mounted) {
+                  _showOpenSettingsPrompt();
+                }
               }
             },
             child: const Text('Izinkan Akses'),
@@ -116,21 +152,27 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
     return false;
   }
 
-  void _showOpenSettingsPrompt() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          'Izin penyimpanan belum diberikan. Buka Pengaturan Aplikasi untuk mengaktifkan.',
+  Future<void> _showOpenSettingsPrompt() async {
+    if (!mounted) return;
+    final isGranted = await HistoryService.hasStoragePermission();
+    if (isGranted) return;
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Izin "Akses semua berkas" belum aktif. Buka Pengaturan untuk mengaktifkan.',
+          ),
+          backgroundColor: AppColors.surfaceContainerHighest,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'Pengaturan',
+            textColor: AppColors.primaryContainer,
+            onPressed: () => openAppSettings(),
+          ),
         ),
-        backgroundColor: AppColors.surfaceContainerHighest,
-        behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: 'Pengaturan',
-          textColor: AppColors.primaryContainer,
-          onPressed: () => openAppSettings(),
-        ),
-      ),
-    );
+      );
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -231,15 +273,6 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
     final count = _selectedItemPaths.length;
     if (!await _confirmBatchDelete(count)) return;
 
-    final hasPermission = await HistoryService.hasStoragePermission();
-    if (!hasPermission) {
-      if (!mounted) return;
-      final ok = await _showStoragePermissionDialog(
-        onGranted: () => _deleteSelectedItems(),
-      );
-      if (!ok) return;
-    }
-
     try {
       final selectedItems = _items
           .where((i) => _selectedItemPaths.contains(i.file.path))
@@ -336,15 +369,6 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen> {
 
   Future<void> _deleteItem(VideoExportItem item) async {
     if (!await _confirmDelete(item)) return;
-
-    final hasPermission = await HistoryService.hasStoragePermission();
-    if (!hasPermission) {
-      if (!mounted) return;
-      final ok = await _showStoragePermissionDialog(
-        onGranted: () => _deleteItem(item),
-      );
-      if (!ok) return;
-    }
 
     try {
       final targetPath = item.file.path;
