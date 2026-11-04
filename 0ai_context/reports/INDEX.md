@@ -16,6 +16,7 @@
 | 12 | 12-audit-microstock-news-architecture.md | 2026-11-04 | audit | Comprehensive architecture audit of Microstock Intel models, RSS parser, cache, and WebP pipeline |
 | 13 | 13-implement-phase1-model-feed-cache.md | 2026-11-04 | feature | Implement Phase 1 Microstock Intel: extended model, package:html DOM parser, direct RSS feeds, and 1h TTL append-merge cache |
 | 14 | 14-implement-phase2-image-webp-isolate.md | 2026-11-04 | feature | Implement Phase 2 Microstock Intel: ArticleImageService, pure Dart WebP downscale in Isolate.run, offline cache, card thumbnails and reader hero banners |
+| 15 | 15-implement-phase3-dynamic-chips-affinity-clean-reader.md | 2026-11-04 | feature | Implement Phase 3 Microstock Intel: 7-day decayed affinity scoring engine, dynamic categories aggregator, offline telemetry, and clean reader UI |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

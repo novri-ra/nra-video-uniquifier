@@ -146,6 +146,7 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   }
 
   Future<void> _launchUrl() async {
+    UserInterestService.recordOpenSourceUrl(widget.article);
     final uri = Uri.tryParse(widget.article.sourceUrl);
     if (uri != null) {
       try {
@@ -249,6 +250,9 @@ class _ArticleContentList extends StatelessWidget {
     required this.onOpenBrowser,
   });
 
+  bool get _isSyntheticArticle =>
+      article.id.startsWith('rss-') || article.id.startsWith('reddit-');
+
   @override
   Widget build(BuildContext context) {
     final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
@@ -286,26 +290,37 @@ class _ArticleContentList extends StatelessWidget {
           isDark: isDark,
         ),
         const SizedBox(height: 16),
-        if (displayTakeaways.isNotEmpty) ...[
+        if (!_isSyntheticArticle && displayTakeaways.isNotEmpty) ...[
           ArticleKeyTakeawaysBox(text: displayTakeaways, isDark: isDark),
           const SizedBox(height: 18),
         ],
-        Text(
-          displayContent,
-          style: TextStyle(color: bodyColor, fontSize: 15, height: 1.6),
-        ),
-        if (displaySpecs.isNotEmpty) ...[
-          const SizedBox(height: 22),
+        for (final paragraph in displayContent.split(RegExp(r'\n{1,2}')))
+          if (paragraph.trim().isNotEmpty) ...[
+            Text(
+              paragraph.trim(),
+              style: TextStyle(
+                color: bodyColor,
+                fontSize: 15,
+                height: 1.6,
+                letterSpacing: 0.1,
+              ),
+            ),
+            const SizedBox(height: 14),
+          ],
+        if (!_isSyntheticArticle && displaySpecs.isNotEmpty) ...[
+          const SizedBox(height: 8),
           ArticleTechnicalSpecsBox(specs: displaySpecs, isDark: isDark),
+          const SizedBox(height: 14),
         ],
-        if (displayChecklist.isNotEmpty) ...[
-          const SizedBox(height: 18),
+        if (!_isSyntheticArticle && displayChecklist.isNotEmpty) ...[
+          const SizedBox(height: 4),
           ArticleContributorChecklistBox(
             items: displayChecklist,
             isDark: isDark,
           ),
+          const SizedBox(height: 14),
         ],
-        const SizedBox(height: 24),
+        const SizedBox(height: 10),
         ArticleFooterSourceBox(article: article, isDark: isDark),
       ],
     );

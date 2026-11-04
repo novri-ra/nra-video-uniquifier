@@ -9,6 +9,7 @@ class NewsSearchAndFilterBar extends StatefulWidget {
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onChipSelected;
   final bool isDark;
+  final List<String>? categories;
 
   const NewsSearchAndFilterBar({
     super.key,
@@ -16,6 +17,7 @@ class NewsSearchAndFilterBar extends StatefulWidget {
     required this.onSearchChanged,
     required this.onChipSelected,
     required this.isDark,
+    this.categories,
   });
 
   @override
@@ -34,6 +36,14 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
   }
 
   @override
+  void didUpdateWidget(covariant NewsSearchAndFilterBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.categories != oldWidget.categories) {
+      _refreshChips();
+    }
+  }
+
+  @override
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
@@ -42,7 +52,13 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
 
   void _refreshChips() {
     setState(() {
-      _adaptiveChips = UserInterestService.getAdaptiveKeywords();
+      if (widget.categories != null && widget.categories!.isNotEmpty) {
+        _adaptiveChips = UserInterestService.getSortedDynamicCategories(
+          widget.categories!,
+        );
+      } else {
+        _adaptiveChips = UserInterestService.getAdaptiveKeywords();
+      }
     });
   }
 

@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): implement 7-day exponential decayed user affinity engine in SharedPreferences
+- feat(microstock): build dynamic category aggregator driven by active article tags and affinity rankings
+- feat(microstock): present clean multi-paragraph reader typography and suppress synthetic boilerplate boxes
+- fix(privacy): eliminate external Google Apps Script telemetry webhooks in compliance with Section 14
+- docs(reports): add report 15-implement-phase3-dynamic-chips-affinity-clean-reader to reports index
 - feat(microstock): build ArticleImageService with background Isolate WebP compression and local disk caching
 - feat(microstock): add responsive 16:9 WebP thumbnails to MicrostockNewsCard and hero banners to MicrostockArticleSheet
 - feat(microstock): implement non-blocking background image download and localImagePath cache preservation

@@ -77,6 +77,35 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     });
   }
 
+  List<String> get _dynamicCategories {
+    final rawSet = <String>{};
+    for (final a in _allArticles) {
+      for (final t in a.tags) {
+        final clean = t.replaceAll('#', '').trim();
+        if (clean.toLowerCase().contains('shutter') ||
+            clean.toLowerCase().contains('adobe') ||
+            clean.toLowerCase().contains('freepik') ||
+            clean.toLowerCase().contains('reddit')) {
+          rawSet.add(clean);
+        }
+      }
+    }
+    for (final a in _allArticles) {
+      if (a.category.isNotEmpty) {
+        rawSet.add(a.category);
+      }
+    }
+    for (final a in _allArticles) {
+      for (final t in a.tags) {
+        final cleanTag = t.replaceAll('#', '').trim();
+        if (cleanTag.isNotEmpty) {
+          rawSet.add(cleanTag);
+        }
+      }
+    }
+    return rawSet.toList();
+  }
+
   void _openSettings(BuildContext context) {
     Navigator.of(
       context,
@@ -151,6 +180,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
             const SizedBox(height: 12),
             NewsSearchAndFilterBar(
               selectedChip: _selectedChip,
+              categories: _dynamicCategories,
               isDark: isDark,
               onSearchChanged: (q) => setState(() => _searchQuery = q),
               onChipSelected: (c) => setState(() => _selectedChip = c),
