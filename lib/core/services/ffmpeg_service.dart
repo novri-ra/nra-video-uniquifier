@@ -1,23 +1,29 @@
 import 'dart:io';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'ffmpeg/ffmpeg_command_builder.dart';
+import 'ffmpeg/ffmpeg_file_helper.dart';
+import 'ffmpeg/media_probe_helper.dart';
 import 'media_scanner_service.dart';
 import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
 import 'storage_service.dart';
 import 'wakelock_service.dart';
-import 'filter_builders.dart';
 import '../utils/variation_generator.dart';
+export 'ffmpeg/ffmpeg_command_builder.dart';
+export 'ffmpeg/ffmpeg_file_helper.dart';
+export 'ffmpeg/ffmpeg_metadata_builder.dart';
+export 'ffmpeg/media_probe_helper.dart';
 export 'render_diagnostic_service.dart';
 export '../utils/variation_generator.dart';
 
 class FfmpegService {
-  static String _escapePath(String path) => path.replaceAll('"', r'\"');
+  static String _escapePath(String path) =>
+      FfmpegCommandBuilder.escapePath(path);
 
   /// Builds dynamic FFmpeg command string with full anti-fingerprint filters.
   static String buildCommand({
@@ -53,180 +59,40 @@ class FfmpegService {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
-  }) {
-    final vars =
-        variations ??
-        (enableDeepAntiFingerprint
-            ? VariationGenerator.generate()
-            : VideoVariations.fallback);
-    final buffer = StringBuffer('-y');
-    _writeInputOptions(
-      buffer,
-      inputPath,
-      enableHardwareAcceleration,
-      enableAutoTrim,
-      totalDurationMs,
-      thermalThrottle,
-      introTrimOffset,
-    );
-    if (removeMetadata) _writeMetadataTags(buffer, vars.deviceProfile);
-    _writeFilterAndCodecOptions(
-      buffer: buffer,
-      modifyVisuals: modifyVisuals,
-      shouldUpscale: upscale ?? upscale1080p,
-      targetResolution: targetResolution,
-      upscaleEngine: upscaleEngine,
-      videoCodec: videoCodec,
-      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-      enableHorizontalFlip: enableHorizontalFlip,
-      enableAggressiveAudio: enableAggressiveAudio,
-      isPortrait: isPortrait,
-      enableBlurredCanvas: enableBlurredCanvas,
-      canvasScalePercent: canvasScalePercent,
-      muteOriginalAudio: muteOriginalAudio,
-      enableDynamicZoom: enableDynamicZoom,
-      enableMicroOverlay: enableMicroOverlay,
-      enableFrameSkip: enableFrameSkip,
-      enableChromaShift: enableChromaShift,
-      modifyAudio: modifyAudio,
-      variations: vars,
-      targetFps: targetFps,
-      saturationLevel: saturationLevel,
-      cropZoomScale: cropZoomScale,
-      cropAnchor: cropAnchor,
-    );
-    buffer.write(' "${_escapePath(outputPath)}"');
-    return buffer.toString();
-  }
-
-  static void _writeInputOptions(
-    StringBuffer buffer,
-    String inputPath,
-    bool hwAccel,
-    bool autoTrim,
-    int durationMs,
-    bool thermalThrottle, [
-    double introTrimOffset = 0.5,
-  ]) {
-    if (hwAccel) buffer.write(' -hwaccel auto');
-    buffer.write(thermalThrottle ? ' -threads 4' : ' -threads 0');
-    if (autoTrim) {
-      final ss = introTrimOffset.clamp(0.0, 3.0);
-      final ssFormatted = ss == 0.5 ? '0.5' : ss.toStringAsFixed(2);
-      buffer.write(' -ss $ssFormatted');
-      final trimTotalMs = ((ss + 0.5) * 1000).toInt();
-      if (durationMs > trimTotalMs) {
-        buffer.write(
-          ' -t ${((durationMs - trimTotalMs) / 1000).toStringAsFixed(2)}',
-        );
-      }
-    }
-    buffer.write(' -i "${_escapePath(inputPath)}"');
-  }
-
-  static void _writeMetadataTags(
-    StringBuffer buffer, [
-    DeviceProfile profile = DeviceProfile.defaultProfile,
-  ]) {
-    buffer.write(
-      ' -map_metadata -1 -map_chapters -1 -bitexact -fflags +bitexact'
-      ' -metadata make="${profile.make}" -metadata model="${profile.model}" -metadata encoder="${profile.encoder}"'
-      ' -metadata:s:v:0 handler_name="${profile.videoHandler}" -metadata:s:a:0 handler_name="${profile.audioHandler}"',
-    );
-  }
-
-  static void _writeFilterAndCodecOptions({
-    required StringBuffer buffer,
-    required bool modifyVisuals,
-    required bool shouldUpscale,
-    required TargetResolution targetResolution,
-    required UpscaleEngine upscaleEngine,
-    required VideoCodec videoCodec,
-    required bool enableEnhanceAndDenoise,
-    required bool enableDeepAntiFingerprint,
-    required bool enableHorizontalFlip,
-    required bool enableAggressiveAudio,
-    required bool isPortrait,
-    required bool enableBlurredCanvas,
-    required double canvasScalePercent,
-    required bool muteOriginalAudio,
-    required bool enableDynamicZoom,
-    required bool enableMicroOverlay,
-    required bool enableFrameSkip,
-    required bool enableChromaShift,
-    required bool modifyAudio,
-    VideoVariations? variations,
-    int? targetFps,
-    double? saturationLevel,
-    double cropZoomScale = 1.0,
-    String cropAnchor = 'center',
-  }) {
-    final vars =
-        variations ??
-        (enableDeepAntiFingerprint
-            ? VariationGenerator.generate()
-            : VideoVariations.fallback);
-    final hasVisual =
-        modifyVisuals ||
-        shouldUpscale ||
-        enableHorizontalFlip ||
-        enableBlurredCanvas ||
-        enableDynamicZoom ||
-        enableMicroOverlay ||
-        enableFrameSkip ||
-        enableChromaShift;
-    final hasAudioProcess = modifyAudio || muteOriginalAudio;
-    final isHighRes =
-        targetResolution == TargetResolution.r2k ||
-        targetResolution == TargetResolution.r4k;
-    final effectiveFps = isHighRes ? 30 : (targetFps ?? 30);
-
-    buffer.write(
-      FilterBuilders.buildVideoFilter(
-        hasVisual: hasVisual,
-        hasAudio: hasAudioProcess,
-        modifyVisuals: modifyVisuals,
-        upscale: shouldUpscale,
-        targetResolution: targetResolution,
-        upscaleEngine: upscaleEngine,
-        videoCodec: videoCodec,
-        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableHorizontalFlip: enableHorizontalFlip,
-        isPortrait: isPortrait,
-        enableBlurredCanvas: enableBlurredCanvas,
-        canvasScalePercent: canvasScalePercent,
-        enableDynamicZoom: enableDynamicZoom,
-        enableMicroOverlay: enableMicroOverlay,
-        enableFrameSkip: enableFrameSkip,
-        enableChromaShift: enableChromaShift,
-        variations: vars,
-        targetFps: effectiveFps,
-        saturationLevel: saturationLevel,
-        cropZoomScale: cropZoomScale,
-        cropAnchor: cropAnchor,
-      ),
-    );
-    buffer.write(
-      FilterBuilders.buildAudioFilter(
-        hasAudio: hasAudioProcess,
-        hasVisual: hasVisual,
-        modifyAudio: modifyAudio,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableAggressiveAudio: enableAggressiveAudio,
-        muteOriginalAudio: muteOriginalAudio,
-        variations: vars,
-      ),
-    );
-    final fpsStr = isHighRes
-        ? '30'
-        : (targetFps != null
-              ? '$targetFps'
-              : vars.outputFps.toStringAsFixed(2));
-    if (hasVisual) buffer.write(' -fps_mode cfr -r $fpsStr');
-    if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
-  }
+  }) => FfmpegCommandBuilder.buildCommand(
+    inputPath: inputPath,
+    outputPath: outputPath,
+    removeMetadata: removeMetadata,
+    modifyAudio: modifyAudio,
+    modifyVisuals: modifyVisuals,
+    upscale1080p: upscale1080p,
+    upscale: upscale,
+    targetResolution: targetResolution,
+    upscaleEngine: upscaleEngine,
+    videoCodec: videoCodec,
+    enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+    enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+    enableHorizontalFlip: enableHorizontalFlip,
+    enableAggressiveAudio: enableAggressiveAudio,
+    enableAutoTrim: enableAutoTrim,
+    totalDurationMs: totalDurationMs,
+    isPortrait: isPortrait,
+    enableHardwareAcceleration: enableHardwareAcceleration,
+    enableBlurredCanvas: enableBlurredCanvas,
+    canvasScalePercent: canvasScalePercent,
+    muteOriginalAudio: muteOriginalAudio,
+    enableDynamicZoom: enableDynamicZoom,
+    enableMicroOverlay: enableMicroOverlay,
+    enableFrameSkip: enableFrameSkip,
+    enableChromaShift: enableChromaShift,
+    variations: variations,
+    thermalThrottle: thermalThrottle,
+    targetFps: targetFps,
+    saturationLevel: saturationLevel,
+    cropZoomScale: cropZoomScale,
+    cropAnchor: cropAnchor,
+    introTrimOffset: introTrimOffset,
+  );
 
   /// Cancels any currently running FFmpeg operations.
   static Future<void> cancel() async {
@@ -241,19 +107,8 @@ class FfmpegService {
   }
 
   /// Safely copies an input video to app temp cache before feeding to native FFmpeg.
-  static Future<File> stageInputFile(String inputPath) async {
-    final inputFile = File(inputPath);
-    if (!inputFile.existsSync() || inputFile.lengthSync() == 0) {
-      throw Exception(
-        'Source video file does not exist or is empty: $inputPath',
-      );
-    }
-    final tempDir = await getTemporaryDirectory();
-    final ext = inputPath.contains('.') ? inputPath.split('.').last : 'mp4';
-    return await inputFile.copy(
-      '${tempDir.path}/staged_${DateTime.now().millisecondsSinceEpoch}.$ext',
-    );
-  }
+  static Future<File> stageInputFile(String inputPath) =>
+      FfmpegFileHelper.stageInputFile(inputPath);
 
   /// Extracts 1st-frame thumbnail via lightweight FFmpeg command.
   static Future<String?> extractThumbnail(
@@ -278,107 +133,14 @@ class FfmpegService {
     return null;
   }
 
-  /// Resolves the public target directory (/storage/emulated/0/Movies/Uniquifier).
-  static Future<Directory> _resolveTargetDir() async {
-    if (Platform.isAndroid) {
-      final publicMovies = Directory('/storage/emulated/0/Movies/Uniquifier');
-      try {
-        if (!await publicMovies.exists()) {
-          await publicMovies.create(recursive: true);
-        }
-        return publicMovies;
-      } catch (_) {
-        try {
-          final dirs = await getExternalStorageDirectories(
-            type: StorageDirectory.movies,
-          );
-          if (dirs != null && dirs.isNotEmpty) {
-            final fallback = Directory('${dirs.first.path}/Uniquifier');
-            if (!await fallback.exists()) {
-              await fallback.create(recursive: true);
-            }
-            return fallback;
-          }
-        } catch (_) {}
-      }
-    }
-    final appDocs = await getApplicationDocumentsDirectory();
-    final localMovies = Directory('${appDocs.path}/Movies/Uniquifier');
-    if (!await localMovies.exists()) await localMovies.create(recursive: true);
-    return localMovies;
-  }
-
-  /// Exports rendered video from sandbox cache to target destination.
-  static Future<String> _exportStagedFile(
-    String stagedPath,
-    String destinationPath,
-  ) async {
-    try {
-      final destFile = File(destinationPath);
-      if (!destFile.parent.existsSync()) {
-        destFile.parent.createSync(recursive: true);
-      }
-      await File(stagedPath).copy(destinationPath);
-      return destinationPath;
-    } catch (_) {
-      try {
-        final dirs = await getExternalStorageDirectories(
-          type: StorageDirectory.movies,
-        );
-        final fb = (dirs != null && dirs.isNotEmpty)
-            ? dirs.first.path
-            : (await getApplicationDocumentsDirectory()).path;
-        final fallbackDir = Directory('$fb/Movies/Uniquifier')
-          ..createSync(recursive: true);
-        final fallbackPath =
-            '${fallbackDir.path}/${destinationPath.split(RegExp(r"[/\\]")).last}';
-        await File(stagedPath).copy(fallbackPath);
-        return fallbackPath;
-      } catch (_) {
-        return stagedPath;
-      }
-    }
-  }
-
   /// Generates the target output path with collision-free timestamp pattern.
-  static Future<String> generateOutputPath(String inputPath) async {
-    final fileName = inputPath.split(RegExp(r'[/\\]')).last;
-    final dotIndex = fileName.lastIndexOf('.');
-    final baseName = dotIndex != -1
-        ? fileName.substring(0, dotIndex)
-        : fileName;
-    final targetDir = await _resolveTargetDir();
-    return '${targetDir.path}/UQ_${baseName}_${DateTime.now().millisecondsSinceEpoch}.mp4';
-  }
-
-  static Future<({int durationMs, int width, int height})> _probeMediaMeta(
-    String path,
-  ) async {
-    try {
-      final session = await FFprobeKit.getMediaInformation(path);
-      final info = session.getMediaInformation();
-      if (info != null) {
-        final durMs =
-            ((double.tryParse(info.getDuration() ?? '') ?? 0.0) * 1000).toInt();
-        for (final s in info.getStreams()) {
-          if (s.getType() == 'video') {
-            return (
-              durationMs: durMs,
-              width: s.getWidth() ?? 0,
-              height: s.getHeight() ?? 0,
-            );
-          }
-        }
-        return (durationMs: durMs, width: 0, height: 0);
-      }
-    } catch (_) {}
-    return (durationMs: 0, width: 0, height: 0);
-  }
+  static Future<String> generateOutputPath(String inputPath) =>
+      FfmpegFileHelper.generateOutputPath(inputPath);
 
   @visibleForTesting
   static Future<({int durationMs, int width, int height})> probeMediaMeta(
     String path,
-  ) => _probeMediaMeta(path);
+  ) => MediaProbeHelper.probeMediaMeta(path);
 
   /// Executes FFmpeg with input staging, real-time statistics, & cleanup.
   static Future<String> processVideo({
@@ -539,7 +301,10 @@ class FfmpegService {
     if (onProgress) FFmpegKitConfig.enableStatisticsCallback(null);
     if (onLog) FFmpegKitConfig.enableLogCallback(null);
     await NotificationService.cancelProgressNotification(101);
-    _deletePartialFile(stagedOut, sourcePath: meta.effectiveInput);
+    FfmpegFileHelper.deletePartialFile(
+      stagedOut,
+      sourcePath: meta.effectiveInput,
+    );
     if (meta.stagedFile != null &&
         meta.stagedFile!.existsSync() &&
         meta.stagedFile!.path != finalDest &&
@@ -572,7 +337,7 @@ class FfmpegService {
     bool resolvedPortrait = isPortrait ?? false;
     int resolvedDuration = totalDurationMs;
     if (isPortrait == null || totalDurationMs <= 0) {
-      final meta = await _probeMediaMeta(effectiveInput);
+      final meta = await MediaProbeHelper.probeMediaMeta(effectiveInput);
       if (isPortrait == null && meta.width > 0 && meta.height > 0) {
         resolvedPortrait = meta.height > meta.width;
       }
@@ -646,17 +411,23 @@ class FfmpegService {
         (diag.isTruncatedPortrait ||
             diag.width == null ||
             diag.height == null)) {
-      _deletePartialFile(stagedRenderedPath, sourcePath: effectiveInput);
+      FfmpegFileHelper.deletePartialFile(
+        stagedRenderedPath,
+        sourcePath: effectiveInput,
+      );
       throw RenderIntegrityException(
         'Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})',
       );
     }
-    final exportedPath = await _exportStagedFile(
+    final exportedPath = await FfmpegFileHelper.exportStagedFile(
       stagedRenderedPath,
       finalDestPath,
     );
     await MediaScannerService.scanFile(exportedPath);
-    _deletePartialFile(stagedOutputPath, sourcePath: effectiveInput);
+    FfmpegFileHelper.deletePartialFile(
+      stagedOutputPath,
+      sourcePath: effectiveInput,
+    );
     if (!suppressCompleteNotification) {
       final name = exportedPath.split(RegExp(r"[/\\]")).last;
       final lang = await SettingsService.getAppLanguageCode();
@@ -686,7 +457,7 @@ class FfmpegService {
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) return outputPath;
-      _deletePartialFile(outputPath, sourcePath: sourcePath);
+      FfmpegFileHelper.deletePartialFile(outputPath, sourcePath: sourcePath);
       if (ReturnCode.isCancel(returnCode)) {
         throw Exception('FFmpeg execution was canceled');
       }
@@ -697,16 +468,8 @@ class FfmpegService {
       debugPrint(err);
       throw Exception(err);
     } catch (_) {
-      _deletePartialFile(outputPath, sourcePath: sourcePath);
+      FfmpegFileHelper.deletePartialFile(outputPath, sourcePath: sourcePath);
       rethrow;
     }
-  }
-
-  static void _deletePartialFile(String path, {String? sourcePath}) {
-    try {
-      if (sourcePath != null && path == sourcePath) return;
-      final file = File(path);
-      if (file.existsSync()) file.deleteSync();
-    } catch (_) {}
   }
 }
