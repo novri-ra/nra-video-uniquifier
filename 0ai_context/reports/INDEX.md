@@ -17,7 +17,8 @@
 | 13 | 13-implement-phase1-model-feed-cache.md | 2026-11-04 | feature | Implement Phase 1 Microstock Intel: extended model, package:html DOM parser, direct RSS feeds, and 1h TTL append-merge cache |
 | 14 | 14-implement-phase2-image-webp-isolate.md | 2026-11-04 | feature | Implement Phase 2 Microstock Intel: ArticleImageService, pure Dart WebP downscale in Isolate.run, offline cache, card thumbnails and reader hero banners |
 | 15 | 15-implement-phase3-dynamic-chips-affinity-clean-reader.md | 2026-11-04 | feature | Implement Phase 3 Microstock Intel: 7-day decayed affinity scoring engine, dynamic categories aggregator, offline telemetry, and clean reader UI |
-| 16 | 16-implement-editorial-ux-bookmarks-pruning.md | 2026-11-04 | feature | Implement Editorial UX: dynamic read time, offline bookmarks, reader progress bar, font size controls, and 50MB WebP cache pruning |
+| 16 | 16-implement-editorial-ux-bookmarks-pruning.md | 2026-11-04 | feature | Implement Editorial UX: dynamic read time, offline bookmarks, reader progress bar, font size controls, and 50MB WebP cache pruning |\r\n| 17 | 17-audit-p2-uniquifier-provider-success-screen.md | 2026-11-04 | audit | Architectural deep audit on P2 technical debt (UniquifierProvider god-object & SuccessScreen heavy component) with zero-regression mixin refactoring roadmap |
+| 18 | 18-implement-p2-phase1-success-screen-refactor.md | 2026-11-04 | refactor | Refactor P2 heavy screen SuccessScreen: extract modular presentation widgets under widgets/success/, shrinking screen from 502 to 111 LOC |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

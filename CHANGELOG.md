@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+- refactor(process): decompose SuccessScreen into modular presentation widgets in widgets/success/
+- refactor(process): extract SuccessHeroCard, SuccessManifestCard, and SuccessActionButtons
+- docs(reports): add report 18-implement-p2-phase1-success-screen-refactor to reports index
 - feat(microstock): add dynamic word-count read time estimation badge
 - feat(microstock): implement offline-first reactive bookmark service and Saved category filter
 - feat(microstock): introduce reader font scaling (A-/A+) and reading scroll progress indicator
