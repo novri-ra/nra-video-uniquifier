@@ -5,6 +5,7 @@ import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../services/article_reader_extractor.dart';
 import '../services/user_news_bookmark_service.dart';
 import '../utils/html_sanitizer.dart';
 import 'microstock_article_content_blocks.dart';
@@ -53,6 +54,12 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   double _scrollProgress = 0.0;
   ScrollController? _activeScrollController;
 
+  // On-demand reader extraction state
+  bool _isExtracting = false;
+  String? _extractedContent;
+  String? _extractedImageUrl;
+  bool _extractionAttempted = false;
+
   void _onScroll() {
     if (_activeScrollController == null ||
         !_activeScrollController!.hasClients) {
@@ -80,19 +87,72 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
     });
   }
 
+  bool get _needsExtraction {
+    final fc = widget.article.fullContent;
+    return fc.trim() == widget.article.title.trim() ||
+        fc.length < 120 ||
+        fc.contains('[Read More]') ||
+        fc.contains('Read more...');
+  }
+
+  bool get _isSyntheticArticle =>
+      widget.article.id.startsWith('rss-') ||
+      widget.article.id.startsWith('reddit-');
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isSyntheticArticle && _needsExtraction) {
+      _tryExtractContent();
+    }
+  }
+
+  Future<void> _tryExtractContent() async {
+    if (_extractionAttempted || !mounted) return;
+    _extractionAttempted = true;
+    setState(() => _isExtracting = true);
+
+    final url = widget.article.sourceUrl;
+    if (url.isEmpty) {
+      if (mounted) setState(() => _isExtracting = false);
+      return;
+    }
+
+    final result = await ArticleReaderExtractor.extract(url);
+    if (!mounted) return;
+
+    if (result != null && result.paragraphs.isNotEmpty) {
+      _extractedContent = result.paragraphs;
+      _extractedImageUrl = result.heroImageUrl;
+
+      // Persist extracted content to cache
+      final updated = widget.article.copyWith(
+        fullContent: result.paragraphs,
+        imageUrl: result.heroImageUrl ?? widget.article.imageUrl,
+      );
+      MicrostockNewsService.saveNewsToCache([updated]);
+    }
+    setState(() => _isExtracting = false);
+  }
+
   String get _displayTitle => HtmlSanitizer.clean(
     (_isTranslated && _translatedTitle != null)
         ? _translatedTitle!
         : widget.article.title,
   );
 
-  String get _displayContent => HtmlSanitizer.clean(
-    (_isTranslated && _translatedContent != null)
+  String get _displayContent {
+    // Use extracted on-demand content if available
+    final base =
+        _extractedContent ??
+        (widget.article.fullContent.isNotEmpty
+            ? widget.article.fullContent
+            : widget.article.summary);
+    final raw = (_isTranslated && _translatedContent != null)
         ? _translatedContent!
-        : (widget.article.fullContent.isNotEmpty
-              ? widget.article.fullContent
-              : widget.article.summary),
-  );
+        : base;
+    return HtmlSanitizer.clean(raw);
+  }
 
   String get _displayTakeaways => HtmlSanitizer.clean(
     (_isTranslated && _translatedTakeaways != null)
@@ -259,6 +319,8 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
                   fontSizeMultiplier: _fontSizeMultiplier,
                   onTranslateToggle: _toggleTranslation,
                   onOpenBrowser: _launchUrl,
+                  isExtracting: _isExtracting,
+                  extractedImageUrl: _extractedImageUrl,
                 ),
               ),
             ],
@@ -302,6 +364,8 @@ class _ArticleContentList extends StatelessWidget {
   final double fontSizeMultiplier;
   final VoidCallback onTranslateToggle;
   final VoidCallback onOpenBrowser;
+  final bool isExtracting;
+  final String? extractedImageUrl;
 
   const _ArticleContentList({
     required this.scrollController,
@@ -317,10 +381,18 @@ class _ArticleContentList extends StatelessWidget {
     required this.fontSizeMultiplier,
     required this.onTranslateToggle,
     required this.onOpenBrowser,
+    this.isExtracting = false,
+    this.extractedImageUrl,
   });
 
   bool get _isSyntheticArticle =>
       article.id.startsWith('rss-') || article.id.startsWith('reddit-');
+
+  /// Effective image URL: original or on-demand extracted og:image fallback.
+  String? get _effectiveImageUrl =>
+      (article.imageUrl != null && article.imageUrl!.isNotEmpty)
+      ? article.imageUrl
+      : extractedImageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -337,8 +409,12 @@ class _ArticleContentList extends StatelessWidget {
         const SizedBox(height: 14),
         if ((article.localImagePath != null &&
                 article.localImagePath!.isNotEmpty) ||
-            (article.imageUrl != null && article.imageUrl!.isNotEmpty)) ...[
-          _ArticleHeroBanner(article: article, isDark: isDark),
+            _effectiveImageUrl != null) ...[
+          _ArticleHeroBanner(
+            article: article,
+            isDark: isDark,
+            fallbackImageUrl: extractedImageUrl,
+          ),
           const SizedBox(height: 14),
         ],
         Text(
@@ -363,19 +439,61 @@ class _ArticleContentList extends StatelessWidget {
           ArticleKeyTakeawaysBox(text: displayTakeaways, isDark: isDark),
           const SizedBox(height: 18),
         ],
-        for (final paragraph in displayContent.split(RegExp(r'\n{1,2}')))
-          if (paragraph.trim().isNotEmpty) ...[
-            Text(
-              paragraph.trim(),
-              style: TextStyle(
-                color: bodyColor,
-                fontSize: 15 * fontSizeMultiplier,
-                height: 1.6,
-                letterSpacing: 0.1,
+        if (isExtracting) ...[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                ),
+              ),
+            ),
+          ),
+        ] else ...[
+          for (final paragraph in displayContent.split(RegExp(r'\n{1,2}')))
+            if (paragraph.trim().isNotEmpty) ...[
+              Text(
+                paragraph.trim(),
+                style: TextStyle(
+                  color: bodyColor,
+                  fontSize: 15 * fontSizeMultiplier,
+                  height: 1.6,
+                  letterSpacing: 0.1,
+                ),
+              ),
+              const SizedBox(height: 14),
+            ],
+          // Fallback hint for thin RSS content
+          if (_isSyntheticArticle &&
+              displayContent.trim() == article.title.trim()) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color:
+                    (isDark
+                            ? AppColors.surfaceContainer
+                            : AppColors.hairlineBorder)
+                        .withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                'Ringkasan singkat. Ketuk "Buka Sumber" untuk membaca artikel lengkap di ${article.source}.',
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.outline
+                      : AppColors.lightOnSurfaceVariant,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
             const SizedBox(height: 14),
           ],
+        ],
         if (!_isSyntheticArticle && displaySpecs.isNotEmpty) ...[
           const SizedBox(height: 8),
           ArticleTechnicalSpecsBox(specs: displaySpecs, isDark: isDark),
@@ -390,7 +508,11 @@ class _ArticleContentList extends StatelessWidget {
           const SizedBox(height: 14),
         ],
         const SizedBox(height: 10),
-        ArticleFooterSourceBox(article: article, isDark: isDark),
+        ArticleFooterSourceBox(
+          article: article,
+          isDark: isDark,
+          isExternalSource: _isSyntheticArticle,
+        ),
       ],
     );
   }
@@ -584,8 +706,13 @@ class _ActionToolbar extends StatelessWidget {
 class _ArticleHeroBanner extends StatelessWidget {
   final MicrostockNewsArticle article;
   final bool isDark;
+  final String? fallbackImageUrl;
 
-  const _ArticleHeroBanner({required this.article, required this.isDark});
+  const _ArticleHeroBanner({
+    required this.article,
+    required this.isDark,
+    this.fallbackImageUrl,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -606,6 +733,17 @@ class _ArticleHeroBanner extends StatelessWidget {
     } else if (article.imageUrl != null && article.imageUrl!.isNotEmpty) {
       imageWidget = Image.network(
         article.imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildPlaceholder();
+        },
+      );
+    } else if (fallbackImageUrl != null && fallbackImageUrl!.isNotEmpty) {
+      imageWidget = Image.network(
+        fallbackImageUrl!,
         fit: BoxFit.cover,
         width: double.infinity,
         errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),

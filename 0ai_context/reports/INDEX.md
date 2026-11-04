@@ -20,6 +20,8 @@
 | 16 | 16-implement-editorial-ux-bookmarks-pruning.md | 2026-11-04 | feature | Implement Editorial UX: dynamic read time, offline bookmarks, reader progress bar, font size controls, and 50MB WebP cache pruning |\r\n| 17 | 17-audit-p2-uniquifier-provider-success-screen.md | 2026-11-04 | audit | Architectural deep audit on P2 technical debt (UniquifierProvider god-object & SuccessScreen heavy component) with zero-regression mixin refactoring roadmap |
 | 18 | 18-implement-p2-phase1-success-screen-refactor.md | 2026-11-04 | refactor | Refactor P2 heavy screen SuccessScreen: extract modular presentation widgets under widgets/success/, shrinking screen from 502 to 111 LOC |
 | 19 | 19-implement-p2-phase2-uniquifier-provider-mixins.md | 2026-11-04 | refactor | Refactor P2 UniquifierProvider into Facade + 4 Domain Mixins (media, modifiers, preset, progress), shrinking provider from 614 to 159 LOC |
+| 20 | 20-audit-article-full-content-empty-bug.md | 2026-11-04 | audit | Audit: article body empty (title-only), synthetic badge on external RSS, hero banner missing — root causes and remediation plan |
+| 21 | 21-implement-article-reader-extractor-fix.md | 2026-11-04 | fix | Implement on-demand ArticleReaderExtractor, external source footer badge distinction, and hero banner fallback |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

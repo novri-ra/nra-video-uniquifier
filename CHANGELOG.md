@@ -1,5 +1,9 @@
 # Changelog
 ## [Unreleased]
+- fix(microstock): build on-demand ArticleReaderExtractor for thin RSS article content and og:image fallback
+- fix(microstock): guard ArticleFooterSourceBox to distinguish external RSS sources from verified guidelines
+- fix(microstock): strip legacy [Read More] artifacts from reader view
+- docs(reports): add report 20 (audit) and report 21 (implementation fix) to reports index
 - refactor(provider): decompose UniquifierProvider god-object into domain mixins under providers/uniquifier/
 - refactor(provider): isolate media probing, modifiers/sliders, presets, and rendering progress into dedicated mixins
 - docs(reports): add report 19-implement-p2-phase2-uniquifier-provider-mixins to reports index

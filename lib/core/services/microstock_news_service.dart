@@ -348,8 +348,8 @@ class MicrostockNewsService {
     );
     final rawDesc = _extractXmlTag(itemBlock, r'description');
 
-    final cleanContent = HtmlSanitizer.clean(rawContent);
-    final cleanDesc = HtmlSanitizer.clean(rawDesc);
+    final cleanDesc = _cleanRssText(HtmlSanitizer.clean(rawDesc));
+    final cleanContent = _cleanRssText(HtmlSanitizer.clean(rawContent));
 
     final fullContent = cleanContent.isNotEmpty
         ? cleanContent
@@ -392,6 +392,16 @@ class MicrostockNewsService {
       author: author.isNotEmpty ? author : null,
       cachedAt: DateTime.now(),
     );
+  }
+
+  static final _readMoreRegex = RegExp(
+    r'\[?\s*Read\s*More\.{0,3}\s*\]?|Continue\s+reading\.{0,3}|…\s*Read\s+more',
+    caseSensitive: false,
+  );
+
+  static String _cleanRssText(String input) {
+    if (input.isEmpty) return '';
+    return input.replaceAll(_readMoreRegex, '').trim();
   }
 
   static String _extractXmlTag(String xml, String tagName) {
