@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): add dynamic word-count read time estimation badge
+- feat(microstock): implement offline-first reactive bookmark service and Saved category filter
+- feat(microstock): introduce reader font scaling (A-/A+) and reading scroll progress indicator
+- feat(microstock): add 50MB storage quota auto-pruning for local WebP image cache
+- docs(reports): add report 16-implement-editorial-ux-bookmarks-pruning to reports index
 - feat(microstock): implement 7-day exponential decayed user affinity engine in SharedPreferences
 - feat(microstock): build dynamic category aggregator driven by active article tags and affinity rankings
 - feat(microstock): present clean multi-paragraph reader typography and suppress synthetic boilerplate boxes

@@ -5,6 +5,7 @@ import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../services/user_news_bookmark_service.dart';
 import '../utils/html_sanitizer.dart';
 import 'microstock_article_content_blocks.dart';
 import 'microstock_article_footer_widgets.dart';
@@ -47,6 +48,37 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   String? _translatedTakeaways;
   List<String>? _translatedSpecs;
   List<String>? _translatedChecklist;
+
+  double _fontSizeMultiplier = 1.0;
+  double _scrollProgress = 0.0;
+  ScrollController? _activeScrollController;
+
+  void _onScroll() {
+    if (_activeScrollController == null ||
+        !_activeScrollController!.hasClients) {
+      return;
+    }
+    final maxScroll = _activeScrollController!.position.maxScrollExtent;
+    final currentScroll = _activeScrollController!.offset;
+    if (maxScroll > 0) {
+      final progress = (currentScroll / maxScroll).clamp(0.0, 1.0);
+      if ((progress - _scrollProgress).abs() > 0.01) {
+        setState(() => _scrollProgress = progress);
+      }
+    }
+  }
+
+  void _increaseFontSize() {
+    setState(() {
+      _fontSizeMultiplier = (_fontSizeMultiplier + 0.1).clamp(0.85, 1.35);
+    });
+  }
+
+  void _decreaseFontSize() {
+    setState(() {
+      _fontSizeMultiplier = (_fontSizeMultiplier - 0.1).clamp(0.85, 1.35);
+    });
+  }
 
   String get _displayTitle => HtmlSanitizer.clean(
     (_isTranslated && _translatedTitle != null)
@@ -156,6 +188,12 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
   }
 
   @override
+  void dispose() {
+    _activeScrollController?.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = widget.isDark;
     final bgColor = isDark ? AppColors.obsidianDark : AppColors.white;
@@ -167,37 +205,66 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
       initialChildSize: 0.88,
       minChildSize: 0.5,
       maxChildSize: 0.95,
-      builder: (ctx, scrollController) => Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border.all(color: borderColor),
-        ),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            _DragHandle(isDark: isDark),
-            _HeaderBar(isDark: isDark, onClose: () => Navigator.of(ctx).pop()),
-            const Divider(height: 1, thickness: 0.5),
-            Expanded(
-              child: _ArticleContentList(
-                scrollController: scrollController,
-                article: widget.article,
-                displayTitle: _displayTitle,
-                displayContent: _displayContent,
-                displayTakeaways: _displayTakeaways,
-                displaySpecs: _displaySpecs,
-                displayChecklist: _displayChecklist,
-                isTranslated: _isTranslated,
-                isTranslating: _isTranslating,
+      builder: (ctx, scrollController) {
+        if (_activeScrollController != scrollController) {
+          _activeScrollController?.removeListener(_onScroll);
+          _activeScrollController = scrollController;
+          _activeScrollController!.addListener(_onScroll);
+        }
+
+        final progressAccent = isDark
+            ? AppColors.mintSage
+            : AppColors.forestDeep;
+        final progressTrack = isDark
+            ? AppColors.surfaceContainer
+            : AppColors.hairlineBorder;
+
+        return Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(color: borderColor),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              _DragHandle(isDark: isDark),
+              _HeaderBar(
+                articleId: widget.article.id,
                 isDark: isDark,
-                onTranslateToggle: _toggleTranslation,
-                onOpenBrowser: _launchUrl,
+                onClose: () => Navigator.of(ctx).pop(),
+                fontSizeMultiplier: _fontSizeMultiplier,
+                onIncreaseFont: _increaseFontSize,
+                onDecreaseFont: _decreaseFontSize,
               ),
-            ),
-          ],
-        ),
-      ),
+              LinearProgressIndicator(
+                value: _scrollProgress,
+                minHeight: 2.5,
+                backgroundColor: progressTrack,
+                valueColor: AlwaysStoppedAnimation<Color>(progressAccent),
+              ),
+              const Divider(height: 1, thickness: 0.5),
+              Expanded(
+                child: _ArticleContentList(
+                  scrollController: scrollController,
+                  article: widget.article,
+                  displayTitle: _displayTitle,
+                  displayContent: _displayContent,
+                  displayTakeaways: _displayTakeaways,
+                  displaySpecs: _displaySpecs,
+                  displayChecklist: _displayChecklist,
+                  isTranslated: _isTranslated,
+                  isTranslating: _isTranslating,
+                  isDark: isDark,
+                  fontSizeMultiplier: _fontSizeMultiplier,
+                  onTranslateToggle: _toggleTranslation,
+                  onOpenBrowser: _launchUrl,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -232,6 +299,7 @@ class _ArticleContentList extends StatelessWidget {
   final bool isTranslated;
   final bool isTranslating;
   final bool isDark;
+  final double fontSizeMultiplier;
   final VoidCallback onTranslateToggle;
   final VoidCallback onOpenBrowser;
 
@@ -246,6 +314,7 @@ class _ArticleContentList extends StatelessWidget {
     required this.isTranslated,
     required this.isTranslating,
     required this.isDark,
+    required this.fontSizeMultiplier,
     required this.onTranslateToggle,
     required this.onOpenBrowser,
   });
@@ -300,7 +369,7 @@ class _ArticleContentList extends StatelessWidget {
               paragraph.trim(),
               style: TextStyle(
                 color: bodyColor,
-                fontSize: 15,
+                fontSize: 15 * fontSizeMultiplier,
                 height: 1.6,
                 letterSpacing: 0.1,
               ),
@@ -328,51 +397,141 @@ class _ArticleContentList extends StatelessWidget {
 }
 
 class _HeaderBar extends StatelessWidget {
+  final String articleId;
   final bool isDark;
   final VoidCallback onClose;
-  const _HeaderBar({required this.isDark, required this.onClose});
+  final double fontSizeMultiplier;
+  final VoidCallback onIncreaseFont;
+  final VoidCallback onDecreaseFont;
+
+  const _HeaderBar({
+    required this.articleId,
+    required this.isDark,
+    required this.onClose,
+    required this.fontSizeMultiplier,
+    required this.onIncreaseFont,
+    required this.onDecreaseFont,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final iconColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
+    final activeAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Icon(Icons.menu_book_rounded, size: 18, color: activeAccent),
+          const SizedBox(width: 8),
           Expanded(
+            child: Text(
+              'MICROSTOCK INTEL READER',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isDark
+                    ? AppColors.outline
+                    : AppColors.lightOnSurfaceVariant,
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          // Font size controls (A- / A+)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            decoration: BoxDecoration(
+              color:
+                  (isDark
+                          ? AppColors.surfaceContainer
+                          : AppColors.hairlineBorder)
+                      .withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.menu_book_rounded,
-                  size: 18,
-                  color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                InkWell(
+                  onTap: onDecreaseFont,
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    child: Text(
+                      'A-',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: fontSizeMultiplier <= 0.86
+                            ? iconColor.withValues(alpha: 0.4)
+                            : iconColor,
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'MICROSTOCK INTEL READER',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: isDark
-                          ? AppColors.outline
-                          : AppColors.lightOnSurfaceVariant,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.8,
+                Container(
+                  width: 1,
+                  height: 10,
+                  color: isDark
+                      ? AppColors.outlineVariant
+                      : AppColors.lightOutlineVariant,
+                ),
+                InkWell(
+                  onTap: onIncreaseFont,
+                  borderRadius: BorderRadius.circular(4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 3,
+                    ),
+                    child: Text(
+                      'A+',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: fontSizeMultiplier >= 1.34
+                            ? iconColor.withValues(alpha: 0.4)
+                            : iconColor,
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 4),
+          // Bookmark toggle
+          ValueListenableBuilder<Set<String>>(
+            valueListenable: UserNewsBookmarkService.bookmarkedIdsNotifier,
+            builder: (context, bookmarkedIds, _) {
+              final isBookmarked = bookmarkedIds.contains(articleId);
+              return IconButton(
+                icon: Icon(
+                  isBookmarked
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  size: 20,
+                  color: isBookmarked ? activeAccent : iconColor,
+                ),
+                onPressed: () =>
+                    UserNewsBookmarkService.toggleBookmark(articleId),
+                tooltip: isBookmarked ? 'Hapus simpanan' : 'Simpan artikel',
+                visualDensity: VisualDensity.compact,
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 20),
-            color: isDark
-                ? AppColors.onSurfaceVariant
-                : AppColors.lightOnSurfaceVariant,
+            color: iconColor,
             onPressed: onClose,
             tooltip: 'Close reader',
+            visualDensity: VisualDensity.compact,
           ),
         ],
       ),

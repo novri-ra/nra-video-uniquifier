@@ -107,41 +107,44 @@ class MicrostockNewsArticle {
     'cachedAt': cachedAt?.toIso8601String(),
   };
 
-  factory MicrostockNewsArticle.fromJson(Map<String, dynamic> json) =>
-      MicrostockNewsArticle(
-        id: json['id'] as String? ?? '',
-        title: json['title'] as String? ?? '',
-        summary: json['summary'] as String? ?? '',
-        source: json['source'] as String? ?? '',
-        category: json['category'] as String? ?? '',
-        publishedDate: json['publishedDate'] as String? ?? '',
-        sourceUrl: json['sourceUrl'] as String? ?? '',
-        tags:
-            (json['tags'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        fullContent:
+  factory MicrostockNewsArticle.fromJson(
+    Map<String, dynamic> json,
+  ) => MicrostockNewsArticle(
+    id: json['id'] as String? ?? '',
+    title: json['title'] as String? ?? '',
+    summary: json['summary'] as String? ?? '',
+    source: json['source'] as String? ?? '',
+    category: json['category'] as String? ?? '',
+    publishedDate: json['publishedDate'] as String? ?? '',
+    sourceUrl: json['sourceUrl'] as String? ?? '',
+    tags:
+        (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+        [],
+    fullContent:
+        json['fullContent'] as String? ?? json['summary'] as String? ?? '',
+    readTime: ((json['readTime'] as String?)?.isNotEmpty ?? false)
+        ? json['readTime'] as String
+        : MicrostockNewsService.calculateReadTime(
             json['fullContent'] as String? ?? json['summary'] as String? ?? '',
-        readTime: json['readTime'] as String? ?? '3 min read',
-        keyTakeaways: json['keyTakeaways'] as String? ?? '',
-        technicalSpecs:
-            (json['technicalSpecs'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            const [],
-        contributorChecklist:
-            (json['contributorChecklist'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            const [],
-        imageUrl: json['imageUrl'] as String?,
-        localImagePath: json['localImagePath'] as String?,
-        author: json['author'] as String?,
-        cachedAt: json['cachedAt'] != null
-            ? DateTime.tryParse(json['cachedAt'] as String)
-            : null,
-      );
+          ),
+    keyTakeaways: json['keyTakeaways'] as String? ?? '',
+    technicalSpecs:
+        (json['technicalSpecs'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        const [],
+    contributorChecklist:
+        (json['contributorChecklist'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        const [],
+    imageUrl: json['imageUrl'] as String?,
+    localImagePath: json['localImagePath'] as String?,
+    author: json['author'] as String?,
+    cachedAt: json['cachedAt'] != null
+        ? DateTime.tryParse(json['cachedAt'] as String)
+        : null,
+  );
 }
 
 /// Service managing microstock hybrid news (Direct Photography RSS + Google News + Shutterstock + Reddit Intel).
@@ -370,7 +373,9 @@ class MicrostockNewsService {
       publishedDate: pubRaw.isNotEmpty ? pubRaw : '2026-11-03',
       sourceUrl: link.isNotEmpty ? link : 'https://news.google.com',
       tags: tags,
-      readTime: _calculateReadTime(fullContent),
+      readTime: calculateReadTime(
+        fullContent.isNotEmpty ? fullContent : summary,
+      ),
       keyTakeaways:
           'Market trend movement, contributor payout policies, and platform guidelines.',
       technicalSpecs: const [
@@ -467,9 +472,12 @@ class MicrostockNewsService {
         : '$truncated...';
   }
 
-  static String _calculateReadTime(String text) {
+  /// Calculates dynamic estimated read time based on ~200 words per minute.
+  /// Falls back to 1 min read for brief content.
+  static String calculateReadTime(String text) {
+    if (text.trim().isEmpty) return '1 min read';
     final words = text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
-    final minutes = (words / 200).ceil().clamp(1, 15);
+    final minutes = (words / 200).ceil().clamp(1, 60);
     return '$minutes min read';
   }
 
@@ -507,6 +515,7 @@ class MicrostockNewsService {
             ? (item['enclosure'] as Map)['link'] as String?
             : null);
 
+    final fullContentStr = content.isNotEmpty ? content : desc;
     return MicrostockNewsArticle(
       id: 'rss-${title.hashCode}',
       title: title,
@@ -516,7 +525,7 @@ class MicrostockNewsService {
       publishedDate: pub.isNotEmpty ? pub : '2026-10-28',
       sourceUrl: item['link'] as String? ?? 'https://shutterstock.com/blog',
       tags: cats,
-      readTime: '3 min read',
+      readTime: calculateReadTime(fullContentStr),
       keyTakeaways:
           'Strict 4K/FHD requirements, CFR cadence, and clean Rec.709 color curve compliance.',
       technicalSpecs: const [
@@ -528,7 +537,7 @@ class MicrostockNewsService {
         'Verify Constant Frame Rate mode.',
         'Sanitize metadata and remove trademark brands.',
       ],
-      fullContent: content.isNotEmpty ? content : desc,
+      fullContent: fullContentStr,
       imageUrl: imageUrl,
       author: author,
       cachedAt: DateTime.now(),
@@ -572,6 +581,7 @@ class MicrostockNewsService {
         ? thumbnail
         : null;
 
+    final fullContentStr = selftext.isNotEmpty ? selftext : title;
     return MicrostockNewsArticle(
       id: 'reddit-${data['id'] ?? title.hashCode}',
       title: title,
@@ -583,7 +593,7 @@ class MicrostockNewsService {
       publishedDate: dateStr,
       sourceUrl: 'https://reddit.com$permalink',
       tags: ['#Reddit', '#MicrostockCommunity', '#$sub'],
-      readTime: '4 min read',
+      readTime: calculateReadTime(fullContentStr),
       keyTakeaways:
           'Community real-world experiences, rejection patterns, and evasion guidelines.',
       technicalSpecs: const [
@@ -595,7 +605,7 @@ class MicrostockNewsService {
         'Strip GPS and camera device signatures.',
         'Test sample clip before mass portfolio upload.',
       ],
-      fullContent: selftext.isNotEmpty ? selftext : title,
+      fullContent: fullContentStr,
       author: author,
       imageUrl: imageUrl,
       cachedAt: DateTime.now(),

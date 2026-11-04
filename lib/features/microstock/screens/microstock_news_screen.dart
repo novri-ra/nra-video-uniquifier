@@ -5,6 +5,7 @@ import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../services/user_news_bookmark_service.dart';
 import '../widgets/microstock_news_card.dart';
 import '../widgets/news_search_and_filter_bar.dart';
 
@@ -28,6 +29,10 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   void initState() {
     super.initState();
     UserInterestService.initialize();
+    UserNewsBookmarkService.initialize();
+    UserNewsBookmarkService.bookmarkedIdsNotifier.addListener(
+      _onBookmarksChanged,
+    );
     _connectivity.isOnline.addListener(_onConnectivityChanged);
     _allArticles = MicrostockNewsService.getSeedArticles();
     _isLoading = false;
@@ -37,8 +42,18 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
 
   @override
   void dispose() {
+    UserNewsBookmarkService.bookmarkedIdsNotifier.removeListener(
+      _onBookmarksChanged,
+    );
     _connectivity.isOnline.removeListener(_onConnectivityChanged);
     super.dispose();
+  }
+
+  void _onBookmarksChanged() {
+    if (!mounted) return;
+    if (_selectedChip == 'Saved') {
+      setState(() {});
+    }
   }
 
   void _onConnectivityChanged() {
@@ -113,6 +128,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   }
 
   List<MicrostockNewsArticle> get _filteredArticles {
+    final bookmarkedIds = UserNewsBookmarkService.bookmarkedIdsNotifier.value;
     return _allArticles.where((article) {
       final matchesSearch =
           _searchQuery.isEmpty ||
@@ -121,6 +137,10 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
           article.tags.any(
             (t) => t.toLowerCase().contains(_searchQuery.toLowerCase()),
           );
+
+      if (_selectedChip == 'Saved') {
+        return matchesSearch && bookmarkedIds.contains(article.id);
+      }
 
       final matchesChip =
           _selectedChip == 'All' ||

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/microstock_news_service.dart';
 import '../../../core/services/translation_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../services/user_news_bookmark_service.dart';
 import '../utils/html_sanitizer.dart';
 import 'microstock_article_sheet.dart';
 
@@ -172,22 +173,27 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          _cleanDate(widget.article.publishedDate),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: widget.isDark
-                                ? AppColors.outline
-                                : AppColors.lightOnSurfaceVariant,
-                            fontSize: 10,
-                            fontFamily: 'monospace',
-                          ),
-                        ),
+                    _ReadTimeBadge(
+                      readTime: widget.article.readTime,
+                      isDark: widget.isDark,
+                    ),
+                    const Spacer(),
+                    Text(
+                      _cleanDate(widget.article.publishedDate),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: widget.isDark
+                            ? AppColors.outline
+                            : AppColors.lightOnSurfaceVariant,
+                        fontSize: 10,
+                        fontFamily: 'monospace',
                       ),
+                    ),
+                    const SizedBox(width: 6),
+                    _BookmarkButton(
+                      articleId: widget.article.id,
+                      isDark: widget.isDark,
                     ),
                   ],
                 ),
@@ -500,6 +506,83 @@ class _CardImageThumbnail extends StatelessWidget {
         size: 28,
         color: isDark ? AppColors.outline : AppColors.lightOnSurfaceVariant,
       ),
+    );
+  }
+}
+
+class _ReadTimeBadge extends StatelessWidget {
+  final String readTime;
+  final bool isDark;
+
+  const _ReadTimeBadge({required this.readTime, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      decoration: BoxDecoration(
+        color: (isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder)
+            .withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.access_time_rounded, size: 9, color: textColor),
+          const SizedBox(width: 3),
+          Text(
+            readTime,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 8.5,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'monospace',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BookmarkButton extends StatelessWidget {
+  final String articleId;
+  final bool isDark;
+
+  const _BookmarkButton({required this.articleId, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<Set<String>>(
+      valueListenable: UserNewsBookmarkService.bookmarkedIdsNotifier,
+      builder: (context, bookmarkedIds, _) {
+        final isBookmarked = bookmarkedIds.contains(articleId);
+        final activeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+        final inactiveColor = isDark
+            ? AppColors.outline
+            : AppColors.lightOutline;
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(6),
+            onTap: () => UserNewsBookmarkService.toggleBookmark(articleId),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                isBookmarked
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_border_rounded,
+                size: 16,
+                color: isBookmarked ? activeColor : inactiveColor,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -121,9 +121,70 @@ class ArticleImageService {
 
       // 4. Persist WebP file to local storage
       await targetFile.writeAsBytes(webpBytes, flush: true);
+
+      // 5. Trigger cache quota pruning asynchronously
+      unawaited(pruneCacheIfExceedsLimit());
+
       return targetFile.path;
     } catch (_) {
       return null;
     }
+  }
+
+  /// Scans news_images/ folder. If total file size exceeds [maxBytes] (default 50 MB),
+  /// deletes oldest files (FIFO by lastModified) until total drops below [targetBytes] (default 40 MB).
+  static Future<void> pruneCacheIfExceedsLimit({
+    int maxBytes = 50 * 1024 * 1024,
+    int targetBytes = 40 * 1024 * 1024,
+  }) async {
+    try {
+      Directory cacheDir;
+      try {
+        cacheDir = tempDirectoryOverride ?? await getTemporaryDirectory();
+      } catch (_) {
+        cacheDir = Directory.systemTemp;
+      }
+
+      final imagesDir = Directory('${cacheDir.path}/news_images');
+      if (!await imagesDir.exists()) return;
+
+      final entities = await imagesDir.list().toList();
+      final files = <File>[];
+      int totalBytes = 0;
+
+      for (final entity in entities) {
+        if (entity is File) {
+          files.add(entity);
+          try {
+            totalBytes += await entity.length();
+          } catch (_) {}
+        }
+      }
+
+      if (totalBytes <= maxBytes) return;
+
+      // Sort oldest files first
+      final fileWithStats = <MapEntry<File, DateTime>>[];
+      for (final file in files) {
+        try {
+          final stat = await file.stat();
+          fileWithStats.add(MapEntry(file, stat.modified));
+        } catch (_) {
+          fileWithStats.add(
+            MapEntry(file, DateTime.fromMillisecondsSinceEpoch(0)),
+          );
+        }
+      }
+      fileWithStats.sort((a, b) => a.value.compareTo(b.value));
+
+      for (final entry in fileWithStats) {
+        if (totalBytes <= targetBytes) break;
+        try {
+          final len = await entry.key.length();
+          await entry.key.delete();
+          totalBytes -= len;
+        } catch (_) {}
+      }
+    } catch (_) {}
   }
 }
