@@ -139,7 +139,7 @@ class VariationGenerator {
   /// - rotateAngle: 0.6 to 0.9 degrees
   /// - audioTempo: matches speedFactor for exact A/V sync
   /// - outputFps: 29.80 to 29.90 (breaks uniform frame-cadence indexing)
-  /// - pitchFactor: 0.960 to 1.040 (±4.0% audio spectral modulation)
+  /// - pitchFactor: 0.985 to 1.015 (±1.5% sub-perceptual audio spectral modulation)
   /// - curves: dynamic multi-channel cubic RGB curves with ±0.02 shift
   /// - deviceProfile: realistic smartphone metadata pool
   static VideoVariations generate({math.Random? random}) {
@@ -154,7 +154,7 @@ class VariationGenerator {
       final rot = 0.6 + rng.nextDouble() * 0.3;
       final tempo = speed;
       final fps = 29.80 + rng.nextDouble() * 0.10;
-      final pitch = 0.960 + rng.nextDouble() * 0.080;
+      final pitch = 0.985 + rng.nextDouble() * 0.030;
       final curves = generateRgbCurves(random: rng);
       final profile =
           DeviceProfile.profiles[rng.nextInt(DeviceProfile.profiles.length)];
