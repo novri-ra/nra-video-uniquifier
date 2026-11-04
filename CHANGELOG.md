@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+- refactor(provider): decompose UniquifierProvider god-object into domain mixins under providers/uniquifier/
+- refactor(provider): isolate media probing, modifiers/sliders, presets, and rendering progress into dedicated mixins
+- docs(reports): add report 19-implement-p2-phase2-uniquifier-provider-mixins to reports index
 - refactor(process): decompose SuccessScreen into modular presentation widgets in widgets/success/
 - refactor(process): extract SuccessHeroCard, SuccessManifestCard, and SuccessActionButtons
 - docs(reports): add report 18-implement-p2-phase1-success-screen-refactor to reports index
