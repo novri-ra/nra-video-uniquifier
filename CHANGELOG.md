@@ -1,5 +1,10 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): reverse-engineer Google News RPC batchexecute (Fbv4je) to decode original publisher URLs
+- feat(microstock): add Indonesian microstock & commercial photography RSS feed with when:14d freshness
+- feat(microstock): expand DOM container selectors for WordPress (.entry-content, .post-content)
+- feat(microstock): unify 'All' tab feed with strict newest-first chronological sorting
+- docs(reports): add report 25 (news reader upgrade) to reports index
 - fix(history): add runtime storage permission prompt for Android Scoped Storage compliance
 - fix(history): enforce strict post-delete disk verification in HistoryService
 - fix(history): eliminate cosmetic UI removal when physical deletion fails

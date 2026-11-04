@@ -221,7 +221,7 @@ class MicrostockNewsService {
     return articles;
   }
 
-  /// Fetches from direct RSS feeds, Google News RSS, RSS-to-JSON endpoint, and Reddit in parallel.
+  /// Fetches from direct RSS feeds, Google News RSS, Indonesian portal RSS, RSS-to-JSON endpoint, and Reddit in parallel.
   static Future<List<MicrostockNewsArticle>> fetchHybridNews() async {
     final results = <MicrostockNewsArticle>[];
     try {
@@ -229,6 +229,7 @@ class MicrostockNewsService {
         _fetchDirectRss('https://petapixel.com/feed/', 'PetaPixel'),
         _fetchDirectRss('https://fstoppers.com/feed', 'Fstoppers'),
         _fetchGoogleNewsRss(),
+        _fetchGoogleNewsIndonesiaRss(),
         _fetchRss2Json(),
         _fetchReddit('microstock'),
         _fetchReddit('stockphotography'),
@@ -259,13 +260,28 @@ class MicrostockNewsService {
   static Future<List<MicrostockNewsArticle>> _fetchGoogleNewsRss() async {
     try {
       final uri = Uri.parse(
-        'https://news.google.com/rss/search?q=microstock+contributor+OR+shutterstock+contributor&hl=en-US&gl=US&ceid=US:en',
+        'https://news.google.com/rss/search?q=microstock+contributor+OR+shutterstock+contributor+when:7d&hl=en-US&gl=US&ceid=US:en',
       );
       final raw = customHttpGet != null
           ? await customHttpGet!(uri)
           : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: 'Google News Intel');
+    } catch (_) {}
+    return [];
+  }
+
+  static Future<List<MicrostockNewsArticle>>
+  _fetchGoogleNewsIndonesiaRss() async {
+    try {
+      final uri = Uri.parse(
+        'https://news.google.com/rss/search?q=kontributor+microstock+OR+fotografi+komersial+OR+desain+grafis+when:14d&hl=id&gl=ID&ceid=ID:id',
+      );
+      final raw = customHttpGet != null
+          ? await customHttpGet!(uri)
+          : await _defaultHttpGet(uri);
+      if (raw.isEmpty) return [];
+      return parseRssXmlFeed(raw, defaultSource: 'Warta Microstock ID');
     } catch (_) {}
     return [];
   }
