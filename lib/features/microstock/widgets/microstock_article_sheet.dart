@@ -454,16 +454,14 @@ class _ArticleContentList extends StatelessWidget {
             ),
           ),
         ] else ...[
-          for (final paragraph in displayContent.split(RegExp(r'\n{1,2}')))
+          for (final paragraph in displayContent.split(RegExp(r'\n{2,}')))
             if (paragraph.trim().isNotEmpty) ...[
-              Text(
+              _buildParagraphWidget(
                 paragraph.trim(),
-                style: TextStyle(
-                  color: bodyColor,
-                  fontSize: 15 * fontSizeMultiplier,
-                  height: 1.6,
-                  letterSpacing: 0.1,
-                ),
+                bodyColor,
+                titleColor,
+                fontSizeMultiplier,
+                isDark,
               ),
               const SizedBox(height: 14),
             ],
@@ -514,6 +512,127 @@ class _ArticleContentList extends StatelessWidget {
           isExternalSource: _isSyntheticArticle,
         ),
       ],
+    );
+  }
+
+  Widget _buildParagraphWidget(
+    String block,
+    Color bodyColor,
+    Color titleColor,
+    double multiplier,
+    bool isDark,
+  ) {
+    // 1. Heading h2: '### text'
+    if (block.startsWith('### ')) {
+      final headingText = block.substring(4).trim();
+      return Padding(
+        padding: const EdgeInsets.only(top: 8, bottom: 2),
+        child: Text(
+          headingText,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 16.5 * multiplier,
+            fontWeight: FontWeight.w700,
+            height: 1.35,
+          ),
+        ),
+      );
+    }
+
+    // 2. Heading h3/h4 or Bold lead: '**text**'
+    if (block.startsWith('**') && block.endsWith('**') && block.length > 4) {
+      final subText = block.substring(2, block.length - 2).trim();
+      return Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 2),
+        child: Text(
+          subText,
+          style: TextStyle(
+            color: titleColor,
+            fontSize: 15.5 * multiplier,
+            fontWeight: FontWeight.w600,
+            height: 1.35,
+          ),
+        ),
+      );
+    }
+
+    // 3. Blockquote: '> text'
+    if (block.startsWith('> ')) {
+      final quoteText = block.substring(2).trim();
+      final quoteAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        decoration: BoxDecoration(
+          color:
+              (isDark ? AppColors.surfaceContainer : AppColors.hairlineBorder)
+                  .withValues(alpha: 0.35),
+          border: Border(left: BorderSide(color: quoteAccent, width: 3.5)),
+          borderRadius: const BorderRadius.horizontal(
+            right: Radius.circular(8),
+          ),
+        ),
+        child: Text(
+          quoteText,
+          style: TextStyle(
+            color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+            fontSize: 14.5 * multiplier,
+            fontStyle: FontStyle.italic,
+            height: 1.55,
+          ),
+        ),
+      );
+    }
+
+    // 4. Bullet lists: lines starting with '• '
+    if (block.contains('\n• ') || block.startsWith('• ')) {
+      final lines = block.split('\n');
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final line in lines)
+            if (line.trim().isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '• ',
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.mintSage
+                            : AppColors.forestDeep,
+                        fontSize: 15 * multiplier,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        line.replaceFirst(RegExp(r'^[•\-\*]\s*'), '').trim(),
+                        style: TextStyle(
+                          color: bodyColor,
+                          fontSize: 14.5 * multiplier,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ],
+      );
+    }
+
+    // 5. Normal narrative paragraph
+    return Text(
+      block,
+      style: TextStyle(
+        color: bodyColor,
+        fontSize: 15 * multiplier,
+        height: 1.6,
+        letterSpacing: 0.1,
+      ),
     );
   }
 }

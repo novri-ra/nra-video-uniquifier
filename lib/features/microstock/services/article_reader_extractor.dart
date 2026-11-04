@@ -214,6 +214,30 @@ class ArticleReaderExtractor {
     }
   }
 
+  static const _clutterSelectors = [
+    'script',
+    'style',
+    'noscript',
+    'iframe',
+    'form',
+    '.advertisement',
+    '.ad',
+    '.ad-container',
+    '.pixelmeter',
+    '.affiliate-disclosure',
+    '.social-share',
+    '.sharedaddy',
+    '.author-bio',
+    '.comments',
+    '.related-posts',
+    '.post-meta',
+    '.post-sharing',
+    '.header-overlay-backdrop',
+    'header',
+    'footer',
+    'nav',
+  ];
+
   static ExtractedArticleContent? _parseHtml(String html) {
     final document = html_parser.parse(html);
 
@@ -229,8 +253,10 @@ class ArticleReaderExtractor {
     // 2. Find main content container
     // Prioritize specific CMS containers before falling back to generic containers
     final container =
-        document.querySelector('.entry-content') ??
+        document.querySelector('.post-full__text') ??
+        document.querySelector('.post-full__content') ??
         document.querySelector('.post-content') ??
+        document.querySelector('.entry-content') ??
         document.querySelector('.td-post-content') ??
         document.querySelector('.article-content') ??
         document.querySelector('.story-content') ??
@@ -240,29 +266,85 @@ class ArticleReaderExtractor {
 
     if (container == null) return null;
 
-    // 3. Extract meaningful paragraphs (> 20 chars)
-    var paragraphs = container
-        .querySelectorAll('p')
-        .map((p) => p.text.trim())
-        .where((t) => t.length > 20)
-        .map((t) => t.replaceAll(_readMorePattern, '').trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    // 3. Pre-cleaning: Remove clutter, advertisements, social widgets, and non-content tags
+    for (final selector in _clutterSelectors) {
+      final elements = container.querySelectorAll(selector);
+      for (final el in elements) {
+        el.remove();
+      }
+    }
 
-    // Fallback: if container yielded no paragraphs, search entire document for <p>
-    if (paragraphs.isEmpty) {
-      paragraphs = document
+    // 4. Extract narrative elements sequentially: p, h2, h3, h4, ul, ol, blockquote
+    final narrativeBlocks = <String>[];
+    final elements = container.querySelectorAll(
+      'p, h2, h3, h4, ul, ol, blockquote',
+    );
+
+    for (final el in elements) {
+      final tag = el.localName?.toLowerCase();
+      if (tag == null) continue;
+
+      if (tag == 'h2') {
+        final text = el.text.trim();
+        if (text.isNotEmpty) {
+          narrativeBlocks.add('### $text');
+        }
+      } else if (tag == 'h3' || tag == 'h4') {
+        final text = el.text.trim();
+        if (text.isNotEmpty) {
+          narrativeBlocks.add('**$text**');
+        }
+      } else if (tag == 'p') {
+        // Exclude paragraphs that are nested inside blockquote/ul/ol (they are handled by parents)
+        if (el.parent?.localName?.toLowerCase() == 'blockquote' ||
+            el.parent?.localName?.toLowerCase() == 'li') {
+          continue;
+        }
+        var text = el.text.trim();
+        if (text.isEmpty) continue;
+
+        // Clean boilerplate patterns
+        text = text.replaceAll(_readMorePattern, '').trim();
+        if (text.length > 20 &&
+            !text.toLowerCase().contains('sign up for newsletter') &&
+            !text.toLowerCase().contains('affiliate disclosure')) {
+          narrativeBlocks.add(text);
+        }
+      } else if (tag == 'ul' || tag == 'ol') {
+        final listItems = el.querySelectorAll('li');
+        final items = <String>[];
+        for (final li in listItems) {
+          final liText = li.text.trim();
+          if (liText.isNotEmpty) {
+            items.add('• $liText');
+          }
+        }
+        if (items.isNotEmpty) {
+          narrativeBlocks.add(items.join('\n'));
+        }
+      } else if (tag == 'blockquote') {
+        final quoteText = el.text.trim();
+        if (quoteText.isNotEmpty) {
+          narrativeBlocks.add('> $quoteText');
+        }
+      }
+    }
+
+    // Fallback: if container yielded no blocks, search entire document for <p>
+    if (narrativeBlocks.isEmpty) {
+      final paragraphs = document
           .querySelectorAll('p')
           .map((p) => p.text.trim())
           .where((t) => t.length > 20)
           .map((t) => t.replaceAll(_readMorePattern, '').trim())
           .where((t) => t.isNotEmpty)
           .toList();
+      narrativeBlocks.addAll(paragraphs);
     }
 
-    if (paragraphs.isEmpty) return null;
+    if (narrativeBlocks.isEmpty) return null;
 
-    final fullText = paragraphs.join('\n\n');
+    final fullText = narrativeBlocks.join('\n\n');
 
     return ExtractedArticleContent(paragraphs: fullText, heroImageUrl: ogImage);
   }

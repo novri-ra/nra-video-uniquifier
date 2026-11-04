@@ -1,5 +1,9 @@
 # Changelog
 ## [Unreleased]
+- feat(microstock): add DOM pre-cleaning to strip advertisements, social widgets, and noise from article reader
+- feat(microstock): support multi-element narrative extraction (headings h2-h4, bullet lists ul/ol/li, blockquotes)
+- feat(microstock): implement rich semantic block rendering in MicrostockArticleSheet
+- docs(reports): add report 26 (full article content dom extraction) to reports index
 - feat(microstock): reverse-engineer Google News RPC batchexecute (Fbv4je) to decode original publisher URLs
 - feat(microstock): add Indonesian microstock & commercial photography RSS feed with when:14d freshness
 - feat(microstock): expand DOM container selectors for WordPress (.entry-content, .post-content)

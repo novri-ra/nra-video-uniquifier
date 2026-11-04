@@ -26,6 +26,7 @@
 | 23 | 23-implement-history-delete-persistence-fix.md | 2026-11-05 | fix | Implement history video delete persistence fix, strict post-delete verification, MediaStore sync, and storage runtime permission prompt |
 | 24 | 24-implement-manage-external-storage-permission.md | 2026-11-05 | fix | Implement MANAGE_EXTERNAL_STORAGE (All Files Access) permission on Android 11+ to resolve public folder deletion under Scoped Storage |
 | 25 | 25-upgrade-news-reader-indonesia-freshness.md | 2026-11-05 | feature | Upgrade Microstock News Reader with Google News RPC batchexecute URL decoding, freshness filters, DOM extractor (.entry-content, .post-content, <article>, <p>), and Indonesian news portal feed |
+| 26 | 26-audit-and-fix-full-article-content.md | 2026-11-05 | feature | Audit and implement full article content extraction with DOM pre-cleaning and multi-element narrative parsing (h2/h3/h4, ul/ol/li, blockquote, p) |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
