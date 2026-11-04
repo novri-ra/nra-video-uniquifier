@@ -1,5 +1,7 @@
 # Changelog
 ## [Unreleased]
+
+## [1.0.0] - 2026-11-05
 - feat(microstock): reactive on-demand full article extraction with dynamic progress indicator
 - fix(microstock): strip aside, banners, and freestar advertising clutter before DOM parsing
 - fix(history): persist storage permission prompt via SharedPreferences to limit dialog to 1 occurrence
