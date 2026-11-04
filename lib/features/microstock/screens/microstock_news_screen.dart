@@ -5,6 +5,7 @@ import '../../../core/services/user_interest_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../../settings/screens/settings_screen.dart';
+import '../services/user_news_bookmark_service.dart';
 import '../widgets/microstock_news_card.dart';
 import '../widgets/news_search_and_filter_bar.dart';
 
@@ -28,6 +29,10 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   void initState() {
     super.initState();
     UserInterestService.initialize();
+    UserNewsBookmarkService.initialize();
+    UserNewsBookmarkService.bookmarkedIdsNotifier.addListener(
+      _onBookmarksChanged,
+    );
     _connectivity.isOnline.addListener(_onConnectivityChanged);
     _allArticles = MicrostockNewsService.getSeedArticles();
     _isLoading = false;
@@ -37,8 +42,18 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
 
   @override
   void dispose() {
+    UserNewsBookmarkService.bookmarkedIdsNotifier.removeListener(
+      _onBookmarksChanged,
+    );
     _connectivity.isOnline.removeListener(_onConnectivityChanged);
     super.dispose();
+  }
+
+  void _onBookmarksChanged() {
+    if (!mounted) return;
+    if (_selectedChip == 'Saved') {
+      setState(() {});
+    }
   }
 
   void _onConnectivityChanged() {
@@ -77,6 +92,35 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
     });
   }
 
+  List<String> get _dynamicCategories {
+    final rawSet = <String>{};
+    for (final a in _allArticles) {
+      for (final t in a.tags) {
+        final clean = t.replaceAll('#', '').trim();
+        if (clean.toLowerCase().contains('shutter') ||
+            clean.toLowerCase().contains('adobe') ||
+            clean.toLowerCase().contains('freepik') ||
+            clean.toLowerCase().contains('reddit')) {
+          rawSet.add(clean);
+        }
+      }
+    }
+    for (final a in _allArticles) {
+      if (a.category.isNotEmpty) {
+        rawSet.add(a.category);
+      }
+    }
+    for (final a in _allArticles) {
+      for (final t in a.tags) {
+        final cleanTag = t.replaceAll('#', '').trim();
+        if (cleanTag.isNotEmpty) {
+          rawSet.add(cleanTag);
+        }
+      }
+    }
+    return rawSet.toList();
+  }
+
   void _openSettings(BuildContext context) {
     Navigator.of(
       context,
@@ -84,6 +128,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
   }
 
   List<MicrostockNewsArticle> get _filteredArticles {
+    final bookmarkedIds = UserNewsBookmarkService.bookmarkedIdsNotifier.value;
     return _allArticles.where((article) {
       final matchesSearch =
           _searchQuery.isEmpty ||
@@ -92,6 +137,10 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
           article.tags.any(
             (t) => t.toLowerCase().contains(_searchQuery.toLowerCase()),
           );
+
+      if (_selectedChip == 'Saved') {
+        return matchesSearch && bookmarkedIds.contains(article.id);
+      }
 
       final matchesChip =
           _selectedChip == 'All' ||
@@ -151,6 +200,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
             const SizedBox(height: 12),
             NewsSearchAndFilterBar(
               selectedChip: _selectedChip,
+              categories: _dynamicCategories,
               isDark: isDark,
               onSearchChanged: (q) => setState(() => _searchQuery = q),
               onChipSelected: (c) => setState(() => _selectedChip = c),
@@ -248,33 +298,41 @@ class _FeedHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Microstock Intel',
-              style: TextStyle(
-                color: titleColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Row(
-              children: [
-                _StatusDot(isOnline: isOnline),
-                const SizedBox(width: 6),
-                Text(
-                  syncStatusText,
-                  style: TextStyle(
-                    color: subtitleColor,
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                  ),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Microstock Intel',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 3),
+              Row(
+                children: [
+                  _StatusDot(isOnline: isOnline),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      syncStatusText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: subtitleColor,
+                        fontSize: 11,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
         IconButton(
           icon: const Icon(Icons.sync_rounded, size: 20),

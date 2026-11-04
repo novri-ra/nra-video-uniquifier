@@ -7,6 +7,11 @@ class FilterBuilders {
     required bool isPortrait,
     double canvasScalePercent = 95.0,
     TargetResolution targetResolution = TargetResolution.r1080p,
+    required VideoVariations vars,
+    bool modifyVisuals = true,
+    bool enableDeepAntiFingerprint = true,
+    double cropZoomScale = 1.0,
+    String cropAnchor = 'center',
   }) {
     final (targetW, targetH) = canonicalDimensions(
       targetResolution,
@@ -17,9 +22,17 @@ class FilterBuilders {
     final fgW = ((targetW * factor) / 2).floor() * 2;
     final fgH = ((targetH * factor) / 2).floor() * 2;
     final fgDim = 'w=$fgW:h=$fgH';
+    final spatialList = _buildSpatialCrop(
+      vars,
+      modifyVisuals,
+      enableDeepAntiFingerprint,
+      cropZoomScale: cropZoomScale,
+      cropAnchor: cropAnchor,
+    );
+    final fgSpatial = spatialList.isNotEmpty ? '${spatialList.join(',')},' : '';
     return '[0:v]split=2[bg][fg];'
         '[bg]scale=$bgDim:force_original_aspect_ratio=increase,crop=$bgDim,boxblur=luma_radius=min(h\\,w)/40:luma_power=2[blurred];'
-        '[fg]scale=$fgDim:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'
+        '[fg]${fgSpatial}scale=$fgDim:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];'
         '[blurred][main]overlay=(W-w)/2:(H-h)/2[outv]';
   }
 
@@ -56,10 +69,10 @@ class FilterBuilders {
         'setpts=(1/${vars.speedFactor.toStringAsFixed(4)})*PTS',
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
-        "zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=$zoomDim:fps=$targetFps",
+        "zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))':s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
-      if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
+      if (enableChromaShift) 'curves=${vars.curves}',
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
@@ -112,16 +125,16 @@ class FilterBuilders {
     if (targetResolution == TargetResolution.r4k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 25M -bufsize 50M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M';
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M -x264-params "stitchable=1"';
     }
     if (targetResolution == TargetResolution.r2k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 20M -bufsize 40M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M';
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M -x264-params "stitchable=1"';
     }
     return videoCodec == VideoCodec.h265
         ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
-        : '-c:v libx264 -preset fast -crf 22';
+        : '-c:v libx264 -preset fast -crf 22 -x264-params "stitchable=1"';
   }
 
   static List<String> _buildSpatialCrop(
@@ -199,10 +212,10 @@ class FilterBuilders {
       ),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
-        "zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=$zoomDim:fps=$targetFps",
+        "zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))':s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:0.6:3:3:0.0',
-      if (enableChromaShift) "curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'",
+      if (enableChromaShift) 'curves=${vars.curves}',
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
@@ -290,7 +303,7 @@ class FilterBuilders {
               ? VariationGenerator.generate()
               : VideoVariations.fallback);
       final vfString = enableBlurredCanvas
-          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel).join(',')}'
+          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution, vars: vars, modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel).join(',')}'
           : _buildFiltersList(
               modifyVisuals: modifyVisuals,
               enableDeepAntiFingerprint: enableDeepAntiFingerprint,
@@ -334,6 +347,7 @@ class FilterBuilders {
   static String buildAudioFilter({
     required bool hasAudio,
     required bool hasVisual,
+    bool modifyAudio = true,
     bool enableDeepAntiFingerprint = true,
     bool enableAggressiveAudio = false,
     bool muteOriginalAudio = false,
@@ -349,18 +363,21 @@ class FilterBuilders {
       final tempo = vars.audioTempo.toStringAsFixed(4);
       final pitchStr = vars.pitchFactor.toStringAsFixed(3);
       final pitchChain = 'asetrate=44100*$pitchStr,atempo=1/$pitchStr';
+      const phaseChorus = 'chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2';
+      final phaseMod = modifyAudio ? ',$phaseChorus' : '';
+
       if (muteOriginalAudio) {
         return ' -af "volume=0.01,$pitchChain,atempo=$tempo" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableAggressiveAudio) {
-        return ' -af "[in]$pitchChain,atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "[in]$pitchChain,atempo=$tempo,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
-      return ' -af "$pitchChain,atempo=$tempo,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
+      return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     } catch (_) {
-      return ' -af "asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
+      return ' -af "asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     }
   }
 }

@@ -238,22 +238,31 @@ class _ProcessActionButton extends StatelessWidget {
         ? 'START BATCH ($batchCount VIDEOS)'
         : singleLabel;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final disabledBg = isDark
+        ? AppColors.surfaceContainerHigh
+        : AppColors.lightSurfaceContainerHigh;
+    final disabledFg = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
+    final contentColor = enabled ? AppColors.white : disabledFg;
+
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        backgroundColor: enabled
-            ? AppColors.forestDeep
-            : AppColors.surfaceContainerHigh,
-        foregroundColor: enabled ? AppColors.white : AppColors.outline,
+        backgroundColor: AppColors.forestDeep,
+        foregroundColor: AppColors.white,
+        disabledBackgroundColor: disabledBg,
+        disabledForegroundColor: disabledFg,
         minimumSize: const Size.fromHeight(52),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         elevation: 0,
       ),
       onPressed: enabled ? onPressed : null,
-      icon: const Icon(Icons.bolt, size: 20, color: AppColors.white),
+      icon: Icon(Icons.bolt, size: 20, color: contentColor),
       label: Text(
         labelText,
-        style: const TextStyle(
-          color: AppColors.white,
+        style: TextStyle(
+          color: contentColor,
           fontSize: 14,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.2,

@@ -114,6 +114,23 @@ class _PresetTile extends StatelessWidget {
     required this.onTap,
   });
 
+  Color _accessibleColor(Color color, bool isDark) {
+    if (isDark) return color;
+    if (color == AppColors.electricIce || color == AppColors.skyPastel) {
+      return const Color(0xFF00677D);
+    }
+    if (color == AppColors.mintSage) {
+      return AppColors.forestDeep;
+    }
+    if (color == AppColors.persimmonOrange) {
+      return const Color(0xFFB84500);
+    }
+    if (color == AppColors.mustardOchre) {
+      return const Color(0xFF7A6800);
+    }
+    return color;
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeBg = isDark
@@ -128,7 +145,11 @@ class _PresetTile extends StatelessWidget {
     final descColor = isDark
         ? AppColors.onSurfaceVariant
         : AppColors.lightOnSurfaceVariant;
-    final iconColor = isSelected ? activeBorder : iconAccent;
+    final effectiveIconAccent = isDark
+        ? iconAccent
+        : _accessibleColor(iconAccent, false);
+    final iconColor = isSelected ? activeBorder : effectiveIconAccent;
+    final effectiveBadgeColor = _accessibleColor(badgeColor, isDark);
 
     return InkWell(
       onTap: onTap,
@@ -180,20 +201,20 @@ class _PresetTile extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: badgeColor.withValues(
-                            alpha: isDark ? 0.15 : 0.12,
+                          color: effectiveBadgeColor.withValues(
+                            alpha: isDark ? 0.15 : 0.10,
                           ),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: badgeColor.withValues(
-                              alpha: isDark ? 0.4 : 0.3,
+                            color: effectiveBadgeColor.withValues(
+                              alpha: isDark ? 0.4 : 0.35,
                             ),
                           ),
                         ),
                         child: Text(
                           badge,
                           style: TextStyle(
-                            color: badgeColor,
+                            color: effectiveBadgeColor,
                             fontSize: 8.5,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'monospace',

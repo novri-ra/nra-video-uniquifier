@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:storage_space/storage_space.dart';
+import 'media_scanner_service.dart';
 
 class VideoExportItem {
   final File file;
@@ -107,16 +110,149 @@ class HistoryService {
     return foundFiles;
   }
 
-  static Future<bool> deleteItem(File file) async {
+  /// Returns whether the device is running on Android 11+ (API 30+).
+  static bool get isAndroid11OrHigher {
+    if (!Platform.isAndroid) return false;
     try {
-      if (await file.exists()) {
-        await file.delete();
-        return true;
+      final osVersion = Platform.operatingSystemVersion;
+      final apiMatch = RegExp(
+        r'API\s*(\d+)',
+        caseSensitive: false,
+      ).firstMatch(osVersion);
+      if (apiMatch != null) {
+        final api = int.tryParse(apiMatch.group(1) ?? '');
+        if (api != null) return api >= 30;
       }
-      return true; // Already gone from disk; clean from state gracefully
+      final verMatch = RegExp(
+        r'(?:Android\s*)?(\d+)',
+        caseSensitive: false,
+      ).firstMatch(osVersion);
+      if (verMatch != null) {
+        final ver = int.tryParse(verMatch.group(1) ?? '');
+        if (ver != null) return ver >= 11;
+      }
+    } catch (_) {}
+    return true; // Default to true on modern Android
+  }
+
+  /// Checks whether storage permissions are granted.
+  /// On Android 11+ (API 30+), MANAGE_EXTERNAL_STORAGE is required for deleting
+  /// files from public shared storage (/storage/emulated/0/Movies).
+  static Future<bool> hasStoragePermission() async {
+    if (!Platform.isAndroid) return true;
+    try {
+      if (isAndroid11OrHigher) {
+        return await Permission.manageExternalStorage.isGranted;
+      } else {
+        return await Permission.storage.isGranted;
+      }
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Requests storage/media permissions with appropriate Android version handling.
+  static Future<bool> requestStoragePermission() async {
+    if (!Platform.isAndroid) return true;
+    try {
+      if (isAndroid11OrHigher) {
+        final status = await Permission.manageExternalStorage.request();
+        if (status.isGranted) return true;
+        return await Permission.manageExternalStorage.isGranted;
+      } else {
+        final status = await Permission.storage.request();
+        return status.isGranted;
+      }
     } catch (_) {
       return false;
     }
+  }
+
+  static Future<void> _cleanupThumbnail(File videoFile) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final name = videoFile.path.split(RegExp(r'[/\\]')).last;
+      final baseName = name.replaceAll(RegExp(r'[^\w\.-]'), '_');
+      final thumbFile = File('${tempDir.path}/thumbnails/thumb_$baseName.jpg');
+      if (await thumbFile.exists()) {
+        await thumbFile.delete();
+      }
+    } catch (e) {
+      debugPrint(
+        '[HistoryService] Thumbnail cleanup skipped for ${videoFile.path}: $e',
+      );
+    }
+  }
+
+  static Future<bool> deleteItem(File file) async {
+    try {
+      final target = File(file.path);
+      if (await target.exists()) {
+        await target.delete();
+        // Strict post-delete verification: confirm physical removal from disk
+        if (await target.exists()) {
+          debugPrint(
+            '[HistoryService] Physical delete failed, file still exists: ${file.path}',
+          );
+          return false;
+        }
+      }
+      // Notify Android MediaStore to remove or update indexed file entry
+      await MediaScannerService.scanFile(target.path);
+      await _cleanupThumbnail(target);
+      return true; // Successfully deleted from disk and verified, or already gone
+    } catch (e, stackTrace) {
+      debugPrint(
+        '[HistoryService] Failed to delete file ${file.path}: $e\n$stackTrace',
+      );
+      return false;
+    }
+  }
+
+  static Future<int> deleteItems(List<File> files) async {
+    int deletedCount = 0;
+    for (final file in files) {
+      final success = await deleteItem(file);
+      if (success) {
+        deletedCount++;
+      }
+    }
+    return deletedCount;
+  }
+
+  static Future<int> deleteExportItems(List<VideoExportItem> items) async {
+    return deleteItems(items.map((i) => i.file).toList());
+  }
+
+  /// Deletes a collection of [VideoExportItem] and returns the list of file paths
+  /// that were successfully and physically deleted from disk.
+  static Future<List<String>> deleteExportItemsDetailed(
+    List<VideoExportItem> items,
+  ) async {
+    final deletedPaths = <String>[];
+    for (final item in items) {
+      try {
+        final f = File(item.file.path);
+        if (await f.exists()) {
+          await f.delete();
+          if (!await f.exists()) {
+            deletedPaths.add(item.file.path);
+            await MediaScannerService.scanFile(item.file.path);
+            await _cleanupThumbnail(f);
+          } else {
+            debugPrint(
+              '[HistoryService] Physical delete failed, file still exists: ${item.file.path}',
+            );
+          }
+        } else {
+          // File was already removed from disk
+          deletedPaths.add(item.file.path);
+        }
+      } catch (e) {
+        debugPrint('Gagal menghapus file: ${item.file.path}, err:$e');
+      }
+    }
+    return deletedPaths;
   }
 
   static Future<StorageSpace?> getDeviceStorage() async {

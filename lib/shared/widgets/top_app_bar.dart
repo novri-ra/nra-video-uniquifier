@@ -215,10 +215,11 @@ class _OfflineBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = AppColors.mustardOchre.withValues(alpha: 0.15);
-    final border = AppColors.mustardOchre.withValues(alpha: 0.35);
-    const accent = AppColors.mustardOchre;
-    const textColor = AppColors.mustardOchre;
+    final offlineColor = isDark
+        ? AppColors.mustardOchre
+        : const Color(0xFF7A6800);
+    final bg = offlineColor.withValues(alpha: isDark ? 0.15 : 0.10);
+    final border = offlineColor.withValues(alpha: isDark ? 0.35 : 0.25);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -233,18 +234,18 @@ class _OfflineBadge extends StatelessWidget {
           Container(
             width: 6,
             height: 6,
-            decoration: const BoxDecoration(
-              color: accent,
+            decoration: BoxDecoration(
+              color: offlineColor,
               shape: BoxShape.circle,
             ),
           ),
           const SizedBox(width: 5),
-          const Icon(Icons.lock, color: accent, size: 12),
+          Icon(Icons.lock, color: offlineColor, size: 12),
           const SizedBox(width: 4),
-          const Text(
+          Text(
             'OFFLINE',
             style: TextStyle(
-              color: textColor,
+              color: offlineColor,
               fontSize: 10,
               fontWeight: FontWeight.w600,
               letterSpacing: 1,

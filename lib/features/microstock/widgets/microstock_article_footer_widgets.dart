@@ -49,16 +49,20 @@ class ArticleTranslateButton extends StatelessWidget {
             else
               Icon(Icons.translate_rounded, size: 14, color: accent),
             const SizedBox(width: 6),
-            Text(
-              isTranslating
-                  ? 'Menerjemahkan...'
-                  : (isTranslated
-                        ? 'Tampilkan Asli'
-                        : 'Terjemahkan Artikel (ID)'),
-              style: TextStyle(
-                color: accent,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+            Flexible(
+              child: Text(
+                isTranslating
+                    ? 'Menerjemahkan...'
+                    : (isTranslated
+                          ? 'Tampilkan Asli'
+                          : 'Terjemahkan Artikel (ID)'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -71,15 +75,23 @@ class ArticleTranslateButton extends StatelessWidget {
 class ArticleFooterSourceBox extends StatelessWidget {
   final MicrostockNewsArticle article;
   final bool isDark;
+  final bool isExternalSource;
   const ArticleFooterSourceBox({
     super.key,
     required this.article,
     required this.isDark,
+    this.isExternalSource = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final iconAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final icon = isExternalSource
+        ? Icons.public_outlined
+        : Icons.verified_outlined;
+    final label = isExternalSource
+        ? 'Dipublikasikan oleh ${article.source} • Sumber Eksternal'
+        : 'Verified Microstock Guideline • ${article.source}';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -94,11 +106,11 @@ class ArticleFooterSourceBox extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.verified_outlined, size: 16, color: iconAccent),
+          Icon(icon, size: 16, color: iconAccent),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Verified Microstock Guideline • ${article.source}',
+              label,
               style: TextStyle(
                 color: isDark
                     ? AppColors.onSurfaceVariant

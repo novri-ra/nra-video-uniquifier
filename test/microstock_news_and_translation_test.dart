@@ -3,6 +3,7 @@ import 'package:nra_video_uniquifier/core/services/connectivity_service.dart';
 import 'package:nra_video_uniquifier/core/services/microstock_news_service.dart';
 import 'package:nra_video_uniquifier/core/services/translation_service.dart';
 import 'package:nra_video_uniquifier/core/services/user_interest_service.dart';
+import 'package:nra_video_uniquifier/features/microstock/services/article_reader_extractor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -15,6 +16,7 @@ void main() {
     TranslationService.customHttpGet = null;
     MicrostockNewsService.mockFetchHandler = null;
     MicrostockNewsService.customHttpGet = null;
+    ArticleReaderExtractor.customHttpGet = null;
     UserInterestService.mockDispatcher = null;
   });
 
@@ -155,7 +157,22 @@ void main() {
       'fetchHybridNews correctly parses and sorts RSS2JSON and Reddit posts',
       () async {
         MicrostockNewsService.customHttpGet = (uri) async {
-          if (uri.toString().contains('rss2json.com')) {
+          if (uri.toString().contains('when:14d') &&
+              uri.toString().contains('hl=id')) {
+            return '''
+          <rss version="2.0">
+            <channel>
+              <item>
+                <title>Tren Kontributor Microstock Indonesia 2026</title>
+                <link>https://news.detik.com/berita/microstock-2026</link>
+                <pubDate>2026-11-04 12:00:00</pubDate>
+                <description>&lt;p&gt;Komunitas fotografer komersial dan desainer grafis tanah air bertumbuh pesat.&lt;/p&gt;</description>
+                <source url="https://detik.com">Detik News</source>
+              </item>
+            </channel>
+          </rss>
+          ''';
+          } else if (uri.toString().contains('rss2json.com')) {
             return '''
           {
             "status": "ok",
@@ -196,7 +213,13 @@ void main() {
         };
 
         final items = await MicrostockNewsService.fetchHybridNews();
-        expect(items.length, equals(2));
+        expect(items.length, equals(3));
+
+        final idItem = items.firstWhere(
+          (i) => i.title == 'Tren Kontributor Microstock Indonesia 2026',
+        );
+        expect(idItem.source, equals('Detik News'));
+        expect(idItem.summary, contains('Komunitas fotografer komersial'));
 
         final rssItem = items.firstWhere(
           (i) => i.source == 'Shutterstock Official',
@@ -307,6 +330,59 @@ void main() {
       }
     });
   });
+
+  group(
+    'Sprint 83: ArticleReaderExtractor DOM Extraction & User-Agent Tests',
+    () {
+      test(
+        'extract parses .entry-content, .post-content, <article>, and fallback <p>',
+        () async {
+          ArticleReaderExtractor.customHttpGet = (uri) async {
+            return '''
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta property="og:image" content="https://insideimaging.com.au/hero.jpg" />
+              </head>
+              <body>
+                <header><p>Nav header</p></header>
+                <div class="post-content">
+                  <p>Dreamstime has announced an increase in contributor royalties.</p>
+                  <p>The microstock platform will adjust earnings starting next quarter across all categories.</p>
+                  <p>Read more...</p>
+                </div>
+              </body>
+            </html>
+          ''';
+          };
+
+          final extracted = await ArticleReaderExtractor.extract(
+            'https://insideimaging.com.au/sample-post',
+          );
+
+          expect(extracted, isNotNull);
+          expect(
+            extracted!.heroImageUrl,
+            equals('https://insideimaging.com.au/hero.jpg'),
+          );
+          expect(extracted.paragraphs, contains('Dreamstime has announced'));
+          expect(
+            extracted.paragraphs,
+            contains('The microstock platform will adjust'),
+          );
+          expect(extracted.paragraphs.contains('Read more...'), isFalse);
+        },
+      );
+
+      test('extract returns null on empty or invalid HTML response', () async {
+        ArticleReaderExtractor.customHttpGet = (uri) async => '';
+        final extracted = await ArticleReaderExtractor.extract(
+          'https://example.com/empty',
+        );
+        expect(extracted, isNull);
+      });
+    },
+  );
 
   group('Sprint 80: UserInterestService Unit Tests', () {
     test(

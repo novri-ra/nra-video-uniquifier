@@ -121,16 +121,39 @@ void main() {
             '-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv',
           ),
         );
-        expect(cmd, contains('-metadata make="Apple"'));
-        expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
-        expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
         expect(
-          cmd,
-          contains('-metadata:s:v:0 handler_name="Core Media Video"'),
+          DeviceProfile.profiles.any(
+            (p) => cmd.contains('-metadata make="${p.make}"'),
+          ),
+          isTrue,
         );
         expect(
-          cmd,
-          contains('-metadata:s:a:0 handler_name="Core Media Audio"'),
+          DeviceProfile.profiles.any(
+            (p) => cmd.contains('-metadata model="${p.model}"'),
+          ),
+          isTrue,
+        );
+        expect(
+          DeviceProfile.profiles.any(
+            (p) => cmd.contains('-metadata encoder="${p.encoder}"'),
+          ),
+          isTrue,
+        );
+        expect(
+          DeviceProfile.profiles.any(
+            (p) => cmd.contains(
+              '-metadata:s:v:0 handler_name="${p.videoHandler}"',
+            ),
+          ),
+          isTrue,
+        );
+        expect(
+          DeviceProfile.profiles.any(
+            (p) => cmd.contains(
+              '-metadata:s:a:0 handler_name="${p.audioHandler}"',
+            ),
+          ),
+          isTrue,
         );
         expect(cmd, contains('-c:a copy'));
         expect(cmd, contains('-r 29.'));
@@ -523,8 +546,8 @@ void main() {
           expect(vars.noiseStrength, lessThanOrEqualTo(4));
           expect(vars.speedFactor, greaterThanOrEqualTo(1.0099));
           expect(vars.speedFactor, lessThanOrEqualTo(1.0251));
-          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9849));
-          expect(vars.pitchFactor, lessThanOrEqualTo(1.0151));
+          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9599));
+          expect(vars.pitchFactor, lessThanOrEqualTo(1.0401));
           expect(vars.outputFps, greaterThanOrEqualTo(29.79));
           expect(vars.outputFps, lessThanOrEqualTo(29.91));
 
@@ -559,16 +582,26 @@ void main() {
           expect(ptsVal, greaterThanOrEqualTo(1.0099));
           expect(ptsVal, lessThanOrEqualTo(1.0251));
 
-          expect(cmd, contains('-metadata make="Apple"'));
-          expect(cmd, contains('-metadata model="iPhone 15 Pro Max"'));
-          expect(cmd, contains('-metadata encoder="Apple QuickTime"'));
+          expect(cmd, contains('-metadata make="${vars.deviceProfile.make}"'));
           expect(
             cmd,
-            contains('-metadata:s:v:0 handler_name="Core Media Video"'),
+            contains('-metadata model="${vars.deviceProfile.model}"'),
           );
           expect(
             cmd,
-            contains('-metadata:s:a:0 handler_name="Core Media Audio"'),
+            contains('-metadata encoder="${vars.deviceProfile.encoder}"'),
+          );
+          expect(
+            cmd,
+            contains(
+              '-metadata:s:v:0 handler_name="${vars.deviceProfile.videoHandler}"',
+            ),
+          );
+          expect(
+            cmd,
+            contains(
+              '-metadata:s:a:0 handler_name="${vars.deviceProfile.audioHandler}"',
+            ),
           );
           expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.0015'));
           expect(cmd, contains('-r 29.'));
@@ -593,10 +626,12 @@ void main() {
             r'[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];',
           ),
         );
+        expect(cmd, contains(r'[fg]crop='));
+        expect(cmd, contains(r'rotate='));
         expect(
           cmd,
           contains(
-            r'[fg]scale=w=1026:h=1824:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];',
+            r'scale=w=1026:h=1824:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];',
           ),
         );
         expect(
@@ -618,10 +653,12 @@ void main() {
             r'[bg]scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];',
           ),
         );
+        expect(cmdLandscape, contains(r'[fg]crop='));
+        expect(cmdLandscape, contains(r'rotate='));
         expect(
           cmdLandscape,
           contains(
-            r'[fg]scale=w=1824:h=1026:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];',
+            r'scale=w=1824:h=1026:force_original_aspect_ratio=decrease,scale=trunc(iw/2)*2:trunc(ih/2)*2[main];',
           ),
         );
 
@@ -633,11 +670,10 @@ void main() {
           canvasScalePercent: 50.0,
           isPortrait: true,
         );
+        expect(cmd50, contains(r'[fg]crop='));
         expect(
           cmd50,
-          contains(
-            r'[fg]scale=w=540:h=960:force_original_aspect_ratio=decrease',
-          ),
+          contains(r'scale=w=540:h=960:force_original_aspect_ratio=decrease'),
         );
 
         // Test 100% scale factor
@@ -648,11 +684,10 @@ void main() {
           canvasScalePercent: 100.0,
           isPortrait: true,
         );
+        expect(cmd100, contains(r'[fg]crop='));
         expect(
           cmd100,
-          contains(
-            r'[fg]scale=w=1080:h=1920:force_original_aspect_ratio=decrease',
-          ),
+          contains(r'scale=w=1080:h=1920:force_original_aspect_ratio=decrease'),
         );
 
         // Test 2K Portrait Canvas scaling
@@ -670,11 +705,10 @@ void main() {
             r'[bg]scale=1440:2560:force_original_aspect_ratio=increase,crop=1440:2560,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];',
           ),
         );
+        expect(cmd2kCanvas, contains(r'[fg]crop='));
         expect(
           cmd2kCanvas,
-          contains(
-            r'[fg]scale=w=1368:h=2432:force_original_aspect_ratio=decrease',
-          ),
+          contains(r'scale=w=1368:h=2432:force_original_aspect_ratio=decrease'),
         );
 
         // Test 4K Portrait Canvas scaling
@@ -692,11 +726,10 @@ void main() {
             r'[bg]scale=2160:3840:force_original_aspect_ratio=increase,crop=2160:3840,boxblur=luma_radius=min(h\,w)/40:luma_power=2[blurred];',
           ),
         );
+        expect(cmd4kCanvas, contains(r'[fg]crop='));
         expect(
           cmd4kCanvas,
-          contains(
-            r'[fg]scale=w=2052:h=3648:force_original_aspect_ratio=decrease',
-          ),
+          contains(r'scale=w=2052:h=3648:force_original_aspect_ratio=decrease'),
         );
       },
     );
@@ -732,15 +765,14 @@ void main() {
         expect(
           cmd,
           contains(
-            r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'",
+            r"zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))'",
           ),
         );
         expect(cmd, contains('s=1080x1920:fps=30'));
         expect(cmd, contains('decimate=cycle=25'));
-        expect(
-          cmd,
-          contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"),
-        );
+        expect(cmd, contains("curves=r='0/0"));
+        expect(cmd, contains(":g='0/0"));
+        expect(cmd, contains(":b='0/0"));
         expect(cmd, contains('noise=alls=5:allf=t+u'));
       },
     );
@@ -777,7 +809,7 @@ void main() {
       expect(
         cmd,
         contains(
-          r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'",
+          r"zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))'",
         ),
       ); // 4. dynamicZoom
       expect(cmd, contains('hflip')); // 5. horizontalFlip
@@ -791,10 +823,7 @@ void main() {
         cmd,
         contains('unsharp=3:3:0.6:3:3:0.0'),
       ); // pre-scale edge sharpness
-      expect(
-        cmd,
-        contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"),
-      ); // 8. chromaShift
+      expect(cmd, contains("curves=r='0/0")); // 8. chromaShift
       expect(cmd, contains('noise=alls=')); // 9. modifyVisuals grain
       expect(cmd, contains('noise=alls=5:allf=t+u')); // 10. microOverlay
       expect(cmd, contains('format=yuv420p')); // color parity
@@ -982,10 +1011,9 @@ void main() {
         // Dynamic zoompan
         expect(cmd, contains('zoompan='));
         // Non-linear color curves
-        expect(
-          cmd,
-          contains("curves=all='0/0 0.15/0.18 0.5/0.5 0.85/0.82 1/1'"),
-        );
+        expect(cmd, contains("curves=r='0/0"));
+        expect(cmd, contains(":g='0/0"));
+        expect(cmd, contains(":b='0/0"));
         // Terminal canonical scale and format lock
         expect(
           cmd,
@@ -1054,7 +1082,7 @@ void main() {
         expect(
           cmd,
           contains(
-            r"zoompan=z='min(zoom+0.0002,1.03)':d=1:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'",
+            r"zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))'",
           ),
         );
         // Gamma & dynamic saturation slider binding

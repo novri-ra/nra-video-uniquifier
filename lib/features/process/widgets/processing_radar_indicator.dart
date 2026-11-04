@@ -20,43 +20,48 @@ class ProcessingRadarIndicator extends StatelessWidget {
         final screenHeight = MediaQuery.sizeOf(context).height;
         final size = screenHeight < 640 ? 120.0 : 150.0;
 
-        return SizedBox(
-          width: size,
-          height: size,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CustomPaint(
-                size: Size(size, size),
-                painter: RadialProgressPainter(
-                  progress: progress,
-                  trackColor: trackColor,
-                  progressColor: AppColors.vividCoral,
+        return Semantics(
+          label: 'Progres pemrosesan video',
+          value: '${(progress * 100).toInt()}%',
+          liveRegion: true,
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: Size(size, size),
+                  painter: RadialProgressPainter(
+                    progress: progress,
+                    trackColor: trackColor,
+                    progressColor: AppColors.vividCoral,
+                  ),
                 ),
-              ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '${(progress * 100).toInt()}%',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: size < 130 ? 24 : 30,
-                      fontWeight: FontWeight.w700,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${(progress * 100).toInt()}%',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: size < 130 ? 24 : 30,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const Text(
-                    'COMPLETED',
-                    style: TextStyle(
-                      color: AppColors.outline,
-                      fontSize: 9,
-                      letterSpacing: 1.5,
-                      fontFamily: 'monospace',
+                    const Text(
+                      'COMPLETED',
+                      style: TextStyle(
+                        color: AppColors.outline,
+                        fontSize: 9,
+                        letterSpacing: 1.5,
+                        fontFamily: 'monospace',
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

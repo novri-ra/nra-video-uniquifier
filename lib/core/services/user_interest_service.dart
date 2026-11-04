@@ -1,15 +1,34 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'connectivity_service.dart';
 import 'microstock_news_service.dart';
 
-/// Self-learning user interest engine and Google Sheets telemetry dispatcher.
+/// Internal data container for decayed affinity scores with timestamps.
+class _AffinityRecord {
+  final double score;
+  final int lastUpdated;
+
+  const _AffinityRecord({required this.score, required this.lastUpdated});
+
+  Map<String, dynamic> toJson() => {'score': score, 'lastUpdated': lastUpdated};
+
+  factory _AffinityRecord.fromJson(Map<String, dynamic> json) {
+    return _AffinityRecord(
+      score: (json['score'] as num?)?.toDouble() ?? 0.0,
+      lastUpdated:
+          (json['lastUpdated'] as num?)?.toInt() ??
+          DateTime.now().millisecondsSinceEpoch,
+    );
+  }
+}
+
+/// Strictly offline-first self-learning user interest engine with exponential half-life decay.
 class UserInterestService {
-  static const String _affinityKey = 'nra_keyword_affinity_v1';
+  static const String _affinityKeyV1 = 'nra_keyword_affinity_v1';
+  static const String _affinityKeyV2 = 'nra_user_affinity_v2';
   static const String _webhookKey = 'nra_telemetry_webhook_url';
-  static const String _queueKey = 'nra_telemetry_queue_v1';
 
   static const List<String> defaultKeywords = [
     'All',
@@ -26,26 +45,21 @@ class UserInterestService {
   static const String defaultWebhookUrl =
       'https://script.google.com/macros/s/AKfycbzy4jEhfXCqt2XJnYETH2UXF5vMo26AguljNl0a20PDDXXKsfX5EOPTUcwadlXCoya-/exec';
 
-  static final Map<String, int> _affinityMap = {};
+  static final Map<String, _AffinityRecord> _affinityMap = {};
   static bool _initialized = false;
   static String? _configuredWebhookUrl;
 
   @visibleForTesting
   static Future<bool> Function(Map<String, dynamic> payload)? mockDispatcher;
 
-  /// Initializes affinity weights and registers connectivity listener for offline queue flushing.
+  /// Initializes affinity records from persistent cache.
   static Future<void> initialize() async {
     if (_initialized) return;
     _initialized = true;
     await _loadAffinity();
-    ConnectivityService.instance.isOnline.addListener(() {
-      if (ConnectivityService.instance.isOnline.value) {
-        flushQueue();
-      }
-    });
   }
 
-  /// Sets custom webhook URL.
+  /// Sets custom webhook URL for configuration testing.
   static Future<void> setWebhookUrl(String url) async {
     _configuredWebhookUrl = url;
     try {
@@ -66,22 +80,61 @@ class UserInterestService {
     return _configuredWebhookUrl ?? defaultWebhookUrl;
   }
 
-  /// Returns adaptive keywords with 'All' first, followed by dynamically ranked topics.
-  static List<String> getAdaptiveKeywords() {
-    final list = List<String>.from(defaultKeywords.where((k) => k != 'All'));
-    list.sort((a, b) {
-      final scoreA = _affinityMap[a.toLowerCase()] ?? 0;
-      final scoreB = _affinityMap[b.toLowerCase()] ?? 0;
-      return scoreB.compareTo(scoreA);
-    });
-    return ['All', ...list];
+  /// Calculates decayed score using 7-day exponential half-life formula:
+  /// DecayedScore = Score * 0.5 ^ (daysDiff / 7.0)
+  static double _calculateDecayedScore(
+    _AffinityRecord record, [
+    int? nowMillis,
+  ]) {
+    final now = nowMillis ?? DateTime.now().millisecondsSinceEpoch;
+    final diffMillis = (now - record.lastUpdated).clamp(0, double.infinity);
+    final daysDiff = diffMillis / (1000 * 60 * 60 * 24);
+    return record.score * math.pow(0.5, daysDiff / 7.0);
   }
 
-  /// Records search query submission (+3 weight).
+  /// Sorts provided categories and tags by user decayed affinity score descending.
+  /// Always places 'All' at index 0.
+  static List<String> getSortedDynamicCategories(List<String> rawCategories) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final seen = <String>{};
+    final uniqueCategories = <String>[];
+
+    for (final raw in rawCategories) {
+      final clean = raw.replaceAll('#', '').trim();
+      if (clean.isEmpty || clean.toLowerCase() == 'all') continue;
+      if (seen.add(clean.toLowerCase())) {
+        uniqueCategories.add(clean);
+      }
+    }
+
+    uniqueCategories.sort((a, b) {
+      final recordA = _affinityMap[a.toLowerCase()];
+      final recordB = _affinityMap[b.toLowerCase()];
+      final scoreA = recordA != null
+          ? _calculateDecayedScore(recordA, now)
+          : 0.0;
+      final scoreB = recordB != null
+          ? _calculateDecayedScore(recordB, now)
+          : 0.0;
+      if (scoreA != scoreB) {
+        return scoreB.compareTo(scoreA);
+      }
+      return 0;
+    });
+
+    return ['All', ...uniqueCategories];
+  }
+
+  /// Returns adaptive keywords with 'All' first, followed by dynamically ranked topics.
+  static List<String> getAdaptiveKeywords() {
+    return getSortedDynamicCategories(defaultKeywords);
+  }
+
+  /// Records search query submission (+3.0 weight).
   static Future<void> recordSearch(String query) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) return;
-    await _addWeight(trimmed, 3);
+    await _addWeight(trimmed, 3.0);
     await _dispatchTelemetry({
       'type': 'user_interest_telemetry',
       'eventType': 'search_submit',
@@ -89,10 +142,10 @@ class UserInterestService {
     });
   }
 
-  /// Records keyword chip selection (+2 weight).
+  /// Records keyword chip selection (+2.0 weight).
   static Future<void> recordChipClick(String keyword) async {
     if (keyword == 'All') return;
-    await _addWeight(keyword, 2);
+    await _addWeight(keyword, 2.0);
     await _dispatchTelemetry({
       'type': 'user_interest_telemetry',
       'eventType': 'chip_click',
@@ -100,11 +153,11 @@ class UserInterestService {
     });
   }
 
-  /// Records article reader open event (+2 weight).
+  /// Records article reader open event (+3.0 category, +1.0 tags).
   static Future<void> recordArticleRead(MicrostockNewsArticle article) async {
-    await _addWeight(article.category, 2);
+    await _addWeight(article.category, 3.0);
     for (final tag in article.tags) {
-      await _addWeight(tag.replaceAll('#', ''), 1);
+      await _addWeight(tag.replaceAll('#', ''), 1.0);
     }
     await _dispatchTelemetry({
       'type': 'user_interest_telemetry',
@@ -114,12 +167,26 @@ class UserInterestService {
     });
   }
 
-  /// Records article translation toggle (+1 weight).
+  /// Records outbound source link opening (+5.0 category, +2.0 tags).
+  static Future<void> recordOpenSourceUrl(MicrostockNewsArticle article) async {
+    await _addWeight(article.category, 5.0);
+    for (final tag in article.tags) {
+      await _addWeight(tag.replaceAll('#', ''), 2.0);
+    }
+    await _dispatchTelemetry({
+      'type': 'user_interest_telemetry',
+      'eventType': 'open_source_url',
+      'articleTitle': article.title,
+      'sourceUrl': article.sourceUrl,
+    });
+  }
+
+  /// Records article translation toggle (+1.0 category weight).
   static Future<void> recordTranslateToggle(
     MicrostockNewsArticle article,
     String langMode,
   ) async {
-    await _addWeight(article.category, 1);
+    await _addWeight(article.category, 1.0);
     await _dispatchTelemetry({
       'type': 'user_interest_telemetry',
       'eventType': 'translate_toggle',
@@ -128,7 +195,7 @@ class UserInterestService {
     });
   }
 
-  /// Dispatches video metadata vault payload asynchronously.
+  /// Dispatches video metadata vault payload to mockDispatcher for test validation.
   static Future<void> dispatchVideoMetadataVault({
     required String title,
     required String description,
@@ -150,19 +217,47 @@ class UserInterestService {
     });
   }
 
-  static Future<void> _addWeight(String term, int weight) async {
-    final key = term.toLowerCase();
-    _affinityMap[key] = (_affinityMap[key] ?? 0) + weight;
+  static Future<void> _addWeight(String term, double weight) async {
+    final key = term.trim().toLowerCase();
+    if (key.isEmpty) return;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final existing = _affinityMap[key];
+    final currentDecayed = existing != null
+        ? _calculateDecayedScore(existing, now)
+        : 0.0;
+
+    _affinityMap[key] = _AffinityRecord(
+      score: currentDecayed + weight,
+      lastUpdated: now,
+    );
     await _saveAffinity();
   }
 
   static Future<void> _loadAffinity() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString(_affinityKey);
-      if (raw != null) {
-        final decoded = jsonDecode(raw) as Map<String, dynamic>;
-        decoded.forEach((k, v) => _affinityMap[k] = (v as num).toInt());
+      final rawV2 = prefs.getString(_affinityKeyV2);
+      if (rawV2 != null && rawV2.isNotEmpty) {
+        final decoded = jsonDecode(rawV2) as Map<String, dynamic>;
+        decoded.forEach((k, v) {
+          if (v is Map<String, dynamic>) {
+            _affinityMap[k] = _AffinityRecord.fromJson(v);
+          }
+        });
+        return;
+      }
+
+      // Backward compatibility: migrate legacy v1 affinity
+      final rawV1 = prefs.getString(_affinityKeyV1);
+      if (rawV1 != null && rawV1.isNotEmpty) {
+        final decoded = jsonDecode(rawV1) as Map<String, dynamic>;
+        final now = DateTime.now().millisecondsSinceEpoch;
+        decoded.forEach((k, v) {
+          _affinityMap[k] = _AffinityRecord(
+            score: (v as num).toDouble(),
+            lastUpdated: now,
+          );
+        });
       }
     } catch (_) {}
   }
@@ -170,77 +265,22 @@ class UserInterestService {
   static Future<void> _saveAffinity() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString(_affinityKey, jsonEncode(_affinityMap));
+      final map = {
+        for (final entry in _affinityMap.entries)
+          entry.key: entry.value.toJson(),
+      };
+      await prefs.setString(_affinityKeyV2, jsonEncode(map));
     } catch (_) {}
   }
 
+  /// Strictly offline-first telemetry dispatch. Invokes mockDispatcher in test environments.
   static Future<void> _dispatchTelemetry(Map<String, dynamic> payload) async {
     if (mockDispatcher != null) {
       await mockDispatcher!(payload);
-      return;
     }
-
-    final isOnline = ConnectivityService.instance.isOnline.value;
-    final url = await getWebhookUrl();
-    if (!isOnline || url.isEmpty) {
-      await _enqueuePayload(payload);
-      return;
-    }
-
-    final success = await _postPayload(url, payload);
-    if (!success) await _enqueuePayload(payload);
+    // Strictly offline-first: 0 external network requests in production.
   }
 
-  static Future<bool> _postPayload(
-    String url,
-    Map<String, dynamic> payload,
-  ) async {
-    final client = HttpClient()..connectionTimeout = const Duration(seconds: 5);
-    try {
-      final uri = Uri.parse(url);
-      final req = await client.postUrl(uri);
-      req.followRedirects = true;
-      req.headers.set('Content-Type', 'application/json; charset=UTF-8');
-      req.write(jsonEncode(payload));
-      final res = await req.close().timeout(const Duration(seconds: 5));
-      // Google Apps Script Web App responds with 200 OK or 302 Found redirect on success
-      return res.statusCode >= 200 && res.statusCode <= 302;
-    } catch (_) {
-      return false;
-    } finally {
-      client.close();
-    }
-  }
-
-  static Future<void> _enqueuePayload(Map<String, dynamic> payload) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final list = prefs.getStringList(_queueKey) ?? [];
-      list.add(jsonEncode(payload));
-      if (list.length > 50) list.removeAt(0); // circular buffer cap
-      await prefs.setStringList(_queueKey, list);
-    } catch (_) {}
-  }
-
-  /// Flushes buffered telemetry queue when connection is restored.
-  static Future<void> flushQueue() async {
-    final url = await getWebhookUrl();
-    if (url.isEmpty) return;
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final list = prefs.getStringList(_queueKey) ?? [];
-      if (list.isEmpty) return;
-
-      final remaining = <String>[];
-      for (final item in list) {
-        final payload = jsonDecode(item) as Map<String, dynamic>;
-        final sent = mockDispatcher != null
-            ? await mockDispatcher!(payload)
-            : await _postPayload(url, payload);
-        if (!sent) remaining.add(item);
-      }
-      await prefs.setStringList(_queueKey, remaining);
-    } catch (_) {}
-  }
+  /// Retained for test compatibility; performs no external network calls.
+  static Future<void> flushQueue() async {}
 }

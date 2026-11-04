@@ -9,6 +9,7 @@ class NewsSearchAndFilterBar extends StatefulWidget {
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<String> onChipSelected;
   final bool isDark;
+  final List<String>? categories;
 
   const NewsSearchAndFilterBar({
     super.key,
@@ -16,6 +17,7 @@ class NewsSearchAndFilterBar extends StatefulWidget {
     required this.onSearchChanged,
     required this.onChipSelected,
     required this.isDark,
+    this.categories,
   });
 
   @override
@@ -34,6 +36,14 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
   }
 
   @override
+  void didUpdateWidget(covariant NewsSearchAndFilterBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.categories != oldWidget.categories) {
+      _refreshChips();
+    }
+  }
+
+  @override
   void dispose() {
     _debounceTimer?.cancel();
     _searchController.dispose();
@@ -42,7 +52,21 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
 
   void _refreshChips() {
     setState(() {
-      _adaptiveChips = UserInterestService.getAdaptiveKeywords();
+      final base = (widget.categories != null && widget.categories!.isNotEmpty)
+          ? UserInterestService.getSortedDynamicCategories(widget.categories!)
+          : UserInterestService.getAdaptiveKeywords();
+
+      final list = <String>[];
+      for (final item in base) {
+        list.add(item);
+        if (item.toLowerCase() == 'all') {
+          list.add('Saved');
+        }
+      }
+      if (!list.contains('Saved')) {
+        list.insert(list.isNotEmpty ? 1 : 0, 'Saved');
+      }
+      _adaptiveChips = list;
     });
   }
 
@@ -203,13 +227,28 @@ class _AdaptiveFilterChip extends StatelessWidget {
           ],
         ),
         child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? selectedText : unselectedText,
-              fontSize: 11.5,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (label == 'Saved') ...[
+                Icon(
+                  isSelected
+                      ? Icons.bookmark_rounded
+                      : Icons.bookmark_border_rounded,
+                  size: 13,
+                  color: isSelected ? selectedText : unselectedText,
+                ),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? selectedText : unselectedText,
+                  fontSize: 11.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
       ),

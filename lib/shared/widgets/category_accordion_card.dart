@@ -58,57 +58,69 @@ class _CategoryAccordionCardState extends State<CategoryAccordionCard> {
       ),
       child: Column(
         children: [
-          InkWell(
-            onTap: () => setState(() => _expanded = !_expanded),
-            borderRadius: BorderRadius.circular(6),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Icon(widget.icon, color: iconColor, size: 16),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            widget.title,
-                            style: TextStyle(
-                              color: titleColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.8,
-                              fontFamily: 'monospace',
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
+          Semantics(
+            button: true,
+            expanded: _expanded,
+            label:
+                '${widget.title}, kategori ${_expanded ? "terbuka" : "tertutup"}',
+            child: InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              borderRadius: BorderRadius.circular(6),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 48),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
                   ),
-                  const SizedBox(width: 6),
-                  Row(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _ActiveBadge(
-                        activeCount: widget.activeCount,
-                        totalCount: widget.totalCount,
-                        isDark: isDark,
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Icon(widget.icon, color: iconColor, size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                widget.title,
+                                style: TextStyle(
+                                  color: titleColor,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                  fontFamily: 'monospace',
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(width: 6),
-                      Icon(
-                        _expanded
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                        color: isDark
-                            ? AppColors.onSurfaceVariant
-                            : AppColors.lightOnSurfaceVariant,
-                        size: 18,
+                      Row(
+                        children: [
+                          _ActiveBadge(
+                            activeCount: widget.activeCount,
+                            totalCount: widget.totalCount,
+                            isDark: isDark,
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            _expanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: isDark
+                                ? AppColors.onSurfaceVariant
+                                : AppColors.lightOnSurfaceVariant,
+                            size: 18,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
