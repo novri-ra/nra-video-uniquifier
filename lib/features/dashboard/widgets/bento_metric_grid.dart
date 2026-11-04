@@ -162,16 +162,31 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Icon(Icons.layers_rounded, color: queueColor, size: 20),
-        GestureDetector(
-          onTap: widget.onTap,
-          child: Container(
-            padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              color: queueColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-              border: Border.all(color: queueColor.withValues(alpha: 0.4)),
+        Semantics(
+          button: true,
+          label: 'Tambah ke antrean batch',
+          child: Tooltip(
+            message: 'Tambah ke antrean batch',
+            child: GestureDetector(
+              onTap: widget.onTap,
+              behavior: HitTestBehavior.opaque,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: queueColor.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: queueColor.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: const Icon(Icons.add, size: 12, color: queueColor),
+                  ),
+                ),
+              ),
             ),
-            child: const Icon(Icons.add, size: 12, color: queueColor),
           ),
         ),
       ],

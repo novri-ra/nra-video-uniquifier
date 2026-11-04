@@ -282,21 +282,38 @@ class _ClearIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return IconButton(
-      icon: const Icon(Icons.close, size: 16),
-      style: IconButton.styleFrom(
-        backgroundColor: isDark
-            ? AppColors.surfaceContainer
-            : AppColors.hairlineBorder,
-        foregroundColor: isDark
-            ? AppColors.onSurfaceVariant
-            : AppColors.lightOnSurfaceVariant,
-        padding: EdgeInsets.zero,
-        minimumSize: const Size(28, 28),
-        fixedSize: const Size(28, 28),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+    return Semantics(
+      button: true,
+      label: 'Hapus berkas sumber',
+      child: Tooltip(
+        message: 'Hapus berkas terpilih',
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(4),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+            child: Center(
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.surfaceContainer
+                      : AppColors.hairlineBorder,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Icon(
+                  Icons.close,
+                  size: 16,
+                  color: isDark
+                      ? AppColors.onSurfaceVariant
+                      : AppColors.lightOnSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
-      onPressed: onPressed,
     );
   }
 }

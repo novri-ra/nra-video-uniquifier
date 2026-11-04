@@ -1,5 +1,8 @@
 # Changelog
 ## [Unreleased]
+- fix(a11y): expand interactive touch targets to 48x48dp for bento add queue, clear file, and accordion header (MAJ-01)
+- feat(a11y): add Semantics liveRegion, tooltips, and dynamic state labels for processing radar and accordion cards (MAJ-02)
+- docs(reports): add report 09-fix-phase2-touch-targets-semantics to reports index
 - fix(ui): resolve critical light mode contrast failures on disabled process action button (CRIT-01)
 - fix(ui): add theme-adaptive accent tokens for preset badges and offline indicator to satisfy WCAG 2.2 AA (CRIT-02)
 - docs(reports): add report 07-audit-ui-ux-standards and report 08-fix-phase1-ui-contrast to reports index

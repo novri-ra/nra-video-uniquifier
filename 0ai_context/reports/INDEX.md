@@ -10,6 +10,7 @@
 | 06 | 06-fix-history-delete-multiselect.md | 2026-11-04 | fix | Implement physical disk file deletion and multi-select batch deletion in export history |
 | 07 | 07-audit-ui-ux-standards.md | 2026-11-04 | audit | Deep UI/UX audit against WCAG 2.2, HIG, Material 3, contrast ratios, and touch targets |
 | 08 | 08-fix-phase1-ui-contrast.md | 2026-11-04 | fix | Fix CRIT-01 and CRIT-02 color contrast issues on disabled action button and pastel badges |
+| 09 | 09-fix-phase2-touch-targets-semantics.md | 2026-11-04 | fix | Enforce >= 48x48dp touch targets and integrate Semantics, tooltips, and live progress announcements |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
