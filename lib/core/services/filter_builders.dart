@@ -76,6 +76,8 @@ class FilterBuilders {
         "zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))':s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:$unsharpLuma:3:3:0.0',
+      if (modifyVisuals)
+        'colorchannelmixer=rr=0.994:rg=0.003:rb=0.003:gg=0.995:gr=0.003:gb=0.002:bb=0.994:br=0.003:bg=0.003',
       if (enableChromaShift) 'curves=${vars.curves}',
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
@@ -126,19 +128,21 @@ class FilterBuilders {
     VideoCodec videoCodec,
     TargetResolution targetResolution,
   ) {
+    const x264GopParams =
+        '-g 36 -keyint_min 18 -sc_threshold 40 -x264-params "stitchable=1"';
     if (targetResolution == TargetResolution.r4k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 25M -bufsize 50M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M -x264-params "stitchable=1"';
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M $x264GopParams';
     }
     if (targetResolution == TargetResolution.r2k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 20M -bufsize 40M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M -x264-params "stitchable=1"';
+          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M $x264GopParams';
     }
     return videoCodec == VideoCodec.h265
         ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
-        : '-c:v libx264 -preset fast -crf 22 -x264-params "stitchable=1"';
+        : '-c:v libx264 -preset fast -crf 22 $x264GopParams';
   }
 
   static List<String> _buildSpatialCrop(
@@ -223,6 +227,8 @@ class FilterBuilders {
         "zoompan=z='1.02+0.015*sin(2*PI*it/12)':d=1:x='(iw-iw/zoom)/2*(1+0.3*sin(2*PI*it/8))':y='(ih-ih/zoom)/2*(1+0.3*cos(2*PI*it/8))':s=$zoomDim:fps=$targetFps",
       if (enableEnhanceAndDenoise && !upscale) 'hqdn3d=1.5:1.5:4:4',
       if (enableEnhanceAndDenoise) 'unsharp=3:3:$unsharpLuma:3:3:0.0',
+      if (modifyVisuals)
+        'colorchannelmixer=rr=0.994:rg=0.003:rb=0.003:gg=0.995:gr=0.003:gb=0.002:bb=0.994:br=0.003:bg=0.003',
       if (enableChromaShift) 'curves=${vars.curves}',
       if (modifyVisuals) 'eq=gamma=1.015:contrast=1.02:saturation=$satStr',
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
@@ -383,10 +389,10 @@ class FilterBuilders {
         return ' -af "volume=0.01,$pitchChain,atempo=$tempo" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableAggressiveAudio) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];[a0][noise]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];aevalsrc=exprs=0.0008*sin(2*PI*24*t)+0.0006*sin(2*PI*18200*t):d=7200:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];[a0][noise]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=7200:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     } catch (_) {

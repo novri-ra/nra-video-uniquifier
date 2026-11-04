@@ -89,6 +89,9 @@ class FfmpegCommandBuilder {
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
     );
+    if (outputPath.toLowerCase().endsWith('.mp4')) {
+      buffer.write(' -bsf:v filter_units=remove_types=6');
+    }
     buffer.write(' "${escapePath(outputPath)}"');
     return buffer.toString();
   }

@@ -120,23 +120,18 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
             ),
             onPressed: () async {
               Navigator.of(ctx).pop(true);
-              final ok = await HistoryService.requestStoragePermission();
+              if (HistoryService.isAndroid11OrHigher) {
+                await HistoryService.requestAllFilesAccessDirectly();
+              } else {
+                await HistoryService.requestStoragePermission();
+              }
+              if (!mounted) return;
+              final ok = await HistoryService.hasStoragePermission();
               if (ok) {
-                if (mounted) {
-                  _loadHistory();
-                  onGranted?.call();
-                }
-              } else if (mounted) {
-                // If not directly granted (e.g. redirected to settings switch), check again or prompt settings
-                final recheck = await HistoryService.hasStoragePermission();
-                if (recheck) {
-                  if (mounted) {
-                    _loadHistory();
-                    onGranted?.call();
-                  }
-                } else if (mounted) {
-                  _showOpenSettingsPrompt();
-                }
+                _loadHistory();
+                onGranted?.call();
+              } else {
+                _showOpenSettingsPrompt();
               }
             },
             child: const Text('Izinkan Akses'),

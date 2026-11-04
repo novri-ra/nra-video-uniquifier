@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:storage_space/storage_space.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'media_scanner_service.dart';
 
 class VideoExportItem {
@@ -165,6 +166,71 @@ class HistoryService {
       }
     } catch (_) {
       return false;
+    }
+  }
+
+  /// 4-Tier Intent Dispatcher for MANAGE_EXTERNAL_STORAGE on Android 11+:
+  /// Tier 1: Action 'android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION' with package URI.
+  /// Tier 2: Fallback to 'android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION'.
+  /// Tier 3: Fallback to 'android.settings.APPLICATION_DETAILS_SETTINGS' with package URI.
+  /// Tier 4: Fallback to openAppSettings() via permission_handler.
+  static Future<void> requestAllFilesAccessDirectly() async {
+    if (!Platform.isAndroid) return;
+    const packageName = 'id.novrira.videouniquifier';
+
+    // Tier 1: App-specific All Files Access screen
+    try {
+      final tier1Uri = Uri.parse(
+        'android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION:package:$packageName',
+      );
+      if (await canLaunchUrl(tier1Uri)) {
+        final launched = await launchUrl(
+          tier1Uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (launched) return;
+      }
+    } catch (e) {
+      debugPrint('[HistoryService] Tier 1 intent failed: $e');
+    }
+
+    // Tier 2: General All Files Access settings list
+    try {
+      final tier2Uri = Uri.parse(
+        'android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION:',
+      );
+      if (await canLaunchUrl(tier2Uri)) {
+        final launched = await launchUrl(
+          tier2Uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (launched) return;
+      }
+    } catch (e) {
+      debugPrint('[HistoryService] Tier 2 intent failed: $e');
+    }
+
+    // Tier 3: App details settings
+    try {
+      final tier3Uri = Uri.parse(
+        'android.settings.APPLICATION_DETAILS_SETTINGS:package:$packageName',
+      );
+      if (await canLaunchUrl(tier3Uri)) {
+        final launched = await launchUrl(
+          tier3Uri,
+          mode: LaunchMode.externalApplication,
+        );
+        if (launched) return;
+      }
+    } catch (e) {
+      debugPrint('[HistoryService] Tier 3 intent failed: $e');
+    }
+
+    // Tier 4: Standard permission_handler openAppSettings()
+    try {
+      await openAppSettings();
+    } catch (e) {
+      debugPrint('[HistoryService] Tier 4 openAppSettings failed: $e');
     }
   }
 
