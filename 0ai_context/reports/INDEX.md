@@ -33,6 +33,7 @@
 | 30 | 30-phase-1-critical-engine-retention-repairs.md | 2026-11-05 | fix | Implement critical P1 fixes: amix audio drop resolution (weights=1 0.001), sub-perceptual pitch bounds (0.985-1.015), dynamic sharpening wiring, physical storage check via storage_space, and eliminate _simulateFallback fake files |
 | 31 | 31-phase-2-3-evasion-and-native-intent.md | 2026-11-05 | feature | Implement Phase 2 & 3: dynamic GOP jittering, micro color matrix shifting, SEI NAL unit software leak sanitization, inaudible psychoacoustic dither, and 4-tier native intent dispatcher for MANAGE_EXTERNAL_STORAGE |
 | 32 | 32-phase-4-5-wcag-language-and-real-data.md | 2026-11-05 | fix | Implement Phase 4 & 5: WCAG 2.2 AAA contrast token repair, English language standardization, background Isolate SHA-256 calculation, dynamic render estimation, and dynamic mutation manifest |
+| 33 | 33-release-v1.0.1-production.md | 2026-11-05 | release | Official production release v1.0.1 (Build 2), SemVer bump, merge to main, git tag v1.0.1, release APK build, and clean target device installation |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
