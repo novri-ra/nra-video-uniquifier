@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -134,6 +135,27 @@ class HistoryService {
       }
     } catch (_) {}
     return true; // Default to true on modern Android
+  }
+
+  /// Returns Android SDK int using device_info_plus (fallback to osVersion parse).
+  static Future<int> getAndroidSdkVersion() async {
+    if (!Platform.isAndroid) return 0;
+    try {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      return androidInfo.version.sdkInt;
+    } catch (_) {
+      try {
+        final osVersion = Platform.operatingSystemVersion;
+        final apiMatch = RegExp(
+          r'API\s*(\d+)',
+          caseSensitive: false,
+        ).firstMatch(osVersion);
+        if (apiMatch != null) {
+          return int.tryParse(apiMatch.group(1) ?? '') ?? 30;
+        }
+      } catch (_) {}
+      return 30;
+    }
   }
 
   /// Checks whether storage permissions are granted.

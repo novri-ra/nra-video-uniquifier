@@ -47,8 +47,19 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && mounted) {
+      _verifyStoragePermissionOnResume();
       _loadHistory();
     }
+  }
+
+  Future<void> _verifyStoragePermissionOnResume() async {
+    if (!mounted || !Platform.isAndroid) return;
+    try {
+      final isGranted = await Permission.manageExternalStorage.isGranted;
+      if (isGranted && mounted) {
+        setState(() {});
+      }
+    } catch (_) {}
   }
 
   Future<void> _checkStoragePermissionOnMount() async {

@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.3.3
   html: ^0.15.4
   image: ^4.3.0
+  device_info_plus: ^12.4.0
 
 dev_dependencies:
   flutter_test:
