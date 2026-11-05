@@ -164,9 +164,9 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         const Icon(Icons.layers_rounded, color: queueColor, size: 20),
         Semantics(
           button: true,
-          label: 'Tambah ke antrean batch',
+          label: 'Add to batch queue',
           child: Tooltip(
-            message: 'Tambah ke antrean batch',
+            message: 'Add to batch queue',
             child: GestureDetector(
               onTap: widget.onTap,
               behavior: HitTestBehavior.opaque,
@@ -237,7 +237,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         : AppColors.lightOnSurfaceVariant;
     const countColor = AppColors.persimmonOrange;
     final l10n = AppLocalizations.of(context);
-    final queueLabel = l10n?.queueReady ?? 'SIAP ANTREAN';
+    final queueLabel = l10n?.queueReady ?? 'QUEUE READY';
 
     return Center(
       child: Column(
@@ -282,7 +282,7 @@ class _BentoQueueCardState extends State<_BentoQueueCard> {
         ),
         Text(
           widget.queue.hasItems
-              ? '${widget.queue.completedCount}/${widget.queue.totalCount} Selesai • Buka'
+              ? '${widget.queue.completedCount}/${widget.queue.totalCount} Completed • Open'
               : emptyText,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

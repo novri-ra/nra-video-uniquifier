@@ -145,7 +145,7 @@ class _DiagnosticsCard extends StatelessWidget {
   Future<void> _testNotification(BuildContext context) async {
     await NotificationService.showTestNotification(
       title: 'NRA Uniquifier Test',
-      body: 'Notifikasi Android 13+ channel berhasil aktif!',
+      body: 'Android 13+ notification channel active!',
     );
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(

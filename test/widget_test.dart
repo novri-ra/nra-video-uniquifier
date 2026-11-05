@@ -563,7 +563,10 @@ void main() {
 
         // Verify search bar and YouTube-style keyword filter chips render
         expect(find.byType(TextField), findsOneWidget);
-        expect(find.text('Cari panduan 4K, tren, kurasi...'), findsOneWidget);
+        expect(
+          find.text('Search 4K guides, trends, curation...'),
+          findsOneWidget,
+        );
         expect(find.text('All'), findsOneWidget);
         expect(find.text('Shutterstock'), findsOneWidget);
 
@@ -599,25 +602,28 @@ void main() {
           find.textContaining('Adobe Stock has officially'),
           findsOneWidget,
         );
-        expect(find.text('KEY TAKEAWAYS / REKOMENDASI CEPAT'), findsOneWidget);
-        expect(find.text('PARAMETER TEKNIS REKOMENDASI'), findsOneWidget);
         expect(
-          find.text('CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)'),
+          find.text('KEY TAKEAWAYS / QUICK RECOMMENDATIONS'),
           findsOneWidget,
         );
-        expect(find.text('Buka Sumber'), findsOneWidget);
+        expect(find.text('RECOMMENDED TECHNICAL PARAMETERS'), findsOneWidget);
+        expect(
+          find.text('CONTRIBUTOR CHECKLIST (100% CURATION PASS)'),
+          findsOneWidget,
+        );
+        expect(find.text('Open Source'), findsOneWidget);
 
         // Verify translation toggle in reader sheet
-        final translateBtn = find.text('Terjemahkan Artikel (ID)');
+        final translateBtn = find.text('Translate Article (ID)');
         expect(translateBtn, findsOneWidget);
         await tester.tap(translateBtn);
         await tester.pumpAndSettle();
-        expect(find.text('Tampilkan Asli'), findsOneWidget);
+        expect(find.text('Show Original'), findsOneWidget);
 
         // Revert back
-        await tester.tap(find.text('Tampilkan Asli'));
+        await tester.tap(find.text('Show Original'));
         await tester.pumpAndSettle();
-        expect(find.text('Terjemahkan Artikel (ID)'), findsOneWidget);
+        expect(find.text('Translate Article (ID)'), findsOneWidget);
 
         // Close reader sheet
         await tester.tap(find.byTooltip('Close reader'));
@@ -694,7 +700,7 @@ void main() {
 
         // Card 4: Asset Staging queue stacked cards & + button
         expect(find.text('0'), findsOneWidget);
-        expect(find.text('SIAP ANTREAN'), findsOneWidget);
+        expect(find.text('QUEUE READY'), findsOneWidget);
         expect(find.byIcon(Icons.add), findsOneWidget);
       },
     );

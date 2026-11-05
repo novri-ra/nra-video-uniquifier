@@ -114,6 +114,7 @@ class UniquifierProvider extends ChangeNotifier
       final thermThrot = await SettingsService.getThermalThrottle();
       final sharpLvl = await SettingsService.getSharpeningLevel();
       final satLvl = await SettingsService.getSaturationLevel();
+      final rotAngle = await SettingsService.getRotateAngle();
       final tgtFps = await SettingsService.getTargetFps();
 
       internalSetModifiersFromSettings(
@@ -140,6 +141,7 @@ class UniquifierProvider extends ChangeNotifier
         thermalThrottle: thermThrot,
         sharpeningLevel: sharpLvl,
         saturationLevel: satLvl,
+        rotateAngle: rotAngle,
         targetFps: tgtFps,
       );
 
@@ -148,7 +150,9 @@ class UniquifierProvider extends ChangeNotifier
       }
     } catch (e, stackTrace) {
       if (!_isDisposed) {
-        debugPrint('[UniquifierProvider] Inisialisasi gagal: $e\n$stackTrace');
+        debugPrint(
+          '[UniquifierProvider] Initialization failed: $e\n$stackTrace',
+        );
       }
     }
   }

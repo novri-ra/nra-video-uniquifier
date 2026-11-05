@@ -131,7 +131,7 @@ class _NewsSearchAndFilterBarState extends State<NewsSearchAndFilterBar> {
             },
             style: TextStyle(color: textColor, fontSize: 13.5),
             decoration: InputDecoration(
-              hintText: 'Cari panduan 4K, tren, kurasi...',
+              hintText: 'Search 4K guides, trends, curation...',
               hintStyle: TextStyle(color: hintColor, fontSize: 13),
               prefixIcon: Icon(
                 Icons.search_rounded,

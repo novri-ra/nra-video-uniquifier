@@ -483,7 +483,7 @@ class _ArticleContentList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                'Ringkasan singkat. Ketuk "Buka Sumber" untuk membaca artikel lengkap di ${article.source}.',
+                'Short summary. Tap "Open Source" to read the full article on ${article.source}.',
                 style: TextStyle(
                   color: isDark
                       ? AppColors.outline
@@ -766,7 +766,7 @@ class _HeaderBar extends StatelessWidget {
                 ),
                 onPressed: () =>
                     UserNewsBookmarkService.toggleBookmark(articleId),
-                tooltip: isBookmarked ? 'Hapus simpanan' : 'Simpan artikel',
+                tooltip: isBookmarked ? 'Remove bookmark' : 'Bookmark article',
                 visualDensity: VisualDensity.compact,
               );
             },
@@ -815,7 +815,7 @@ class _ActionToolbar extends StatelessWidget {
         TextButton.icon(
           onPressed: onOpenBrowser,
           icon: const Icon(Icons.open_in_browser_rounded, size: 15),
-          label: const Text('Buka Sumber', style: TextStyle(fontSize: 11)),
+          label: const Text('Open Source', style: TextStyle(fontSize: 11)),
           style: TextButton.styleFrom(
             foregroundColor: isDark ? AppColors.mintSage : AppColors.forestDeep,
             visualDensity: VisualDensity.compact,

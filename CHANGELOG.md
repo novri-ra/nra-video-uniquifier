@@ -1,6 +1,12 @@
 # Changelog
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-05
+- feat(ui): implement InteractivePreviewSlider with 60 FPS real-time floating preview overlay
+- feat(controls): wire manual sliders for crop zoom, micro-rotation, sharpening, saturation, and canvas scale
+- fix(success): resolve missing thumbnail display on SuccessScreen with robust fallback
+- test: expand test suite to 185 passing tests covering slider overlay lifecycles
+
 ## [1.0.2] - 2026-11-05
 - feat(storage): implement WidgetsBindingObserver for real-time permission sync on resume
 - feat(storage): integrate device_info_plus for dynamic Android SDK version detection

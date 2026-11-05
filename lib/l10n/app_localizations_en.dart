@@ -196,7 +196,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storageAvailable => 'AVAILABLE';
 
   @override
-  String get queueReady => 'SIAP ANTREAN';
+  String get queueReady => 'QUEUE READY';
 
   @override
   String get readyToUpload => 'Ready to Upload • Tap +';

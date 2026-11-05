@@ -69,7 +69,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
           content: Text(
             e is TranslationOfflineException
                 ? e.message
-                : 'Gagal menerjemahkan berita',
+                : 'Failed to translate news',
           ),
           behavior: SnackBarBehavior.floating,
         ),
@@ -433,7 +433,7 @@ class _TranslateButton extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  isTranslated ? 'Tampilkan Asli' : 'Terjemahkan (ID)',
+                  isTranslated ? 'Show Original' : 'Translate (ID)',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

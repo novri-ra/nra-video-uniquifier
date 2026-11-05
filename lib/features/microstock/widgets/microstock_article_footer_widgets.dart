@@ -52,10 +52,10 @@ class ArticleTranslateButton extends StatelessWidget {
             Flexible(
               child: Text(
                 isTranslating
-                    ? 'Menerjemahkan...'
+                    ? 'Translating...'
                     : (isTranslated
-                          ? 'Tampilkan Asli'
-                          : 'Terjemahkan Artikel (ID)'),
+                          ? 'Show Original'
+                          : 'Translate Article (ID)'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -90,7 +90,7 @@ class ArticleFooterSourceBox extends StatelessWidget {
         ? Icons.public_outlined
         : Icons.verified_outlined;
     final label = isExternalSource
-        ? 'Dipublikasikan oleh ${article.source} • Sumber Eksternal'
+        ? 'Published by ${article.source} • External Source'
         : 'Verified Microstock Guideline • ${article.source}';
 
     return Container(

@@ -337,7 +337,7 @@ class HistoryService {
           deletedPaths.add(item.file.path);
         }
       } catch (e) {
-        debugPrint('Gagal menghapus file: ${item.file.path}, err:$e');
+        debugPrint('Failed to delete file: ${item.file.path}, err:$e');
       }
     }
     return deletedPaths;

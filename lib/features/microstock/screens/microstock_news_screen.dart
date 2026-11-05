@@ -259,7 +259,7 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tidak ada berita atau panduan sesuai filter',
+              'No articles or guides matching current filter',
               style: TextStyle(
                 color: isDark
                     ? AppColors.onSurfaceVariant

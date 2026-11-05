@@ -159,6 +159,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       cropZoomScale: provider.cropZoomScale,
       cropAnchor: provider.cropAnchor,
       introTrimOffset: provider.introTrimOffset,
+      rotateAngle: provider.rotateAngle,
       onProgress: (p, speed, timeMs) =>
           _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
@@ -281,17 +282,17 @@ class _CentralModuleCard extends StatelessWidget {
   const _CentralModuleCard({required this.progress, required this.step});
 
   String _getStageDescription(double p) {
-    if (p < 0.10) return 'Menyiapkan staging environment & membaca metadata...';
+    if (p < 0.10) return 'Preparing staging environment & reading metadata...';
     if (p < 0.30) {
-      return 'Menerapkan transformasi spasial, micro-trim & rotasi...';
+      return 'Applying spatial transform, micro-trim & rotation...';
     }
     if (p < 0.75) {
-      return 'Memproses rendering filtergraph & penajaman kanonikal...';
+      return 'Rendering filtergraph & canonical sharpening...';
     }
     if (p < 0.95) {
-      return 'Mengompresi video fidelitas tinggi (CRF 17) & enkoding audio...';
+      return 'Encoding high-fidelity video (CRF 17) & audio stream...';
     }
-    return 'Menyinkronkan ke galeri publik (MediaStore) & membersihkan cache...';
+    return 'Syncing to public MediaStore gallery & cleaning cache...';
   }
 
   @override

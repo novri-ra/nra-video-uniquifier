@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @queueReady.
   ///
   /// In en, this message translates to:
-  /// **'SIAP ANTREAN'**
+  /// **'QUEUE READY'**
   String get queueReady;
 
   /// No description provided for @readyToUpload.

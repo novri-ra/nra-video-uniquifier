@@ -100,7 +100,7 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '• REKOMENDASI TERKINI',
+                    '• LATEST RECOMMENDATIONS',
                     style: TextStyle(
                       color: isDark
                           ? AppColors.outline
