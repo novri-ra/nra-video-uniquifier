@@ -44,6 +44,7 @@ class AppColors {
   static const Color surfaceContainer = Color(0xFF22302D);
   static const Color surfaceContainerHigh = Color(0xFF2D3E3A);
   static const Color surfaceContainerHighest = Color(0xFF3B4E4A);
+  static const Color surfaceVariant = Color(0xFF2A3A37);
 
   // Mint / Emerald Accents
   static const Color primary = Color(0xFFA3EFD5);

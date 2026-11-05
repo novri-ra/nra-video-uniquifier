@@ -127,6 +127,7 @@ class SettingsService {
   static const String keyThermalThrottle = 'app_thermal_throttle';
   static const String keySharpeningLevel = 'app_sharpening_level';
   static const String keySaturationLevel = 'app_saturation_level';
+  static const String keyRotateAngle = 'app_rotate_angle';
   static const String keyTargetFps = 'app_target_fps';
   static const String keyAppLocale = 'app_language_code';
   static const String keyAppTheme = 'app_theme_mode';
@@ -249,6 +250,16 @@ class SettingsService {
   static Future<void> setSaturationLevel(double val) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(keySaturationLevel, val);
+  }
+
+  static Future<double> getRotateAngle() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(keyRotateAngle) ?? 0.0;
+  }
+
+  static Future<void> setRotateAngle(double val) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(keyRotateAngle, val);
   }
 
   static Future<int> getTargetFps() async {

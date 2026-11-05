@@ -12,6 +12,7 @@ class FilterBuilders {
     bool enableDeepAntiFingerprint = true,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
+    double? rotateAngle,
   }) {
     final (targetW, targetH) = canonicalDimensions(
       targetResolution,
@@ -28,6 +29,7 @@ class FilterBuilders {
       enableDeepAntiFingerprint,
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
+      rotateAngle: rotateAngle,
     );
     final fgSpatial = spatialList.isNotEmpty ? '${spatialList.join(',')},' : '';
     return '[0:v]split=2[bg][fg];'
@@ -151,6 +153,7 @@ class FilterBuilders {
     bool deep, {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
+    double? rotateAngle,
   }) {
     if (!modifyVisuals) return const [];
     final List<String> list = [];
@@ -164,12 +167,21 @@ class FilterBuilders {
       );
     }
     if (!deep) {
+      if (rotateAngle != null && rotateAngle.abs() > 0.01) {
+        final rot = '${rotateAngle.toStringAsFixed(3)}*PI/180';
+        list.add(
+          'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
+        );
+      }
       if (list.isEmpty) list.add('crop=trunc(iw*0.98/2)*2:trunc(ih*0.98/2)*2');
       return list;
     }
     final keep = (1.0 - vars.cropPercent).toStringAsFixed(4);
     final off = (vars.cropPercent / 2.0).toStringAsFixed(4);
-    final rot = '${vars.rotateAngle.toStringAsFixed(3)}*PI/180';
+    final effectiveRot = (rotateAngle != null && rotateAngle.abs() > 0.01)
+        ? rotateAngle
+        : vars.rotateAngle;
+    final rot = '${effectiveRot.toStringAsFixed(3)}*PI/180';
     list.addAll([
       'crop=trunc(iw*$keep/2)*2:trunc(ih*$keep/2)*2:trunc(iw*$off/2)*2:trunc(ih*$off/2)*2',
       'rotate=$rot:ow=trunc(iw*0.96/2)*2:oh=trunc(ih*0.96/2)*2:c=none',
@@ -196,6 +208,7 @@ class FilterBuilders {
     double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
+    double? rotateAngle,
   }) {
     final (targetW, targetH) = canonicalDimensions(
       targetResolution,
@@ -221,6 +234,7 @@ class FilterBuilders {
         enableDeepAntiFingerprint,
         cropZoomScale: cropZoomScale,
         cropAnchor: cropAnchor,
+        rotateAngle: rotateAngle,
       ),
       if (enableHorizontalFlip) 'hflip',
       if (enableDynamicZoom)
@@ -311,6 +325,7 @@ class FilterBuilders {
     double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
+    double? rotateAngle,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
@@ -320,7 +335,7 @@ class FilterBuilders {
               ? VariationGenerator.generate()
               : VideoVariations.fallback);
       final vfString = enableBlurredCanvas
-          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution, vars: vars, modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel, sharpeningLevel: sharpeningLevel).join(',')}'
+          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution, vars: vars, modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor, rotateAngle: rotateAngle)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel, sharpeningLevel: sharpeningLevel).join(',')}'
           : _buildFiltersList(
               modifyVisuals: modifyVisuals,
               enableDeepAntiFingerprint: enableDeepAntiFingerprint,
@@ -340,6 +355,7 @@ class FilterBuilders {
               sharpeningLevel: sharpeningLevel,
               cropZoomScale: cropZoomScale,
               cropAnchor: cropAnchor,
+              rotateAngle: rotateAngle,
             ).join(',');
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';

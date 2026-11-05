@@ -114,6 +114,7 @@ class UniquifierProvider extends ChangeNotifier
       final thermThrot = await SettingsService.getThermalThrottle();
       final sharpLvl = await SettingsService.getSharpeningLevel();
       final satLvl = await SettingsService.getSaturationLevel();
+      final rotAngle = await SettingsService.getRotateAngle();
       final tgtFps = await SettingsService.getTargetFps();
 
       internalSetModifiersFromSettings(
@@ -140,6 +141,7 @@ class UniquifierProvider extends ChangeNotifier
         thermalThrottle: thermThrot,
         sharpeningLevel: sharpLvl,
         saturationLevel: satLvl,
+        rotateAngle: rotAngle,
         targetFps: tgtFps,
       );
 

@@ -60,6 +60,7 @@ class FfmpegService {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
+    double? rotateAngle,
   }) => FfmpegCommandBuilder.buildCommand(
     inputPath: inputPath,
     outputPath: outputPath,
@@ -94,6 +95,7 @@ class FfmpegService {
     cropZoomScale: cropZoomScale,
     cropAnchor: cropAnchor,
     introTrimOffset: introTrimOffset,
+    rotateAngle: rotateAngle,
   );
 
   /// Cancels any currently running FFmpeg operations.
@@ -181,6 +183,7 @@ class FfmpegService {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
+    double? rotateAngle,
   }) async {
     if (!await StorageService.hasEnoughSpace()) {
       throw Exception(
@@ -230,6 +233,7 @@ class FfmpegService {
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
       introTrimOffset: introTrimOffset,
+      rotateAngle: rotateAngle,
     );
 
     _setupCallbacks(

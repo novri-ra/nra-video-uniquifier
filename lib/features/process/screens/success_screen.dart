@@ -167,7 +167,14 @@ class _SuccessScreenState extends State<SuccessScreen> {
         : 'UQ_video_output.mp4';
     final directoryPath =
         effectivePath ?? '/storage/emulated/0/Movies/Uniquifier';
-    final thumbPath = provider.outputThumbnailPath;
+    final outputThumb = provider.outputThumbnailPath;
+    final hasOutputThumb =
+        outputThumb != null && File(outputThumb).existsSync();
+    final inputThumb = provider.thumbnailPath;
+    final hasInputThumb = inputThumb != null && File(inputThumb).existsSync();
+    final thumbPath = hasOutputThumb
+        ? outputThumb
+        : (hasInputThumb ? inputThumb : null);
     final activeMutations = _buildActiveMutations(provider);
 
     return Scaffold(

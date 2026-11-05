@@ -159,6 +159,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       cropZoomScale: provider.cropZoomScale,
       cropAnchor: provider.cropAnchor,
       introTrimOffset: provider.introTrimOffset,
+      rotateAngle: provider.rotateAngle,
       onProgress: (p, speed, timeMs) =>
           _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,

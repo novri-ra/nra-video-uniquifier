@@ -168,6 +168,15 @@ class _ThumbnailReadyBadge extends StatelessWidget {
         : AppColors.hairlineBorder;
     final badgeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
+    Widget placeholder() {
+      return Container(
+        color: AppColors.surfaceVariant,
+        child: const Center(
+          child: Icon(Icons.videocam, color: AppColors.outline, size: 32),
+        ),
+      );
+    }
+
     return Container(
       width: 80,
       height: 80,
@@ -188,11 +197,10 @@ class _ThumbnailReadyBadge extends StatelessWidget {
               cacheWidth: 240,
               cacheHeight: 240,
               fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => placeholder(),
             )
           else
-            const Center(
-              child: Icon(Icons.videocam, color: AppColors.outline, size: 32),
-            ),
+            placeholder(),
           Positioned(
             top: 4,
             left: 4,

@@ -20,7 +20,8 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
       _cropZoomScale = 1.08,
       _introTrimOffset = 0.5,
       _sharpeningLevel = 1.0,
-      _saturationLevel = 1.0;
+      _saturationLevel = 1.0,
+      _rotateAngle = 0.0;
   String _cropAnchor = 'top', _activePreset = 'TikTok Fast';
   bool _thermalThrottle = false, _hardwareAcceleration = true;
   int _targetFps = 30, _currentTabIndex = 0;
@@ -52,6 +53,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
   bool get thermalThrottle => _thermalThrottle;
   double get sharpeningLevel => _sharpeningLevel;
   double get saturationLevel => _saturationLevel;
+  double get rotateAngle => _rotateAngle;
   int get targetFps => _targetFps;
   String get activePreset => _activePreset;
   TargetResolution get targetResolution => _targetResolution;
@@ -87,6 +89,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     required bool thermalThrottle,
     required double sharpeningLevel,
     required double saturationLevel,
+    double rotateAngle = 0.0,
     required int targetFps,
   }) {
     _targetResolution = targetResolution;
@@ -112,6 +115,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     _thermalThrottle = thermalThrottle;
     _sharpeningLevel = sharpeningLevel;
     _saturationLevel = saturationLevel;
+    _rotateAngle = rotateAngle;
     _targetFps = targetFps;
   }
 
@@ -296,6 +300,14 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     _saturationLevel = val.clamp(0.8, 1.3);
     try {
       SettingsService.setSaturationLevel(_saturationLevel);
+    } catch (_) {}
+    notifyListeners();
+  }
+
+  void setRotateAngle(double val) {
+    _rotateAngle = double.parse(val.clamp(-2.0, 2.0).toStringAsFixed(2));
+    try {
+      SettingsService.setRotateAngle(_rotateAngle);
     } catch (_) {}
     notifyListeners();
   }

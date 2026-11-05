@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../shared/widgets/interactive_preview_slider.dart';
 
 /// Control card for manual zoom scale, anchor pill selection, and intro cut slider.
 class StudioCustomSlidersCard extends StatelessWidget {
@@ -15,7 +16,6 @@ class StudioCustomSlidersCard extends StatelessWidget {
     final borderCol = isDark
         ? AppColors.outlineVariant
         : AppColors.lightOutlineVariant;
-    final zoomAccent = isDark ? AppColors.electricIce : AppColors.forestDeep;
     final trimAccent = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
@@ -29,49 +29,16 @@ class StudioCustomSlidersCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.center_focus_strong, size: 16, color: zoomAccent),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'ZOOM & FACE FOCUS (CROP)',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.outline
-                        : AppColors.lightOnSurfaceVariant,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.6,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${provider.cropZoomScale.toStringAsFixed(2)}x',
-                style: TextStyle(
-                  color: zoomAccent,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'monospace',
-                ),
-              ),
-            ],
-          ),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: zoomAccent,
-              thumbColor: zoomAccent,
-              trackHeight: 3,
-            ),
-            child: Slider(
-              value: provider.cropZoomScale,
-              min: 1.0,
-              max: 1.5,
-              divisions: 10,
-              onChanged: provider.setCropZoomScale,
-            ),
+          InteractivePreviewSlider(
+            value: provider.cropZoomScale,
+            min: 1.0,
+            max: 1.5,
+            divisions: 10,
+            label: '${provider.cropZoomScale.toStringAsFixed(2)}x',
+            parameterName: 'ZOOM & FACE FOCUS (CROP)',
+            effect: PreviewEffect.cropZoom,
+            thumbnailPath: provider.thumbnailPath,
+            onChanged: provider.setCropZoomScale,
           ),
           const SizedBox(height: 4),
           Wrap(
@@ -107,6 +74,19 @@ class StudioCustomSlidersCard extends StatelessWidget {
                 isDark: isDark,
               ),
             ],
+          ),
+          const SizedBox(height: 12),
+          InteractivePreviewSlider(
+            value: provider.rotateAngle,
+            min: -2.0,
+            max: 2.0,
+            divisions: 40,
+            label:
+                '${provider.rotateAngle >= 0 ? '+' : ''}${provider.rotateAngle.toStringAsFixed(1)}°',
+            parameterName: 'MICRO-ROTATION / TILT',
+            effect: PreviewEffect.microRotation,
+            thumbnailPath: provider.thumbnailPath,
+            onChanged: provider.setRotateAngle,
           ),
           if (provider.enableAutoTrim) ...[
             const SizedBox(height: 12),

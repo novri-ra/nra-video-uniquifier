@@ -43,6 +43,7 @@ class FfmpegCommandBuilder {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
+    double? rotateAngle,
   }) {
     final vars =
         variations ??
@@ -88,6 +89,7 @@ class FfmpegCommandBuilder {
       sharpeningLevel: sharpeningLevel,
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
+      rotateAngle: rotateAngle,
     );
     if (outputPath.toLowerCase().endsWith('.mp4')) {
       buffer.write(' -bsf:v filter_units=remove_types=6');
@@ -149,6 +151,7 @@ class FfmpegCommandBuilder {
     double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
+    double? rotateAngle,
   }) {
     final vars =
         variations ??
@@ -195,6 +198,7 @@ class FfmpegCommandBuilder {
         sharpeningLevel: sharpeningLevel,
         cropZoomScale: cropZoomScale,
         cropAnchor: cropAnchor,
+        rotateAngle: rotateAngle,
       ),
     );
     buffer.write(

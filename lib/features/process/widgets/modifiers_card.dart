@@ -5,7 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/category_accordion_card.dart';
 import '../../../../shared/widgets/setting_fps_selector_row.dart';
-import '../../../../shared/widgets/setting_slider_toggle_row.dart';
+import '../../../../shared/widgets/interactive_preview_slider.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 import 'studio_custom_sliders_card.dart';
 
@@ -336,16 +336,32 @@ class ModifiersCard extends StatelessWidget {
               totalCount: 5,
               initiallyExpanded: true,
               children: [
-                SettingSliderToggleRow(
+                SettingToggleRow(
                   icon: Icons.blur_on,
                   title: 'Blurred Canvas Frame',
                   subtitle: 'Padded background blur',
                   value: provider.enableBlurredCanvas,
                   onChanged: provider.toggleBlurredCanvas,
-                  sliderValue: provider.canvasScalePercent,
-                  sliderLabel: 'Scale: ${provider.canvasScalePercent.toInt()}%',
-                  onSliderChanged: provider.setCanvasScalePercent,
                 ),
+                if (provider.enableBlurredCanvas) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    child: InteractivePreviewSlider(
+                      value: provider.canvasScalePercent.clamp(70.0, 100.0),
+                      min: 70.0,
+                      max: 100.0,
+                      divisions: 30,
+                      label: '${provider.canvasScalePercent.toInt()}%',
+                      parameterName: 'BLURRED CANVAS SCALE',
+                      effect: PreviewEffect.canvasScale,
+                      thumbnailPath: provider.thumbnailPath,
+                      onChanged: provider.setCanvasScalePercent,
+                    ),
+                  ),
+                ],
                 const Divider(
                   color: AppColors.surfaceContainerHighest,
                   height: 1,
@@ -372,39 +388,47 @@ class ModifiersCard extends StatelessWidget {
                   color: AppColors.surfaceContainerHighest,
                   height: 1,
                 ),
-                SettingSliderToggleRow(
-                  icon: Icons.deblur,
-                  title:
-                      AppLocalizations.of(context)?.sharpeningLabel ??
-                      'Sharpening Level',
-                  subtitle: 'Adjust unsharp mask intensity',
-                  value: true,
-                  onChanged: (_) {},
-                  sliderValue: provider.sharpeningLevel * 100,
-                  min: 20.0,
-                  max: 200.0,
-                  sliderLabel:
-                      '${provider.sharpeningLevel.toStringAsFixed(1)}x',
-                  onSliderChanged: (v) => provider.setSharpeningLevel(v / 100),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: InteractivePreviewSlider(
+                    value: provider.sharpeningLevel.clamp(0.1, 2.0),
+                    min: 0.1,
+                    max: 2.0,
+                    divisions: 19,
+                    label: '${provider.sharpeningLevel.toStringAsFixed(1)}x',
+                    parameterName:
+                        AppLocalizations.of(context)?.sharpeningLabel ??
+                        'SHARPENING INTENSITY',
+                    effect: PreviewEffect.sharpening,
+                    thumbnailPath: provider.thumbnailPath,
+                    onChanged: provider.setSharpeningLevel,
+                  ),
                 ),
                 const Divider(
                   color: AppColors.surfaceContainerHighest,
                   height: 1,
                 ),
-                SettingSliderToggleRow(
-                  icon: Icons.color_lens_outlined,
-                  title:
-                      AppLocalizations.of(context)?.saturationLabel ??
-                      'Saturation Level',
-                  subtitle: 'Color intensity control',
-                  value: true,
-                  onChanged: (_) {},
-                  sliderValue: provider.saturationLevel * 100,
-                  min: 80.0,
-                  max: 130.0,
-                  sliderLabel:
-                      '${provider.saturationLevel.toStringAsFixed(2)}x',
-                  onSliderChanged: (v) => provider.setSaturationLevel(v / 100),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: InteractivePreviewSlider(
+                    value: provider.saturationLevel.clamp(0.8, 1.3),
+                    min: 0.8,
+                    max: 1.3,
+                    divisions: 10,
+                    label: '${provider.saturationLevel.toStringAsFixed(2)}x',
+                    parameterName:
+                        AppLocalizations.of(context)?.saturationLabel ??
+                        'SATURATION / VIBRANCE',
+                    effect: PreviewEffect.saturation,
+                    thumbnailPath: provider.thumbnailPath,
+                    onChanged: provider.setSaturationLevel,
+                  ),
                 ),
               ],
             ),
