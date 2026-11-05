@@ -114,7 +114,7 @@ class _TitleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = isDark ? AppColors.primaryContainer : AppColors.lightPrimary;
+    final accent = isDark ? AppColors.mintSage : AppColors.lightPrimary;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
 
     return Row(

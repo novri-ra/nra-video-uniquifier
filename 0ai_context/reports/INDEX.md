@@ -32,6 +32,7 @@
 | 29 | 29-super-power-deep-audit-complete-system.md | 2026-11-05 | audit | Super Power Deep Audit: complete system architecture, visual/audio retention, cutting-edge bot evasion research, preset integrity, native Android 1-click intent, WCAG 2.2 contrast, i18n, and commercial paid app readiness |
 | 30 | 30-phase-1-critical-engine-retention-repairs.md | 2026-11-05 | fix | Implement critical P1 fixes: amix audio drop resolution (weights=1 0.001), sub-perceptual pitch bounds (0.985-1.015), dynamic sharpening wiring, physical storage check via storage_space, and eliminate _simulateFallback fake files |
 | 31 | 31-phase-2-3-evasion-and-native-intent.md | 2026-11-05 | feature | Implement Phase 2 & 3: dynamic GOP jittering, micro color matrix shifting, SEI NAL unit software leak sanitization, inaudible psychoacoustic dither, and 4-tier native intent dispatcher for MANAGE_EXTERNAL_STORAGE |
+| 32 | 32-phase-4-5-wcag-language-and-real-data.md | 2026-11-05 | fix | Implement Phase 4 & 5: WCAG 2.2 AAA contrast token repair, English language standardization, background Isolate SHA-256 calculation, dynamic render estimation, and dynamic mutation manifest |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

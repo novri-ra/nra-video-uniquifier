@@ -81,13 +81,13 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           children: [
             Icon(
               Icons.folder_shared_outlined,
-              color: AppColors.primaryContainer,
+              color: AppColors.mintSage,
               size: 22,
             ),
             SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Izin Kelola Berkas',
+                'File Management Permission',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -98,7 +98,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           ],
         ),
         content: const Text(
-          'Untuk memindai, mengelola, dan menghapus video ekspor dari folder publik secara permanen, Android memerlukan izin "Akses Semua Berkas" (All Files Access).\n\nAktifkan izin ini pada menu pengaturan yang akan terbuka.',
+          'To scan, manage, and permanently delete exported videos from shared storage, Android requires "All Files Access" permission.\n\nPlease enable this permission on the settings screen that opens.',
           style: TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 13,
@@ -109,7 +109,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: const Text(
-              'Nanti',
+              'Later',
               style: TextStyle(color: AppColors.outline),
             ),
           ),
@@ -134,7 +134,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
                 _showOpenSettingsPrompt();
               }
             },
-            child: const Text('Izinkan Akses'),
+            child: const Text('Grant Access'),
           ),
         ],
       ),
@@ -156,13 +156,13 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text(
-            'Izin "Akses semua berkas" belum aktif. Buka Pengaturan untuk mengaktifkan.',
+            'All Files Access permission is required. Open Settings to enable.',
           ),
           backgroundColor: AppColors.surfaceContainerHighest,
           behavior: SnackBarBehavior.floating,
           action: SnackBarAction(
-            label: 'Pengaturan',
-            textColor: AppColors.primaryContainer,
+            label: 'Settings',
+            textColor: AppColors.mintSage,
             onPressed: () => openAppSettings(),
           ),
         ),
@@ -235,11 +235,11 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         title: Text(
-          'Hapus $count Video?',
+          'Delete $count Videos?',
           style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
         content: Text(
-          'Apakah Anda yakin ingin menghapus $count video terpilih secara permanen dari perangkat?',
+          'Are you sure you want to permanently delete $count selected videos from this device?',
           style: const TextStyle(
             color: AppColors.onSurfaceVariant,
             fontSize: 13,
@@ -248,12 +248,12 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Batal'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             child: const Text(
-              'Hapus Semua',
+              'Delete All',
               style: TextStyle(color: AppColors.vividCoral),
             ),
           ),
@@ -288,7 +288,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         if (deletedPaths.length == selectedItems.length) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('$count video berhasil dihapus dari perangkat'),
+              content: Text('$count video(s) permanently deleted'),
               backgroundColor: AppColors.surfaceContainerHighest,
               behavior: SnackBarBehavior.floating,
             ),
@@ -297,7 +297,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '${deletedPaths.length} video berhasil dihapus. ${selectedItems.length - deletedPaths.length} video gagal dihapus (periksa izin penyimpanan).',
+                '${deletedPaths.length} video(s) deleted. ${selectedItems.length - deletedPaths.length} failed to delete (verify storage permissions).',
               ),
               backgroundColor: AppColors.surfaceContainerHighest,
               behavior: SnackBarBehavior.floating,
@@ -307,7 +307,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Gagal menghapus video terpilih. Pastikan izin akses penyimpanan telah diberikan.',
+                'Failed to delete selected videos. Ensure storage permissions are granted.',
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -319,7 +319,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Terjadi kesalahan saat menghapus video: $e'),
+            content: Text('Error deleting videos: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -375,7 +375,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Video berhasil dihapus dari perangkat'),
+              content: Text('Video permanently deleted from device'),
               backgroundColor: AppColors.surfaceContainerHighest,
               behavior: SnackBarBehavior.floating,
             ),
@@ -384,7 +384,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                'Gagal menghapus berkas fisik dari penyimpanan. Pastikan izin akses penyimpanan telah diberikan.',
+                'Failed to delete physical file. Ensure storage permissions are granted.',
               ),
               backgroundColor: AppColors.error,
               behavior: SnackBarBehavior.floating,
@@ -396,7 +396,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Terjadi kesalahan saat menghapus video: $e'),
+            content: Text('Error deleting video: $e'),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
