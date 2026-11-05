@@ -1,3 +1,4 @@
+import '../models/unified_effect_preset.dart';
 import '../utils/variation_generator.dart';
 import 'settings_service.dart';
 
@@ -414,5 +415,138 @@ class FilterBuilders {
     } catch (_) {
       return ' -af "asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     }
+  }
+
+  /// Builds unified visual effect filtergraph according to [effect].
+  static String buildUnifiedEffectFilter(
+    UnifiedVisualEffect effect, {
+    double canvasScalePercent = 95.0,
+  }) {
+    switch (effect) {
+      case UnifiedVisualEffect.none:
+        return '';
+      case UnifiedVisualEffect.blurredCanvas:
+        return buildBlurredCanvasEffect(canvasScalePercent: canvasScalePercent);
+      case UnifiedVisualEffect.motionEcho:
+        return buildMotionEchoEffect();
+      case UnifiedVisualEffect.rgbSplit:
+        return buildRgbSplitEffect();
+      case UnifiedVisualEffect.dreamyBloom:
+        return buildDreamyBloomEffect();
+      case UnifiedVisualEffect.film16mm:
+        return build16mmFilmToneEffect();
+      case UnifiedVisualEffect.dynamicGrain:
+        return buildDynamicGrainEffect();
+    }
+  }
+
+  /// 1. Blurred Canvas / Dynamic Split: Kanvas latar blur dengan skala foreground (70% - 100%).
+  static String buildBlurredCanvasEffect({double canvasScalePercent = 95.0}) {
+    final scaleFactor = (canvasScalePercent / 100.0)
+        .clamp(0.70, 1.00)
+        .toStringAsFixed(2);
+    return 'split=2[bg][fg];[bg]boxblur=luma_radius=min(h\\,w)/30:luma_power=2[blurred];[fg]scale=iw*$scaleFactor:ih*$scaleFactor:force_original_aspect_ratio=decrease[fg_scaled];[blurred][fg_scaled]overlay=(W-w)/2:(H-h)/2';
+  }
+
+  /// 2. Temporal Motion Echo / Clone Delay: Filter split multi-layer waktu (setpts=PTS+offset/TB, overlay/blend).
+  static String buildMotionEchoEffect({
+    double delaySeconds = 0.15,
+    double opacity = 0.35,
+  }) {
+    final delay = delaySeconds.toStringAsFixed(3);
+    final op = opacity.toStringAsFixed(2);
+    return 'split=2[orig][delayed];[delayed]setpts=PTS+$delay/TB[echo];[orig][echo]blend=all_mode=addition:all_opacity=$op';
+  }
+
+  /// 3. RGB Temporal Split: Pemisahan kanal warna R, G, B dengan delay waktu (lutrgb, blend=addition).
+  static String buildRgbSplitEffect({
+    double delayGreen = 0.05,
+    double delayBlue = 0.10,
+  }) {
+    final gDelay = delayGreen.toStringAsFixed(3);
+    final bDelay = delayBlue.toStringAsFixed(3);
+    return 'split=3[r][g][b];[r]lutrgb=g=0:b=0[ro];[g]lutrgb=r=0:b=0,setpts=PTS+$gDelay/TB[go];[b]lutrgb=r=0:g=0,setpts=PTS+$bDelay/TB[bo];[ro][go]blend=all_mode=addition[rg];[rg][bo]blend=all_mode=addition';
+  }
+
+  /// 4. Dreamy Bloom / Pro-Mist: Pendaran highlight lembut (gblur, blend=screen).
+  static String buildDreamyBloomEffect({
+    double sigma = 12.0,
+    double opacity = 0.38,
+  }) {
+    final s = sigma.toStringAsFixed(1);
+    final op = opacity.toStringAsFixed(2);
+    return 'split=2[orig][glow];[glow]gblur=sigma=$s:steps=2[glow_blurred];[orig][glow_blurred]blend=all_mode=screen:all_opacity=$op';
+  }
+
+  /// 5. 16mm Nostalgia & Film Tone: Kurva warm vintage (curves, colorbalance).
+  static String build16mmFilmToneEffect() {
+    return 'curves=vintage,colorbalance=rs=0.08:gs=-0.04:bs=-0.08:rm=0.06:gm=0.02:bm=-0.06:rh=0.04:gh=0.0:bh=-0.06,eq=contrast=1.06:saturation=0.92';
+  }
+
+  /// 6. Dynamic Noise / Film Grain: Injeksi bintik dinamis (noise=alls=8:allf=t+u).
+  static String buildDynamicGrainEffect({int strength = 8}) {
+    return 'noise=alls=$strength:allf=t+u';
+  }
+
+  /// Builds lightweight preview filter chain combining active parameters.
+  static String buildPreviewFilterChain({
+    double cropZoomScale = 1.0,
+    String cropAnchor = 'center',
+    double rotateAngle = 0.0,
+    double saturationLevel = 1.0,
+    double sharpeningLevel = 1.0,
+    bool enableBlurredCanvas = false,
+    double canvasScalePercent = 95.0,
+    UnifiedVisualEffect effect = UnifiedVisualEffect.none,
+  }) {
+    final filters = <String>[];
+
+    // 1. Spatial Transforms
+    if (cropZoomScale > 1.001) {
+      final yCrop = cropAnchor == 'top'
+          ? '0'
+          : cropAnchor == 'bottom'
+          ? 'ih-ih/$cropZoomScale'
+          : '(ih-ih/$cropZoomScale)/2';
+      filters.add(
+        'crop=iw/$cropZoomScale:ih/$cropZoomScale:(iw-iw/$cropZoomScale)/2:$yCrop',
+      );
+    }
+    if (rotateAngle.abs() > 0.01) {
+      final rad = (rotateAngle * 3.141592653589793 / 180.0).toStringAsFixed(5);
+      filters.add('rotate=$rad:ow=rotw($rad):oh=roth($rad):c=none');
+    }
+
+    // 2. Color and Detail
+    if ((sharpeningLevel - 1.0).abs() > 0.05) {
+      final luma = (0.6 * sharpeningLevel).clamp(0.1, 2.0).toStringAsFixed(2);
+      filters.add('unsharp=3:3:$luma:3:3:0.0');
+    }
+    if ((saturationLevel - 1.0).abs() > 0.01) {
+      filters.add('eq=saturation=${saturationLevel.toStringAsFixed(3)}');
+    }
+
+    // 3. Effect Suite
+    final effectiveEffect = effect != UnifiedVisualEffect.none
+        ? effect
+        : (enableBlurredCanvas
+              ? UnifiedVisualEffect.blurredCanvas
+              : UnifiedVisualEffect.none);
+
+    if (effectiveEffect != UnifiedVisualEffect.none) {
+      final effectFilter = buildUnifiedEffectFilter(
+        effectiveEffect,
+        canvasScalePercent: canvasScalePercent,
+      );
+      if (effectFilter.isNotEmpty) {
+        if (filters.isEmpty) {
+          return effectFilter;
+        } else {
+          return '${filters.join(',')},$effectFilter';
+        }
+      }
+    }
+
+    return filters.join(',');
   }
 }

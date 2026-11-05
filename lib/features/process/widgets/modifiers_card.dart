@@ -358,7 +358,18 @@ class ModifiersCard extends StatelessWidget {
                       parameterName: 'BLURRED CANVAS SCALE',
                       effect: PreviewEffect.canvasScale,
                       thumbnailPath: provider.thumbnailPath,
-                      onChanged: provider.setCanvasScalePercent,
+                      isPreviewRendering: provider.isPreviewRendering,
+                      renderedPreviewFramePath:
+                          provider.renderedPreviewFramePath,
+                      onChanged: (val) {
+                        provider.setCanvasScalePercent(val);
+                        provider.requestFilteredPreviewDebounced();
+                      },
+                      onChangeEnd: (_) {
+                        provider.requestFilteredPreviewDebounced(
+                          immediate: true,
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -404,7 +415,15 @@ class ModifiersCard extends StatelessWidget {
                         'SHARPENING INTENSITY',
                     effect: PreviewEffect.sharpening,
                     thumbnailPath: provider.thumbnailPath,
-                    onChanged: provider.setSharpeningLevel,
+                    isPreviewRendering: provider.isPreviewRendering,
+                    renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                    onChanged: (val) {
+                      provider.setSharpeningLevel(val);
+                      provider.requestFilteredPreviewDebounced();
+                    },
+                    onChangeEnd: (_) {
+                      provider.requestFilteredPreviewDebounced(immediate: true);
+                    },
                   ),
                 ),
                 const Divider(
@@ -427,7 +446,15 @@ class ModifiersCard extends StatelessWidget {
                         'SATURATION / VIBRANCE',
                     effect: PreviewEffect.saturation,
                     thumbnailPath: provider.thumbnailPath,
-                    onChanged: provider.setSaturationLevel,
+                    isPreviewRendering: provider.isPreviewRendering,
+                    renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                    onChanged: (val) {
+                      provider.setSaturationLevel(val);
+                      provider.requestFilteredPreviewDebounced();
+                    },
+                    onChangeEnd: (_) {
+                      provider.requestFilteredPreviewDebounced(immediate: true);
+                    },
                   ),
                 ),
               ],

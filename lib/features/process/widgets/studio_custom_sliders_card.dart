@@ -38,7 +38,15 @@ class StudioCustomSlidersCard extends StatelessWidget {
             parameterName: 'ZOOM & FACE FOCUS (CROP)',
             effect: PreviewEffect.cropZoom,
             thumbnailPath: provider.thumbnailPath,
-            onChanged: provider.setCropZoomScale,
+            isPreviewRendering: provider.isPreviewRendering,
+            renderedPreviewFramePath: provider.renderedPreviewFramePath,
+            onChanged: (val) {
+              provider.setCropZoomScale(val);
+              provider.requestFilteredPreviewDebounced();
+            },
+            onChangeEnd: (_) {
+              provider.requestFilteredPreviewDebounced(immediate: true);
+            },
           ),
           const SizedBox(height: 4),
           Wrap(
@@ -86,7 +94,15 @@ class StudioCustomSlidersCard extends StatelessWidget {
             parameterName: 'MICRO-ROTATION / TILT',
             effect: PreviewEffect.microRotation,
             thumbnailPath: provider.thumbnailPath,
-            onChanged: provider.setRotateAngle,
+            isPreviewRendering: provider.isPreviewRendering,
+            renderedPreviewFramePath: provider.renderedPreviewFramePath,
+            onChanged: (val) {
+              provider.setRotateAngle(val);
+              provider.requestFilteredPreviewDebounced();
+            },
+            onChangeEnd: (_) {
+              provider.requestFilteredPreviewDebounced(immediate: true);
+            },
           ),
           if (provider.enableAutoTrim) ...[
             const SizedBox(height: 12),

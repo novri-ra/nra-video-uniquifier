@@ -222,5 +222,39 @@ void main() {
         expect(find.text('BLURRED CANVAS SCALE'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'displays rendering indicator badge when isPreviewRendering is true',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: InteractivePreviewSlider(
+                value: 1.0,
+                min: 0.1,
+                max: 2.0,
+                label: '1.0x',
+                parameterName: 'SHARPENING',
+                effect: PreviewEffect.sharpening,
+                isPreviewRendering: true,
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        );
+
+        // Start drag to display overlay
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.byType(Slider)),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.text('Rendering preview...'), findsOneWidget);
+
+        await gesture.up();
+        await tester.pump(const Duration(milliseconds: 250));
+      },
+    );
   });
 }
