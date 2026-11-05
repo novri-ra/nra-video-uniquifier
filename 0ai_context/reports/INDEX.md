@@ -34,6 +34,7 @@
 | 31 | 31-phase-2-3-evasion-and-native-intent.md | 2026-11-05 | feature | Implement Phase 2 & 3: dynamic GOP jittering, micro color matrix shifting, SEI NAL unit software leak sanitization, inaudible psychoacoustic dither, and 4-tier native intent dispatcher for MANAGE_EXTERNAL_STORAGE |
 | 32 | 32-phase-4-5-wcag-language-and-real-data.md | 2026-11-05 | fix | Implement Phase 4 & 5: WCAG 2.2 AAA contrast token repair, English language standardization, background Isolate SHA-256 calculation, dynamic render estimation, and dynamic mutation manifest |
 | 33 | 33-release-v1.0.1-production.md | 2026-11-05 | release | Official production release v1.0.1 (Build 2), SemVer bump, merge to main, git tag v1.0.1, release APK build, and clean target device installation |
+| 34 | 34-release-v1.0.2-android14-storage-fix.md | 2026-11-05 | release | Official production release v1.0.2 (Build 3), Android 14 storage permission fix, device_info_plus, lifecycle observer, release APK build, and clean target device installation |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
