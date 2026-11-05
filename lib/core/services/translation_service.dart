@@ -53,7 +53,7 @@ class TranslationService {
 
     if (!isOnline) {
       throw const TranslationOfflineException(
-        'Koneksi internet diperlukan untuk menerjemahkan',
+        'Internet connection required for translation',
       );
     }
 

@@ -24,10 +24,10 @@ class MicrostockSeedData {
           'Encoding: H.264 / H.265 CRF 17-22, Moov Atom FastStart',
         ],
         contributorChecklist: [
-          'Pastikan tidak ada logo merk/brand terlihat pada latar belakang.',
-          'Sertakan model release legal jika menampilkan wajah manusia jelas.',
-          'Hindari filter over-sharpening yang memunculkan white halos di tepi objek.',
-          'Gunakan nama file deskriptif berbasis keyword tanpa karakter spesial.',
+          'Ensure no logos or brand marks are visible in the background.',
+          'Include legal model release if recognizable human faces are present.',
+          'Avoid over-sharpening filters that introduce white halos around edges.',
+          'Use descriptive keyword-based file names without special characters.',
         ],
         fullContent:
             'Adobe Stock has officially unveiled its comprehensive 2026 Visual Trend Forecast for video creators and contributors worldwide. Analysis of over 85 million commercial search queries demonstrates a dramatic 140% surge in requests for authentic, unpolished cinematography highlighting autonomous industrial robotics, distributed renewable energy installations, and localized cultural celebrations.\n\nCommercial advertising agencies and enterprise social media managers now heavily favor vertical 9:16 portrait assets over traditional landscape video. Ingestion algorithms directly deprioritize footage suffering from variable frame rate stutter, harsh artificial sharpness, or inconsistent gamma curves.\n\nTo maximize licensing revenue, contributors should produce 5-15 second looping B-roll clips with subtle handheld or slow-gimbal micro-movements. Clips featuring genuine candid smiles, diverse age demographics, and natural workplace interaction achieve the highest click-through rates across corporate branding campaigns.',
@@ -52,10 +52,10 @@ class MicrostockSeedData {
           'Chroma Subsampling: 4:2:0 YUV baseline level 5.1',
         ],
         contributorChecklist: [
-          'Ubah mode kamera ponsel dari VFR ke Constant Frame Rate (CFR).',
-          'Periksa metadata EXIF dan GPS agar tidak mengekspos lokasi privat.',
-          'Pastikan tidak ada audio statik berdengung atau clipped waveform.',
-          'Cantumkan informasi Editorial yang akurat pada judul (Kota, Tanggal, Peristiwa).',
+          'Set camera recording mode from VFR to Constant Frame Rate (CFR).',
+          'Inspect EXIF and GPS metadata to avoid exposing private locations.',
+          'Ensure audio has no static buzz or clipped waveforms.',
+          'Include accurate Editorial information in titles (City, Date, Event).',
         ],
         fullContent:
             'Shutterstock has implemented stricter automated technical validation standards across its global ingest pipeline. The automated quality control system now performs frame-by-frame cadence analysis to reject Variable Frame Rate (VFR) videos that introduce sound desynchronization inside professional NLEs like Premiere Pro and DaVinci Resolve.\n\nFurthermore, all submitted MP4 files must feature the "moov atom" metadata packet positioned at the absolute start of the file structure. This guarantees immediate zero-buffering preview playback for corporate enterprise teams auditing assets on iOS and Android workstations.\n\nSubmissions with crushed shadows, clipped high-key highlights, or non-compliant color matrices (such as un-tagged BT.2020) are automatically rejected. The platform recommends shooting in flat profiles and grading strictly into Rec.709.',
@@ -86,10 +86,10 @@ class MicrostockSeedData {
           'Metadata: Complete camera serial & GPS sanitization',
         ],
         contributorChecklist: [
-          'Jangan gunakan batch upload dengan frame rate berbeda-beda.',
-          'Uji coba 1-2 file sampel sebelum upload 100 video sekaligus.',
-          'Periksa apakah kurator manusia memberikan feedback serupa pada agensi lain.',
-          'Gunakan deskripsi yang berbeda antara Shutterstock dan Adobe Stock.',
+          'Avoid batch uploads with mismatched or inconsistent frame rates.',
+          'Test 1-2 sample files before uploading 100 videos at once.',
+          'Check if human reviewers provide similar feedback across agencies.',
+          'Use differentiated descriptions between Shutterstock and Adobe Stock.',
         ],
         fullContent:
             'A trending discussion on Reddit\'s r/microstock community sheds light on recent creator experiences with automated duplication flags across major agencies. Several full-time contributors reported that uploading identical ProRes exports to Shutterstock, Adobe Stock, and Freepik simultaneously triggered automated spam warnings on their portfolios.\n\nMembers analyzed the detection mechanism and confirmed agencies now compare multidimensional perceptual hashes and temporal cadence fingerprints. Slight trimming of intro frames alone is no longer sufficient to create a distinct media identity in the agency databases.\n\nThe consensus recommendation from experienced contributors is to apply systematic media uniquification: strip all EXIF hardware signatures, apply 2-4% dynamic spatial crop with face-aware framing, and introduce microscopic sensor noise. This ensures full compliance with agency anti-spam rules while protecting accounts from mistaken automated shadowbans.',
@@ -114,10 +114,10 @@ class MicrostockSeedData {
           'Duration: 6 to 30 seconds optimal loop lengths',
         ],
         contributorChecklist: [
-          'Terapkan modifikasi vDNA (tilt/crop 1-3%) pada variasi adegan serupa.',
-          'Pilih kategori dan tag microstock yang relevan maksimal 15-20 tags.',
-          'Pastikan tidak ada watermark pribadi atau teks overlay.',
-          'Unggah secara konsisten 10-20 klip berkualitas per minggu.',
+          'Apply vDNA modifications (1-3% tilt/crop) across similar scene takes.',
+          'Select 15-20 highly relevant microstock tags and categories.',
+          'Ensure no personal watermarks or overlaid text are present.',
+          'Maintain a consistent upload cadence of 10-20 high-quality clips weekly.',
         ],
         fullContent:
             'Freepik has officially rolled out its 2026 Contributor Royalty Booster Program, distributing over €2.5M in bonus rewards to creators of high-demand motion content. Footage categories achieving the fastest download velocity include urban lifestyle, culinary food preparation, modern workspace collaboration, and aesthetic background textures.\n\nHowever, Freepik also announced aggressive measures against catalog spamming. Contributors uploading identical footage with minor color grading changes risk account demotion. The platform uses deep visual hashes to detect perceptual duplication across contributor portfolios.\n\nTo safely maximize earnings, contributors are encouraged to introduce subtle optical variations, differing camera angles, and authentic physical micro-framing before batch uploading.',
@@ -142,10 +142,10 @@ class MicrostockSeedData {
           'Audio Pitch & Speed: 1.01x - 1.025x synchronized time warp',
         ],
         contributorChecklist: [
-          'Hapus jejak GPS, serial kamera, dan signature software pengedit.',
-          'Ganti metadata kamera sintetis dengan profil resmi (iPhone 15 Pro Max).',
-          'Lakukan uji coba render preview sebelum upload massal ke 5 agensi.',
-          'Pertahankan integritas rasio aspek agar tidak terdistorsi.',
+          'Strip GPS coordinates, camera serial numbers, and editing software signatures.',
+          'Replace synthetic metadata with standard camera profile (iPhone 15 Pro Max).',
+          'Perform a preview render test before mass-uploading across agencies.',
+          'Maintain true aspect ratio integrity without stretching or distortion.',
         ],
         fullContent:
             'The Microstock Contributor Guild has released an essential operational whitepaper detailing how stock platforms deploy neural networks and perceptual hashing to detect duplicate uploads across different accounts and sibling agencies.\n\nThese automated inspection algorithms compute multidimensional feature vectors capturing high-frequency sensor noise patterns, edge geometry, and color distribution. When a creator distributes identical footage across multiple agencies, aggressive bots can trigger automatic rejections or shadowbans.\n\nEthical uniquification practices recommended by the Guild include stripping synthetic encoding tags, injecting subtle microscopic grain, adjusting spatial framing by 1-5% with face-focus crop anchors, and modifying audio frequency spectrums without degrading perceptible consumer playback quality.',

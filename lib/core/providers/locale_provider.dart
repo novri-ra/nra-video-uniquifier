@@ -20,7 +20,7 @@ class LocaleProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e, stackTrace) {
-      debugPrint('[LocaleProvider] Gagal memuat locale: $e\n$stackTrace');
+      debugPrint('[LocaleProvider] Failed to load locale: $e\n$stackTrace');
     }
   }
 

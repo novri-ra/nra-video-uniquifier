@@ -113,7 +113,7 @@ class ArticleKeyTakeawaysBox extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'KEY TAKEAWAYS / REKOMENDASI CEPAT',
+                  'KEY TAKEAWAYS / QUICK RECOMMENDATIONS',
                   style: TextStyle(
                     color: accent,
                     fontSize: 11,
@@ -175,7 +175,7 @@ class ArticleTechnicalSpecsBox extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'PARAMETER TEKNIS REKOMENDASI',
+                  'RECOMMENDED TECHNICAL PARAMETERS',
                   style: TextStyle(
                     color: specAccent,
                     fontSize: 11,
@@ -256,7 +256,7 @@ class ArticleContributorChecklistBox extends StatelessWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  'CHECKLIST KONTRIBUTOR (100% LOLOS KURASI)',
+                  'CONTRIBUTOR CHECKLIST (100% CURATION PASS)',
                   style: TextStyle(
                     color: checkAccent,
                     fontSize: 11,

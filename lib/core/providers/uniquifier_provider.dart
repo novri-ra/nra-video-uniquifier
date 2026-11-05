@@ -148,7 +148,9 @@ class UniquifierProvider extends ChangeNotifier
       }
     } catch (e, stackTrace) {
       if (!_isDisposed) {
-        debugPrint('[UniquifierProvider] Inisialisasi gagal: $e\n$stackTrace');
+        debugPrint(
+          '[UniquifierProvider] Initialization failed: $e\n$stackTrace',
+        );
       }
     }
   }

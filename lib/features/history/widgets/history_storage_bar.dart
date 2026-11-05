@@ -134,7 +134,7 @@ class HistoryHeader extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.checklist_rtl_rounded, size: 18),
                 color: metaColor,
-                tooltip: 'Pilih Banyak',
+                tooltip: 'Select Multiple',
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
                 onPressed: onToggleSelectionMode,

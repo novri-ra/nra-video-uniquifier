@@ -284,9 +284,9 @@ class _ClearIconButton extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Semantics(
       button: true,
-      label: 'Hapus berkas sumber',
+      label: 'Remove source file',
       child: Tooltip(
-        message: 'Hapus berkas terpilih',
+        message: 'Remove selected file',
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(4),
