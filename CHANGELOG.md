@@ -1,6 +1,11 @@
 # Changelog
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-05
+- feat(storage): implement WidgetsBindingObserver for real-time permission sync on resume
+- feat(storage): integrate device_info_plus for dynamic Android SDK version detection
+- fix(manifest): register granular media permissions (READ_MEDIA_VIDEO, READ_MEDIA_IMAGES, READ_MEDIA_AUDIO)
+
 ## [1.0.1] - 2026-11-05
 - fix(engine): resolve audio amix drop (-6 dB) and calibrate sub-perceptual pitch shift (±1.5%)
 - fix(engine): wire dynamic sharpening slider and connect real physical disk storage check
