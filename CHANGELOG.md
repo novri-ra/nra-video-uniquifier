@@ -1,6 +1,15 @@
 # Changelog
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-05
+- fix(engine): resolve audio amix drop (-6 dB) and calibrate sub-perceptual pitch shift (±1.5%)
+- fix(engine): wire dynamic sharpening slider and connect real physical disk storage check
+- feat(evasion): implement dynamic GOP jittering, micro color matrix shifting, and SEI NAL stripping
+- feat(storage): implement 4-tier native intent dispatcher for Android 11+ MANAGE_EXTERNAL_STORAGE
+- feat(a11y): upgrade dark mode contrast to WCAG AAA (12.18:1) via mintSage tokens
+- feat(i18n): normalize entire UI copy and notification strings to English default
+- feat(data): integrate real background SHA-256 hashing, dynamic render estimation, and dynamic manifest badges
+
 ## [1.0.0] - 2026-11-05
 - feat(microstock): reactive on-demand full article extraction with dynamic progress indicator
 - fix(microstock): strip aside, banners, and freestar advertising clutter before DOM parsing

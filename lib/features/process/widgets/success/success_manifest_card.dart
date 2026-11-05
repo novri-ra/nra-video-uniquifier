@@ -7,12 +7,14 @@ class SuccessManifestCard extends StatelessWidget {
   final String fileName;
   final String directoryPath;
   final String? thumbnailPath;
+  final List<String>? activeMutations;
 
   const SuccessManifestCard({
     super.key,
     required this.fileName,
     required this.directoryPath,
     this.thumbnailPath,
+    this.activeMutations,
   });
 
   @override
@@ -49,6 +51,7 @@ class SuccessManifestCard extends StatelessWidget {
                   fileName: fileName,
                   directoryPath: directoryPath,
                   isDark: isDark,
+                  activeMutations: activeMutations,
                 ),
               ),
             ],
@@ -82,7 +85,7 @@ class _ManifestHeader extends StatelessWidget {
         Text(
           'GALLERY INDEXED',
           style: TextStyle(
-            color: isDark ? AppColors.primaryContainer : AppColors.forestDeep,
+            color: isDark ? AppColors.mintSage : AppColors.forestDeep,
             fontSize: 10,
             fontWeight: FontWeight.w700,
             fontFamily: 'monospace',
@@ -97,20 +100,27 @@ class _ManifestDetailsColumn extends StatelessWidget {
   final String fileName;
   final String directoryPath;
   final bool isDark;
+  final List<String>? activeMutations;
 
   const _ManifestDetailsColumn({
     required this.fileName,
     required this.directoryPath,
     required this.isDark,
+    this.activeMutations,
   });
 
   @override
   Widget build(BuildContext context) {
     final fileNameColor = isDark ? Colors.white : AppColors.textDark;
-    final dirColor = isDark ? AppColors.primaryContainer : AppColors.forestDeep;
+    final dirColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final metaColor = isDark
         ? AppColors.onSurfaceVariant
         : AppColors.lightOnSurfaceVariant;
+
+    final mutationsText =
+        (activeMutations != null && activeMutations!.isNotEmpty)
+        ? activeMutations!.join(' • ')
+        : 'Metadata stripped • PTS & Audio shifted • Micro-cropped • Color EQ';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,10 +149,7 @@ class _ManifestDetailsColumn extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 8),
-        Text(
-          'Metadata stripped • PTS & Audio shifted • Micro-cropped • Color EQ',
-          style: TextStyle(color: metaColor, fontSize: 10),
-        ),
+        Text(mutationsText, style: TextStyle(color: metaColor, fontSize: 10)),
       ],
     );
   }
@@ -159,9 +166,7 @@ class _ThumbnailReadyBadge extends StatelessWidget {
     final borderColor = isDark
         ? AppColors.surfaceContainerHighest
         : AppColors.hairlineBorder;
-    final badgeColor = isDark
-        ? AppColors.primaryContainer
-        : AppColors.forestDeep;
+    final badgeColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: 80,

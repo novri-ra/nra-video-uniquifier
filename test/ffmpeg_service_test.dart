@@ -106,7 +106,7 @@ void main() {
         expect(cmd, contains('scale=w=1920:h=1080:flags=lanczos+accurate_rnd'));
         // When upscale is enabled, destructive hqdn3d is bypassed to preserve clarity
         expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
-        expect(cmd, contains('unsharp=3:3:0.6:3:3:0.0'));
+        expect(cmd, contains('unsharp=3:3:0.60:3:3:0.0'));
         expect(cmd, isNot(contains('curves=preset=vintage')));
         expect(cmd, contains('eq=gamma=1.015:contrast=1.02:saturation='));
         expect(cmd, contains('noise=alls='));
@@ -400,7 +400,12 @@ void main() {
         enableAggressiveAudio: true,
       );
       expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.003[noise]'));
-      expect(cmd, contains('[a0][noise]amix=inputs=2:duration=first[out]'));
+      expect(
+        cmd,
+        contains(
+          '[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]',
+        ),
+      );
       expect(cmd, contains('atempo='));
       expect(
         cmd,
@@ -546,8 +551,8 @@ void main() {
           expect(vars.noiseStrength, lessThanOrEqualTo(4));
           expect(vars.speedFactor, greaterThanOrEqualTo(1.0099));
           expect(vars.speedFactor, lessThanOrEqualTo(1.0251));
-          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9599));
-          expect(vars.pitchFactor, lessThanOrEqualTo(1.0401));
+          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9849));
+          expect(vars.pitchFactor, lessThanOrEqualTo(1.0151));
           expect(vars.outputFps, greaterThanOrEqualTo(29.79));
           expect(vars.outputFps, lessThanOrEqualTo(29.91));
 
@@ -821,7 +826,7 @@ void main() {
       expect(cmd, isNot(contains('hqdn3d=1.5:1.5:4:4')));
       expect(
         cmd,
-        contains('unsharp=3:3:0.6:3:3:0.0'),
+        contains('unsharp=3:3:0.60:3:3:0.0'),
       ); // pre-scale edge sharpness
       expect(cmd, contains("curves=r='0/0")); // 8. chromaShift
       expect(cmd, contains('noise=alls=')); // 9. modifyVisuals grain

@@ -56,6 +56,7 @@ class FfmpegService {
     bool thermalThrottle = false,
     int? targetFps,
     double? saturationLevel,
+    double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
@@ -89,6 +90,7 @@ class FfmpegService {
     thermalThrottle: thermalThrottle,
     targetFps: targetFps,
     saturationLevel: saturationLevel,
+    sharpeningLevel: sharpeningLevel,
     cropZoomScale: cropZoomScale,
     cropAnchor: cropAnchor,
     introTrimOffset: introTrimOffset,
@@ -175,13 +177,14 @@ class FfmpegService {
     int totalDurationMs = 0,
     int targetFps = 30,
     double? saturationLevel,
+    double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
   }) async {
     if (!await StorageService.hasEnoughSpace()) {
       throw Exception(
-        'Sisa penyimpanan kurang dari 2 GB. Bersihkan ruang penyimpanan.',
+        'Insufficient storage space (less than 1.5 GB). Please free up storage.',
       );
     }
     final meta = await _resolveInputMeta(
@@ -223,6 +226,7 @@ class FfmpegService {
       thermalThrottle: thermalThrottle,
       targetFps: targetFps,
       saturationLevel: saturationLevel,
+      sharpeningLevel: sharpeningLevel,
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
       introTrimOffset: introTrimOffset,
@@ -237,8 +241,8 @@ class FfmpegService {
     await NotificationService.showProgressNotification(
       id: 101,
       progress: 0,
-      title: 'Memproses Video',
-      body: 'Memulai rendering...',
+      title: 'Processing Video',
+      body: 'Starting render...',
       force: true,
     );
     await WakeLockService.acquire();
@@ -354,12 +358,12 @@ class FfmpegService {
   }
 
   static String _stageDescription(int percent) {
-    if (percent < 15) return 'Inisialisasi & filter awal...';
-    if (percent < 40) return 'Transformasi visual & anti-fingerprint...';
+    if (percent < 15) return 'Initializing & base filters...';
+    if (percent < 40) return 'Visual transforms & anti-fingerprint...';
     if (percent < 80) return 'Encoding video stream & scaling...';
     return percent < 95
-        ? 'Muxing audio & normalisasi...'
-        : 'Finalisasi ekspor & galeri...';
+        ? 'Audio muxing & normalization...'
+        : 'Finalizing export & gallery...';
   }
 
   static void _setupCallbacks({
@@ -381,7 +385,7 @@ class FfmpegService {
         NotificationService.showProgressNotification(
           id: 101,
           progress: percent,
-          title: 'Memproses Video ($percent%)',
+          title: 'Processing Video ($percent%)',
           body: _stageDescription(percent),
         );
       });

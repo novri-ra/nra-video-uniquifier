@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -20,11 +21,13 @@ class EngineStateStrip extends StatelessWidget {
         ? AppColors.outlineVariant
         : AppColors.lightOutlineVariant;
 
+    final isSmallScreen = MediaQuery.of(context).size.width < 340;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(6),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: cardBg,
           borderRadius: BorderRadius.circular(6),
@@ -37,10 +40,15 @@ class EngineStateStrip extends StatelessWidget {
               child: _EngineStatusLabel(
                 isHardware: provider.hardwareAcceleration,
                 isDark: isDark,
+                compact: isSmallScreen,
               ),
             ),
-            const SizedBox(width: 8),
-            _RenderEstimateLabel(isDark: isDark),
+            const SizedBox(width: 6),
+            _RenderEstimateLabel(
+              isDark: isDark,
+              durationMs: provider.totalDurationMs,
+              compact: isSmallScreen,
+            ),
           ],
         ),
       ),
@@ -49,8 +57,12 @@ class EngineStateStrip extends StatelessWidget {
 }
 
 class _EngineStatusLabel extends StatelessWidget {
-  final bool isHardware, isDark;
-  const _EngineStatusLabel({required this.isHardware, required this.isDark});
+  final bool isHardware, isDark, compact;
+  const _EngineStatusLabel({
+    required this.isHardware,
+    required this.isDark,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,16 +70,18 @@ class _EngineStatusLabel extends StatelessWidget {
     final textColor = isDark
         ? AppColors.onSurfaceVariant
         : AppColors.textDark.withValues(alpha: 0.75);
+    final gpuLabel = Platform.isAndroid
+        ? (compact ? 'MediaCodec' : 'GPU: MediaCodec / Vulkan')
+        : (compact ? 'Metal/GLES' : 'GPU: Metal / GLES');
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.memory, color: iconColor, size: 14),
-        const SizedBox(width: 6),
+        const SizedBox(width: 5),
         Expanded(
           child: Text(
-            isHardware
-                ? 'GPU Accel: Metal / GLES (Active)'
-                : 'Software CPU Fallback',
+            isHardware ? '$gpuLabel (Active)' : 'Software CPU Fallback',
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
               color: textColor,
@@ -84,7 +98,13 @@ class _EngineStatusLabel extends StatelessWidget {
 
 class _RenderEstimateLabel extends StatelessWidget {
   final bool isDark;
-  const _RenderEstimateLabel({required this.isDark});
+  final int durationMs;
+  final bool compact;
+  const _RenderEstimateLabel({
+    required this.isDark,
+    this.durationMs = 0,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,10 +113,17 @@ class _RenderEstimateLabel extends StatelessWidget {
         : AppColors.textDark.withValues(alpha: 0.75);
     final iconColor = isDark ? AppColors.outline : AppColors.forestDeep;
 
+    final estimateText = durationMs > 0
+        ? (compact
+              ? '~${(durationMs / 1000 * 0.45).clamp(1.5, 300.0).toStringAsFixed(1)}s'
+              : 'Est: ~${(durationMs / 1000 * 0.45).clamp(1.5, 300.0).toStringAsFixed(1)}s')
+        : (compact ? 'Dynamic' : 'Est: Dynamic');
+
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Est. Render: ~2.4s',
+          estimateText,
           style: TextStyle(
             color: textColor,
             fontSize: 11,

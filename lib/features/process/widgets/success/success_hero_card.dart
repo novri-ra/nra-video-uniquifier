@@ -30,12 +30,8 @@ class SuccessHeroCard extends StatelessWidget {
     final circleBg = isDark
         ? AppColors.surfaceContainer
         : AppColors.lightSurfaceContainer;
-    final circleBorder = isDark
-        ? AppColors.primaryContainer
-        : AppColors.forestDeep;
-    final iconColor = isDark
-        ? AppColors.primaryContainer
-        : AppColors.forestDeep;
+    final circleBorder = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
     return Container(
       width: double.infinity,
@@ -85,9 +81,7 @@ class SuccessHeroCard extends StatelessWidget {
               Text(
                 outputHash,
                 style: TextStyle(
-                  color: isDark
-                      ? AppColors.primaryContainer
-                      : AppColors.forestDeep,
+                  color: isDark ? AppColors.mintSage : AppColors.forestDeep,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace',

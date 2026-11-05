@@ -39,6 +39,7 @@ class FfmpegCommandBuilder {
     bool thermalThrottle = false,
     int? targetFps,
     double? saturationLevel,
+    double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
@@ -84,9 +85,13 @@ class FfmpegCommandBuilder {
       variations: vars,
       targetFps: targetFps,
       saturationLevel: saturationLevel,
+      sharpeningLevel: sharpeningLevel,
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
     );
+    if (outputPath.toLowerCase().endsWith('.mp4')) {
+      buffer.write(' -bsf:v filter_units=remove_types=6');
+    }
     buffer.write(' "${escapePath(outputPath)}"');
     return buffer.toString();
   }
@@ -141,6 +146,7 @@ class FfmpegCommandBuilder {
     VideoVariations? variations,
     int? targetFps,
     double? saturationLevel,
+    double? sharpeningLevel,
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
   }) {
@@ -186,6 +192,7 @@ class FfmpegCommandBuilder {
         variations: vars,
         targetFps: effectiveFps,
         saturationLevel: saturationLevel,
+        sharpeningLevel: sharpeningLevel,
         cropZoomScale: cropZoomScale,
         cropAnchor: cropAnchor,
       ),

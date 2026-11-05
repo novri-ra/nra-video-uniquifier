@@ -55,14 +55,14 @@ class HistoryHeader extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.close, size: 18),
               color: textCol,
-              tooltip: 'Batal',
+              tooltip: 'Cancel',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               onPressed: onToggleSelectionMode,
             ),
             const SizedBox(width: 6),
             Text(
-              '$selectedCount Terpilih',
+              '$selectedCount Selected',
               style: TextStyle(
                 color: textCol,
                 fontWeight: FontWeight.w700,
@@ -79,7 +79,7 @@ class HistoryHeader extends StatelessWidget {
                 color: accentCol,
               ),
               label: Text(
-                isAllSelected ? 'Batal Semua' : 'Pilih Semua',
+                isAllSelected ? 'Deselect All' : 'Select All',
                 style: TextStyle(
                   color: accentCol,
                   fontSize: 11,
@@ -95,7 +95,7 @@ class HistoryHeader extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.delete_outline, size: 18),
               color: selectedCount > 0 ? AppColors.vividCoral : metaColor,
-              tooltip: 'Hapus Terpilih',
+              tooltip: 'Delete Selected',
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               onPressed: selectedCount > 0 ? onDeleteSelected : null,

@@ -57,7 +57,7 @@ class AppColors {
   static const Color onSurface = Color(0xFFF2F6F4);
   static const Color onSurfaceVariant = Color(0xFFB9CBBF);
   static const Color outline = Color(0xFF84958A);
-  static const Color outlineVariant = Color(0x1FA3EFD5);
+  static const Color outlineVariant = Color(0x3DA3EFD5);
 
   // Controlled Neutrals (Official)
   static const Color white = Color(0xFFFFFFFF);

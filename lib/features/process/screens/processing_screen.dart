@@ -37,7 +37,9 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       duration: const Duration(seconds: 4),
     )..addListener(_onProgressTick);
     _controller.forward();
-    _runEngine();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _runEngine();
+    });
   }
 
   void _onProgressTick() {
@@ -66,10 +68,23 @@ class _ProcessingScreenState extends State<ProcessingScreen>
   Future<void> _runEngine() async {
     final provider = context.read<UniquifierProvider>();
     final inputPath = provider.selectedFilePath;
+
+    if (inputPath == null || inputPath.isEmpty) {
+      debugPrint('[ProcessingScreen] Invalid or empty input video path.');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid input video path'),
+          backgroundColor: AppColors.errorContainer,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
     try {
-      final outputPath = (inputPath == null || inputPath.isEmpty)
-          ? await _simulateFallback()
-          : await _processWithNative(provider, inputPath);
+      final outputPath = await _processWithNative(provider, inputPath);
       if (!mounted || _isCancelled) return;
       HapticFeedback.mediumImpact();
       provider.setLastProcessedResult(outputPath);
@@ -87,11 +102,6 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
       );
     }
-  }
-
-  Future<String> _simulateFallback() async {
-    await Future.delayed(const Duration(seconds: 3));
-    return await FfmpegService.generateOutputPath('video_01.mp4');
   }
 
   void _dispatchTelemetryVault(UniquifierProvider provider) {
@@ -145,6 +155,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       totalDurationMs: provider.totalDurationMs,
       targetFps: provider.targetFps,
       saturationLevel: provider.saturationLevel,
+      sharpeningLevel: provider.sharpeningLevel,
       cropZoomScale: provider.cropZoomScale,
       cropAnchor: provider.cropAnchor,
       introTrimOffset: provider.introTrimOffset,

@@ -28,6 +28,11 @@
 | 25 | 25-upgrade-news-reader-indonesia-freshness.md | 2026-11-05 | feature | Upgrade Microstock News Reader with Google News RPC batchexecute URL decoding, freshness filters, DOM extractor (.entry-content, .post-content, <article>, <p>), and Indonesian news portal feed |
 | 26 | 26-audit-and-fix-full-article-content.md | 2026-11-05 | feature | Audit and implement full article content extraction with DOM pre-cleaning and multi-element narrative parsing (h2/h3/h4, ul/ol/li, blockquote, p) |
 | 27 | 27-comprehensive-history-news-engine-fix.md | 2026-11-05 | fix | Comprehensive resolution for news reader DOM cleaning/stateful loading and history storage permission 1-time prompt & resilient bulk deletion |
+| 28 | 28-release-v1.0.0-production.md | 2026-11-05 | release | Official production release v1.0.0 (Build 1), SemVer bump, merge to main, git tag v1.0.0, release APK build, and clean target device installation |
+| 29 | 29-super-power-deep-audit-complete-system.md | 2026-11-05 | audit | Super Power Deep Audit: complete system architecture, visual/audio retention, cutting-edge bot evasion research, preset integrity, native Android 1-click intent, WCAG 2.2 contrast, i18n, and commercial paid app readiness |
+| 30 | 30-phase-1-critical-engine-retention-repairs.md | 2026-11-05 | fix | Implement critical P1 fixes: amix audio drop resolution (weights=1 0.001), sub-perceptual pitch bounds (0.985-1.015), dynamic sharpening wiring, physical storage check via storage_space, and eliminate _simulateFallback fake files |
+| 31 | 31-phase-2-3-evasion-and-native-intent.md | 2026-11-05 | feature | Implement Phase 2 & 3: dynamic GOP jittering, micro color matrix shifting, SEI NAL unit software leak sanitization, inaudible psychoacoustic dither, and 4-tier native intent dispatcher for MANAGE_EXTERNAL_STORAGE |
+| 32 | 32-phase-4-5-wcag-language-and-real-data.md | 2026-11-05 | fix | Implement Phase 4 & 5: WCAG 2.2 AAA contrast token repair, English language standardization, background Isolate SHA-256 calculation, dynamic render estimation, and dynamic mutation manifest |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused

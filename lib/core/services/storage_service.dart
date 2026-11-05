@@ -1,19 +1,30 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:storage_space/storage_space.dart';
 
 class StorageService {
-  static const int minRequiredBytes = 2 * 1024 * 1024 * 1024; // 2 GB
+  static const int minRequiredBytes =
+      (1500 * 1024 * 1024); // 1.5 GB minimum threshold
 
-  /// Returns true if at least 2 GB free space available.
+  /// Returns true if at least 1.5 GB free disk space is available.
   static Future<bool> hasEnoughSpace() async {
     try {
       if (!Platform.isAndroid) return true;
-      final tempDir = await getTemporaryDirectory();
-      final stat = await FileStat.stat(tempDir.path);
-      // shortcut: StatFS not available via Dart, use temp dir write test
-      return stat.type != FileSystemEntityType.notFound;
-    } catch (_) {
-      return true; // Assume OK if check fails
+      final space = await getStorageSpace(
+        lowOnSpaceThreshold: minRequiredBytes,
+        fractionDigits: 1,
+      );
+      final freeBytes = space.free;
+      debugPrint(
+        '[StorageService] Free disk space: ${(freeBytes / (1024 * 1024)).toStringAsFixed(1)} MB (required: ${(minRequiredBytes / (1024 * 1024)).toStringAsFixed(1)} MB)',
+      );
+      return freeBytes >= minRequiredBytes;
+    } catch (e) {
+      debugPrint(
+        '[StorageService] Error checking storage space: $e. Falling back to permissive check.',
+      );
+      return true; // Fallback to permissive on error
     }
   }
 
