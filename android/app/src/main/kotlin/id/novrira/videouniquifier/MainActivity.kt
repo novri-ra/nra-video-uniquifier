@@ -59,9 +59,18 @@ class MainActivity : FlutterActivity() {
                 description = "Notifikasi status proses video dan ekspor aset"
                 enableVibration(true)
             }
+            val videoProcessingChannel = NotificationChannel(
+                "video_processing_channel",
+                "Video Processing",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Video Processing notifications and alert status"
+                enableVibration(true)
+            }
             notificationManager?.createNotificationChannel(uniquifierChannel)
             notificationManager?.createNotificationChannel(processChannel)
             notificationManager?.createNotificationChannel(completeChannel)
+            notificationManager?.createNotificationChannel(videoProcessingChannel)
         }
     }
 

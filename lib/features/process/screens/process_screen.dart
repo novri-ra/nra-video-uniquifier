@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/engine_state_strip.dart';
 import '../widgets/modifiers_card.dart';
 import '../widgets/source_file_section.dart';
+import '../widgets/visual_effect_selector_card.dart';
 import 'batch_processing_screen.dart';
 import 'processing_screen.dart';
 import '../../../core/models/batch_video_item.dart';
@@ -168,6 +169,8 @@ class _ProcessBody extends StatelessWidget {
         const ModifiersHeader(),
         const SizedBox(height: 6),
         PresetChipRow(provider: provider),
+        const SizedBox(height: 8),
+        VisualEffectSelectorCard(provider: provider),
         const SizedBox(height: 8),
         ModifiersCard(provider: provider, onOpenAdvanced: onOpenAdvanced),
         const SizedBox(height: 12),

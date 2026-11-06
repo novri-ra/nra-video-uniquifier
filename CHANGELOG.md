@@ -1,6 +1,14 @@
 # Changelog
 ## [Unreleased]
 
+## [1.0.4] - 2026-11-06
+- feat(compatibility): implement universal Android support from legacy Android 7.0 (API 24) to Android 16 (API 36)
+- fix(notifications): ensure rock-solid notification delivery on Android 13-16 via POST_NOTIFICATIONS runtime flow, dataSync foreground service type, and R8 keep rules
+- feat(preview): full-fidelity debounced preview rendering with FFmpeg 1-frame extraction and active session cancellation
+- feat(effects): unified visual effect catalog (Blurred Canvas, Echo Delay, RGB Split, Dreamy Bloom, 16mm Film, Dynamic Grain)
+- feat(ui): VisualEffectSelectorCard with responsive horizontal carousel and contextual dynamic sub-controls
+- test: expand test suite to 206+ passing tests with zero static analysis issues
+
 ## [1.0.3] - 2026-11-05
 - feat(ui): implement InteractivePreviewSlider with 60 FPS real-time floating preview overlay
 - feat(controls): wire manual sliders for crop zoom, micro-rotation, sharpening, saturation, and canvas scale

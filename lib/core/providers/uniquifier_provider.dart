@@ -174,15 +174,27 @@ class UniquifierProvider extends ChangeNotifier
   String? _renderedPreviewFramePath;
   Timer? _previewDebounceTimer;
   UnifiedVisualEffect _selectedVisualEffect = UnifiedVisualEffect.none;
+  double _motionEchoDelay = 0.15;
 
   bool get isPreviewRendering => _isPreviewRendering;
   String? get renderedPreviewFramePath => _renderedPreviewFramePath;
   UnifiedVisualEffect get selectedVisualEffect => _selectedVisualEffect;
+  double get motionEchoDelay => _motionEchoDelay;
 
-  void setVisualEffect(UnifiedVisualEffect effect) {
+  void setSelectedVisualEffect(UnifiedVisualEffect effect) {
     _selectedVisualEffect = effect;
     notifyListeners();
     requestFilteredPreviewDebounced(immediate: true);
+  }
+
+  void setVisualEffect(UnifiedVisualEffect effect) =>
+      setSelectedVisualEffect(effect);
+
+  void setMotionEchoDelay(double value) {
+    if ((_motionEchoDelay - value).abs() < 0.001) return;
+    _motionEchoDelay = value;
+    notifyListeners();
+    requestFilteredPreviewDebounced();
   }
 
   /// Debounced trigger for high-fidelity single frame preview rendering.
@@ -240,6 +252,7 @@ class UniquifierProvider extends ChangeNotifier
             enableBlurredCanvas: enableBlurredCanvas,
             canvasScalePercent: canvasScalePercent,
             effect: _selectedVisualEffect,
+            motionEchoDelay: _motionEchoDelay,
           );
 
       final resultPath = await FfmpegService.renderFilteredPreviewFrame(

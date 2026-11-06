@@ -310,6 +310,7 @@ class FfmpegService {
       resolvedDurationMs: meta.durationMs,
       baseName: inputPath.split(RegExp(r'[/\\]')).last,
     );
+    await NotificationService.requestPermission();
     await NotificationService.showProgressNotification(
       id: 101,
       progress: 0,

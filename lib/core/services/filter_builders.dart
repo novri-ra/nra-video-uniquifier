@@ -421,6 +421,7 @@ class FilterBuilders {
   static String buildUnifiedEffectFilter(
     UnifiedVisualEffect effect, {
     double canvasScalePercent = 95.0,
+    double motionEchoDelay = 0.15,
   }) {
     switch (effect) {
       case UnifiedVisualEffect.none:
@@ -428,7 +429,7 @@ class FilterBuilders {
       case UnifiedVisualEffect.blurredCanvas:
         return buildBlurredCanvasEffect(canvasScalePercent: canvasScalePercent);
       case UnifiedVisualEffect.motionEcho:
-        return buildMotionEchoEffect();
+        return buildMotionEchoEffect(delaySeconds: motionEchoDelay);
       case UnifiedVisualEffect.rgbSplit:
         return buildRgbSplitEffect();
       case UnifiedVisualEffect.dreamyBloom:
@@ -498,6 +499,7 @@ class FilterBuilders {
     bool enableBlurredCanvas = false,
     double canvasScalePercent = 95.0,
     UnifiedVisualEffect effect = UnifiedVisualEffect.none,
+    double motionEchoDelay = 0.15,
   }) {
     final filters = <String>[];
 
@@ -537,6 +539,7 @@ class FilterBuilders {
       final effectFilter = buildUnifiedEffectFilter(
         effectiveEffect,
         canvasScalePercent: canvasScalePercent,
+        motionEchoDelay: motionEchoDelay,
       );
       if (effectFilter.isNotEmpty) {
         if (filters.isEmpty) {

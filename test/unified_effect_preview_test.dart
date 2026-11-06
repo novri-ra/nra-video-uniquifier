@@ -118,10 +118,20 @@ void main() {
       provider.dispose();
     });
 
-    test('setVisualEffect updates selectedVisualEffect', () {
+    test('setVisualEffect and setSelectedVisualEffect update state', () {
       final provider = UniquifierProvider();
       provider.setVisualEffect(UnifiedVisualEffect.dreamyBloom);
       expect(provider.selectedVisualEffect, UnifiedVisualEffect.dreamyBloom);
+
+      provider.setSelectedVisualEffect(UnifiedVisualEffect.motionEcho);
+      expect(provider.selectedVisualEffect, UnifiedVisualEffect.motionEcho);
+
+      provider.setSelectedVisualEffect(UnifiedVisualEffect.blurredCanvas);
+      expect(provider.selectedVisualEffect, UnifiedVisualEffect.blurredCanvas);
+
+      provider.setMotionEchoDelay(0.30);
+      expect(provider.motionEchoDelay, closeTo(0.30, 0.001));
+
       provider.dispose();
     });
 
