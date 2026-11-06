@@ -42,7 +42,7 @@ class NotificationService {
       mainChannelId,
       'NRA Uniquifier Processing',
       channelDescription: 'Notifikasi status proses video dan ekspor aset',
-      importance: Importance.max,
+      importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       ongoing: false,
@@ -67,11 +67,22 @@ class NotificationService {
       mainChannelId,
       'NRA Uniquifier Processing',
       description: 'Notifikasi status proses video dan ekspor aset',
-      importance: Importance.max,
+      importance: Importance.high,
       playSound: true,
       enableVibration: true,
     );
     await plugin.createNotificationChannel(channel);
+
+    const videoProcessingChannel = AndroidNotificationChannel(
+      'video_processing_channel',
+      'Video Processing',
+      description: 'Notifikasi pemrosesan dan rendering video',
+      importance: Importance.high,
+      playSound: true,
+      enableVibration: true,
+    );
+    await plugin.createNotificationChannel(videoProcessingChannel);
+
     await plugin.createNotificationChannel(
       const AndroidNotificationChannel(
         processChannelId,
@@ -127,10 +138,7 @@ class NotificationService {
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >();
-      final bool? enabled = await android?.areNotificationsEnabled();
-      if (enabled == false) {
-        await android?.requestNotificationsPermission();
-      }
+      await android?.requestNotificationsPermission();
     } catch (_) {}
   }
 
@@ -288,7 +296,7 @@ class NotificationService {
       mainChannelId,
       'NRA Uniquifier Processing',
       channelDescription: 'Notifikasi status proses video dan ekspor aset',
-      importance: Importance.max,
+      importance: Importance.high,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
       playSound: playSound,

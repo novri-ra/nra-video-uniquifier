@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/device_capability_service.dart';
+import '../services/ffmpeg_service.dart';
 import '../services/settings_service.dart';
 import '../utils/formatters.dart';
 import 'uniquifier/uniquifier_media_mixin.dart';
@@ -7,6 +9,7 @@ import 'uniquifier/uniquifier_modifiers_mixin.dart';
 import 'uniquifier/uniquifier_preset_mixin.dart';
 import 'uniquifier/uniquifier_progress_mixin.dart';
 
+export '../models/unified_effect_preset.dart';
 export 'uniquifier/uniquifier_media_mixin.dart';
 export 'uniquifier/uniquifier_modifiers_mixin.dart';
 export 'uniquifier/uniquifier_preset_mixin.dart';
@@ -42,6 +45,7 @@ class UniquifierProvider extends ChangeNotifier
   @override
   void dispose() {
     _isDisposed = true;
+    _previewDebounceTimer?.cancel();
     SettingsService.upscaleResolutionNotifier.removeListener(
       _onResolutionNotifierChanged,
     );
@@ -166,9 +170,118 @@ class UniquifierProvider extends ChangeNotifier
     );
   }
 
+  bool _isPreviewRendering = false;
+  String? _renderedPreviewFramePath;
+  Timer? _previewDebounceTimer;
+  UnifiedVisualEffect _selectedVisualEffect = UnifiedVisualEffect.none;
+  double _motionEchoDelay = 0.15;
+
+  bool get isPreviewRendering => _isPreviewRendering;
+  String? get renderedPreviewFramePath => _renderedPreviewFramePath;
+  UnifiedVisualEffect get selectedVisualEffect => _selectedVisualEffect;
+  double get motionEchoDelay => _motionEchoDelay;
+
+  void setSelectedVisualEffect(UnifiedVisualEffect effect) {
+    _selectedVisualEffect = effect;
+    notifyListeners();
+    requestFilteredPreviewDebounced(immediate: true);
+  }
+
+  void setVisualEffect(UnifiedVisualEffect effect) =>
+      setSelectedVisualEffect(effect);
+
+  void setMotionEchoDelay(double value) {
+    if ((_motionEchoDelay - value).abs() < 0.001) return;
+    _motionEchoDelay = value;
+    notifyListeners();
+    requestFilteredPreviewDebounced();
+  }
+
+  /// Debounced trigger for high-fidelity single frame preview rendering.
+  /// When [immediate] is true, triggers execution immediately (e.g. on onChangeEnd).
+  void requestFilteredPreviewDebounced({
+    Duration debounceDuration = const Duration(milliseconds: 300),
+    bool immediate = false,
+    double timestampSeconds = 0.5,
+    String? customFilter,
+  }) {
+    _previewDebounceTimer?.cancel();
+
+    final input = selectedFilePath;
+    if (input == null || input.isEmpty) {
+      _renderedPreviewFramePath = null;
+      _isPreviewRendering = false;
+      return;
+    }
+
+    if (immediate) {
+      _executePreviewRender(
+        inputPath: input,
+        timestampSeconds: timestampSeconds,
+        customFilter: customFilter,
+      );
+    } else {
+      _previewDebounceTimer = Timer(debounceDuration, () {
+        _executePreviewRender(
+          inputPath: input,
+          timestampSeconds: timestampSeconds,
+          customFilter: customFilter,
+        );
+      });
+    }
+  }
+
+  Future<void> _executePreviewRender({
+    required String inputPath,
+    required double timestampSeconds,
+    String? customFilter,
+  }) async {
+    if (_isDisposed) return;
+    _isPreviewRendering = true;
+    notifyListeners();
+
+    try {
+      final filter =
+          customFilter ??
+          FilterBuilders.buildPreviewFilterChain(
+            cropZoomScale: cropZoomScale,
+            cropAnchor: cropAnchor,
+            rotateAngle: rotateAngle,
+            saturationLevel: saturationLevel,
+            sharpeningLevel: sharpeningLevel,
+            enableBlurredCanvas: enableBlurredCanvas,
+            canvasScalePercent: canvasScalePercent,
+            effect: _selectedVisualEffect,
+            motionEchoDelay: _motionEchoDelay,
+          );
+
+      final resultPath = await FfmpegService.renderFilteredPreviewFrame(
+        inputPath: inputPath,
+        filterComplex: filter,
+        timestampSeconds: timestampSeconds,
+      );
+
+      if (!_isDisposed) {
+        _isPreviewRendering = false;
+        if (resultPath != null) {
+          _renderedPreviewFramePath = resultPath;
+        }
+        notifyListeners();
+      }
+    } catch (_) {
+      if (!_isDisposed) {
+        _isPreviewRendering = false;
+        notifyListeners();
+      }
+    }
+  }
+
   void clearSelection() {
     clearMediaSelection();
     clearProgressAndOutputs();
+    _renderedPreviewFramePath = null;
+    _isPreviewRendering = false;
+    _previewDebounceTimer?.cancel();
     notifyListeners();
   }
 

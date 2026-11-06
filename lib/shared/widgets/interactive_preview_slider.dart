@@ -41,6 +41,15 @@ class InteractivePreviewSlider extends StatefulWidget {
   /// placeholder icon instead of a real image.
   final String? thumbnailPath;
 
+  /// Whether FFmpeg is actively rendering a debounced preview frame.
+  final bool isPreviewRendering;
+
+  /// Rendered single-frame image path generated via FFmpeg.
+  final String? renderedPreviewFramePath;
+
+  /// Aspect ratio for full-fidelity preview frame display (defaults to 16/9).
+  final double? aspectRatio;
+
   const InteractivePreviewSlider({
     super.key,
     required this.value,
@@ -53,6 +62,9 @@ class InteractivePreviewSlider extends StatefulWidget {
     this.onChangeEnd,
     required this.effect,
     this.thumbnailPath,
+    this.isPreviewRendering = false,
+    this.renderedPreviewFramePath,
+    this.aspectRatio,
   });
 
   @override
@@ -82,6 +94,13 @@ class _InteractivePreviewSliderState extends State<InteractivePreviewSlider>
     if (widget.value != oldWidget.value && _overlayEntry == null) {
       _liveValue = widget.value;
     }
+    if (_overlayEntry != null &&
+        (widget.isPreviewRendering != oldWidget.isPreviewRendering ||
+            widget.renderedPreviewFramePath !=
+                oldWidget.renderedPreviewFramePath ||
+            widget.thumbnailPath != oldWidget.thumbnailPath)) {
+      _overlayEntry?.markNeedsBuild();
+    }
   }
 
   @override
@@ -104,6 +123,9 @@ class _InteractivePreviewSliderState extends State<InteractivePreviewSlider>
         thumbnailPath: widget.thumbnailPath,
         min: widget.min,
         max: widget.max,
+        isPreviewRendering: widget.isPreviewRendering,
+        renderedPreviewFramePath: widget.renderedPreviewFramePath,
+        aspectRatio: widget.aspectRatio,
       ),
     );
     Overlay.of(context).insert(_overlayEntry!);
@@ -201,6 +223,9 @@ class _FloatingPreviewOverlay extends StatelessWidget {
   final String? thumbnailPath;
   final double min;
   final double max;
+  final bool isPreviewRendering;
+  final String? renderedPreviewFramePath;
+  final double? aspectRatio;
 
   const _FloatingPreviewOverlay({
     required this.animation,
@@ -211,6 +236,9 @@ class _FloatingPreviewOverlay extends StatelessWidget {
     required this.thumbnailPath,
     required this.min,
     required this.max,
+    this.isPreviewRendering = false,
+    this.renderedPreviewFramePath,
+    this.aspectRatio,
   });
 
   @override
@@ -224,17 +252,20 @@ class _FloatingPreviewOverlay extends StatelessWidget {
         : AppColors.lightOutlineVariant;
     final accent = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final size = MediaQuery.of(context).size;
-    final previewSize = (size.width * 0.42).clamp(120.0, 200.0);
+    final previewWidth = (size.width * 0.44).clamp(130.0, 200.0);
+    final ratio = aspectRatio ?? (16 / 9);
+    final previewHeight = (previewWidth / ratio).clamp(70.0, 220.0);
+    final cardWidth = previewWidth + 24;
 
     return Positioned(
       top: size.height * 0.15,
-      left: (size.width - previewSize - 32) / 2,
+      left: (size.width - cardWidth) / 2,
       child: FadeTransition(
         opacity: animation,
         child: Material(
           color: Colors.transparent,
           child: Container(
-            width: previewSize + 32,
+            width: cardWidth,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: cardBg,
@@ -265,10 +296,42 @@ class _FloatingPreviewOverlay extends StatelessWidget {
                 const SizedBox(height: 6),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: SizedBox(
-                    width: previewSize,
-                    height: previewSize * 9 / 16,
-                    child: _buildPreviewContent(previewSize, accent),
+                  child: Container(
+                    width: previewWidth,
+                    height: previewHeight,
+                    color: const Color(0xFF141E1C),
+                    child: AspectRatio(
+                      aspectRatio: ratio,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: SizedBox(
+                          width: previewWidth,
+                          height: previewHeight,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 250),
+                                switchInCurve: Curves.easeOut,
+                                switchOutCurve: Curves.easeIn,
+                                child: _buildPreviewContent(
+                                  previewWidth,
+                                  previewHeight,
+                                  accent,
+                                ),
+                              ),
+                              if (isPreviewRendering)
+                                Positioned(
+                                  bottom: 4,
+                                  left: 6,
+                                  right: 6,
+                                  child: _buildLoadingBadge(accent),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -289,6 +352,46 @@ class _FloatingPreviewOverlay extends StatelessWidget {
     );
   }
 
+  Widget _buildLoadingBadge(Color accent) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+        decoration: BoxDecoration(
+          color: Colors.black.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: accent.withValues(alpha: 0.6), width: 0.8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 8,
+              height: 8,
+              child: CircularProgressIndicator(
+                strokeWidth: 1.5,
+                valueColor: AlwaysStoppedAnimation<Color>(accent),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Flexible(
+              child: Text(
+                'Rendering preview...',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _formatLiveLabel() {
     switch (effect) {
       case PreviewEffect.cropZoom:
@@ -304,29 +407,66 @@ class _FloatingPreviewOverlay extends StatelessWidget {
     }
   }
 
-  Widget _buildPreviewContent(double previewSize, Color accent) {
+  Widget _buildPreviewContent(
+    double previewWidth,
+    double previewHeight,
+    Color accent,
+  ) {
+    if (renderedPreviewFramePath != null &&
+        File(renderedPreviewFramePath!).existsSync()) {
+      return Image.file(
+        File(renderedPreviewFramePath!),
+        key: ValueKey<String>(renderedPreviewFramePath!),
+        fit: BoxFit.contain,
+        width: previewWidth,
+        height: previewHeight,
+        errorBuilder: (_, _, _) =>
+            _buildSimulatedFallback(previewWidth, previewHeight, accent),
+      );
+    }
+
+    return _buildSimulatedFallback(
+      previewWidth,
+      previewHeight,
+      accent,
+      key: const ValueKey<String>('simulated_preview'),
+    );
+  }
+
+  Widget _buildSimulatedFallback(
+    double previewWidth,
+    double previewHeight,
+    Color accent, {
+    Key? key,
+  }) {
     Widget thumbnail;
     if (thumbnailPath != null && thumbnailPath!.isNotEmpty) {
       thumbnail = Image.file(
         File(thumbnailPath!),
-        fit: BoxFit.cover,
-        width: previewSize,
-        height: previewSize * 9 / 16,
-        errorBuilder: (_, _, _) => _placeholderBox(previewSize, accent),
+        fit: BoxFit.contain,
+        width: previewWidth,
+        height: previewHeight,
+        errorBuilder: (_, _, _) =>
+            _placeholderBox(previewWidth, previewHeight, accent),
       );
     } else {
-      thumbnail = _placeholderBox(previewSize, accent);
+      thumbnail = _placeholderBox(previewWidth, previewHeight, accent);
     }
 
-    return _applyEffect(thumbnail);
+    return KeyedSubtree(
+      key: key ?? UniqueKey(),
+      child: _applyEffect(thumbnail),
+    );
   }
 
-  Widget _placeholderBox(double previewSize, Color accent) {
+  Widget _placeholderBox(double width, double height, Color accent) {
     return Container(
-      width: previewSize,
-      height: previewSize * 9 / 16,
+      width: width,
+      height: height,
       color: const Color(0xFF2A3A37),
-      child: Icon(Icons.videocam_outlined, color: accent, size: 32),
+      child: Center(
+        child: Icon(Icons.videocam_outlined, color: accent, size: 32),
+      ),
     );
   }
 

@@ -50,6 +50,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
+        <service
+            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

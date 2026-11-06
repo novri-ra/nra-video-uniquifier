@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
@@ -18,10 +19,14 @@ export 'ffmpeg/ffmpeg_command_builder.dart';
 export 'ffmpeg/ffmpeg_file_helper.dart';
 export 'ffmpeg/ffmpeg_metadata_builder.dart';
 export 'ffmpeg/media_probe_helper.dart';
+export 'filter_builders.dart';
 export 'render_diagnostic_service.dart';
+export '../models/unified_effect_preset.dart';
 export '../utils/variation_generator.dart';
 
 class FfmpegService {
+  static int? _activePreviewSessionId;
+
   static String _escapePath(String path) =>
       FfmpegCommandBuilder.escapePath(path);
 
@@ -137,6 +142,69 @@ class FfmpegService {
     return null;
   }
 
+  /// Renders a single-frame preview using ultra-fast FFmpeg extraction with applied filters.
+  /// Automatically cancels any previous in-flight preview session to avoid process queue pileup.
+  static Future<String?> renderFilteredPreviewFrame({
+    required String inputPath,
+    required String filterComplex,
+    required double timestampSeconds,
+  }) async {
+    try {
+      final inputFile = File(inputPath);
+      if (!inputFile.existsSync() || inputFile.lengthSync() == 0) return null;
+
+      // Cancel previous preview session if currently running
+      if (_activePreviewSessionId != null) {
+        final prevId = _activePreviewSessionId;
+        _activePreviewSessionId = null;
+        try {
+          await FFmpegKit.cancel(prevId);
+        } catch (_) {}
+      }
+
+      final tempDir = await getTemporaryDirectory();
+      final outputPath =
+          '${tempDir.path}/preview_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      final cleanFilter = filterComplex.trim();
+      final String vfOption;
+      if (cleanFilter.contains(';') || cleanFilter.contains('[')) {
+        vfOption = '-filter_complex "$cleanFilter,scale=480:-2"';
+      } else if (cleanFilter.isEmpty) {
+        vfOption = '-vf "scale=480:-2"';
+      } else {
+        final trailing = cleanFilter.endsWith(',') ? '' : ',';
+        vfOption = '-vf "$cleanFilter${trailing}scale=480:-2"';
+      }
+
+      final ssParam = timestampSeconds.toStringAsFixed(3);
+      final cmd =
+          '-ss $ssParam -i "${_escapePath(inputPath)}" -vframes 1 -preset ultrafast $vfOption -y "${_escapePath(outputPath)}"';
+
+      final completer = Completer<String?>();
+      final session = await FFmpegKit.executeAsync(cmd, (session) async {
+        final returnCode = await session.getReturnCode();
+        if (ReturnCode.isSuccess(returnCode) && File(outputPath).existsSync()) {
+          if (!completer.isCompleted) completer.complete(outputPath);
+        } else {
+          if (!completer.isCompleted) completer.complete(null);
+        }
+      });
+
+      final currentId = session.getSessionId();
+      _activePreviewSessionId = currentId;
+
+      final result = await completer.future;
+      if (_activePreviewSessionId == currentId) {
+        _activePreviewSessionId = null;
+      }
+      return result;
+    } catch (e) {
+      debugPrint('[FfmpegService] renderFilteredPreviewFrame error: $e');
+      return null;
+    }
+  }
+
   /// Generates the target output path with collision-free timestamp pattern.
   static Future<String> generateOutputPath(String inputPath) =>
       FfmpegFileHelper.generateOutputPath(inputPath);
@@ -242,6 +310,7 @@ class FfmpegService {
       resolvedDurationMs: meta.durationMs,
       baseName: inputPath.split(RegExp(r'[/\\]')).last,
     );
+    await NotificationService.requestPermission();
     await NotificationService.showProgressNotification(
       id: 101,
       progress: 0,
