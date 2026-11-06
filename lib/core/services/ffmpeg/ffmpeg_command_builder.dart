@@ -1,6 +1,7 @@
+import '../../models/unified_effect_preset.dart';
+import '../../utils/variation_generator.dart';
 import '../filter_builders.dart';
 import '../settings_service.dart';
-import '../../utils/variation_generator.dart';
 import 'ffmpeg_metadata_builder.dart';
 
 /// Builder responsible for constructing complete FFmpeg command strings.
@@ -44,6 +45,7 @@ class FfmpegCommandBuilder {
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) {
     final vars =
         variations ??
@@ -78,6 +80,7 @@ class FfmpegCommandBuilder {
       enableBlurredCanvas: enableBlurredCanvas,
       canvasScalePercent: canvasScalePercent,
       muteOriginalAudio: muteOriginalAudio,
+      activeVisualEffects: activeVisualEffects,
       enableDynamicZoom: enableDynamicZoom,
       enableMicroOverlay: enableMicroOverlay,
       enableFrameSkip: enableFrameSkip,
@@ -152,6 +155,7 @@ class FfmpegCommandBuilder {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) {
     final vars =
         variations ??
@@ -199,6 +203,7 @@ class FfmpegCommandBuilder {
         cropZoomScale: cropZoomScale,
         cropAnchor: cropAnchor,
         rotateAngle: rotateAngle,
+        activeVisualEffects: activeVisualEffects,
       ),
     );
     buffer.write(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../../../core/providers/uniquifier_provider.dart';
 import '../../../core/services/ffmpeg_service.dart';
 import '../../../core/services/user_interest_service.dart';
@@ -160,6 +161,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       cropAnchor: provider.cropAnchor,
       introTrimOffset: provider.introTrimOffset,
       rotateAngle: provider.rotateAngle,
+      activeVisualEffects: provider.activeVisualEffects,
       onProgress: (p, speed, timeMs) =>
           _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,
