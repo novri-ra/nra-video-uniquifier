@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:storage_space/storage_space.dart';
 import '../../../core/services/history_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/widgets/app_toast.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 import '../widgets/history_empty_state.dart';
 import '../widgets/history_item_card.dart';
@@ -166,6 +167,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          duration: const Duration(seconds: 4),
           content: const Text(
             'All Files Access permission is required. Open Settings to enable.',
           ),
@@ -174,7 +176,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           action: SnackBarAction(
             label: 'Settings',
             textColor: AppColors.mintSage,
-            onPressed: () => openAppSettings(),
+            onPressed: () => HistoryService.requestAllFilesAccessDirectly(),
           ),
         ),
       );
@@ -297,43 +299,33 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         });
 
         if (deletedPaths.length == selectedItems.length) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('$count video(s) permanently deleted'),
-              backgroundColor: AppColors.surfaceContainerHighest,
-              behavior: SnackBarBehavior.floating,
-            ),
+          AppToast.show(
+            context,
+            message: '$count video(s) permanently deleted',
+            isError: true,
           );
         } else if (deletedPaths.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
+          AppToast.show(
+            context,
+            message:
                 '${deletedPaths.length} video(s) deleted. ${selectedItems.length - deletedPaths.length} failed to delete (verify storage permissions).',
-              ),
-              backgroundColor: AppColors.surfaceContainerHighest,
-              behavior: SnackBarBehavior.floating,
-            ),
+            isError: true,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          AppToast.show(
+            context,
+            message:
                 'Failed to delete selected videos. Ensure storage permissions are granted.',
-              ),
-              backgroundColor: AppColors.error,
-              behavior: SnackBarBehavior.floating,
-            ),
+            isError: true,
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting videos: $e'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppToast.show(
+          context,
+          message: 'Error deleting videos: $e',
+          isError: true,
         );
       }
     }
@@ -384,33 +376,26 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           setState(() {
             _items.removeWhere((i) => i.file.path == targetPath);
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Video permanently deleted from device'),
-              backgroundColor: AppColors.surfaceContainerHighest,
-              behavior: SnackBarBehavior.floating,
-            ),
+          AppToast.show(
+            context,
+            message: 'Video permanently deleted from device',
+            isError: true,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
+          AppToast.show(
+            context,
+            message:
                 'Failed to delete physical file. Ensure storage permissions are granted.',
-              ),
-              backgroundColor: AppColors.error,
-              behavior: SnackBarBehavior.floating,
-            ),
+            isError: true,
           );
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting video: $e'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppToast.show(
+          context,
+          message: 'Error deleting video: $e',
+          isError: true,
         );
       }
     }
@@ -423,12 +408,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       ], text: 'Exported video: ${item.fileName}');
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Share error: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        AppToast.show(context, message: 'Share error: $e', isError: true);
       }
     }
   }
@@ -437,21 +417,15 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
     try {
       final res = await OpenFilex.open(item.file.path);
       if (res.type != ResultType.done && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Unable to open: ${res.message}'),
-            backgroundColor: AppColors.surfaceContainerHighest,
-          ),
+        AppToast.show(
+          context,
+          message: 'Unable to open: ${res.message}',
+          isError: true,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Open error: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        AppToast.show(context, message: 'Open error: $e', isError: true);
       }
     }
   }

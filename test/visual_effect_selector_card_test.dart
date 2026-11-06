@@ -168,5 +168,45 @@ void main() {
         provider.dispose();
       },
     );
+
+    testWidgets(
+      'supports multi-select toggling and displays multiple sliders simultaneously',
+      (tester) async {
+        final provider = UniquifierProvider();
+
+        await tester.pumpWidget(buildTestableWidget(provider: provider));
+        await tester.pumpAndSettle();
+
+        // Tap Blurred Canvas
+        await tester.tap(find.text('Blurred Canvas'));
+        await tester.pumpAndSettle();
+        expect(find.text('CANVAS'), findsOneWidget);
+        expect(find.text('BLURRED CANVAS FOREGROUND SCALE'), findsOneWidget);
+
+        // Tap Echo Delay without de-selecting Blurred Canvas
+        await tester.tap(find.text('Echo Delay'));
+        await tester.pumpAndSettle();
+        expect(find.text('2 ACTIVE'), findsOneWidget);
+
+        // Both contextual sliders must render simultaneously
+        expect(find.text('BLURRED CANVAS FOREGROUND SCALE'), findsOneWidget);
+        expect(find.text('TEMPORAL CLONE DELAY'), findsOneWidget);
+
+        // Tapping Blurred Canvas again deactivates it
+        await tester.tap(find.text('Blurred Canvas'));
+        await tester.pumpAndSettle();
+        expect(find.text('ECHO'), findsOneWidget);
+        expect(find.text('BLURRED CANVAS FOREGROUND SCALE'), findsNothing);
+        expect(find.text('TEMPORAL CLONE DELAY'), findsOneWidget);
+
+        // Tapping None resets everything
+        await tester.tap(find.text('None'));
+        await tester.pumpAndSettle();
+        expect(find.text('ORIGINAL'), findsOneWidget);
+        expect(find.text('TEMPORAL CLONE DELAY'), findsNothing);
+
+        provider.dispose();
+      },
+    );
   });
 }

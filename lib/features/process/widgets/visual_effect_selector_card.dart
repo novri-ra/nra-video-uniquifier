@@ -166,7 +166,10 @@ class VisualEffectSelectorCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        _getActiveBadgeLabel(selectedEffect),
+                        _getActiveBadgeLabel(
+                          provider.activeVisualEffects,
+                          selectedEffect,
+                        ),
                         style: TextStyle(
                           fontFamily: 'monospace',
                           fontSize: 10,
@@ -193,7 +196,7 @@ class VisualEffectSelectorCard extends StatelessWidget {
                   separatorBuilder: (_, _) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final item = _items[index];
-                    final isSelected = selectedEffect == item.effect;
+                    final isSelected = provider.isEffectActive(item.effect);
 
                     return _EffectCatalogCard(
                       item: item,
@@ -201,18 +204,17 @@ class VisualEffectSelectorCard extends StatelessWidget {
                       isDark: isDark,
                       primaryAccent: primaryAccent,
                       onTap: () {
-                        provider.setSelectedVisualEffect(item.effect);
-                        provider.requestFilteredPreviewDebounced(
-                          immediate: true,
-                        );
+                        provider.toggleVisualEffect(item.effect);
                       },
                     );
                   },
                 ),
               ),
 
-              // Contextual Sub-Controls based on selected preset
-              if (selectedEffect == UnifiedVisualEffect.blurredCanvas) ...[
+              // Contextual Sub-Controls based on active presets
+              if (provider.isEffectActive(
+                UnifiedVisualEffect.blurredCanvas,
+              )) ...[
                 Divider(
                   color: isDark
                       ? AppColors.surfaceContainerHighest
@@ -241,7 +243,8 @@ class VisualEffectSelectorCard extends StatelessWidget {
                     },
                   ),
                 ),
-              ] else if (selectedEffect == UnifiedVisualEffect.motionEcho) ...[
+              ],
+              if (provider.isEffectActive(UnifiedVisualEffect.motionEcho)) ...[
                 Divider(
                   color: isDark
                       ? AppColors.surfaceContainerHighest
@@ -270,7 +273,10 @@ class VisualEffectSelectorCard extends StatelessWidget {
                     },
                   ),
                 ),
-              ] else if (selectedEffect != UnifiedVisualEffect.none) ...[
+              ],
+              if (selectedEffect != UnifiedVisualEffect.none &&
+                  !provider.isEffectActive(UnifiedVisualEffect.blurredCanvas) &&
+                  !provider.isEffectActive(UnifiedVisualEffect.motionEcho)) ...[
                 Divider(
                   color: isDark
                       ? AppColors.surfaceContainerHighest
@@ -306,23 +312,33 @@ class VisualEffectSelectorCard extends StatelessWidget {
     );
   }
 
-  String _getActiveBadgeLabel(UnifiedVisualEffect effect) {
-    switch (effect) {
-      case UnifiedVisualEffect.none:
-        return 'ORIGINAL';
-      case UnifiedVisualEffect.blurredCanvas:
-        return 'CANVAS';
-      case UnifiedVisualEffect.motionEcho:
-        return 'ECHO';
-      case UnifiedVisualEffect.rgbSplit:
-        return 'RGB SPLIT';
-      case UnifiedVisualEffect.dreamyBloom:
-        return 'BLOOM';
-      case UnifiedVisualEffect.film16mm:
-        return '16MM';
-      case UnifiedVisualEffect.dynamicGrain:
-        return 'GRAIN';
+  String _getActiveBadgeLabel(
+    Set<UnifiedVisualEffect> activeEffects,
+    UnifiedVisualEffect selectedEffect,
+  ) {
+    final active = activeEffects
+        .where((e) => e != UnifiedVisualEffect.none)
+        .toList();
+    if (active.isEmpty) return 'ORIGINAL';
+    if (active.length == 1) {
+      switch (active.first) {
+        case UnifiedVisualEffect.none:
+          return 'ORIGINAL';
+        case UnifiedVisualEffect.blurredCanvas:
+          return 'CANVAS';
+        case UnifiedVisualEffect.motionEcho:
+          return 'ECHO';
+        case UnifiedVisualEffect.rgbSplit:
+          return 'RGB SPLIT';
+        case UnifiedVisualEffect.dreamyBloom:
+          return 'BLOOM';
+        case UnifiedVisualEffect.film16mm:
+          return '16MM';
+        case UnifiedVisualEffect.dynamicGrain:
+          return 'GRAIN';
+      }
     }
+    return '${active.length} ACTIVE';
   }
 }
 

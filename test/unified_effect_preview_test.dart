@@ -107,6 +107,51 @@ void main() {
       expect(filter, contains('eq=saturation=1.200'));
       expect(filter, contains('curves=vintage'));
     });
+
+    test(
+      'orderEffectsByStage sorts effects in strict 4-stage pipeline order',
+      () {
+        final unordered = {
+          UnifiedVisualEffect.dynamicGrain,
+          UnifiedVisualEffect.dreamyBloom,
+          UnifiedVisualEffect.blurredCanvas,
+          UnifiedVisualEffect.motionEcho,
+        };
+        final ordered = FilterBuilders.orderEffectsByStage(unordered);
+
+        expect(ordered, [
+          UnifiedVisualEffect.blurredCanvas, // 1. Spatial
+          UnifiedVisualEffect.motionEcho, // 2. Temporal
+          UnifiedVisualEffect.dreamyBloom, // 3. Tonal
+          UnifiedVisualEffect.dynamicGrain, // 4. Texture
+        ]);
+      },
+    );
+
+    test(
+      'buildPreviewFilterChain chains multi-stage effects with valid stream labels',
+      () {
+        final multiFilter = FilterBuilders.buildPreviewFilterChain(
+          cropZoomScale: 1.1,
+          activeEffects: {
+            UnifiedVisualEffect.blurredCanvas,
+            UnifiedVisualEffect.motionEcho,
+            UnifiedVisualEffect.dynamicGrain,
+          },
+        );
+
+        // Stage 0 (transforms): outputs [v0]
+        expect(multiFilter, contains('[v0]'));
+        // Stage 1 (Blurred Canvas): takes [v0], outputs [v1]
+        expect(multiFilter, contains('[v0]split=2'));
+        expect(multiFilter, contains('[v1]'));
+        // Stage 2 (Motion Echo): takes [v1], outputs [v2]
+        expect(multiFilter, contains('[v1]split=2'));
+        expect(multiFilter, contains('[v2]'));
+        // Stage 3 (Dynamic Grain): takes [v2]
+        expect(multiFilter, contains('[v2]noise=alls=8:allf=t+u'));
+      },
+    );
   });
 
   group('UniquifierProvider Preview State Tests', () {
@@ -154,6 +199,55 @@ void main() {
       expect(provider.isPreviewRendering, isFalse);
       provider.dispose();
     });
+
+    test(
+      'toggleVisualEffect supports interactive multi-select and none reset',
+      () {
+        final provider = UniquifierProvider();
+        expect(provider.isEffectActive(UnifiedVisualEffect.none), isTrue);
+        expect(provider.activeVisualEffects, {UnifiedVisualEffect.none});
+
+        // Toggle on Blurred Canvas
+        provider.toggleVisualEffect(UnifiedVisualEffect.blurredCanvas);
+        expect(
+          provider.isEffectActive(UnifiedVisualEffect.blurredCanvas),
+          isTrue,
+        );
+        expect(provider.isEffectActive(UnifiedVisualEffect.none), isFalse);
+
+        // Toggle on Motion Echo (now 2 active)
+        provider.toggleVisualEffect(UnifiedVisualEffect.motionEcho);
+        expect(
+          provider.isEffectActive(UnifiedVisualEffect.blurredCanvas),
+          isTrue,
+        );
+        expect(provider.isEffectActive(UnifiedVisualEffect.motionEcho), isTrue);
+        expect(provider.activeVisualEffects.length, 2);
+
+        // Toggle off Blurred Canvas (now only Motion Echo)
+        provider.toggleVisualEffect(UnifiedVisualEffect.blurredCanvas);
+        expect(
+          provider.isEffectActive(UnifiedVisualEffect.blurredCanvas),
+          isFalse,
+        );
+        expect(provider.isEffectActive(UnifiedVisualEffect.motionEcho), isTrue);
+
+        // Toggle off Motion Echo (empty -> falls back to none)
+        provider.toggleVisualEffect(UnifiedVisualEffect.motionEcho);
+        expect(provider.isEffectActive(UnifiedVisualEffect.none), isTrue);
+        expect(provider.activeVisualEffects, {UnifiedVisualEffect.none});
+
+        // Multiple active then tap None resets everything to none
+        provider.toggleVisualEffect(UnifiedVisualEffect.rgbSplit);
+        provider.toggleVisualEffect(UnifiedVisualEffect.film16mm);
+        expect(provider.activeVisualEffects.length, 2);
+        provider.toggleVisualEffect(UnifiedVisualEffect.none);
+        expect(provider.activeVisualEffects, {UnifiedVisualEffect.none});
+        expect(provider.isEffectActive(UnifiedVisualEffect.none), isTrue);
+
+        provider.dispose();
+      },
+    );
   });
 
   group('FfmpegService Preview Frame Engine Tests', () {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/app_toast.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 
 /// Informative placeholder screen for the Workstation Profile destination.
@@ -148,12 +149,10 @@ class _DiagnosticsCard extends StatelessWidget {
       body: 'Android 13+ notification channel active!',
     );
     if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Test notification sent to system tray'),
-        backgroundColor: AppColors.forestDeep,
-        duration: Duration(seconds: 2),
-      ),
+    AppToast.show(
+      context,
+      message: 'Test notification sent to system tray',
+      isError: false,
     );
   }
 

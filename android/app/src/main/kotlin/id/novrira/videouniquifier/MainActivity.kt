@@ -10,6 +10,7 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.PowerManager
+import android.provider.Settings
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -21,6 +22,7 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL_AI = "id.novrira.videouniquifier/ai_super_res"
     private val CHANNEL_DEVICE = "id.novrira.videouniquifier/device_capability"
     private val CHANNEL_WAKELOCK = "id.novrira.videouniquifier/wakelock"
+    private val CHANNEL_STORAGE = "id.novrira.videouniquifier/storage_intent"
 
     private var wakeLock: PowerManager.WakeLock? = null
 
@@ -31,6 +33,7 @@ class MainActivity : FlutterActivity() {
         setupScannerChannel(flutterEngine)
         setupDeviceChannel(flutterEngine)
         setupWakeLockChannel(flutterEngine)
+        setupStorageChannel(flutterEngine)
     }
 
     private fun registerNotificationChannels() {
@@ -224,6 +227,52 @@ class MainActivity : FlutterActivity() {
                 }
                 "isWakeLockHeld" -> {
                     result.success(wakeLock?.isHeld == true)
+                }
+                else -> result.notImplemented()
+            }
+        }
+    }
+
+    private fun setupStorageChannel(flutterEngine: FlutterEngine) {
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_STORAGE).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "openAllFilesAccessSettings" -> {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            val uri = Uri.parse("package:" + applicationContext.packageName)
+                            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(intent)
+                            result.success(true)
+                        } else {
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.parse("package:" + applicationContext.packageName)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(intent)
+                            result.success(true)
+                        }
+                    } catch (e: Exception) {
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                val fallbackIntent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                startActivity(fallbackIntent)
+                                result.success(true)
+                            } else {
+                                val fallbackIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.parse("package:" + applicationContext.packageName)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                startActivity(fallbackIntent)
+                                result.success(true)
+                            }
+                        } catch (e2: Exception) {
+                            result.error("INTENT_ERROR", e2.message, null)
+                        }
+                    }
                 }
                 else -> result.notImplemented()
             }

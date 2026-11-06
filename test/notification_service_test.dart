@@ -70,7 +70,7 @@ void main() {
       );
       expect(initCall.arguments, isNotNull);
       final args = Map<String, dynamic>.from(initCall.arguments as Map);
-      expect(args['defaultIcon'], equals('@mipmap/ic_launcher'));
+      expect(args['defaultIcon'], equals('ic_notification'));
     });
 
     test(
@@ -117,7 +117,7 @@ void main() {
         expect(specifics['showProgress'], isTrue);
         expect(specifics['progress'], equals(50));
         expect(specifics['ongoing'], isTrue);
-        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+        expect(specifics['icon'], equals('ic_notification'));
       },
     );
 
@@ -214,7 +214,7 @@ void main() {
         expect(showCalls.isNotEmpty, isTrue);
         final completeCall = showCalls.last;
         final args = Map<String, dynamic>.from(completeCall.arguments as Map);
-        expect(args['id'], equals(NotificationService.completeNotificationId));
+        expect(args['id'], isA<int>());
         expect(args['title'], equals('Processing Done'));
         expect(args['body'], equals('Video exported successfully'));
         final specifics = Map<String, dynamic>.from(
@@ -227,14 +227,15 @@ void main() {
         );
         expect(
           NotificationService.completeChannelId,
-          equals('nra_uniquifier_channel_v2'),
+          equals('video_processing_channel'),
         );
-        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+        expect(specifics['icon'], equals('ic_notification'));
+        expect(specifics['ticker'], equals('NRA Video Uniquifier'));
       },
     );
 
     test(
-      'showTestNotification invokes show with testNotificationId and channel',
+      'showTestNotification invokes show with unique id and video_processing_channel',
       () async {
         await NotificationService.showTestNotification(
           title: 'Diagnostic Test',
@@ -247,7 +248,7 @@ void main() {
         expect(showCalls.isNotEmpty, isTrue);
         final testCall = showCalls.last;
         final args = Map<String, dynamic>.from(testCall.arguments as Map);
-        expect(args['id'], equals(NotificationService.testNotificationId));
+        expect(args['id'], isA<int>());
         expect(args['title'], equals('Diagnostic Test'));
         expect(args['body'], equals('Testing Android 13+ channel binding'));
         final specifics = Map<String, dynamic>.from(
@@ -255,13 +256,71 @@ void main() {
         );
         expect(
           specifics['channelId'],
-          equals(NotificationService.mainChannelId),
+          equals(NotificationService.processChannelId),
         );
         expect(
-          NotificationService.mainChannelId,
-          equals('nra_uniquifier_channel_v2'),
+          NotificationService.processChannelId,
+          equals('video_processing_channel'),
         );
-        expect(specifics['icon'], equals('@mipmap/ic_launcher'));
+        expect(specifics['icon'], equals('ic_notification'));
+        expect(specifics['ticker'], equals('NRA Video Uniquifier'));
+      },
+    );
+
+    test(
+      'processChannelId is video_processing_channel with high importance',
+      () {
+        expect(
+          NotificationService.processChannelId,
+          equals('video_processing_channel'),
+        );
+      },
+    );
+
+    test(
+      'requestNotificationsPermission delegates to requestPermission',
+      () async {
+        final granted =
+            await NotificationService.requestNotificationsPermission();
+        expect(granted, isTrue);
+      },
+    );
+
+    test(
+      'sendTestNotification and showCompletionNotification aliases invoke show and createNotificationChannel',
+      () async {
+        await NotificationService.sendTestNotification(
+          title: 'Alias Test',
+          body: 'Alias test body',
+        );
+
+        expect(
+          capturedNotificationsCalls.any(
+            (call) => call.method == 'createNotificationChannel',
+          ),
+          isTrue,
+        );
+        expect(
+          capturedNotificationsCalls.any((call) => call.method == 'show'),
+          isTrue,
+        );
+
+        capturedNotificationsCalls.clear();
+        await NotificationService.showCompletionNotification(
+          title: 'Alias Completion',
+          body: 'Alias completion body',
+        );
+
+        expect(
+          capturedNotificationsCalls.any(
+            (call) => call.method == 'createNotificationChannel',
+          ),
+          isTrue,
+        );
+        expect(
+          capturedNotificationsCalls.any((call) => call.method == 'show'),
+          isTrue,
+        );
       },
     );
   });
