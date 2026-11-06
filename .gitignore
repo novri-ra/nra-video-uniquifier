@@ -58,8 +58,11 @@ __pycache__/
 .idea/
 # Staged temporary test files
 staged_*
-Movies/
+staged_*.mp4
 *.mp4
+/test_media/
+/temp_staged/
+Movies/
 *.aac
 *.ts
 *.m4a
