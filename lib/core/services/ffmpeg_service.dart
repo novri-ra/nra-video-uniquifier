@@ -210,10 +210,41 @@ class FfmpegService {
       if (_activePreviewSessionId == currentId) {
         _activePreviewSessionId = null;
       }
+
+      if (result != null) {
+        _cleanupOldPreviews(result);
+      }
+
       return result;
     } catch (e) {
       debugPrint('[FfmpegService] renderFilteredPreviewFrame error: $e');
       return null;
+    }
+  }
+
+    /// Deletes old preview_*.jpg files in the temp directory to prevent cache bloat.
+  static void _cleanupOldPreviews(String currentPath) {
+    try {
+      final dir = File(currentPath).parent;
+      if (!dir.existsSync()) return;
+
+      final files = dir.listSync();
+      for (final entity in files) {
+        if (entity is File) {
+          final fileName = entity.path.split(RegExp(r'[/\\]')).last;
+          // Cari file yang berawalan 'preview_' dan berekstensi '.jpg'
+          if (fileName.startsWith('preview_') && fileName.endsWith('.jpg')) {
+            // Jangan hapus file yang baru saja dibuat (currentPath)
+            if (entity.path != currentPath) {
+              try {
+                entity.deleteSync();
+              } catch (_) {}
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Abaikan error cleanup agar tidak mengganggu proses rendering utama
     }
   }
 
