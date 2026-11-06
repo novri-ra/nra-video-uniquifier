@@ -37,6 +37,7 @@
 | 34 | 34-release-v1.0.2-android14-storage-fix.md | 2026-11-05 | release | Official production release v1.0.2 (Build 3), Android 14 storage permission fix, device_info_plus, lifecycle observer, release APK build, and clean target device installation |
 | 35 | 35-release-v1.0.3-interactive-sliders-and-thumbnail-fix.md | 2026-11-05 | release | Official production release v1.0.3 (Build 4), InteractivePreviewSlider floating overlay, visual sliders wiring, success screen thumbnail fallback, release APK build, and clean target device installation |
 | 36 | 36-full-fidelity-preview-and-effect-suite.md | 2026-11-06 | feature | Implement full-fidelity debounced preview rendering engine (1-frame extraction via FFmpeg) with previous session cancellation, unified 6-effect visual suite, and full aspect ratio floating preview overlay with loading badge and AnimatedSwitcher |
+| 37 | 37-release-v1.0.4-universal-compatibility-and-effect-catalog.md | 2026-11-06 | release | Official production release v1.0.4 (Build 5), universal Android compatibility (API 24 to 36), POST_NOTIFICATIONS runtime flow, dataSync foreground service type, R8 keep rules, VisualEffectSelectorCard, release APK build, and clean target device installation |
 
 ## Numbering Rules
 - NN = 2-digit, monotonic, never reused
