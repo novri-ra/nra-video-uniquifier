@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../models/batch_video_item.dart';
 import '../services/ffmpeg_service.dart';
 import '../services/notification_service.dart';
@@ -168,6 +169,8 @@ class BatchQueueProvider extends ChangeNotifier {
       cropZoomScale: config.cropZoomScale,
       cropAnchor: config.cropAnchor,
       introTrimOffset: config.introTrimOffset,
+      rotateAngle: config.rotateAngle,
+      activeVisualEffects: config.activeVisualEffects,
       onProgress: (p, speed, timeMs) =>
           _handleBatchProgress(i, p, speed, timeMs, current, config),
     );

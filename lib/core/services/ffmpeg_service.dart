@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../models/unified_effect_preset.dart';
+import '../utils/variation_generator.dart';
 import 'ffmpeg/ffmpeg_command_builder.dart';
 import 'ffmpeg/ffmpeg_file_helper.dart';
 import 'ffmpeg/media_probe_helper.dart';
@@ -14,15 +18,15 @@ import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
 import 'storage_service.dart';
 import 'wakelock_service.dart';
-import '../utils/variation_generator.dart';
+
+export '../models/unified_effect_preset.dart';
+export '../utils/variation_generator.dart';
 export 'ffmpeg/ffmpeg_command_builder.dart';
 export 'ffmpeg/ffmpeg_file_helper.dart';
 export 'ffmpeg/ffmpeg_metadata_builder.dart';
 export 'ffmpeg/media_probe_helper.dart';
 export 'filter_builders.dart';
 export 'render_diagnostic_service.dart';
-export '../models/unified_effect_preset.dart';
-export '../utils/variation_generator.dart';
 
 class FfmpegService {
   static int? _activePreviewSessionId;
@@ -66,6 +70,7 @@ class FfmpegService {
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) => FfmpegCommandBuilder.buildCommand(
     inputPath: inputPath,
     outputPath: outputPath,
@@ -101,6 +106,7 @@ class FfmpegService {
     cropAnchor: cropAnchor,
     introTrimOffset: introTrimOffset,
     rotateAngle: rotateAngle,
+    activeVisualEffects: activeVisualEffects,
   );
 
   /// Cancels any currently running FFmpeg operations.
@@ -204,10 +210,41 @@ class FfmpegService {
       if (_activePreviewSessionId == currentId) {
         _activePreviewSessionId = null;
       }
+
+      if (result != null) {
+        _cleanupOldPreviews(result);
+      }
+
       return result;
     } catch (e) {
       debugPrint('[FfmpegService] renderFilteredPreviewFrame error: $e');
       return null;
+    }
+  }
+
+    /// Deletes old preview_*.jpg files in the temp directory to prevent cache bloat.
+  static void _cleanupOldPreviews(String currentPath) {
+    try {
+      final dir = File(currentPath).parent;
+      if (!dir.existsSync()) return;
+
+      final files = dir.listSync();
+      for (final entity in files) {
+        if (entity is File) {
+          final fileName = entity.path.split(RegExp(r'[/\\]')).last;
+          // Cari file yang berawalan 'preview_' dan berekstensi '.jpg'
+          if (fileName.startsWith('preview_') && fileName.endsWith('.jpg')) {
+            // Jangan hapus file yang baru saja dibuat (currentPath)
+            if (entity.path != currentPath) {
+              try {
+                entity.deleteSync();
+              } catch (_) {}
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Abaikan error cleanup agar tidak mengganggu proses rendering utama
     }
   }
 
@@ -258,6 +295,7 @@ class FfmpegService {
     String cropAnchor = 'center',
     double introTrimOffset = 0.5,
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) async {
     if (!await StorageService.hasEnoughSpace()) {
       throw Exception(
@@ -308,6 +346,7 @@ class FfmpegService {
       cropAnchor: cropAnchor,
       introTrimOffset: introTrimOffset,
       rotateAngle: rotateAngle,
+      activeVisualEffects: activeVisualEffects,
     );
 
     _setupCallbacks(

@@ -210,6 +210,7 @@ class FilterBuilders {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) {
     final (targetW, targetH) = canonicalDimensions(
       targetResolution,
@@ -249,7 +250,7 @@ class FilterBuilders {
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (allowFrameSkip) 'decimate=cycle=25',
-      if (upscale)
+            if (upscale)
         buildScaleFilter(
           targetResolution: targetResolution,
           isPortrait: isPortrait,
@@ -257,6 +258,15 @@ class FilterBuilders {
         )
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+
+      // --- TAMBAHKAN LOGIKA MULTI-SELECT VISUAL EFFECTS DI SINI ---
+      if (activeVisualEffects != null)
+        ...activeVisualEffects
+            .where((effect) => effect != UnifiedVisualEffect.none)
+            .map((effect) => buildUnifiedEffectFilter(effect))
+            .where((filterStr) => filterStr.isNotEmpty),
+      // ------------------------------------------------------------
+
       'setpts=PTS-STARTPTS',
       'format=yuv420p',
     ];
@@ -327,6 +337,7 @@ class FilterBuilders {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double? rotateAngle,
+    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
@@ -357,6 +368,7 @@ class FilterBuilders {
               cropZoomScale: cropZoomScale,
               cropAnchor: cropAnchor,
               rotateAngle: rotateAngle,
+              activeVisualEffects: activeVisualEffects,
             ).join(',');
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
       return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';

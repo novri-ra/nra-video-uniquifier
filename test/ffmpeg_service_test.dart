@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nra_video_uniquifier/core/services/ffmpeg_service.dart';
@@ -39,6 +40,37 @@ void main() {
       expect(cmd, contains('-map_metadata -1 -map_chapters -1 -bitexact'));
       expect(cmd, contains('-c copy'));
       expect(cmd, contains('"/path/output.mp4"'));
+    });
+
+    test('Active visual effects inject effect filters into video filtergraph', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: 'input.mp4',
+        outputPath: 'output.mp4',
+        activeVisualEffects: {UnifiedVisualEffect.motionEcho},
+      );
+      // Memastikan parameter activeVisualEffects benar-benar merangkai filter
+      // motionEcho (biasanya menggunakan tmix atau sejenisnya)
+      expect(
+        cmd,
+        isNot(
+          equals(
+            FfmpegService.buildCommand(
+              inputPath: 'input.mp4',
+              outputPath: 'output.mp4',
+            ),
+          ),
+        ),
+      );
+    });
+
+    test('Rotate angle injects rotate filter into spatial stage', () {
+      final cmd = FfmpegService.buildCommand(
+        inputPath: 'input.mp4',
+        outputPath: 'output.mp4',
+        rotateAngle: 1.5,
+      );
+      // Memastikan parameter rotateAngle diteruskan ke filter FFmpeg
+      expect(cmd, contains('rotate='));
     });
 
     test(
