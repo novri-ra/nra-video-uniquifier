@@ -169,7 +169,13 @@ class FfmpegService {
       final cleanFilter = filterComplex.trim();
       final String vfOption;
       if (cleanFilter.contains(';') || cleanFilter.contains('[')) {
-        vfOption = '-filter_complex "$cleanFilter,scale=480:-2"';
+        if (cleanFilter.endsWith(']')) {
+          final lastBracket = cleanFilter.lastIndexOf('[');
+          final outLabel = cleanFilter.substring(lastBracket);
+          vfOption = '-filter_complex "$cleanFilter;$outLabel scale=480:-2"';
+        } else {
+          vfOption = '-filter_complex "$cleanFilter,scale=480:-2"';
+        }
       } else if (cleanFilter.isEmpty) {
         vfOption = '-vf "scale=480:-2"';
       } else {

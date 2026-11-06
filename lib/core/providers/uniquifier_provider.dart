@@ -173,16 +173,58 @@ class UniquifierProvider extends ChangeNotifier
   bool _isPreviewRendering = false;
   String? _renderedPreviewFramePath;
   Timer? _previewDebounceTimer;
-  UnifiedVisualEffect _selectedVisualEffect = UnifiedVisualEffect.none;
+  Set<UnifiedVisualEffect> _activeVisualEffects = {UnifiedVisualEffect.none};
   double _motionEchoDelay = 0.15;
 
   bool get isPreviewRendering => _isPreviewRendering;
   String? get renderedPreviewFramePath => _renderedPreviewFramePath;
-  UnifiedVisualEffect get selectedVisualEffect => _selectedVisualEffect;
+  Set<UnifiedVisualEffect> get activeVisualEffects =>
+      Set.unmodifiable(_activeVisualEffects);
+  UnifiedVisualEffect get selectedVisualEffect {
+    final nonNone = _activeVisualEffects.where(
+      (e) => e != UnifiedVisualEffect.none,
+    );
+    return nonNone.isNotEmpty ? nonNone.last : UnifiedVisualEffect.none;
+  }
+
   double get motionEchoDelay => _motionEchoDelay;
 
+  /// Returns true if [effect] is currently active in the multi-select set.
+  bool isEffectActive(UnifiedVisualEffect effect) {
+    if (effect == UnifiedVisualEffect.none) {
+      return _activeVisualEffects.length == 1 &&
+          _activeVisualEffects.contains(UnifiedVisualEffect.none);
+    }
+    return _activeVisualEffects.contains(effect);
+  }
+
+  /// Toggles an effect on/off with tap-to-toggle multi-select semantics.
+  /// Tapping 'None' clears all active effects and sets only 'None'.
+  /// Tapping any other effect toggles it; if empty, falls back to 'None'.
+  void toggleVisualEffect(UnifiedVisualEffect effect) {
+    if (effect == UnifiedVisualEffect.none) {
+      _activeVisualEffects = {UnifiedVisualEffect.none};
+    } else {
+      _activeVisualEffects.remove(UnifiedVisualEffect.none);
+      if (_activeVisualEffects.contains(effect)) {
+        _activeVisualEffects.remove(effect);
+      } else {
+        _activeVisualEffects.add(effect);
+      }
+      if (_activeVisualEffects.isEmpty) {
+        _activeVisualEffects = {UnifiedVisualEffect.none};
+      }
+    }
+    notifyListeners();
+    requestFilteredPreviewDebounced(immediate: true);
+  }
+
   void setSelectedVisualEffect(UnifiedVisualEffect effect) {
-    _selectedVisualEffect = effect;
+    if (effect == UnifiedVisualEffect.none) {
+      _activeVisualEffects = {UnifiedVisualEffect.none};
+    } else {
+      _activeVisualEffects = {effect};
+    }
     notifyListeners();
     requestFilteredPreviewDebounced(immediate: true);
   }
@@ -251,7 +293,8 @@ class UniquifierProvider extends ChangeNotifier
             sharpeningLevel: sharpeningLevel,
             enableBlurredCanvas: enableBlurredCanvas,
             canvasScalePercent: canvasScalePercent,
-            effect: _selectedVisualEffect,
+            effect: selectedVisualEffect,
+            activeEffects: _activeVisualEffects,
             motionEchoDelay: _motionEchoDelay,
           );
 

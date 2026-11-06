@@ -243,7 +243,8 @@ void main() {
               if (call.method == 'initialize') return true;
               if (call.method == 'show') {
                 final args = Map<String, dynamic>.from(call.arguments as Map);
-                if (args['id'] == NotificationService.completeNotificationId) {
+                if (args['title'] == 'Batch Processing Finished' ||
+                    args['id'] == NotificationService.completeNotificationId) {
                   completeCalls.add(call);
                 }
               }

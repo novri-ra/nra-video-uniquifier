@@ -489,6 +489,81 @@ class FilterBuilders {
     return 'noise=alls=$strength:allf=t+u';
   }
 
+  /// Orders [effects] according to the 4 pipeline stages:
+  /// 1. Spatial Stage: Blurred Canvas (skala latar dan foreground).
+  /// 2. Temporal Stage: Motion Echo atau RGB Split.
+  /// 3. Tonal Stage: Dreamy Bloom atau 16mm Vintage Curve.
+  /// 4. Texture Stage: Dynamic Film Grain.
+  static List<UnifiedVisualEffect> orderEffectsByStage(
+    Iterable<UnifiedVisualEffect> effects,
+  ) {
+    const stageOrder = [
+      UnifiedVisualEffect.blurredCanvas,
+      UnifiedVisualEffect.motionEcho,
+      UnifiedVisualEffect.rgbSplit,
+      UnifiedVisualEffect.dreamyBloom,
+      UnifiedVisualEffect.film16mm,
+      UnifiedVisualEffect.dynamicGrain,
+    ];
+    final active = effects.where((e) => e != UnifiedVisualEffect.none).toSet();
+    final ordered = <UnifiedVisualEffect>[];
+    for (final effect in stageOrder) {
+      if (active.contains(effect)) {
+        ordered.add(effect);
+      }
+    }
+    return ordered;
+  }
+
+  static String _buildStageSegment(
+    UnifiedVisualEffect effect, {
+    String? inTag,
+    String? outTag,
+    double canvasScalePercent = 95.0,
+    double motionEchoDelay = 0.15,
+  }) {
+    final inPrefix = (inTag != null && inTag.isNotEmpty) ? inTag : '';
+    final outSuffix = (outTag != null && outTag.isNotEmpty) ? outTag : '';
+
+    switch (effect) {
+      case UnifiedVisualEffect.none:
+        return '';
+      case UnifiedVisualEffect.blurredCanvas:
+        final scaleFactor = (canvasScalePercent / 100.0)
+            .clamp(0.70, 1.00)
+            .toStringAsFixed(2);
+        return '${inPrefix}split=2[bc_bg][bc_fg];'
+            '[bc_bg]boxblur=luma_radius=min(h\\,w)/30:luma_power=2[bc_bl];'
+            '[bc_fg]scale=iw*$scaleFactor:ih*$scaleFactor:force_original_aspect_ratio=decrease[bc_sc];'
+            '[bc_bl][bc_sc]overlay=(W-w)/2:(H-h)/2$outSuffix';
+      case UnifiedVisualEffect.motionEcho:
+        final delay = motionEchoDelay.toStringAsFixed(3);
+        const op = '0.35';
+        return '${inPrefix}split=2[me_orig][me_del];'
+            '[me_del]setpts=PTS+$delay/TB[me_ec];'
+            '[me_orig][me_ec]blend=all_mode=addition:all_opacity=$op$outSuffix';
+      case UnifiedVisualEffect.rgbSplit:
+        const gDelay = '0.050';
+        const bDelay = '0.100';
+        return '${inPrefix}split=3[rs_r][rs_g][rs_b];'
+            '[rs_r]lutrgb=g=0:b=0[rs_ro];'
+            '[rs_g]lutrgb=r=0:b=0,setpts=PTS+$gDelay/TB[rs_go];'
+            '[rs_b]lutrgb=r=0:g=0,setpts=PTS+$bDelay/TB[rs_bo];'
+            '[rs_ro][rs_go]blend=all_mode=addition[rs_rg];'
+            '[rs_rg][rs_bo]blend=all_mode=addition$outSuffix';
+      case UnifiedVisualEffect.dreamyBloom:
+        const s = '12.0';
+        const op = '0.38';
+        return '${inPrefix}split=2[db_orig][db_glow];'
+            '[db_glow]gblur=sigma=$s:steps=2[db_bl];'
+            '[db_orig][db_bl]blend=all_mode=screen:all_opacity=$op$outSuffix';
+      case UnifiedVisualEffect.film16mm:
+        return '${inPrefix}curves=vintage,colorbalance=rs=0.08:gs=-0.04:bs=-0.08:rm=0.06:gm=0.02:bm=-0.06:rh=0.04:gh=0.0:bh=-0.06,eq=contrast=1.06:saturation=0.92$outSuffix';
+      case UnifiedVisualEffect.dynamicGrain:
+        return '${inPrefix}noise=alls=8:allf=t+u$outSuffix';
+    }
+  }
+
   /// Builds lightweight preview filter chain combining active parameters.
   static String buildPreviewFilterChain({
     double cropZoomScale = 1.0,
@@ -499,6 +574,7 @@ class FilterBuilders {
     bool enableBlurredCanvas = false,
     double canvasScalePercent = 95.0,
     UnifiedVisualEffect effect = UnifiedVisualEffect.none,
+    Set<UnifiedVisualEffect>? activeEffects,
     double motionEchoDelay = 0.15,
   }) {
     final filters = <String>[];
@@ -528,16 +604,28 @@ class FilterBuilders {
       filters.add('eq=saturation=${saturationLevel.toStringAsFixed(3)}');
     }
 
-    // 3. Effect Suite
-    final effectiveEffect = effect != UnifiedVisualEffect.none
-        ? effect
-        : (enableBlurredCanvas
-              ? UnifiedVisualEffect.blurredCanvas
-              : UnifiedVisualEffect.none);
+    // 3. Multi-Stage Effect Suite
+    final Set<UnifiedVisualEffect> effectiveSet;
+    if (activeEffects != null && activeEffects.isNotEmpty) {
+      effectiveSet = activeEffects.toSet();
+    } else if (effect != UnifiedVisualEffect.none) {
+      effectiveSet = {effect};
+    } else if (enableBlurredCanvas) {
+      effectiveSet = {UnifiedVisualEffect.blurredCanvas};
+    } else {
+      effectiveSet = {UnifiedVisualEffect.none};
+    }
 
-    if (effectiveEffect != UnifiedVisualEffect.none) {
+    final orderedEffects = orderEffectsByStage(effectiveSet);
+
+    if (orderedEffects.isEmpty) {
+      return filters.join(',');
+    }
+
+    if (orderedEffects.length == 1) {
+      final singleEffect = orderedEffects.first;
       final effectFilter = buildUnifiedEffectFilter(
-        effectiveEffect,
+        singleEffect,
         canvasScalePercent: canvasScalePercent,
         motionEchoDelay: motionEchoDelay,
       );
@@ -548,8 +636,36 @@ class FilterBuilders {
           return '${filters.join(',')},$effectFilter';
         }
       }
+      return filters.join(',');
     }
 
-    return filters.join(',');
+    // Multiple active effects: chain stage by stage with distinct stream labels
+    final segments = <String>[];
+    String? currentTag;
+
+    if (filters.isNotEmpty) {
+      segments.add('${filters.join(',')}[v0]');
+      currentTag = '[v0]';
+    }
+
+    for (int i = 0; i < orderedEffects.length; i++) {
+      final isLast = (i == orderedEffects.length - 1);
+      final nextTag = isLast
+          ? null
+          : '[v${filters.isNotEmpty ? i + 1 : i + 1}]';
+      final seg = _buildStageSegment(
+        orderedEffects[i],
+        inTag: currentTag,
+        outTag: nextTag,
+        canvasScalePercent: canvasScalePercent,
+        motionEchoDelay: motionEchoDelay,
+      );
+      if (seg.isNotEmpty) {
+        segments.add(seg);
+        currentTag = nextTag;
+      }
+    }
+
+    return segments.join(';');
   }
 }

@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/uniquifier_provider.dart';
+import '../../../core/services/notification_service.dart';
 import '../../../core/services/settings_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/app_toast.dart';
 import '../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../shared/widgets/setting_toggle_row.dart';
 import '../../../shared/widgets/top_app_bar.dart';
@@ -77,11 +79,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!mounted) return;
     setState(() => _cacheSizeBytes = updated);
     final freedMb = (freed / (1024 * 1024)).toStringAsFixed(1);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Cache purged: $freedMb MB freed'),
-        backgroundColor: AppColors.primaryContainer,
-      ),
+    AppToast.show(
+      context,
+      message: 'Cache purged: $freedMb MB freed',
+      icon: Icons.cleaning_services_outlined,
     );
   }
 
@@ -348,6 +349,71 @@ class _AlertsSettingsCard extends StatelessWidget {
             subtitle: 'Play completion chime on finish',
             value: notificationSound,
             onChanged: onToggleSound,
+          ),
+          Divider(
+            height: 1,
+            color: isDark
+                ? AppColors.surfaceContainerHighest
+                : AppColors.lightOutlineVariant,
+          ),
+          InkWell(
+            onTap: () async {
+              await NotificationService.showTestNotification();
+              if (context.mounted) {
+                AppToast.show(
+                  context,
+                  message: 'Test notification sent to system tray',
+                  isError: false,
+                );
+              }
+            },
+            borderRadius: const BorderRadius.vertical(
+              bottom: Radius.circular(10),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.notifications_active_outlined,
+                    size: 20,
+                    color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Test Notification',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? AppColors.onSurface
+                                : AppColors.lightOnSurface,
+                          ),
+                        ),
+                        Text(
+                          'Send diagnostic test notification to status bar',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark
+                                ? AppColors.onSurfaceVariant
+                                : AppColors.lightOnSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.send_rounded,
+                    size: 16,
+                    color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
