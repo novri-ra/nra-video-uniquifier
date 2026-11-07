@@ -1,8 +1,6 @@
 package id.novrira.videouniquifier
 
 import android.app.ActivityManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,7 +26,7 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        registerNotificationChannels()
+        // registerNotificationChannels() DIHAPUS DARI SINI
         setupAiChannel(flutterEngine)
         setupScannerChannel(flutterEngine)
         setupDeviceChannel(flutterEngine)
@@ -36,46 +34,7 @@ class MainActivity : FlutterActivity() {
         setupStorageChannel(flutterEngine)
     }
 
-    private fun registerNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
-            val processChannel = NotificationChannel(
-                "nra_video_processing_channel",
-                "Pemrosesan Video NRA",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Menampilkan progres rendering dan status video"
-                setShowBadge(false)
-            }
-            val completeChannel = NotificationChannel(
-                "video_complete_channel",
-                "Video Processing Complete",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Alerts when video processing finishes"
-            }
-            val uniquifierChannel = NotificationChannel(
-                "nra_uniquifier_channel_v2",
-                "NRA Uniquifier Processing",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifikasi status proses video dan ekspor aset"
-                enableVibration(true)
-            }
-            val videoProcessingChannel = NotificationChannel(
-                "video_processing_channel",
-                "Video Processing",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Video Processing notifications and alert status"
-                enableVibration(true)
-            }
-            notificationManager?.createNotificationChannel(uniquifierChannel)
-            notificationManager?.createNotificationChannel(processChannel)
-            notificationManager?.createNotificationChannel(completeChannel)
-            notificationManager?.createNotificationChannel(videoProcessingChannel)
-        }
-    }
+    // FUNGSI registerNotificationChannels() DIHAPUS DARI SINI
 
     private fun setupAiChannel(flutterEngine: FlutterEngine) {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_AI).setMethodCallHandler { call, result ->

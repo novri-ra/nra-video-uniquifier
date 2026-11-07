@@ -11,7 +11,7 @@ void main() {
 
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    ConnectivityService.mockPingHandler = null;
+    // ConnectivityService.mockPingHandler = null; <-- DIHAPUS (sudah tidak ada)
     TranslationService.mockTranslator = null;
     TranslationService.customHttpGet = null;
     MicrostockNewsService.mockFetchHandler = null;
@@ -25,22 +25,8 @@ void main() {
   });
 
   group('Sprint 76: ConnectivityService Unit Tests', () {
-    test(
-      'checkConnectivity returns mocked state without socket connection',
-      () async {
-        final connectivity = ConnectivityService.instance;
-        ConnectivityService.mockPingHandler = () async => true;
-
-        final isOnline = await connectivity.checkConnectivity();
-        expect(isOnline, isTrue);
-        expect(connectivity.isOnline.value, isTrue);
-
-        ConnectivityService.mockPingHandler = () async => false;
-        final isOffline = await connectivity.checkConnectivity();
-        expect(isOffline, isFalse);
-        expect(connectivity.isOnline.value, isFalse);
-      },
-    );
+    // Test lama yang memanggil checkConnectivity() dan mockPingHandler telah DIHAPUS
+    // karena kita sudah beralih ke event-driven connectivity_plus.
 
     test('setOnlineForTesting directly toggles ValueNotifier state', () {
       final connectivity = ConnectivityService.instance;

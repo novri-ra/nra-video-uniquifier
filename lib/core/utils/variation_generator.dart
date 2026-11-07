@@ -94,18 +94,18 @@ class VideoVariations {
     this.deviceProfile = DeviceProfile.defaultProfile,
   });
 
-  /// Hardened static fallback matching Sprint 69 anti-detection baseline.
+    /// Hardened static fallback matching the new aggressive baseline.
   static const VideoVariations fallback = VideoVariations(
-    cropPercent: 0.08,
+    cropPercent: 0.10,       // <-- Ubah ke 10%
     brightness: 0.0,
     contrast: 1.0,
     saturation: 1.0,
-    noiseStrength: 4,
-    speedFactor: 1.015,
-    rotateAngle: 0.8,
-    audioTempo: 1.015,
-    outputFps: 29.85,
-    pitchFactor: 1.012,
+    noiseStrength: 6,        // <-- Ubah ke 6
+    speedFactor: 1.03,       // <-- Ubah ke 1.03
+    rotateAngle: 1.0,        // <-- Ubah ke 1.0
+    audioTempo: 1.03,        // <-- Samakan dengan speedFactor
+    outputFps: 29.7,         // <-- Variasi FPS
+    pitchFactor: 0.99,       // <-- Pitch shift lebih kuat
     curves:
         "r='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1':g='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1':b='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1'",
     deviceProfile: DeviceProfile.defaultProfile,
@@ -145,16 +145,22 @@ class VariationGenerator {
   static VideoVariations generate({math.Random? random}) {
     try {
       final rng = random ?? _random;
-      final crop = 0.07 + rng.nextDouble() * 0.02;
+      // 1. Perkuat Crop: 8% hingga 12%
+      final crop = 0.08 + rng.nextDouble() * 0.04;
       final bright = -0.01 + rng.nextDouble() * 0.02;
       final cont = 0.99 + rng.nextDouble() * 0.02;
       final sat = 0.99 + rng.nextDouble() * 0.02;
-      final noise = rng.nextBool() ? 3 : 4;
-      final speed = 1.010 + rng.nextDouble() * 0.015;
-      final rot = 0.6 + rng.nextDouble() * 0.3;
-      final tempo = speed;
-      final fps = 29.80 + rng.nextDouble() * 0.10;
-      final pitch = 0.985 + rng.nextDouble() * 0.030;
+      // 2. Perkuat Noise: 4 hingga 8
+      final noise = 4 + rng.nextInt(5);
+      // 3. Perkuat Speed Warp: 1.02 hingga 1.05 (2-5% lebih cepat)
+      final speed = 1.02 + rng.nextDouble() * 0.03;
+      // 4. Perkuat Rotasi: 0.8 hingga 1.5 derajat
+      final rot = 0.8 + rng.nextDouble() * 0.7;
+      final tempo = speed; // Sinkron dengan speed
+      // 5. FPS lebih bervariasi
+      final fps = 29.50 + rng.nextDouble() * 0.8;
+      // 6. Perkuat Pitch Shift: 0.98 hingga 1.02 (±2%)
+      final pitch = 0.98 + rng.nextDouble() * 0.04;
       final curves = generateRgbCurves(random: rng);
       final profile =
           DeviceProfile.profiles[rng.nextInt(DeviceProfile.profiles.length)];

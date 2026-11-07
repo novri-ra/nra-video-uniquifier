@@ -188,7 +188,7 @@ void main() {
           isTrue,
         );
         expect(cmd, contains('-c:a copy'));
-        expect(cmd, contains('-r 29.'));
+        expect(cmd, matches(RegExp(r'-r \d+\.\d+')));
 
         // Strict sequential order checks: PTS -> Crop -> Rotate -> Unsharp -> EQ -> Noise -> Scale -> Format
         final ptsIdx = cmd.indexOf('setpts=');
@@ -563,8 +563,8 @@ void main() {
       },
     );
 
-    test(
-      'TikTok Hardened Evasion Validation: crop >= 7%, rotation >= 0.6 deg, noise >= 3, speed warp 1.01-1.025x, smartphone metadata',
+        test(
+      'TikTok Hardened Evasion Validation: crop >= 8%, rotation >= 0.8 deg, noise >= 4, speed warp 1.02-1.05x, smartphone metadata',
       () {
         final cropRegex = RegExp(
           r'crop=trunc\(iw\*([0-9.]+)/2\)\*2:trunc\(ih\*([0-9.]+)/2\)\*2',
@@ -575,18 +575,30 @@ void main() {
 
         for (var i = 0; i < 20; i++) {
           final vars = VariationGenerator.generate();
-          expect(vars.cropPercent, greaterThanOrEqualTo(0.0699));
-          expect(vars.cropPercent, lessThanOrEqualTo(0.0901));
-          expect(vars.rotateAngle, greaterThanOrEqualTo(0.599));
-          expect(vars.rotateAngle, lessThanOrEqualTo(0.901));
-          expect(vars.noiseStrength, greaterThanOrEqualTo(3));
-          expect(vars.noiseStrength, lessThanOrEqualTo(4));
-          expect(vars.speedFactor, greaterThanOrEqualTo(1.0099));
-          expect(vars.speedFactor, lessThanOrEqualTo(1.0251));
-          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9849));
-          expect(vars.pitchFactor, lessThanOrEqualTo(1.0151));
-          expect(vars.outputFps, greaterThanOrEqualTo(29.79));
-          expect(vars.outputFps, lessThanOrEqualTo(29.91));
+
+          // Batas Baru: Crop 8% - 12%
+          expect(vars.cropPercent, greaterThanOrEqualTo(0.0799));
+          expect(vars.cropPercent, lessThanOrEqualTo(0.1201));
+
+          // Batas Baru: Rotasi 0.8 - 1.5 derajat
+          expect(vars.rotateAngle, greaterThanOrEqualTo(0.799));
+          expect(vars.rotateAngle, lessThanOrEqualTo(1.501));
+
+          // Batas Baru: Noise 4 - 8
+          expect(vars.noiseStrength, greaterThanOrEqualTo(4));
+          expect(vars.noiseStrength, lessThanOrEqualTo(8));
+
+          // Batas Baru: Speed 1.02 - 1.05
+          expect(vars.speedFactor, greaterThanOrEqualTo(1.0199));
+          expect(vars.speedFactor, lessThanOrEqualTo(1.0501));
+
+          // Batas Baru: Pitch 0.98 - 1.02
+          expect(vars.pitchFactor, greaterThanOrEqualTo(0.9799));
+          expect(vars.pitchFactor, lessThanOrEqualTo(1.0201));
+
+          // Batas Baru: FPS 29.50 - 30.30
+          expect(vars.outputFps, greaterThanOrEqualTo(29.49));
+          expect(vars.outputFps, lessThanOrEqualTo(30.31));
 
           final cmd = FfmpegService.buildCommand(
             inputPath: '/path/input.mp4',
@@ -600,24 +612,25 @@ void main() {
           final cropMatch = cropRegex.firstMatch(cmd);
           expect(cropMatch, isNotNull);
           final keepRatio = double.parse(cropMatch!.group(1)!);
-          expect(keepRatio, lessThanOrEqualTo(0.9301));
-          expect(keepRatio, greaterThanOrEqualTo(0.9099));
+          // Batas Baru keepRatio (1.0 - crop): 0.8799 - 0.9201
+          expect(keepRatio, lessThanOrEqualTo(0.9201));
+          expect(keepRatio, greaterThanOrEqualTo(0.8799));
 
           final rotMatch = rotRegex.firstMatch(cmd);
           expect(rotMatch, isNotNull);
           final rotAngle = double.parse(rotMatch!.group(1)!);
-          expect(rotAngle, greaterThanOrEqualTo(0.599));
+          expect(rotAngle, greaterThanOrEqualTo(0.799));
 
           final noiseMatch = noiseRegex.firstMatch(cmd);
           expect(noiseMatch, isNotNull);
           final noiseVal = int.parse(noiseMatch!.group(1)!);
-          expect(noiseVal, greaterThanOrEqualTo(3));
+          expect(noiseVal, greaterThanOrEqualTo(4));
 
           final ptsMatch = ptsRegex.firstMatch(cmd);
           expect(ptsMatch, isNotNull);
           final ptsVal = double.parse(ptsMatch!.group(1)!);
-          expect(ptsVal, greaterThanOrEqualTo(1.0099));
-          expect(ptsVal, lessThanOrEqualTo(1.0251));
+          expect(ptsVal, greaterThanOrEqualTo(1.0199));
+          expect(ptsVal, lessThanOrEqualTo(1.0501));
 
           expect(cmd, contains('-metadata make="${vars.deviceProfile.make}"'));
           expect(
@@ -641,7 +654,7 @@ void main() {
             ),
           );
           expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.0015'));
-          expect(cmd, contains('-r 29.'));
+          expect(cmd, contains('-r ${vars.outputFps.toStringAsFixed(2)}'));
         }
       },
     );

@@ -93,7 +93,8 @@ class FilterBuilders {
           upscaleEngine: upscaleEngine,
         )
       else
-        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+      'fps=$targetFps',
       'setpts=PTS-STARTPTS',
       'format=yuv420p',
     ];
@@ -267,7 +268,14 @@ class FilterBuilders {
             .where((filterStr) => filterStr.isNotEmpty),
       // ------------------------------------------------------------
 
+      // 1. Paksa konversi frame rate (CFR) setelah semua transformasi
+      'fps=$targetFps',
+
+      // 2. Reset Timestamp video ke 0 (Sinkronisasi dengan audio)
       'setpts=PTS-STARTPTS',
+
+      // 3. Tambahkan watermark kotak kecil transparan (Anti-crash, tidak butuh font)
+      'drawbox=x=iw-20:y=ih-20:w=10:h=10:color=white@0.05:t=fill',
       'format=yuv420p',
     ];
   }
@@ -423,7 +431,7 @@ class FilterBuilders {
       if (enableDeepAntiFingerprint) {
         return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=7200:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
-      return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
+      return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1:first_pts=0,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     } catch (_) {
       return ' -af "asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     }

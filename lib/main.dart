@@ -2,6 +2,7 @@ import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+
 import 'core/providers/batch_queue_provider.dart';
 import 'core/providers/locale_provider.dart';
 import 'core/providers/theme_provider.dart';
@@ -16,18 +17,28 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
     FFmpegKitConfig.setSessionHistorySize(3);
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[Main] FFmpeg init failed: $e');
+  }
+
   try {
     await StorageService.pruneStaleFiles();
     await SettingsService.purgeTempCache();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[Main] Cache cleanup failed: $e');
+  }
+
   try {
     await NotificationService.initialize();
     await NotificationService.requestPermission();
     ConnectivityService.instance.initialize();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('[Main] Service init failed: $e');
+  }
+
   runApp(
     MultiProvider(
       providers: [

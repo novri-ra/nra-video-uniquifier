@@ -148,7 +148,7 @@ class FfmpegService {
     return null;
   }
 
-  /// Renders a single-frame preview using ultra-fast FFmpeg extraction with applied filters.
+    /// Renders a single-frame preview using ultra-fast FFmpeg extraction with applied filters.
   /// Automatically cancels any previous in-flight preview session to avoid process queue pileup.
   static Future<String?> renderFilteredPreviewFrame({
     required String inputPath,
@@ -189,9 +189,22 @@ class FfmpegService {
         vfOption = '-vf "$cleanFilter${trailing}scale=480:-2"';
       }
 
+      // 🔥 PERBAIKAN: Deteksi efek temporal (Echo, RGB Split, dll)
+      final hasTemporalEffect = cleanFilter.contains('blend') ||
+                                cleanFilter.contains('setpts=PTS+') ||
+                                cleanFilter.contains('tmix');
+
+      // Jika efek temporal, proses 0.2 detik dan timpa gambar terakhir (-update 1).
+      // Jika bukan, cukup ambil 1 frame (-vframes 1).
+      final String frameArg = hasTemporalEffect
+          ? '-t 0.2 -update 1'
+          : '-vframes 1';
+
       final ssParam = timestampSeconds.toStringAsFixed(3);
+
+      // Gunakan frameArg yang sudah dinamis
       final cmd =
-          '-ss $ssParam -i "${_escapePath(inputPath)}" -vframes 1 -preset ultrafast $vfOption -y "${_escapePath(outputPath)}"';
+          '-ss $ssParam -i "${_escapePath(inputPath)}" $frameArg -preset ultrafast $vfOption -y "${_escapePath(outputPath)}"';
 
       final completer = Completer<String?>();
       final session = await FFmpegKit.executeAsync(cmd, (session) async {
