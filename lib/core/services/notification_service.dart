@@ -62,7 +62,9 @@ class NotificationService {
     );
     try {
       await _plugin.cancel(id: 999);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[NotificationService] cancel ping failed: $e');
+    }
   }
 
   /// Registers official notification channels with Android OS.
@@ -153,7 +155,9 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin
           >();
       await android?.requestNotificationsPermission();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[NotificationService] permission request failed: $e');
+    }
   }
 
   /// Requests notification permission on Android 13+ (POST_NOTIFICATIONS).
@@ -169,7 +173,9 @@ class NotificationService {
         }
         return true;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[NotificationService] requestPermission failed: $e');
+    }
     return true;
   }
 
@@ -241,7 +247,9 @@ class NotificationService {
           body: body,
           notificationDetails: NotificationDetails(android: fallback),
         );
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[NotificationService] show fallback failed: $e');
+      }
     }
   }
 
@@ -292,7 +300,9 @@ class NotificationService {
     if (!_canRun) return;
     try {
       await _plugin.cancel(id: id);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[NotificationService] cancel progress failed: $e');
+    }
   }
 
   /// Shows high-priority completion notification with sound and vibration alert.
@@ -330,7 +340,9 @@ class NotificationService {
     bool playSound = true;
     try {
       playSound = await SettingsService.getNotificationSound();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[NotificationService] sound setting read failed: $e');
+    }
 
     final notificationId =
         id ??
