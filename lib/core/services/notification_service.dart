@@ -1,7 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import 'settings_service.dart';
 
 class NotificationService {
@@ -21,9 +23,9 @@ class NotificationService {
   static const int testNotificationId = 7777;
 
   static const String mainChannelId = 'nra_uniquifier_channel_v2';
-  static const String processChannelId = 'video_processing_channel';
+  static const String processChannelId = 'nra_progress_silent_channel'; // <-- ID BARU (SUNYI)
   static const String legacyProcessChannelId = 'nra_video_processing_channel';
-  static const String completeChannelId = 'video_processing_channel';
+  static const String completeChannelId = 'nra_complete_alert_channel'; // <-- ID BARU (BERSUSUARA)
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -43,10 +45,12 @@ class NotificationService {
       processChannelId,
       'Video Processing',
       channelDescription: 'Video processing status and completion',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.low,
+      priority: Priority.low,
       icon: 'ic_notification',
       ticker: 'NRA Video Uniquifier',
+      playSound: false,
+      enableVibration: false,
       ongoing: false,
       autoCancel: true,
     );
@@ -62,39 +66,44 @@ class NotificationService {
   }
 
   /// Registers official notification channels with Android OS.
-  static Future<void> _createNotificationChannels(
+    static Future<void> _createNotificationChannels(
     AndroidFlutterLocalNotificationsPlugin plugin,
   ) async {
-    const videoProcessingChannel = AndroidNotificationChannel(
-      processChannelId,
-      'Video Processing',
-      description: 'Video processing status and completion',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-      showBadge: true,
-    );
-    await plugin.createNotificationChannel(videoProcessingChannel);
-
-    const channel = AndroidNotificationChannel(
-      mainChannelId,
-      'NRA Uniquifier Processing',
-      description: 'Notifikasi status proses video dan ekspor aset',
-      importance: Importance.high,
-      playSound: true,
-      enableVibration: true,
-    );
-    await plugin.createNotificationChannel(channel);
-
+    // 1. Channel Progres (SUNYI, TANPA POP-UP)
     await plugin.createNotificationChannel(
       const AndroidNotificationChannel(
-        legacyProcessChannelId,
-        'Pemrosesan Video NRA',
-        description: 'Menampilkan progres rendering dan status video',
+        processChannelId,
+        'Video Processing Progress',
+        description: 'Menampilkan progres rendering tanpa suara',
+        importance: Importance.low,
+        playSound: false,
+        enableVibration: false,
+        showBadge: false,
+      ),
+    );
+
+    // 2. Channel Selesai (BERSUSUARA, POP-UP)
+    await plugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        completeChannelId,
+        'Video Processing Complete',
+        description: 'Pemberitahuan saat video selesai diproses',
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
         showBadge: true,
+      ),
+    );
+
+    // Channel lama (biarkan saja untuk kompatibilitas)
+    await plugin.createNotificationChannel(
+      const AndroidNotificationChannel(
+        mainChannelId,
+        'NRA Uniquifier Processing',
+        description: 'Notifikasi status proses video dan ekspor aset',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
       ),
     );
   }
@@ -168,16 +177,18 @@ class NotificationService {
   @pragma('vm:entry-point')
   static Future<bool> requestNotificationsPermission() => requestPermission();
 
-  static AndroidNotificationDetails _buildProgressDetails({
+    static AndroidNotificationDetails _buildProgressDetails({
     required int progress,
     required int maxProgress,
   }) {
     return AndroidNotificationDetails(
       processChannelId,
-      'Video Processing',
-      channelDescription: 'Menampilkan progres rendering dan status video',
-      importance: Importance.high,
-      priority: Priority.high,
+      'Video Processing Progress',
+      channelDescription: 'Menampilkan progres rendering tanpa suara',
+      importance: Importance.low,     // <-- Ubah ke LOW
+      priority: Priority.low,         // <-- Ubah ke LOW
+      playSound: false,               // <-- MATIKAN SUARA
+      enableVibration: false,         // <-- MATIKAN GETARAN
       icon: 'ic_notification',
       ticker: 'NRA Video Uniquifier',
       showProgress: true,
@@ -306,9 +317,9 @@ class NotificationService {
 
     await androidPlatform?.createNotificationChannel(
       const AndroidNotificationChannel(
-        'video_processing_channel',
-        'Video Processing',
-        description: 'Video processing status and completion',
+        completeChannelId, // <-- UBAH INI
+        'Video Processing Complete', // <-- UBAH INI
+        description: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -326,9 +337,9 @@ class NotificationService {
         (DateTime.now().millisecond == 0 ? 1 : DateTime.now().millisecond);
 
     final androidDetails = AndroidNotificationDetails(
-      'video_processing_channel',
-      'Video Processing',
-      channelDescription: 'Video processing status and completion',
+      completeChannelId, // <-- UBAH INI
+      'Video Processing Complete', // <-- UBAH INI
+      channelDescription: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
       importance: Importance.high,
       priority: Priority.high,
       icon: 'ic_notification',

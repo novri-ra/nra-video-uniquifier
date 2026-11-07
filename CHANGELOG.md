@@ -1,7 +1,25 @@
 # Changelog
+
 ## [Unreleased]
 
+### Added
+
+- **TikTok Evasion Hardening**: Increased crop aggression (8-12%), rotation (0.8-1.5°), noise strength (4-8), speed warp (1.02-1.05x), and pitch shift (0.98-1.02x) to bypass perceptual hashing and audio fingerprinting.
+- **Foreground Service**: Added `mediaProcessing` type for Android 14+ compliance.
+
+### Changed
+
+- **Battery Optimization**: Migrated `ConnectivityService` from `Timer.periodic` polling to event-driven `connectivity_plus` listener. App now uses 0% CPU/Radio when in background.
+- **Notification UX**: Split notification channels. Progress notifications are now silent (no sound/vibration), while completion notifications retain sound alerts.
+
+### Fixed
+
+- **FFmpeg Preview Crash**: Fixed a native crash when previewing temporal effects (Echo, RGB Split) by changing `-vframes 1` to `-t 0.2 -update 1` in the preview renderer.
+- **R8/ProGuard**: Added `raw/keep.xml` and ProGuard rules to prevent notification icons and classes from being stripped in release builds.
+- **Unit Tests**: Updated test assertions for the new hardened evasion parameters and removed deprecated connectivity mocks.
+
 ## [1.0.4] - 2026-11-06
+
 - feat(compatibility): implement universal Android support from legacy Android 7.0 (API 24) to Android 16 (API 36)
 - fix(notifications): ensure rock-solid notification delivery on Android 13-16 via POST_NOTIFICATIONS runtime flow, dataSync foreground service type, and R8 keep rules
 - feat(preview): full-fidelity debounced preview rendering with FFmpeg 1-frame extraction and active session cancellation
@@ -10,17 +28,20 @@
 - test: expand test suite to 206+ passing tests with zero static analysis issues
 
 ## [1.0.3] - 2026-11-05
+
 - feat(ui): implement InteractivePreviewSlider with 60 FPS real-time floating preview overlay
 - feat(controls): wire manual sliders for crop zoom, micro-rotation, sharpening, saturation, and canvas scale
 - fix(success): resolve missing thumbnail display on SuccessScreen with robust fallback
 - test: expand test suite to 185 passing tests covering slider overlay lifecycles
 
 ## [1.0.2] - 2026-11-05
+
 - feat(storage): implement WidgetsBindingObserver for real-time permission sync on resume
 - feat(storage): integrate device_info_plus for dynamic Android SDK version detection
 - fix(manifest): register granular media permissions (READ_MEDIA_VIDEO, READ_MEDIA_IMAGES, READ_MEDIA_AUDIO)
 
 ## [1.0.1] - 2026-11-05
+
 - fix(engine): resolve audio amix drop (-6 dB) and calibrate sub-perceptual pitch shift (±1.5%)
 - fix(engine): wire dynamic sharpening slider and connect real physical disk storage check
 - feat(evasion): implement dynamic GOP jittering, micro color matrix shifting, and SEI NAL stripping
@@ -30,6 +51,7 @@
 - feat(data): integrate real background SHA-256 hashing, dynamic render estimation, and dynamic manifest badges
 
 ## [1.0.0] - 2026-11-05
+
 - feat(microstock): reactive on-demand full article extraction with dynamic progress indicator
 - fix(microstock): strip aside, banners, and freestar advertising clutter before DOM parsing
 - fix(history): persist storage permission prompt via SharedPreferences to limit dialog to 1 occurrence
@@ -99,10 +121,13 @@
 - fix(core): resolve P1 empty catch blocks in FfmpegService and UniquifierProvider with local diagnostic logging and lifecycle guards (AUDIT-20261104-001, AUDIT-20261104-002)
 - docs(reports): add report 02-fix-p1-silent-error-catches and update report index
 - Regenerated context packet (HANDOFF.md, audit report, state).
+
 ### Added
+
 - Setup sistem kontinuitas chat (CHAT-CONTINUITY.md) dan aturan Git.
 - Menambahkan `0ai_context/ANALYST-PROMPT.txt` untuk standarisasi prompt awal AI Chat.
 - Menerapkan fitur deduplikasi audit di Mapper.
 
 ### Fixed
+
 - Memperbaiki 23 peringatan linter curly_braces pada core services dan providers.

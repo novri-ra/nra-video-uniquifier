@@ -135,6 +135,12 @@ Generated release artifacts in `build/app/outputs/flutter-apk/`:
 - **Fixed (P2)**: Added auto-purge logic for temporary `preview_*.jpg` cache files to prevent storage bloat.
 - **Fixed (P2)**: Added `FOREGROUND_SERVICE_MEDIA_PROCESSING` permission and `mediaProcessing` type for Android 14+ Play Store compliance.
 - **Tested (P3)**: Added unit tests for multi-select filter chaining and rotation bindings.
+- **Performance**: Migrated network monitoring to `connectivity_plus` to eliminate background battery drain.
+- **Performance**: Fixed FFmpeg native crash when previewing temporal visual effects.
+- **UX**: Separated notification channels for silent progress updates and audible completion alerts.
+- **Evasion**: Hardened anti-fingerprint filters (crop, rotation, noise, speed warp, pitch) to bypass TikTok's perceptual hashing.
+- **Android**: Added `mediaProcessing` foreground service type for Android 14+ compliance.
+- **Android**: Implemented R8 keep rules and `keep.xml` to ensure notification icons persist in release APKs.
 
 ---
 
