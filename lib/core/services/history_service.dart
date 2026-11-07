@@ -59,12 +59,16 @@ class HistoryService {
             dirs.add(Directory('${dir.path}/Uniquifier'));
           }
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[HistoryService] external dirs probe failed: $e');
+      }
     }
     try {
       final appDocs = await getApplicationDocumentsDirectory();
       dirs.add(Directory('${appDocs.path}/Movies/Uniquifier'));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[HistoryService] app docs dir probe failed: $e');
+    }
     return dirs;
   }
 
@@ -96,7 +100,9 @@ class HistoryService {
           }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[HistoryService] scan directory failed: $e');
+    }
     return results;
   }
 
@@ -143,7 +149,8 @@ class HistoryService {
     try {
       final androidInfo = await DeviceInfoPlugin().androidInfo;
       return androidInfo.version.sdkInt;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[HistoryService] device info sdk probe failed: $e');
       try {
         final osVersion = Platform.operatingSystemVersion;
         final apiMatch = RegExp(
@@ -153,7 +160,9 @@ class HistoryService {
         if (apiMatch != null) {
           return int.tryParse(apiMatch.group(1) ?? '') ?? 30;
         }
-      } catch (_) {}
+      } catch (innerError) {
+        debugPrint('[HistoryService] sdk version probe failed: $innerError');
+      }
       return 30;
     }
   }
@@ -227,7 +236,8 @@ class HistoryService {
       }
     } catch (e) {
       debugPrint(
-        '[HistoryService] Thumbnail cleanup skipped for ${videoFile.path}: $e',
+        '[HistoryService] Thumbnail cleanup skipped for '
+        '${videoFile.path.split(RegExp(r'[/\\]')).last}: $e',
       );
     }
   }
@@ -240,7 +250,8 @@ class HistoryService {
         // Strict post-delete verification: confirm physical removal from disk
         if (await target.exists()) {
           debugPrint(
-            '[HistoryService] Physical delete failed, file still exists: ${file.path}',
+            '[HistoryService] Physical delete failed, file still exists: '
+            '${file.path.split(RegExp(r'[/\\]')).last}',
           );
           return false;
         }
@@ -251,7 +262,8 @@ class HistoryService {
       return true; // Successfully deleted from disk and verified, or already gone
     } catch (e, stackTrace) {
       debugPrint(
-        '[HistoryService] Failed to delete file ${file.path}: $e\n$stackTrace',
+        '[HistoryService] Failed to delete file '
+        '${file.path.split(RegExp(r'[/\\]')).last}: $e\n$stackTrace',
       );
       return false;
     }
@@ -289,7 +301,8 @@ class HistoryService {
             await _cleanupThumbnail(f);
           } else {
             debugPrint(
-              '[HistoryService] Physical delete failed, file still exists: ${item.file.path}',
+              '[HistoryService] Physical delete failed, file still exists: '
+              '${item.file.path.split(RegExp(r'[/\\]')).last}',
             );
           }
         } else {
@@ -297,7 +310,10 @@ class HistoryService {
           deletedPaths.add(item.file.path);
         }
       } catch (e) {
-        debugPrint('Failed to delete file: ${item.file.path}, err:$e');
+        debugPrint(
+          '[HistoryService] Failed to delete file '
+          '${item.file.path.split(RegExp(r'[/\\]')).last}: $e',
+        );
       }
     }
     return deletedPaths;
@@ -309,7 +325,8 @@ class HistoryService {
         fractionDigits: 1,
         lowOnSpaceThreshold: 1024 * 1024 * 500,
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[HistoryService] device storage probe failed: $e');
       return null;
     }
   }
