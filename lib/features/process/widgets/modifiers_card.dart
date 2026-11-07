@@ -29,15 +29,24 @@ class PresetChipRow extends StatelessWidget {
               modifyVisuals: true,
               upscale1080p: false,
               upscaleTarget: '1080p',
+
+              // Filter Evasi Maksimal
               enableEnhanceAndDenoise: false,
-              enableDeepAntiFingerprint: true,
-              enableHorizontalFlip: true,
-              enableAutoTrim: true,
-              enableDynamicZoom: true,
-              enableChromaShift: true,
-              enableMicroOverlay: true,
-              enableAggressiveAudio: true,
-              enableBlurredCanvas: false,
+              enableDeepAntiFingerprint:
+                  true, // (Crop 8-12%, Speed Warp, Pitch Shift)
+              enableHorizontalFlip: true, // (Mirroring)
+              enableAutoTrim: true, // (Potong Frame Awal/Akhir)
+              // Blurred Canvas (Wajib untuk estetika TikTok)
+              enableBlurredCanvas: true,
+              canvasScalePercent: 90.0, // Skala 90% (lebih agresif dari 95%)
+              // Filter Tambahan
+              enableChromaShift: true, // (Geser warna)
+              enableMicroOverlay: true, // (Noise tambahan)
+              enableAggressiveAudio: true, // (Pink noise)
+              // Filter Berat (Tetap dimatikan agar HP tidak overheat)
+              enableDynamicZoom: false,
+              enableFrameSkip: false,
+
               targetFps: 30,
               presetName: 'TikTok Extreme',
             ),
@@ -48,12 +57,14 @@ class PresetChipRow extends StatelessWidget {
             label: 'Microstock 4K',
             isSelected: provider.activePreset == 'Microstock 4K',
             onTap: () => provider.applyPreset(
-              removeMetadata: true,        // Wajib bersih dari EXIF/GPS
-              modifyAudio: false,          // Audio asli tidak diubah
-              modifyVisuals: false,        // Tidak ada crop atau speed warp
-              upscale1080p: true,          // Nyalakan upscaler
-              upscaleTarget: '4k',         // Target 4K (kualitas tertinggi untuk agensi)
-              enableEnhanceAndDenoise: true, // Beri sentuhan jernih (Unsharp mask)
+              removeMetadata: true, // Wajib bersih dari EXIF/GPS
+              modifyAudio: false, // Audio asli tidak diubah
+              modifyVisuals: false, // Tidak ada crop atau speed warp
+              upscale1080p: true, // Nyalakan upscaler
+              upscaleTarget:
+                  '4k', // Target 4K (kualitas tertinggi untuk agensi)
+              enableEnhanceAndDenoise:
+                  true, // Beri sentuhan jernih (Unsharp mask)
               enableDeepAntiFingerprint: false, // Matikan (tidak perlu evasi)
               enableHorizontalFlip: false,
               enableAutoTrim: false,
@@ -467,13 +478,16 @@ class ModifiersCard extends StatelessWidget {
                       effect: PreviewEffect.sharpening,
                       thumbnailPath: provider.thumbnailPath,
                       isPreviewRendering: provider.isPreviewRendering,
-                      renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                      renderedPreviewFramePath:
+                          provider.renderedPreviewFramePath,
                       onChanged: (val) {
                         provider.setSharpeningLevel(val);
                         provider.requestFilteredPreviewDebounced();
                       },
                       onChangeEnd: (_) {
-                        provider.requestFilteredPreviewDebounced(immediate: true);
+                        provider.requestFilteredPreviewDebounced(
+                          immediate: true,
+                        );
                       },
                     ),
                   ),
@@ -502,13 +516,16 @@ class ModifiersCard extends StatelessWidget {
                       effect: PreviewEffect.saturation,
                       thumbnailPath: provider.thumbnailPath,
                       isPreviewRendering: provider.isPreviewRendering,
-                      renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                      renderedPreviewFramePath:
+                          provider.renderedPreviewFramePath,
                       onChanged: (val) {
                         provider.setSaturationLevel(val);
                         provider.requestFilteredPreviewDebounced();
                       },
                       onChangeEnd: (_) {
-                        provider.requestFilteredPreviewDebounced(immediate: true);
+                        provider.requestFilteredPreviewDebounced(
+                          immediate: true,
+                        );
                       },
                     ),
                   ),

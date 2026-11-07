@@ -117,6 +117,8 @@ class FfmpegCommandBuilder {
       buffer.write(' -bsf:v filter_units=remove_types=6');
     }
 
+    buffer.write(' -max_muxing_queue_size 4096');
+
     buffer.write(' "${escapePath(outputPath)}"');
     return buffer.toString();
   }
