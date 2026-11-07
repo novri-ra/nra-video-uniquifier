@@ -1,13 +1,30 @@
-[
-  {"name": "AppColors", "fan_in": 169, "path": "lib/core/theme/app_colors.dart"},
-  {"name": "SettingsService", "fan_in": 50, "path": "lib/core/services/settings_service.dart"},
-  {"name": "AppLocalizations", "fan_in": 27, "path": "lib/l10n/app_localizations.dart"},
-  {"name": "TargetResolution", "fan_in": 19, "path": "lib/core/services/settings_service.dart"},
-  {"name": "_getBool", "fan_in": 18, "path": "lib/core/services/settings_service.dart"},
-  {"name": "_setBool", "fan_in": 18, "path": "lib/core/services/settings_service.dart"},
-  {"name": "UpscaleEngine", "fan_in": 17, "path": "lib/core/services/settings_service.dart"},
-  {"name": "VideoCodec", "fan_in": 13, "path": "lib/core/services/settings_service.dart"},
-  {"name": "FfmpegService", "fan_in": 12, "path": "lib/core/services/ffmpeg_service.dart"},
-  {"name": "NotificationService", "fan_in": 12, "path": "lib/core/services/notification_service.dart"},
-  {"name": "UniquifierProvider", "fan_in": 10, "path": "lib/core/providers/uniquifier_provider.dart"}
-]
+{
+  "query": "MATCH (n)<-[:USAGE|CALLS]-(m) RETURN n.qualified_name, n.file_path, count(m) ORDER BY fan_in DESC LIMIT 30",
+  "rows": [
+    ["AppColors", "lib/core/theme/app_colors.dart", 181],
+    ["AppLocalizations.of", "lib/l10n/app_localizations.dart", 102],
+    ["UniquifierProvider", "lib/core/providers/uniquifier_provider.dart", 37],
+    ["AppLocalizations", "lib/l10n/app_localizations.dart", 29],
+    ["TargetResolution", "lib/core/services/settings_service.dart", 26],
+    ["SettingsService", "lib/core/services/settings_service.dart", 26],
+    ["UpscaleEngine", "lib/core/services/settings_service.dart", 24],
+    ["UnifiedVisualEffect", "lib/core/models/unified_effect_preset.dart", 22],
+    ["UnifiedVisualEffect.none", "lib/core/models/unified_effect_preset.dart", 20],
+    ["VideoCodec", "lib/core/services/settings_service.dart", 19],
+    ["BatchQueueProvider", "lib/core/providers/batch_queue_provider.dart", 18],
+    ["SettingsService._getBool", "lib/core/services/settings_service.dart", 18],
+    ["SettingsService._setBool", "lib/core/services/settings_service.dart", 18],
+    ["DeviceTier.entry", "lib/core/services/device_capability_service.dart", 16],
+    ["MicrostockNewsArticle", "lib/core/services/microstock_news_service.dart", 15],
+    ["BatchQueueProvider.clear", "lib/core/providers/batch_queue_provider.dart", 14],
+    ["TargetResolution.r1080p", "lib/core/services/settings_service.dart", 14],
+    ["FfmpegService.cancel", "lib/core/services/ffmpeg_service.dart", 13],
+    ["NotificationService", "lib/core/services/notification_service.dart", 13],
+    ["UpscaleEngine.lanczos", "lib/core/services/settings_service.dart", 13],
+    ["HtmlSanitizer.clean", "lib/features/microstock/utils/html_sanitizer.dart", 13],
+    ["TopAppBar", "lib/shared/widgets/top_app_bar.dart", 13],
+    ["FfmpegService", "lib/core/services/ffmpeg_service.dart", 12],
+    ["RenderIntegrityException.toString", "lib/core/services/render_diagnostic_service.dart", 12],
+    ["TargetResolution.r4k", "lib/core/services/settings_service.dart", 12]
+  ]
+}

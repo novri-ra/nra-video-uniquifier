@@ -1,6 +1,30 @@
-﻿c1db18f 2026-11-04 chore(ai): remove 0ai_context completely for fresh bootstrap
-1ebee61 2026-11-04 style(lint): apply curly braces to flow control structures
-02364b4 2026-11-04 fix(prompt): prevent literal placeholder in execution summary template
-30b8454 2026-11-04 feat(output): enforce detailed bullet-point execution summary
-3e03bb9 2026-11-04 chore(test): auto-cleanup staged artifacts and update gitignore
-b6e9d29 2026-11-04 chore: Initial clean commit - NRA Video Uniquifier v2.0.0 (Context AI System configured)
+﻿6278087 2026-11-08 chore(release): bump version to v1.0.5
+e020826 2026-11-07 fix(notifications): sync test expectations and showTestNotification with new separated channels
+ad5509e 2026-11-07 docs: update changelog and readme with latest performance and evasion fixes
+f691b04 2026-11-07 perf: optimize battery, enhance TikTok evasion filters, fix FFmpeg preview crash, and update tests
+e3bc546 2026-11-06 docs(README): update feature descriptions and enhance clarity on visual effects and testing
+7fdb3bb 2026-11-06 test(ffmpeg): add unit tests for activeVisualEffects and rotateAngle wiring
+d1c29da 2026-11-06 fix(android): add mediaProcessing foreground service type for Android 14+ compliance
+53a786f 2026-11-06 fix(ffmpeg): auto-purge old preview cache files to prevent storage bloat
+015c987 2026-11-06 fix(batch): forward rotateAngle and activeVisualEffects to processVideo pipeline
+e5ec30f 2026-11-06 fix(ffmpeg): wire multi-select activeVisualEffects from UI to export pipeline
+db764d3 2026-11-06 feat(reports): add deep system audit and health check report (v1.0.4+)
+d692bf9 2026-11-06 chore(cleanup): purge root staged media, categorize report archives, and update index
+9f88ab0 2026-11-06 fix(ui): implement top floating capsule toast and resolve native notification delivery
+331f9b2 2026-11-06 docs(reports): add report 37 (release v1.0.4 universal compatibility and effect catalog)
+c5ddb4e 2026-11-06 chore(release): bump version to 1.0.4+5 with universal android compatibility and visual effect catalog
+41d5e25 2026-11-06 feat(preview): implement high-fidelity debounced preview rendering and unified effect suite
+d4c3dd5 2026-11-05 chore(release): bump version to 1.0.3+4
+175e985 2026-11-05 feat(process): wire interactive preview sliders and fix success screen thumbnail fallback
+7a525a7 2026-11-05 fix(i18n): standardize entire UI and localization strings to English default
+04eb3ce 2026-11-05 docs(reports): add report 34 for v1.0.2 android 14 storage fix release
+9c4dc6d 2026-11-05 chore(release): bump version to 1.0.2+3
+56540c5 2026-11-05 feat(storage): wire device_info_plus and lifecycle permission observer for Android 14
+b9f85de 2026-11-05 docs(reports): add report 33 for v1.0.1 production release
+76fcee4 2026-11-05 chore(release): bump version to 1.0.1+2
+0fd98a7 2026-11-05 feat: complete phase 4 and 5 wcag contrast, english i18n, and real data bindings
+d870a79 2026-11-05 feat(storage): implement MANAGE_EXTERNAL_STORAGE permission for Android 11+ to enhance file management capabilities
+1bf8031 2026-11-05 feat(evasion): implement dynamic GOP jittering, color matrix shifting, SEI leak sanitization, and 4-tier storage intent
+dfe8360 2026-11-05 fix(engine): resolve critical P1 audio amix drop, sub-perceptual pitch, dynamic sharpening, real storage check, and fake file elimination
+377ca59 2026-11-05 docs(reports): add report 29 super power deep audit and system evaluation
+53ccaea 2026-11-05 docs(reports): add report 28 for production release v1.0.0

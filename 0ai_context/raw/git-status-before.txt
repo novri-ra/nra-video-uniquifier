@@ -1,0 +1,6 @@
+﻿ D OpenCode-Bootstrap-Prompt.txt
+ M lib/core/services/ffmpeg/ffmpeg_command_builder.dart
+ M lib/features/process/widgets/modifiers_card.dart
+ M macos/Flutter/GeneratedPluginRegistrant.swift
+ M windows/flutter/generated_plugin_registrant.cc
+ M windows/flutter/generated_plugins.cmake

@@ -42,6 +42,12 @@
 | 38 | [38-audit-notif-storage-and-multi-select-effects.md](38-audit-notif-storage-and-multi-select-effects.md) | 2026-11-06 | fix | Physical device notification audit (icon lookup, channel importance cache, runtime permission), native direct intent for All Files Access & 4s auto-dismiss banner, and interactive multi-select visual effects with FFmpeg filter chaining |
 | 39 | [39-fix-top-toast-and-native-notification-delivery.md](39-fix-top-toast-and-native-notification-delivery.md) | 2026-11-06 | fix | Top floating capsule toast (AppToast), Android gesture bar clearance, ic_notification verified in all densities, explicit video_processing_channel creation with unique IDs, and physical device deployment |
 | 40 | [40-deep-system-audit-and-health-check.md](40-deep-system-audit-and-health-check.md) | 2026-11-06 | audit | Deep system audit across FFmpeg pipeline, state lifecycles, Android 16 compatibility, UI stability, and 75.44% test coverage with actionable P1-P3 remediation plan |
+| 41 | [41-fix-wire-active-visual-effects-into-export-pipeline.md](41-fix-wire-active-visual-effects-into-export-pipeline.md) | 2026-11-06 | fix | Wire multi-select `activeVisualEffects` from UI state into the FFmpeg export pipeline |
+| 42 | [42-fix-batch-queue-parameter-drop.md](42-fix-batch-queue-parameter-drop.md) | 2026-11-06 | fix | Forward `rotateAngle` and `activeVisualEffects` through the batch queue into `processVideo` |
+| 43 | [43-fix-temporary-preview-cache-accumulation.md](43-fix-temporary-preview-cache-accumulation.md) | 2026-11-06 | fix | Auto-purge stale preview cache files to stop storage growth |
+| 44 | [44-fix-android-foreground-service-media-processing.md](44-fix-android-foreground-service-media-processing.md) | 2026-11-06 | fix | Declare `mediaProcessing` foreground service type for Android 14+ compliance |
+| 86 | [86-audit.md](86-audit.md) | 2026-11-08 | audit | Context-mapper audit at v1.0.5: analyze clean, 216/216 tests, format gate failing, 20 findings (P0=0 P1=6 P2=9 P3=5) |
+| 87 | [87-out-of-scope.md](87-out-of-scope.md) | 2026-11-08 | drift | 5 out-of-scope items: README network claim, pubspec placeholder, CHANGELOG Unreleased block, uncommitted tree, mapper format-write incident |
 
 ## Archive Structure
 - `0ai_context/reports/archive/phase1-foundation/`: Reports 01 to 15 (Initial audits, core engine fixes, Microstock Intel Phase 1-3).

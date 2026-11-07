@@ -1,1 +1,19 @@
-[]
+{
+  "method": "search_graph(label=Class|Method, max_degree=0)",
+  "note": "NOT-with-pattern predicates are rejected by the query engine; zero-degree search used instead. Platform scaffold entries (iOS/macOS/Windows/Linux runners, XML/plist pseudo-classes) filtered out manually.",
+  "classes_zero_degree": [
+    ["MicrostockAiScreen", "lib/features/microstock/screens/microstock_ai_screen.dart", "6-47"],
+    ["SeasonalCampaignInfo", "lib/features/dashboard/helpers/seasonal_event_helper.dart", "2-16"],
+    ["RealEsrganNcnnVulkan", "android/app/src/main/cpp/ncnn_sr_jni.cpp", "20-72"]
+  ],
+  "methods_zero_degree": [
+    ["UserInterestService.flushQueue", "lib/core/services/user_interest_service.dart", "285-285"],
+    ["Formatters.formatFileSize", "lib/core/utils/formatters.dart", "19-19"],
+    ["HistoryService.getAndroidSdkVersion", "lib/core/services/history_service.dart", "141-141"],
+    ["UserNewsBookmarkService.isBookmarkedSync", "lib/features/microstock/services/user_news_bookmark_service.dart", "32-32"],
+    ["_BentoStorageCard._buildTopRow", "lib/features/dashboard/widgets/bento_cards.dart", "257-257"],
+    ["_BentoStorageCard._buildFooter", "lib/features/dashboard/widgets/bento_cards.dart", "312-312"],
+    ["_BentoQueueCardState._cardDecoration", "lib/features/dashboard/widgets/bento_metric_grid.dart", "299-299"]
+  ],
+  "interpretation": "Zero in/out edges is a weak dead-code signal in this graph: several flagged widget methods are referenced through widget trees the indexer does not resolve. Only MicrostockAiScreen has no reference anywhere in lib/."
+}

@@ -1,0 +1,49 @@
+{
+  "generated_at": "2026-11-08T01:35:00Z",
+  "previous_handoff": "0ai_context/handoff/archive/HANDOFF-2026-11-04.md",
+  "resolved": [
+    "AUDIT-20261104-001",
+    "AUDIT-20261104-002",
+    "AUDIT-20261104-003",
+    "AUDIT-20261104-004",
+    "AUDIT-20261104-005",
+    "AUDIT-20261104-006"
+  ],
+  "added": [
+    "AUDIT-20261108-001",
+    "AUDIT-20261108-002",
+    "AUDIT-20261108-003",
+    "AUDIT-20261108-004",
+    "AUDIT-20261108-005",
+    "AUDIT-20261108-006",
+    "AUDIT-20261108-007",
+    "AUDIT-20261108-008",
+    "AUDIT-20261108-009",
+    "AUDIT-20261108-010",
+    "AUDIT-20261108-011",
+    "AUDIT-20261108-012",
+    "AUDIT-20261108-013",
+    "AUDIT-20261108-014",
+    "AUDIT-20261108-015",
+    "AUDIT-20261108-016",
+    "AUDIT-20261108-017",
+    "AUDIT-20261108-018",
+    "AUDIT-20261108-019",
+    "AUDIT-20261108-020"
+  ],
+  "persisted": [],
+  "semantic_mapping": {
+    "AUDIT-20261104-001": "AUDIT-20261108-002 (same empty-catch cluster, line moved to 147)",
+    "AUDIT-20261104-002": "AUDIT-20261108-001 (provider empty catches, moved into uniquifier_modifiers_mixin.dart)",
+    "AUDIT-20261104-003": "AUDIT-20261108-010 (ffmpeg_service.dart still oversized, 699 -> 610 lines)",
+    "AUDIT-20261104-004": "resolved - UniquifierProvider split into 3 mixins, now 334 lines",
+    "AUDIT-20261104-005": "resolved - SuccessScreen reduced to 211 lines",
+    "AUDIT-20261104-006": "AUDIT-20261108-016 (locale_provider empty catch, line moved to 34)"
+  },
+  "health_change": {
+    "analyze": "0 -> 0",
+    "test": "173/173 -> 216/216",
+    "format": "0 files changed -> 7 files changed",
+    "graph": "1660 nodes / 4607 edges -> 2571 nodes / 6819 edges"
+  }
+}

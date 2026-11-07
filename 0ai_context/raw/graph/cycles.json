@@ -1,1 +1,15 @@
-[]
+{
+  "cycles_total": 1,
+  "cycles": [
+    {
+      "size": 2,
+      "members": [
+        "lib/core/services/filter_builders.dart — FilterBuilders._fallbackVideoFilter",
+        "lib/core/services/filter_builders.dart — FilterBuilders.buildVideoFilter"
+      ],
+      "kind": "call cycle inside one file (buildVideoFilter falls back to _fallbackVideoFilter, which re-enters buildVideoFilter on error)"
+    }
+  ],
+  "import_cycles": [],
+  "note": "No import-level cycles were reported; the single cycle is a call-graph recursion path inside filter_builders.dart."
+}

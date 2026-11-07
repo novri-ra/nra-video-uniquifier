@@ -1,1 +1,26 @@
-{"entrypoints": ["lib/main.dart"]}
+{
+  "project": "C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier",
+  "total_nodes": 2571,
+  "total_edges": 6819,
+  "languages": [["Dart", 124], ["C++", 9], ["C", 8], ["HTML", 8], ["Swift", 7], ["YAML", 5], ["Kotlin", 1]],
+  "packages": [["features", 510], ["core", 321], ["shared", 62], ["app", 59], ["runner", 55], ["Runner", 36], ["l10n", 9]],
+  "entry_points": [
+    ["lib/main.dart", "main"],
+    ["linux/runner/main.cc", "main"]
+  ],
+  "hotspots": [
+    ["lib/core/services/settings_service.dart", "SettingsService._setBool", 18],
+    ["lib/core/services/settings_service.dart", "SettingsService._getBool", 18],
+    ["lib/core/services/user_interest_service.dart", "UserInterestService._dispatchTelemetry", 6],
+    ["lib/core/services/microstock_news_service.dart", "MicrostockNewsService._defaultHttpGet", 5],
+    ["lib/core/services/filter_builders.dart", "FilterBuilders.canonicalDimensions", 4],
+    ["lib/core/services/notification_service.dart", "NotificationService._safeShow", 4],
+    ["lib/core/services/notification_service.dart", "NotificationService.init", 4]
+  ],
+  "cycles_total": 1,
+  "cycles": [[
+    "lib/core/services/filter_builders.dart:FilterBuilders._fallbackVideoFilter",
+    "lib/core/services/filter_builders.dart:FilterBuilders.buildVideoFilter"
+  ]],
+  "call_edges_scanned": 363
+}

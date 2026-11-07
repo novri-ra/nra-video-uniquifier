@@ -1,1 +1,17 @@
-{"schema": "success"}
+{
+  "node_labels": {
+    "Method": 696, "Section": 626, "Class": 344, "File": 273, "Module": 266,
+    "Variable": 153, "Folder": 111, "Function": 53, "Field": 19, "Macro": 16,
+    "Enum": 7, "Decorator": 4, "Branch": 1, "Project": 1
+  },
+  "edge_types": {
+    "DEFINES": 2199, "USAGE": 1259, "CALLS": 1092, "DEFINES_METHOD": 693,
+    "MENTIONS": 490, "REFERENCES_FILE": 297, "CONTAINS_FILE": 273,
+    "DECORATES": 246, "IMPORTS": 101, "CONTAINS_FOLDER": 82, "WRITES": 19,
+    "FILE_CHANGES_WITH": 9, "INHERITS": 3, "OVERRIDE": 3,
+    "SEMANTICALLY_RELATED": 2, "CALL_REFERENCE": 1, "HAS_BRANCH": 1,
+    "SIMILAR_TO": 1, "THROWS": 1
+  },
+  "co_change_properties": ["co_changes", "coupling_score", "last_co_change"],
+  "notes": "Cypher dialect rejects NOT with a pattern predicate; dead-code detection done via search_graph max_degree=0."
+}

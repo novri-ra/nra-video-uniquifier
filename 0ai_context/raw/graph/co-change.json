@@ -1,1 +1,20 @@
-[]
+{
+  "query": "MATCH (a)-[r:FILE_CHANGES_WITH]->(b) RETURN a.file_path, b.file_path, r.co_changes, r.coupling_score ORDER BY score DESC LIMIT 30",
+  "rows": [
+    ["lib/core/services/ffmpeg_service.dart", "lib/core/services/filter_builders.dart", 8, 0.89],
+    ["lib/core/providers/uniquifier_provider.dart", "lib/core/services/ffmpeg_service.dart", 6, 0.86],
+    ["lib/core/services/filter_builders.dart", "test/ffmpeg_service_test.dart", 4, 0.80],
+    ["lib/core/providers/uniquifier_provider.dart", "test/unified_effect_preview_test.dart", 3, 1.00],
+    ["lib/core/services/ffmpeg_service.dart", "lib/features/process/screens/processing_screen.dart", 4, 1.00],
+    ["lib/core/services/ffmpeg_service.dart", "test/unified_effect_preview_test.dart", 3, 1.00],
+    ["lib/core/services/ffmpeg_service.dart", "lib/core/utils/variation_generator.dart", 3, 1.00],
+    ["lib/core/services/filter_builders.dart", "lib/core/utils/variation_generator.dart", 3, 1.00],
+    ["lib/core/services/history_service.dart", "lib/features/history/screens/recent_history_screen.dart", 6, 1.00],
+    ["lib/core/services/notification_service.dart", "test/notification_service_test.dart", 3, 1.00],
+    ["lib/core/services/microstock_news_service.dart", "lib/features/microstock/widgets/microstock_news_card.dart", 3, 1.00],
+    ["lib/features/process/screens/success_screen.dart", "lib/features/process/widgets/success/success_manifest_card.dart", 3, 1.00],
+    ["android/app/src/main/kotlin/id/novrira/videouniquifier/MainActivity.kt", "lib/core/services/ffmpeg_service.dart", 3, 1.00],
+    ["android/app/src/main/kotlin/id/novrira/videouniquifier/MainActivity.kt", "lib/core/services/filter_builders.dart", 3, 1.00]
+  ],
+  "note": "Rows co-changing with 0ai_context/reports/INDEX.md and CHANGELOG.md were filtered out as bookkeeping noise."
+}
