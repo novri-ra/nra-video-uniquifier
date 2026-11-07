@@ -33,6 +33,7 @@ void main() {
           if (call.method == 'initialize') return true;
           if (call.method == 'show') return null;
           if (call.method == 'cancel') return null;
+          if (call.method == 'createNotificationChannel') return null;
           return null;
         });
 
@@ -118,6 +119,10 @@ void main() {
         expect(specifics['progress'], equals(50));
         expect(specifics['ongoing'], isTrue);
         expect(specifics['icon'], equals('ic_notification'));
+        expect(
+          specifics['channelId'],
+          equals(NotificationService.processChannelId),
+        );
       },
     );
 
@@ -227,7 +232,7 @@ void main() {
         );
         expect(
           NotificationService.completeChannelId,
-          equals('video_processing_channel'),
+          equals('nra_complete_alert_channel'),
         );
         expect(specifics['icon'], equals('ic_notification'));
         expect(specifics['ticker'], equals('NRA Video Uniquifier'));
@@ -235,7 +240,7 @@ void main() {
     );
 
     test(
-      'showTestNotification invokes show with unique id and video_processing_channel',
+      'showTestNotification invokes show with unique id and completeChannelId',
       () async {
         await NotificationService.showTestNotification(
           title: 'Diagnostic Test',
@@ -256,11 +261,11 @@ void main() {
         );
         expect(
           specifics['channelId'],
-          equals(NotificationService.processChannelId),
+          equals(NotificationService.completeChannelId),
         );
         expect(
-          NotificationService.processChannelId,
-          equals('video_processing_channel'),
+          NotificationService.completeChannelId,
+          equals('nra_complete_alert_channel'),
         );
         expect(specifics['icon'], equals('ic_notification'));
         expect(specifics['ticker'], equals('NRA Video Uniquifier'));
@@ -268,11 +273,11 @@ void main() {
     );
 
     test(
-      'processChannelId is video_processing_channel with high importance',
+      'processChannelId is nra_progress_silent_channel',
       () {
         expect(
           NotificationService.processChannelId,
-          equals('video_processing_channel'),
+          equals('nra_progress_silent_channel'),
         );
       },
     );

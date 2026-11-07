@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/category_accordion_card.dart';
-import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/interactive_preview_slider.dart';
+import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 import 'studio_custom_sliders_card.dart';
 
@@ -19,6 +20,53 @@ class PresetChipRow extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
+          _PresetChip(
+            label: 'TikTok Extreme',
+            isSelected: provider.activePreset == 'TikTok Extreme',
+            onTap: () => provider.applyPreset(
+              removeMetadata: true,
+              modifyAudio: true,
+              modifyVisuals: true,
+              upscale1080p: false,
+              upscaleTarget: '1080p',
+              enableEnhanceAndDenoise: false,
+              enableDeepAntiFingerprint: true,
+              enableHorizontalFlip: true,
+              enableAutoTrim: true,
+              enableDynamicZoom: true,
+              enableChromaShift: true,
+              enableMicroOverlay: true,
+              enableAggressiveAudio: true,
+              enableBlurredCanvas: false,
+              targetFps: 30,
+              presetName: 'TikTok Extreme',
+            ),
+          ),
+          const SizedBox(width: 6),
+          // --- TAMBAHKAN PRESET MICROSTOCK DI SINI ---
+          _PresetChip(
+            label: 'Microstock 4K',
+            isSelected: provider.activePreset == 'Microstock 4K',
+            onTap: () => provider.applyPreset(
+              removeMetadata: true,        // Wajib bersih dari EXIF/GPS
+              modifyAudio: false,          // Audio asli tidak diubah
+              modifyVisuals: false,        // Tidak ada crop atau speed warp
+              upscale1080p: true,          // Nyalakan upscaler
+              upscaleTarget: '4k',         // Target 4K (kualitas tertinggi untuk agensi)
+              enableEnhanceAndDenoise: true, // Beri sentuhan jernih (Unsharp mask)
+              enableDeepAntiFingerprint: false, // Matikan (tidak perlu evasi)
+              enableHorizontalFlip: false,
+              enableAutoTrim: false,
+              enableDynamicZoom: false,
+              enableChromaShift: false,
+              enableMicroOverlay: false,
+              enableAggressiveAudio: false,
+              enableBlurredCanvas: false,
+              presetName: 'Microstock 4K',
+            ),
+          ),
+          // ------------------------------------------
+          const SizedBox(width: 6),
           _PresetChip(
             label: 'TikTok / Reels',
             isSelected: provider.activePreset == 'TikTok / Reels',
@@ -395,68 +443,76 @@ class ModifiersCard extends StatelessWidget {
                   value: provider.enableMicroOverlay,
                   onChanged: provider.toggleMicroOverlay,
                 ),
-                const Divider(
-                  color: AppColors.surfaceContainerHighest,
-                  height: 1,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+
+                // --- PROGRESSIVE DISCLOSURE: SHARPENING ---
+                if (provider.enableEnhanceAndDenoise) ...[
+                  const Divider(
+                    color: AppColors.surfaceContainerHighest,
+                    height: 1,
                   ),
-                  child: InteractivePreviewSlider(
-                    value: provider.sharpeningLevel.clamp(0.1, 2.0),
-                    min: 0.1,
-                    max: 2.0,
-                    divisions: 19,
-                    label: '${provider.sharpeningLevel.toStringAsFixed(1)}x',
-                    parameterName:
-                        AppLocalizations.of(context)?.sharpeningLabel ??
-                        'SHARPENING INTENSITY',
-                    effect: PreviewEffect.sharpening,
-                    thumbnailPath: provider.thumbnailPath,
-                    isPreviewRendering: provider.isPreviewRendering,
-                    renderedPreviewFramePath: provider.renderedPreviewFramePath,
-                    onChanged: (val) {
-                      provider.setSharpeningLevel(val);
-                      provider.requestFilteredPreviewDebounced();
-                    },
-                    onChangeEnd: (_) {
-                      provider.requestFilteredPreviewDebounced(immediate: true);
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: InteractivePreviewSlider(
+                      value: provider.sharpeningLevel.clamp(0.1, 2.0),
+                      min: 0.1,
+                      max: 2.0,
+                      divisions: 19,
+                      label: '${provider.sharpeningLevel.toStringAsFixed(1)}x',
+                      parameterName:
+                          AppLocalizations.of(context)?.sharpeningLabel ??
+                          'SHARPENING INTENSITY',
+                      effect: PreviewEffect.sharpening,
+                      thumbnailPath: provider.thumbnailPath,
+                      isPreviewRendering: provider.isPreviewRendering,
+                      renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                      onChanged: (val) {
+                        provider.setSharpeningLevel(val);
+                        provider.requestFilteredPreviewDebounced();
+                      },
+                      onChangeEnd: (_) {
+                        provider.requestFilteredPreviewDebounced(immediate: true);
+                      },
+                    ),
                   ),
-                ),
-                const Divider(
-                  color: AppColors.surfaceContainerHighest,
-                  height: 1,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
+                ],
+
+                // --- PROGRESSIVE DISCLOSURE: SATURATION ---
+                if (provider.modifyVisuals) ...[
+                  const Divider(
+                    color: AppColors.surfaceContainerHighest,
+                    height: 1,
                   ),
-                  child: InteractivePreviewSlider(
-                    value: provider.saturationLevel.clamp(0.8, 1.3),
-                    min: 0.8,
-                    max: 1.3,
-                    divisions: 10,
-                    label: '${provider.saturationLevel.toStringAsFixed(2)}x',
-                    parameterName:
-                        AppLocalizations.of(context)?.saturationLabel ??
-                        'SATURATION / VIBRANCE',
-                    effect: PreviewEffect.saturation,
-                    thumbnailPath: provider.thumbnailPath,
-                    isPreviewRendering: provider.isPreviewRendering,
-                    renderedPreviewFramePath: provider.renderedPreviewFramePath,
-                    onChanged: (val) {
-                      provider.setSaturationLevel(val);
-                      provider.requestFilteredPreviewDebounced();
-                    },
-                    onChangeEnd: (_) {
-                      provider.requestFilteredPreviewDebounced(immediate: true);
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    child: InteractivePreviewSlider(
+                      value: provider.saturationLevel.clamp(0.8, 1.3),
+                      min: 0.8,
+                      max: 1.3,
+                      divisions: 10,
+                      label: '${provider.saturationLevel.toStringAsFixed(2)}x',
+                      parameterName:
+                          AppLocalizations.of(context)?.saturationLabel ??
+                          'SATURATION / VIBRANCE',
+                      effect: PreviewEffect.saturation,
+                      thumbnailPath: provider.thumbnailPath,
+                      isPreviewRendering: provider.isPreviewRendering,
+                      renderedPreviewFramePath: provider.renderedPreviewFramePath,
+                      onChanged: (val) {
+                        provider.setSaturationLevel(val);
+                        provider.requestFilteredPreviewDebounced();
+                      },
+                      onChangeEnd: (_) {
+                        provider.requestFilteredPreviewDebounced(immediate: true);
+                      },
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
             const SizedBox(height: 8),

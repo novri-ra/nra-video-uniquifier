@@ -40,3 +40,16 @@
 
 # File Picker Plugin
 -keep class com.mr.flutter.plugin.filepicker.** { *; }
+
+# Aturan untuk flutter_local_notifications
+-keep class com.dexterous.** { *; }
+
+# Aturan untuk Gson (digunakan oleh flutter_local_notifications untuk scheduled notifications)
+-keepattributes Signature
+-keep class com.google.gson.** { *; }
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}

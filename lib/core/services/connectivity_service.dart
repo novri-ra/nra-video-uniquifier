@@ -1,79 +1,63 @@
 import 'dart:async';
-import 'dart:io';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 /// Lightweight real-time network connectivity monitor.
+/// Uses OS-level events instead of polling to save battery (0% idle drain).
 class ConnectivityService {
   static final ConnectivityService instance = ConnectivityService._internal();
   ConnectivityService._internal();
 
   final ValueNotifier<bool> isOnline = ValueNotifier<bool>(false);
-  Timer? _pollingTimer;
+  final Connectivity _connectivity = Connectivity();
+
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   bool _initialized = false;
 
-  /// Custom socket ping runner for test mocking.
-  @visibleForTesting
-  static Future<bool> Function()? mockPingHandler;
-
   /// Starts monitoring network connectivity.
-  void initialize({Duration interval = const Duration(seconds: 10)}) {
+  void initialize() {
     if (_initialized) return;
     _initialized = true;
-    checkConnectivity();
-    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
-      // In test environment, skip periodic timer to allow clean pumpAndSettle
-      return;
-    }
-    _pollingTimer = Timer.periodic(interval, (_) => checkConnectivity());
+
+    // 1. Cek status koneksi saat ini (hanya sekali saat inisialisasi)
+    _checkInitialConnectivity();
+
+    // 2. Dengarkan perubahan koneksi dari OS (Event-driven, bukan polling)
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+      _updateConnectionStatus,
+      onError: (e) => debugPrint('[Connectivity] Error: $e'),
+    );
   }
 
-  /// One-shot network check.
-  Future<bool> checkConnectivity() async {
-    if (mockPingHandler != null) {
-      final online = await mockPingHandler!();
-      if (isOnline.value != online) {
-        isOnline.value = online;
-      }
-      return online;
-    }
-
-    bool online = false;
+  Future<void> _checkInitialConnectivity() async {
     try {
-      final socket = await Socket.connect(
-        '1.1.1.1',
-        53,
-        timeout: const Duration(seconds: 2),
-      );
-      socket.destroy();
-      online = true;
+      final result = await _connectivity.checkConnectivity();
+      _updateConnectionStatus(result);
     } catch (_) {
-      try {
-        final result = await InternetAddress.lookup(
-          'dns.google',
-        ).timeout(const Duration(seconds: 2));
-        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-          online = true;
-        }
-      } catch (_) {
-        online = false;
-      }
+      isOnline.value = false;
     }
+  }
+
+  void _updateConnectionStatus(List<ConnectivityResult> results) {
+    // Jika array kosong atau berisi 'none', berarti offline.
+    // Jika berisi 'wifi', 'mobile', 'ethernet', dll, berarti online.
+    final online = results.any((result) => result != ConnectivityResult.none);
 
     if (isOnline.value != online) {
       isOnline.value = online;
     }
-    return online;
   }
 
-  /// Sets connectivity state directly (useful for tests and manual toggles).
+  /// Sets connectivity state directly (useful for tests).
   void setOnlineForTesting(bool value) {
     isOnline.value = value;
   }
 
-  /// Disposes polling timer.
+  /// Disposes listener when app shuts down.
   void dispose() {
-    _pollingTimer?.cancel();
-    _pollingTimer = null;
+    _connectivitySubscription?.cancel();
+    _connectivitySubscription = null;
     _initialized = false;
   }
 }

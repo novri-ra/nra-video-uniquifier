@@ -68,6 +68,7 @@ Movies/
 *.m4a
 *.dump
 0ai_context/reports/screenshots/
+*.hprof
 
 # Keystore & Signing Secrets
 *.jks
