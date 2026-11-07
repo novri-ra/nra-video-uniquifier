@@ -62,9 +62,27 @@ class FfmpegCommandBuilder {
       thermalThrottle,
       introTrimOffset,
     );
+
+    // --- METADATA SANITIZATION & SPOOFING LOGIC ---
     if (removeMetadata) {
-      FfmpegMetadataBuilder.writeMetadataTags(buffer, vars.deviceProfile);
+      // 1. SELALU hapus metadata asli, stream-level, & chapter
+      buffer.write(' -map_metadata -1');
+      buffer.write(' -map_metadata:s:v -1');
+      buffer.write(' -map_metadata:s:a -1');
+      buffer.write(' -map_chapters -1');
+
+      // 2. Cegah FFmpeg menulis tag encoder (Lavf...) yang bisa dideteksi AI
+      buffer.write(' -fflags +bitexact');
+      buffer.write(' -flags:v +bitexact');
+      buffer.write(' -flags:a +bitexact');
+
+      // 3. HANYA suntikkan metadata kamera PALSU jika mode Deep Evasion (TikTok) aktif
+      if (enableDeepAntiFingerprint) {
+        FfmpegMetadataBuilder.writeMetadataTags(buffer, vars.deviceProfile);
+      }
     }
+    // ----------------------------------------------
+
     writeFilterAndCodecOptions(
       buffer: buffer,
       modifyVisuals: modifyVisuals,
@@ -94,9 +112,11 @@ class FfmpegCommandBuilder {
       cropAnchor: cropAnchor,
       rotateAngle: rotateAngle,
     );
+
     if (outputPath.toLowerCase().endsWith('.mp4')) {
       buffer.write(' -bsf:v filter_units=remove_types=6');
     }
+
     buffer.write(' "${escapePath(outputPath)}"');
     return buffer.toString();
   }

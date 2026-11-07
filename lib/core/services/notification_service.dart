@@ -374,7 +374,7 @@ class NotificationService {
 
   /// Instant test notification trigger for diagnostics and verification.
   @pragma('vm:entry-point')
-  static Future<void> showTestNotification({
+    static Future<void> showTestNotification({
     int? id,
     String title = 'NRA Video Uniquifier Test',
     String body = 'Sistem notifikasi dan channel Android aktif sempurna!',
@@ -389,9 +389,9 @@ class NotificationService {
 
     await androidPlatform?.createNotificationChannel(
       const AndroidNotificationChannel(
-        'video_processing_channel',
-        'Video Processing',
-        description: 'Video processing status and completion',
+        completeChannelId, // <-- UBAH INI (sebelumnya 'video_processing_channel')
+        'Video Processing Complete', // <-- UBAH INI
+        description: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -403,10 +403,10 @@ class NotificationService {
         id ??
         (DateTime.now().millisecond == 0 ? 1 : DateTime.now().millisecond);
 
-    const androidDetails = AndroidNotificationDetails(
-      'video_processing_channel',
-      'Video Processing',
-      channelDescription: 'Video processing status and completion',
+    final androidDetails = AndroidNotificationDetails(
+      completeChannelId, // <-- UBAH INI (sebelumnya 'video_processing_channel')
+      'Video Processing Complete', // <-- UBAH INI
+      channelDescription: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
       importance: Importance.high,
       priority: Priority.high,
       icon: 'ic_notification',
