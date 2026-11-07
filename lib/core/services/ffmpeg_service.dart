@@ -144,7 +144,9 @@ class FfmpegService {
           File(thumbPath).existsSync()) {
         return thumbPath;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[FfmpegService] thumbnail failed for $inputPath: $e');
+    }
     return null;
   }
 
@@ -165,7 +167,9 @@ class FfmpegService {
         _activePreviewSessionId = null;
         try {
           await FFmpegKit.cancel(prevId);
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('[FfmpegService] preview cancel failed: $e');
+        }
       }
 
       final tempDir = await getTemporaryDirectory();
@@ -251,7 +255,12 @@ class FfmpegService {
             if (entity.path != currentPath) {
               try {
                 entity.deleteSync();
-              } catch (_) {}
+              } catch (e) {
+                debugPrint(
+                  '[FfmpegService] delete old preview failed for '
+                  '${entity.path}: $e',
+                );
+              }
             }
           }
         }
@@ -446,7 +455,12 @@ class FfmpegService {
         meta.stagedFile!.path != inputPath) {
       try {
         meta.stagedFile!.deleteSync();
-      } catch (_) {}
+      } catch (e) {
+        debugPrint(
+          '[FfmpegService] delete staged file failed for '
+          '${meta.stagedFile?.path}: $e',
+        );
+      }
     }
   }
 
@@ -461,7 +475,9 @@ class FfmpegService {
     File? stagedFile;
     try {
       stagedFile = await stageInputFile(inputPath);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[FfmpegService] stage input failed for $inputPath: $e');
+    }
     final effectiveInput = stagedFile?.path ?? inputPath;
     final inputFile = File(effectiveInput);
     if (!inputFile.existsSync() || inputFile.lengthSync() == 0) {
