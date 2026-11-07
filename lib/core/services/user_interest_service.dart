@@ -65,7 +65,9 @@ class UserInterestService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_webhookKey, url);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[UserInterestService] webhook url save failed: $e');
+    }
   }
 
   /// Retrieves active webhook URL from memory or preferences.
@@ -259,7 +261,10 @@ class UserInterestService {
           );
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      // FormatException echoes the corrupted JSON, whose keys are user queries.
+      debugPrint('[UserInterestService] affinity load failed: ${e.runtimeType}');
+    }
   }
 
   static Future<void> _saveAffinity() async {
@@ -270,7 +275,9 @@ class UserInterestService {
           entry.key: entry.value.toJson(),
       };
       await prefs.setString(_affinityKeyV2, jsonEncode(map));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[UserInterestService] affinity save failed: $e');
+    }
   }
 
   /// Strictly offline-first telemetry dispatch. Invokes mockDispatcher in test environments.
