@@ -238,7 +238,9 @@ class MicrostockNewsService {
         results.addAll(list);
       }
       results.sort((a, b) => b.publishedDate.compareTo(a.publishedDate));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch hybrid feeds failed: $e');
+    }
     return results;
   }
 
@@ -253,7 +255,9 @@ class MicrostockNewsService {
           : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: defaultSource);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch RSS $url failed: $e');
+    }
     return [];
   }
 
@@ -267,7 +271,9 @@ class MicrostockNewsService {
           : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: 'Google News Intel');
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch Google News RSS failed: $e');
+    }
     return [];
   }
 
@@ -282,7 +288,9 @@ class MicrostockNewsService {
           : await _defaultHttpGet(uri);
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: 'Warta Microstock ID');
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch Google News ID RSS failed: $e');
+    }
     return [];
   }
 
@@ -484,7 +492,9 @@ class MicrostockNewsService {
         final frag = html_parser.parseFragment(htmlContent);
         final src = frag.querySelector('img')?.attributes['src'];
         if (src != null && src.isNotEmpty) return src;
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('[MicrostockNewsService] parse image url failed: $e');
+      }
     }
     return null;
   }
@@ -522,7 +532,9 @@ class MicrostockNewsService {
             .map((i) => _parseRssJsonItem(i as Map<String, dynamic>))
             .toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch RSS2JSON failed: $e');
+    }
     return [];
   }
 
@@ -586,7 +598,9 @@ class MicrostockNewsService {
             )
             .toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] fetch Reddit r/$sub failed: $e');
+    }
     return [];
   }
 
@@ -650,7 +664,8 @@ class MicrostockNewsService {
       if (res.statusCode == 200) {
         return await res.transform(utf8.decoder).join();
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] HTTP GET $uri failed: $e');
     } finally {
       client.close();
     }
@@ -673,7 +688,9 @@ class MicrostockNewsService {
             )
             .toList();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] cache read failed: $e');
+    }
     return [];
   }
 
@@ -724,7 +741,9 @@ class MicrostockNewsService {
       final encoded = jsonEncode(cappedList.map((a) => a.toJson()).toList());
       await prefs.setString(_cacheKey, encoded);
       await prefs.setString(_lastFetchedKey, now.toIso8601String());
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] cache write failed: $e');
+    }
   }
 
   /// Gets timestamp of last successful news synchronization.
@@ -739,7 +758,13 @@ class MicrostockNewsService {
 
   /// Triggers non-blocking background image download and WebP conversion for articles with remote image URLs.
   static void triggerBackgroundDownload(List<MicrostockNewsArticle> articles) {
-    unawaited(_downloadImagesForArticles(articles).catchError((_) {}));
+    unawaited(
+      _downloadImagesForArticles(
+        articles,
+      ).catchError((Object e) => debugPrint(
+        '[MicrostockNewsService] image download failed: $e',
+      )),
+    );
   }
 
   static Future<void> _downloadImagesForArticles(
