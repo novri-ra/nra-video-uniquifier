@@ -145,7 +145,10 @@ class FfmpegService {
         return thumbPath;
       }
     } catch (e) {
-      debugPrint('[FfmpegService] thumbnail failed for $inputPath: $e');
+      debugPrint(
+        '[FfmpegService] thumbnail failed for '
+        "${inputPath.split(RegExp(r'[/\\]')).last}: ${e.runtimeType}",
+      );
     }
     return null;
   }
