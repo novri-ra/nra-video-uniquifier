@@ -118,7 +118,12 @@ class DeviceCapabilityService {
         _cachedSpecs = DeviceSpecs.fromMap(res);
         return _cachedSpecs!;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[DeviceCapabilityService] device specs probe failed: '
+        '${e.runtimeType}',
+      );
+    }
 
     _cachedSpecs = DeviceSpecs.defaultFallback();
     return _cachedSpecs!;

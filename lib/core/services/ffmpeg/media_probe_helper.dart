@@ -1,4 +1,5 @@
 import 'package:ffmpeg_kit_flutter_new/ffprobe_kit.dart';
+import 'package:flutter/foundation.dart';
 
 /// Probes media stream properties such as duration, resolution, and orientation.
 class MediaProbeHelper {
@@ -25,7 +26,10 @@ class MediaProbeHelper {
         }
         return (durationMs: durMs, width: 0, height: 0);
       }
-    } catch (_) {}
+    } catch (e) {
+      // FFprobe errors echo the media path; log the type only.
+      debugPrint('[MediaProbeHelper] media probe failed: ${e.runtimeType}');
+    }
     return (durationMs: 0, width: 0, height: 0);
   }
 }

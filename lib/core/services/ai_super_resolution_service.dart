@@ -65,7 +65,13 @@ class AiSuperResolutionService {
         }
         outPaths.add(target.path);
       }
-    } catch (_) {}
+    } catch (e) {
+      // Asset keys and cache paths appear in these messages; log the type only.
+      debugPrint(
+        '[AiSuperResolutionService] model asset prepare failed: '
+        '${e.runtimeType}',
+      );
+    }
     return outPaths;
   }
 
@@ -75,7 +81,10 @@ class AiSuperResolutionService {
     try {
       final supported = await _channel.invokeMethod<bool>('isVulkanSupported');
       return supported ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint(
+        '[AiSuperResolutionService] vulkan probe failed: ${e.runtimeType}',
+      );
       return false;
     }
   }
