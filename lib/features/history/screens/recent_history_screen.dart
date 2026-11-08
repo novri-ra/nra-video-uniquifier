@@ -60,7 +60,13 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       if (isGranted && mounted) {
         setState(() {});
       }
-    } catch (_) {}
+    } catch (e) {
+      // permission_handler errors may echo the permission name.
+      debugPrint(
+        '[RecentHistoryScreen] storage permission check failed: '
+        '${e.runtimeType}',
+      );
+    }
   }
 
   Future<void> _checkStoragePermissionOnMount() async {
@@ -77,8 +83,9 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
           _showStoragePermissionDialog();
         }
       }
-    } catch (_) {
+    } catch (e) {
       // Fallback: If SharedPreferences fails, do not spam dialog
+      debugPrint('[RecentHistoryScreen] storage permission prompt failed: $e');
     }
   }
 

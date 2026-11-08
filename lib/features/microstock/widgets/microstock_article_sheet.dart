@@ -186,7 +186,12 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
     setState(() => _isTranslating = true);
     try {
       await _executeTranslation();
-    } catch (_) {
+    } catch (e) {
+      // Translation errors echo article text; log the type only.
+      debugPrint(
+        '[MicrostockArticleSheet] translation toggle failed: '
+        '${e.runtimeType}',
+      );
       if (mounted) setState(() => _isTranslating = false);
     }
   }
@@ -247,7 +252,12 @@ class _MicrostockArticleSheetState extends State<MicrostockArticleSheet> {
     if (uri != null) {
       try {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } catch (_) {}
+      } catch (e) {
+        // Launcher errors echo the publisher URL; log the type only.
+        debugPrint(
+          '[MicrostockArticleSheet] launch url failed: ${e.runtimeType}',
+        );
+      }
     }
   }
 

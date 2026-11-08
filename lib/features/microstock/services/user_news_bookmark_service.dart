@@ -22,8 +22,9 @@ class UserNewsBookmarkService {
       _cachedIds.addAll(list);
       bookmarkedIdsNotifier.value = Set.unmodifiable(_cachedIds);
       _initialized = true;
-    } catch (_) {
+    } catch (e) {
       // Offline fallback: keep in-memory set
+      debugPrint('[UserNewsBookmarkService] bookmark init failed: $e');
       _initialized = true;
     }
   }
@@ -52,7 +53,9 @@ class UserNewsBookmarkService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_bookmarkKey, _cachedIds.toList());
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[UserNewsBookmarkService] bookmark save failed: $e');
+    }
   }
 
   /// Returns list of all bookmarked article IDs.
