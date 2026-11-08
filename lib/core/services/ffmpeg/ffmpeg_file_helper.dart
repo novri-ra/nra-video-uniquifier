@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Helper responsible for FFmpeg file staging, target directory resolution, and export.
@@ -27,7 +28,11 @@ class FfmpegFileHelper {
           await publicMovies.create(recursive: true);
         }
         return publicMovies;
-      } catch (_) {
+      } catch (e) {
+        debugPrint(
+          '[FfmpegFileHelper] public target dir probe failed: '
+          '${e.runtimeType}',
+        );
         try {
           final dirs = await getExternalStorageDirectories(
             type: StorageDirectory.movies,
@@ -39,7 +44,11 @@ class FfmpegFileHelper {
             }
             return fallback;
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint(
+            '[FfmpegFileHelper] external dirs probe failed: ${e.runtimeType}',
+          );
+        }
       }
     }
     final appDocs = await getApplicationDocumentsDirectory();
@@ -71,7 +80,8 @@ class FfmpegFileHelper {
       }
       await File(stagedPath).copy(destinationPath);
       return destinationPath;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[FfmpegFileHelper] export copy failed: ${e.runtimeType}');
       try {
         final dirs = await getExternalStorageDirectories(
           type: StorageDirectory.movies,
@@ -85,7 +95,10 @@ class FfmpegFileHelper {
             '${fallbackDir.path}/${destinationPath.split(RegExp(r"[/\\]")).last}';
         await File(stagedPath).copy(fallbackPath);
         return fallbackPath;
-      } catch (_) {
+      } catch (e) {
+        debugPrint(
+          '[FfmpegFileHelper] export fallback failed: ${e.runtimeType}',
+        );
         return stagedPath;
       }
     }
@@ -97,6 +110,10 @@ class FfmpegFileHelper {
       if (sourcePath != null && path == sourcePath) return;
       final file = File(path);
       if (file.existsSync()) file.deleteSync();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[FfmpegFileHelper] partial file delete failed: ${e.runtimeType}',
+      );
+    }
   }
 }

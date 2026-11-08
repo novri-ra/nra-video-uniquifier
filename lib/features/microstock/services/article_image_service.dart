@@ -39,7 +39,12 @@ class ArticleImageService {
       }
 
       return img.encodeWebP(processed, quality: dto.quality, lossless: false);
-    } catch (_) {
+    } catch (e) {
+      // Bytes, URLs and paths all stay out of the log; only the failure type.
+      debugPrint(
+        '[ArticleImageService] image isolate worker failed: '
+        '${e.runtimeType}',
+      );
       return null;
     }
   }
@@ -56,7 +61,10 @@ class ArticleImageService {
       Directory cacheDir;
       try {
         cacheDir = tempDirectoryOverride ?? await getTemporaryDirectory();
-      } catch (_) {
+      } catch (e) {
+        debugPrint(
+          '[ArticleImageService] cache dir probe failed: ${e.runtimeType}',
+        );
         cacheDir = Directory.systemTemp;
       }
 
@@ -126,7 +134,10 @@ class ArticleImageService {
       unawaited(pruneCacheIfExceedsLimit());
 
       return targetFile.path;
-    } catch (_) {
+    } catch (e) {
+      debugPrint(
+        '[ArticleImageService] image download failed: ${e.runtimeType}',
+      );
       return null;
     }
   }
@@ -141,7 +152,10 @@ class ArticleImageService {
       Directory cacheDir;
       try {
         cacheDir = tempDirectoryOverride ?? await getTemporaryDirectory();
-      } catch (_) {
+      } catch (e) {
+        debugPrint(
+          '[ArticleImageService] cache dir probe failed: ${e.runtimeType}',
+        );
         cacheDir = Directory.systemTemp;
       }
 
@@ -157,7 +171,12 @@ class ArticleImageService {
           files.add(entity);
           try {
             totalBytes += await entity.length();
-          } catch (_) {}
+          } catch (e) {
+            debugPrint(
+              '[ArticleImageService] image cache size read failed: '
+              '${e.runtimeType}',
+            );
+          }
         }
       }
 
@@ -169,7 +188,10 @@ class ArticleImageService {
         try {
           final stat = await file.stat();
           fileWithStats.add(MapEntry(file, stat.modified));
-        } catch (_) {
+        } catch (e) {
+          debugPrint(
+            '[ArticleImageService] image cache stat failed: ${e.runtimeType}',
+          );
           fileWithStats.add(
             MapEntry(file, DateTime.fromMillisecondsSinceEpoch(0)),
           );
@@ -183,8 +205,17 @@ class ArticleImageService {
           final len = await entry.key.length();
           await entry.key.delete();
           totalBytes -= len;
-        } catch (_) {}
+        } catch (e) {
+          debugPrint(
+            '[ArticleImageService] image cache prune delete failed: '
+            '${e.runtimeType}',
+          );
+        }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[ArticleImageService] image cache prune failed: ${e.runtimeType}',
+      );
+    }
   }
 }

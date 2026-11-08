@@ -121,7 +121,12 @@ class TranslationService {
         }
         return buf.toString();
       }
-    } catch (_) {}
+    } catch (e) {
+      // GTX JSON and the request URI both carry article text; log the type only.
+      debugPrint(
+        '[TranslationService] gtx chunk fetch failed: ${e.runtimeType}',
+      );
+    }
     return '';
   }
 
@@ -133,7 +138,8 @@ class TranslationService {
       if (res.statusCode == 200) {
         return await res.transform(utf8.decoder).join();
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[TranslationService] HTTP GET failed: ${e.runtimeType}');
     } finally {
       client.close();
     }
@@ -189,7 +195,11 @@ class TranslationService {
         _putMemoryCache(key, val);
         return val;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[TranslationService] translate cache read failed: ${e.runtimeType}',
+      );
+    }
     return null;
   }
 
@@ -198,7 +208,12 @@ class TranslationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('$_cacheKeyPrefix$key', translated);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[TranslationService] translate cache persist failed: '
+        '${e.runtimeType}',
+      );
+    }
   }
 
   static String? _translateFromOfflineDictionary(
