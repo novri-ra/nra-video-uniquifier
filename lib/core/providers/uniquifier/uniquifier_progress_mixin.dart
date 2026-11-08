@@ -53,7 +53,13 @@ mixin UniquifierProgressMixin on ChangeNotifier {
         _lastDiagnosticInfo = diag;
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e) {
+      // FfmpegKit errors echo the rendered output path; log the type only.
+      debugPrint(
+        '[UniquifierProgressMixin] output diagnostics probe failed: '
+        '${e.runtimeType}',
+      );
+    }
   }
 
   Future<void> _extractOutputThumbnailAsync(String outputPath) async {
@@ -63,6 +69,11 @@ mixin UniquifierProgressMixin on ChangeNotifier {
         _outputThumbnailPath = thumb;
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[UniquifierProgressMixin] output thumbnail extract failed: '
+        '${e.runtimeType}',
+      );
+    }
   }
 }

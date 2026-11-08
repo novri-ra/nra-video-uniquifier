@@ -17,7 +17,9 @@ class ThemeProvider extends ChangeNotifier {
       final saved = await SettingsService.getThemeMode();
       _themeMode = _parseThemeMode(saved);
       notifyListeners();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[ThemeProvider] theme mode load failed: $e');
+    }
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
@@ -26,7 +28,9 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await SettingsService.setThemeMode(_themeModeToString(mode));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[ThemeProvider] theme mode save failed: $e');
+    }
   }
 
   static ThemeMode _parseThemeMode(String val) {

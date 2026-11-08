@@ -62,7 +62,12 @@ mixin UniquifierMediaMixin on ChangeNotifier {
         _thumbnailPath = thumb;
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e) {
+      // FfmpegKit errors echo the source path; log the type only.
+      debugPrint(
+        '[UniquifierMediaMixin] thumbnail extract failed: ${e.runtimeType}',
+      );
+    }
   }
 
   Future<void> _probeMediaInfo(String path) async {
@@ -74,7 +79,11 @@ mixin UniquifierMediaMixin on ChangeNotifier {
         _applyMediaDuration(mediaInfo.getDuration());
         notifyListeners();
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[UniquifierMediaMixin] media info probe failed: ${e.runtimeType}',
+      );
+    }
   }
 
   void _applyMediaStreams(dynamic streams) {
