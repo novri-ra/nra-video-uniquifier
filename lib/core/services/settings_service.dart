@@ -393,7 +393,10 @@ class SettingsService {
           }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      // FileSystemException echoes the path, so log the type only.
+      debugPrint('[SettingsService] temp cache size failed: ${e.runtimeType}');
+    }
     return totalBytes;
   }
 
@@ -413,11 +416,18 @@ class SettingsService {
                 entry.deleteSync();
                 freedBytes += len;
               }
-            } catch (_) {}
+            } catch (e) {
+              debugPrint(
+                '[SettingsService] temp cache entry purge failed: '
+                '${e.runtimeType}',
+              );
+            }
           }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[SettingsService] temp cache purge failed: ${e.runtimeType}');
+    }
     return freedBytes;
   }
 }
