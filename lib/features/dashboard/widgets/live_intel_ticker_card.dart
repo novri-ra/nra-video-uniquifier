@@ -48,7 +48,12 @@ class _LiveIntelTickerCardState extends State<LiveIntelTickerCard>
           setState(() => _topArticle = seed.first);
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      // Cached news is decoded JSON; FormatException echoes article text.
+      debugPrint(
+        '[LiveIntelTickerCard] headline load failed: ${e.runtimeType}',
+      );
+    }
   }
 
   void _navigateToIntelTab(BuildContext context) {

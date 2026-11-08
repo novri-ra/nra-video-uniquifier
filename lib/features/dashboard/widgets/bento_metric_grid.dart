@@ -45,7 +45,11 @@ class _BentoMetricGridState extends State<BentoMetricGrid> {
           _freeFraction = fraction;
         });
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[BentoMetricGrid] storage metrics load failed: ${e.runtimeType}',
+      );
+    }
   }
 
   Color _storageColor(double gb) {

@@ -31,6 +31,10 @@ class LocaleProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await SettingsService.setAppLanguageCode(code);
-    } catch (_) {}
+    } catch (e) {
+      // Prefs-only surface: MissingPluginException/PlatformException carry the
+      // key name, never the locale value.
+      debugPrint('[LocaleProvider] locale save failed: $e');
+    }
   }
 }
