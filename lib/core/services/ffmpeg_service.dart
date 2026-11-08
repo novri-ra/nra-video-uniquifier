@@ -153,7 +153,7 @@ class FfmpegService {
     return null;
   }
 
-    /// Renders a single-frame preview using ultra-fast FFmpeg extraction with applied filters.
+  /// Renders a single-frame preview using ultra-fast FFmpeg extraction with applied filters.
   /// Automatically cancels any previous in-flight preview session to avoid process queue pileup.
   static Future<String?> renderFilteredPreviewFrame({
     required String inputPath,
@@ -197,9 +197,10 @@ class FfmpegService {
       }
 
       // 🔥 PERBAIKAN: Deteksi efek temporal (Echo, RGB Split, dll)
-      final hasTemporalEffect = cleanFilter.contains('blend') ||
-                                cleanFilter.contains('setpts=PTS+') ||
-                                cleanFilter.contains('tmix');
+      final hasTemporalEffect =
+          cleanFilter.contains('blend') ||
+          cleanFilter.contains('setpts=PTS+') ||
+          cleanFilter.contains('tmix');
 
       // Jika efek temporal, proses 0.2 detik dan timpa gambar terakhir (-update 1).
       // Jika bukan, cukup ambil 1 frame (-vframes 1).
@@ -242,7 +243,7 @@ class FfmpegService {
     }
   }
 
-    /// Deletes old preview_*.jpg files in the temp directory to prevent cache bloat.
+  /// Deletes old preview_*.jpg files in the temp directory to prevent cache bloat.
   static void _cleanupOldPreviews(String currentPath) {
     try {
       final dir = File(currentPath).parent;

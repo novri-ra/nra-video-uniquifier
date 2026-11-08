@@ -94,18 +94,18 @@ class VideoVariations {
     this.deviceProfile = DeviceProfile.defaultProfile,
   });
 
-    /// Hardened static fallback matching the new aggressive baseline.
+  /// Hardened static fallback matching the new aggressive baseline.
   static const VideoVariations fallback = VideoVariations(
-    cropPercent: 0.10,       // <-- Ubah ke 10%
+    cropPercent: 0.10, // <-- Ubah ke 10%
     brightness: 0.0,
     contrast: 1.0,
     saturation: 1.0,
-    noiseStrength: 6,        // <-- Ubah ke 6
-    speedFactor: 1.03,       // <-- Ubah ke 1.03
-    rotateAngle: 1.0,        // <-- Ubah ke 1.0
-    audioTempo: 1.03,        // <-- Samakan dengan speedFactor
-    outputFps: 29.7,         // <-- Variasi FPS
-    pitchFactor: 0.99,       // <-- Pitch shift lebih kuat
+    noiseStrength: 6, // <-- Ubah ke 6
+    speedFactor: 1.03, // <-- Ubah ke 1.03
+    rotateAngle: 1.0, // <-- Ubah ke 1.0
+    audioTempo: 1.03, // <-- Samakan dengan speedFactor
+    outputFps: 29.7, // <-- Variasi FPS
+    pitchFactor: 0.99, // <-- Pitch shift lebih kuat
     curves:
         "r='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1':g='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1':b='0/0 0.15/0.1800 0.5/0.5000 0.85/0.8200 1/1'",
     deviceProfile: DeviceProfile.defaultProfile,

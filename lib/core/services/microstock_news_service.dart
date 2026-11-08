@@ -759,11 +759,10 @@ class MicrostockNewsService {
   /// Triggers non-blocking background image download and WebP conversion for articles with remote image URLs.
   static void triggerBackgroundDownload(List<MicrostockNewsArticle> articles) {
     unawaited(
-      _downloadImagesForArticles(
-        articles,
-      ).catchError((Object e) => debugPrint(
-        '[MicrostockNewsService] image download failed: $e',
-      )),
+      _downloadImagesForArticles(articles).catchError(
+        (Object e) =>
+            debugPrint('[MicrostockNewsService] image download failed: $e'),
+      ),
     );
   }
 

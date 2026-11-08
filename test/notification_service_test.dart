@@ -272,15 +272,12 @@ void main() {
       },
     );
 
-    test(
-      'processChannelId is nra_progress_silent_channel',
-      () {
-        expect(
-          NotificationService.processChannelId,
-          equals('nra_progress_silent_channel'),
-        );
-      },
-    );
+    test('processChannelId is nra_progress_silent_channel', () {
+      expect(
+        NotificationService.processChannelId,
+        equals('nra_progress_silent_channel'),
+      );
+    });
 
     test(
       'requestNotificationsPermission delegates to requestPermission',

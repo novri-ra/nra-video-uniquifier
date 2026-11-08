@@ -93,7 +93,7 @@ class FilterBuilders {
           upscaleEngine: upscaleEngine,
         )
       else
-      'scale=trunc(iw/2)*2:trunc(ih/2)*2',
+        'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'fps=$targetFps',
       'setpts=PTS-STARTPTS',
       'format=yuv420p',
@@ -251,7 +251,7 @@ class FilterBuilders {
       if (modifyVisuals) 'noise=alls=${vars.noiseStrength}:allf=t+u',
       if (enableMicroOverlay) 'noise=alls=5:allf=t+u',
       if (allowFrameSkip) 'decimate=cycle=25',
-            if (upscale)
+      if (upscale)
         buildScaleFilter(
           targetResolution: targetResolution,
           isPortrait: isPortrait,

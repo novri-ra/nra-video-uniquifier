@@ -23,9 +23,11 @@ class NotificationService {
   static const int testNotificationId = 7777;
 
   static const String mainChannelId = 'nra_uniquifier_channel_v2';
-  static const String processChannelId = 'nra_progress_silent_channel'; // <-- ID BARU (SUNYI)
+  static const String processChannelId =
+      'nra_progress_silent_channel'; // <-- ID BARU (SUNYI)
   static const String legacyProcessChannelId = 'nra_video_processing_channel';
-  static const String completeChannelId = 'nra_complete_alert_channel'; // <-- ID BARU (BERSUSUARA)
+  static const String completeChannelId =
+      'nra_complete_alert_channel'; // <-- ID BARU (BERSUSUARA)
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -68,7 +70,7 @@ class NotificationService {
   }
 
   /// Registers official notification channels with Android OS.
-    static Future<void> _createNotificationChannels(
+  static Future<void> _createNotificationChannels(
     AndroidFlutterLocalNotificationsPlugin plugin,
   ) async {
     // 1. Channel Progres (SUNYI, TANPA POP-UP)
@@ -183,7 +185,7 @@ class NotificationService {
   @pragma('vm:entry-point')
   static Future<bool> requestNotificationsPermission() => requestPermission();
 
-    static AndroidNotificationDetails _buildProgressDetails({
+  static AndroidNotificationDetails _buildProgressDetails({
     required int progress,
     required int maxProgress,
   }) {
@@ -191,10 +193,10 @@ class NotificationService {
       processChannelId,
       'Video Processing Progress',
       channelDescription: 'Menampilkan progres rendering tanpa suara',
-      importance: Importance.low,     // <-- Ubah ke LOW
-      priority: Priority.low,         // <-- Ubah ke LOW
-      playSound: false,               // <-- MATIKAN SUARA
-      enableVibration: false,         // <-- MATIKAN GETARAN
+      importance: Importance.low, // <-- Ubah ke LOW
+      priority: Priority.low, // <-- Ubah ke LOW
+      playSound: false, // <-- MATIKAN SUARA
+      enableVibration: false, // <-- MATIKAN GETARAN
       icon: 'ic_notification',
       ticker: 'NRA Video Uniquifier',
       showProgress: true,
@@ -329,7 +331,8 @@ class NotificationService {
       const AndroidNotificationChannel(
         completeChannelId, // <-- UBAH INI
         'Video Processing Complete', // <-- UBAH INI
-        description: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
+        description:
+            'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -351,7 +354,8 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       completeChannelId, // <-- UBAH INI
       'Video Processing Complete', // <-- UBAH INI
-      channelDescription: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
+      channelDescription:
+          'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
       importance: Importance.high,
       priority: Priority.high,
       icon: 'ic_notification',
@@ -386,7 +390,7 @@ class NotificationService {
 
   /// Instant test notification trigger for diagnostics and verification.
   @pragma('vm:entry-point')
-    static Future<void> showTestNotification({
+  static Future<void> showTestNotification({
     int? id,
     String title = 'NRA Video Uniquifier Test',
     String body = 'Sistem notifikasi dan channel Android aktif sempurna!',
@@ -403,7 +407,8 @@ class NotificationService {
       const AndroidNotificationChannel(
         completeChannelId, // <-- UBAH INI (sebelumnya 'video_processing_channel')
         'Video Processing Complete', // <-- UBAH INI
-        description: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
+        description:
+            'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
         importance: Importance.high,
         playSound: true,
         enableVibration: true,
@@ -418,7 +423,8 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       completeChannelId, // <-- UBAH INI (sebelumnya 'video_processing_channel')
       'Video Processing Complete', // <-- UBAH INI
-      channelDescription: 'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
+      channelDescription:
+          'Pemberitahuan saat video selesai diproses', // <-- UBAH INI
       importance: Importance.high,
       priority: Priority.high,
       icon: 'ic_notification',

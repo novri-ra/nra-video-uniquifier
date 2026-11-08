@@ -263,7 +263,9 @@ class UserInterestService {
       }
     } catch (e) {
       // FormatException echoes the corrupted JSON, whose keys are user queries.
-      debugPrint('[UserInterestService] affinity load failed: ${e.runtimeType}');
+      debugPrint(
+        '[UserInterestService] affinity load failed: ${e.runtimeType}',
+      );
     }
   }
 

@@ -155,7 +155,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setRemoveMetadata(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleRemoveMetadata persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleRemoveMetadata persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -165,7 +167,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setModifyAudio(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleModifyAudio persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleModifyAudio persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -175,7 +179,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setModifyVisuals(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleModifyVisuals persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleModifyVisuals persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -185,7 +191,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setUpscale1080p(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleUpscale1080p persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleUpscale1080p persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -195,7 +203,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setEnhanceAndDenoise(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleEnhanceAndDenoise persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleEnhanceAndDenoise persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -205,7 +215,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setDeepAntiFingerprint(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleDeepAntiFingerprint persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleDeepAntiFingerprint persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -215,7 +227,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setHorizontalFlip(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleHorizontalFlip persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleHorizontalFlip persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -227,7 +241,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setAggressiveAudio(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleAggressiveAudio persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleAggressiveAudio persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -237,7 +253,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setAutoTrim(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleAutoTrim persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleAutoTrim persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -249,7 +267,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setBlurredCanvas(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleBlurredCanvas persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleBlurredCanvas persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -259,7 +279,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setMuteOriginalAudio(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleMuteOriginalAudio persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleMuteOriginalAudio persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -269,7 +291,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setDynamicZoom(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleDynamicZoom persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleDynamicZoom persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -279,7 +303,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setMicroOverlay(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleMicroOverlay persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleMicroOverlay persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -289,7 +315,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setFrameSkip(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleFrameSkip persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleFrameSkip persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -299,7 +327,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setChromaShift(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleChromaShift persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleChromaShift persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -309,7 +339,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setCanvasScalePercent(_canvasScalePercent);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setCanvasScalePercent persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setCanvasScalePercent persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -319,7 +351,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setThermalThrottle(val);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] toggleThermalThrottle persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] toggleThermalThrottle persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -329,7 +363,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setSharpeningLevel(_sharpeningLevel);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setSharpeningLevel persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setSharpeningLevel persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -339,7 +375,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setSaturationLevel(_saturationLevel);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setSaturationLevel persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setSaturationLevel persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -349,7 +387,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setRotateAngle(_rotateAngle);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setRotateAngle persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setRotateAngle persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -386,7 +426,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setUpscaleResolution(_targetResolution);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setUpscaleTarget persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setUpscaleTarget persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -396,7 +438,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     try {
       SettingsService.setUpscaleEngine(engine);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] setUpscaleEngine persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] setUpscaleEngine persist failed: $e',
+      );
     }
     notifyListeners();
   }
@@ -433,7 +477,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
       try {
         SettingsService.setDefaultPreset(presetName);
       } catch (e) {
-        debugPrint('[UniquifierModifiersMixin] applyPresetInternal preset persist failed: $e');
+        debugPrint(
+          '[UniquifierModifiersMixin] applyPresetInternal preset persist failed: $e',
+        );
       }
     }
     if (targetFps != null) {
@@ -441,7 +487,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
       try {
         SettingsService.setTargetFps(targetFps);
       } catch (e) {
-        debugPrint('[UniquifierModifiersMixin] applyPresetInternal fps persist failed: $e');
+        debugPrint(
+          '[UniquifierModifiersMixin] applyPresetInternal fps persist failed: $e',
+        );
       }
     }
     _removeMetadata = removeMetadata;
@@ -480,7 +528,9 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
       SettingsService.setCanvasScalePercent(_canvasScalePercent);
       SettingsService.setMuteOriginalAudio(_muteOriginalAudio);
     } catch (e) {
-      debugPrint('[UniquifierModifiersMixin] applyPresetInternal bulk persist failed: $e');
+      debugPrint(
+        '[UniquifierModifiersMixin] applyPresetInternal bulk persist failed: $e',
+      );
     }
     notifyListeners();
   }
