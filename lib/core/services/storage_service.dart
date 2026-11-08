@@ -16,13 +16,16 @@ class StorageService {
         fractionDigits: 1,
       );
       final freeBytes = space.free;
+      // Free-space size and threshold stay out of the log (§14).
       debugPrint(
-        '[StorageService] Free disk space: ${(freeBytes / (1024 * 1024)).toStringAsFixed(1)} MB (required: ${(minRequiredBytes / (1024 * 1024)).toStringAsFixed(1)} MB)',
+        '[StorageService] Free space check: '
+        '${freeBytes >= minRequiredBytes ? 'sufficient' : 'insufficient'}',
       );
       return freeBytes >= minRequiredBytes;
     } catch (e) {
       debugPrint(
-        '[StorageService] Error checking storage space: $e. Falling back to permissive check.',
+        '[StorageService] Storage space probe failed: ${e.runtimeType}. '
+        'Falling back to permissive check.',
       );
       return true; // Fallback to permissive on error
     }
@@ -46,10 +49,16 @@ class StorageService {
                 freed += len;
               }
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint(
+              '[StorageService] stale file prune failed: ${e.runtimeType}',
+            );
+          }
         }
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[StorageService] temp dir read failed: ${e.runtimeType}');
+    }
     return freed;
   }
 
@@ -59,6 +68,10 @@ class StorageService {
     try {
       final file = File(path);
       if (file.existsSync()) file.deleteSync();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint(
+        '[StorageService] partial file cleanup failed: ${e.runtimeType}',
+      );
+    }
   }
 }
