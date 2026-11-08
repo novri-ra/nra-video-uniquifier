@@ -256,7 +256,10 @@ class MicrostockNewsService {
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: defaultSource);
     } catch (e) {
-      debugPrint('[MicrostockNewsService] fetch RSS $url failed: $e');
+      // Exception string may echo RSS feed snippets containing article titles/summaries.
+      debugPrint(
+        '[MicrostockNewsService] fetch RSS $url failed: ${e.runtimeType}',
+      );
     }
     return [];
   }
@@ -272,7 +275,10 @@ class MicrostockNewsService {
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: 'Google News Intel');
     } catch (e) {
-      debugPrint('[MicrostockNewsService] fetch Google News RSS failed: $e');
+      // Exception string may echo feed snippets containing article titles/summaries.
+      debugPrint(
+        '[MicrostockNewsService] fetch Google News RSS failed: ${e.runtimeType}',
+      );
     }
     return [];
   }
@@ -289,7 +295,10 @@ class MicrostockNewsService {
       if (raw.isEmpty) return [];
       return parseRssXmlFeed(raw, defaultSource: 'Warta Microstock ID');
     } catch (e) {
-      debugPrint('[MicrostockNewsService] fetch Google News ID RSS failed: $e');
+      // Exception string may echo feed snippets containing article titles/summaries.
+      debugPrint(
+        '[MicrostockNewsService] fetch Google News ID RSS failed: ${e.runtimeType}',
+      );
     }
     return [];
   }
@@ -533,7 +542,10 @@ class MicrostockNewsService {
             .toList();
       }
     } catch (e) {
-      debugPrint('[MicrostockNewsService] fetch RSS2JSON failed: $e');
+      // FormatException echoes the JSON source prefix, which contains article title/summary.
+      debugPrint(
+        '[MicrostockNewsService] fetch RSS2JSON failed: ${e.runtimeType}',
+      );
     }
     return [];
   }
@@ -599,7 +611,10 @@ class MicrostockNewsService {
             .toList();
       }
     } catch (e) {
-      debugPrint('[MicrostockNewsService] fetch Reddit r/$sub failed: $e');
+      // FormatException echoes the JSON source prefix, which contains post titles/content.
+      debugPrint(
+        '[MicrostockNewsService] fetch Reddit r/$sub failed: ${e.runtimeType}',
+      );
     }
     return [];
   }
@@ -689,7 +704,8 @@ class MicrostockNewsService {
             .toList();
       }
     } catch (e) {
-      debugPrint('[MicrostockNewsService] cache read failed: $e');
+      // FormatException echoes the cached JSON prefix, which contains article title/summary.
+      debugPrint('[MicrostockNewsService] cache read failed: ${e.runtimeType}');
     }
     return [];
   }
