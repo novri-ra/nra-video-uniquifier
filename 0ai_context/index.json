@@ -1,44 +1,10 @@
 {
-  "name": "nra_video_uniquifier",
-  "version": "1.0.5+5",
-  "generated_at": "2026-11-08T01:25:00Z",
-  "commit": "6278087bcdd5364538ff2b54de5be7c71e3c82ba",
-  "branch": "development",
-  "stack": {
-    "detected": ["dart", "flutter"],
-    "primary": "dart",
-    "framework": "Flutter 3.47.8 / Dart 3.13.7"
-  },
-  "modules": [
-    "core/models",
-    "core/providers",
-    "core/services",
-    "core/services/ffmpeg",
-    "core/theme",
-    "core/utils",
-    "features/batch",
-    "features/dashboard",
-    "features/history",
-    "features/microstock",
-    "features/navigation",
-    "features/process",
-    "features/profile",
-    "features/settings",
-    "l10n",
-    "shared/widgets"
-  ],
-  "reports": ["86-audit.md", "87-out-of-scope.md"],
-  "handoff": "HANDOFF.md",
-  "run_mode": "RESUME",
-  "health": {
-    "analyze": { "exit": 0, "summary": "No issues found!" },
-    "test": { "exit": 0, "summary": "216/216 passed" },
-    "format": { "exit": 1, "summary": "7 files changed" }
-  },
-  "graph": {
-    "project": "C-Users-Administrator-Saved-Games-_Project-nra_video_uniquifier",
-    "status": "ready",
-    "nodes": 2571,
-    "edges": 6819
-  }
+  "next_report_number": 104,
+  "reports": [
+    {
+      "number": 103,
+      "path": "reports/103-audit.md",
+      "type": "audit"
+    }
+  ]
 }

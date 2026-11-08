@@ -1,7 +1,15 @@
 {
-  "analyze": { "exit": 0, "issues": "No issues found!" },
-  "test": { "exit": 0, "passed": "216/216" },
-  "format": { "exit": 1, "changed": "7 files" },
-  "run_at": "2026-11-08T01:15:00Z",
-  "note": "dart format --set-exit-if-changed rewrites files; formatting writes were reverted for 6 files that were clean at run start. lib/features/process/widgets/modifiers_card.dart was already user-modified and retained its formatted state."
+  "analyze": {
+    "exit": 0,
+    "output": "No issues found!"
+  },
+  "test": {
+    "passed": 216,
+    "total": 216,
+    "exit": 0
+  },
+  "format": {
+    "exit": 0,
+    "changed": 0
+  }
 }

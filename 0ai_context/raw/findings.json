@@ -1,202 +1,62 @@
 [
   {
-    "id": "AUDIT-20261108-001",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/providers/uniquifier/uniquifier_modifiers_mixin.dart:142",
-    "impact": "27 empty catch blocks swallow settings persistence and preview-render failures, so UI state silently diverges from stored state.",
-    "fix": "Replace each empty catch with a debugPrint plus a recorded error field, or propagate a typed failure.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-002",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/services/ffmpeg_service.dart:147",
-    "impact": "5 empty catch blocks in staging and cleanup paths hide filesystem failures that later surface as unexplained export errors.",
-    "fix": "Log the exception with file path context and surface it through the existing RenderIntegrityException channel.",
-    "scope": "requires-source-edit",
-    "since": "AUDIT-20261104-001"
-  },
-  {
-    "id": "AUDIT-20261108-003",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/services/microstock_news_service.dart:241",
-    "impact": "9 empty catch blocks hide RSS fetch and parse failures, leaving the news feed empty with no diagnostic signal.",
-    "fix": "Record the failing feed URL and error, then expose a degraded-feed state to the UI.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-004",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/services/notification_service.dart:65",
-    "impact": "6 empty catch blocks hide notification permission and delivery failures, so users silently stop receiving completion alerts.",
-    "fix": "Log delivery failures and fall back to the in-app toast path when the platform channel throws.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-005",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/services/history_service.dart:62",
-    "impact": "5 empty catch blocks discard history read/write errors, which can silently lose the user's processed-video ledger.",
-    "fix": "Log the failure and mark the history store as degraded instead of returning an empty list.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-006",
-    "severity": "P1",
-    "category": "correctness",
-    "location": "lib/core/services/user_interest_service.dart:262",
-    "impact": "Legacy affinity migration swallows JSON decode errors, dropping all previously accumulated interest weights without notice.",
-    "fix": "Catch the decode error explicitly, log it, and reset the affinity map deterministically.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-007",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/core/services/filter_builders.dart:323",
-    "impact": "691-line filter builder plus a 2-node call cycle (buildVideoFilter <-> _fallbackVideoFilter) makes filter changes hard to reason about.",
-    "fix": "Extract per-effect filter segments into separate builders and remove the recursive fallback.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-008",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/features/microstock/widgets/microstock_article_sheet.dart:1",
-    "impact": "901-line widget file mixes article rendering, bookmark state, and share actions.",
-    "fix": "Split header, body renderer, and action bar into separate widgets.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-009",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/core/services/microstock_news_service.dart:1",
-    "impact": "791-line service combines HTTP transport, RSS parsing, translation, and caching concerns.",
-    "fix": "Extract transport and parser into separate collaborators.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-010",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/core/services/ffmpeg_service.dart:1",
-    "impact": "610-line service still holds orchestration, staging, probing, and export verification after the command-builder extraction.",
-    "fix": "Move probe/export/verification steps into the existing lib/core/services/ffmpeg helpers.",
-    "scope": "requires-source-edit",
-    "since": "AUDIT-20261104-003"
-  },
-  {
-    "id": "AUDIT-20261108-011",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/core/services/ffmpeg_service.dart:274",
-    "impact": "processVideo takes 35+ named parameters and co-changes with filter_builders at 0.89, so every filter change touches two large files.",
-    "fix": "Introduce a single immutable ProcessVideoOptions value object shared by service and builder.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-012",
-    "severity": "P2",
-    "category": "quality",
-    "location": "lib/features/microstock/screens/microstock_ai_screen.dart:6",
-    "impact": "MicrostockAiScreen has zero inbound and outbound graph edges, indicating dead UI surface.",
-    "fix": "Confirm with the product owner, then delete the screen and its route entry.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-013",
-    "severity": "P2",
-    "category": "quality",
-    "location": "test/ffmpeg_service_test.dart:1",
-    "impact": "1147-line test file covers multiple concerns, slowing targeted test runs and obscuring failures.",
-    "fix": "Split into command-builder, filter, and process-lifecycle test files.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-014",
-    "severity": "P2",
-    "category": "documentation",
-    "location": "README.md:7",
-    "impact": "README claims zero network transmission and zero external telemetry, but MicrostockNewsService performs HTTP GET requests to external RSS feeds.",
-    "fix": "Scope the offline claim to video processing and document the news feed network path explicitly.",
-    "scope": "doc-only",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-015",
-    "severity": "P2",
-    "category": "safety",
-    "location": "lib/core/services/ffmpeg/ffmpeg_file_helper.dart:24",
-    "impact": "The Android public-storage path /storage/emulated/0/Movies/Uniquifier is duplicated in 4 files, so a storage-policy change needs 4 edits.",
-    "fix": "Centralize the path in a single storage constants file and reference it everywhere.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-016",
-    "severity": "P3",
-    "category": "quality",
-    "location": "lib/core/providers/locale_provider.dart:34",
-    "impact": "Empty catch on locale decode hides corrupt stored locale values.",
-    "fix": "Add a debugPrint with the offending value.",
-    "scope": "requires-source-edit",
-    "since": "AUDIT-20261104-006"
-  },
-  {
-    "id": "AUDIT-20261108-017",
-    "severity": "P3",
-    "category": "quality",
-    "location": "lib/core/services/settings_service.dart:396",
-    "impact": "3 empty catch blocks hide SharedPreferences failures on settings write.",
-    "fix": "Log the failure and keep the in-memory value as the source of truth.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
-    "id": "AUDIT-20261108-018",
-    "severity": "P3",
-    "category": "quality",
-    "location": "lib/core/services/storage_service.dart:49",
-    "impact": "3 empty catch blocks hide directory-size and free-space probe failures used for the storage check.",
-    "fix": "Log the probe failure and fall back to a conservative storage estimate.",
-    "scope": "requires-source-edit",
-    "since": "new"
-  },
-  {
     "id": "AUDIT-20261108-019",
     "severity": "P3",
     "category": "documentation",
-    "location": "lib/core/services/notification_service.dart:24",
-    "impact": "Indonesian inline comments remain in a codebase that standardized UI and localization on English.",
-    "fix": "Translate the remaining Indonesian comments to English.",
-    "scope": "requires-source-edit",
-    "since": "new"
+    "description": "Indonesian comments in notification_service.dart:24-25 after English-only i18n policy."
   },
   {
     "id": "AUDIT-20261108-020",
     "severity": "P3",
     "category": "quality",
-    "location": "lib/features/process/widgets/modifiers_card.dart:1",
-    "impact": "Format gate fails: 7 Dart files are not dart-format clean, so the format check cannot be used as a CI gate.",
-    "fix": "Run dart format over lib/ and test/ in a whitespace-only commit.",
-    "scope": "requires-source-edit",
-    "since": "new"
+    "description": "23x catch (_) silent non-empty handlers producing no log."
+  },
+  {
+    "id": "AUDIT-20261108-021",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "history_service.dart logs basename + $e + stack trace in delete/cleanup."
+  },
+  {
+    "id": "AUDIT-20261108-022",
+    "severity": "P2",
+    "category": "privacy",
+    "description": "microstock_news_service.dart logs cache read failed with article JSON via $e."
+  },
+  {
+    "id": "AUDIT-20261108-023",
+    "severity": "P3",
+    "category": "correctness",
+    "description": "SettingsService setUpscaleResolution/setUpscaleEngine write prefs before updating ValueNotifier."
+  },
+  {
+    "id": "AUDIT-20261108-024",
+    "severity": "P2",
+    "category": "quality",
+    "description": "Temp-cache walk duplicated across settings_service, storage_service, and ffmpeg_file_helper."
+  },
+  {
+    "id": "AUDIT-20261108-025",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "FfmpegFileHelper.stageInputFile throws Exception with absolute inputPath."
+  },
+  {
+    "id": "AUDIT-20261108-026",
+    "severity": "P3",
+    "category": "cosmetic",
+    "description": "ai_super_resolution_service.dart mixes log prefixes [AiSuperResolution] and [AiSuperResolutionService]."
+  },
+  {
+    "id": "AUDIT-20261108-027",
+    "severity": "P3",
+    "category": "infra",
+    "description": "MCP index_status exited with code 1 once during preflight; retry succeeded."
+  },
+  {
+    "id": "AUDIT-20261108-028",
+    "severity": "P3",
+    "category": "policy",
+    "description": "Ambiguity in HANDOFF §14 regarding whether user video basenames are allowed in log messages."
   }
 ]
