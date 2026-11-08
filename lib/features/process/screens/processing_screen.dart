@@ -122,7 +122,12 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         category: provider.isPortrait ? 'VERTICAL_REELS' : 'LANDSCAPE_4K',
         leadWindow: 'Q4 Commercial Window',
       );
-    } catch (_) {}
+    } catch (e) {
+      // Payload carries the user's video title and keywords; type only.
+      debugPrint(
+        '[ProcessingScreen] telemetry dispatch failed: ${e.runtimeType}',
+      );
+    }
   }
 
   Future<String> _processWithNative(

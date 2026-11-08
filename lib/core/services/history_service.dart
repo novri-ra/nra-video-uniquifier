@@ -101,7 +101,8 @@ class HistoryService {
         }
       }
     } catch (e) {
-      debugPrint('[HistoryService] scan directory failed: $e');
+      // FileSystemException echoes the absolute directory path; type only.
+      debugPrint('[HistoryService] scan directory failed: ${e.runtimeType}');
     }
     return results;
   }
@@ -139,7 +140,9 @@ class HistoryService {
         final ver = int.tryParse(verMatch.group(1) ?? '');
         if (ver != null) return ver >= 11;
       }
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[HistoryService] android 11 check failed: $e');
+    }
     return true; // Default to true on modern Android
   }
 
@@ -178,7 +181,11 @@ class HistoryService {
       } else {
         return await Permission.storage.isGranted;
       }
-    } catch (_) {
+    } catch (e) {
+      // permission_handler errors may echo the permission name.
+      debugPrint(
+        '[HistoryService] storage permission check failed: ${e.runtimeType}',
+      );
       return true;
     }
   }
@@ -195,7 +202,11 @@ class HistoryService {
         final status = await Permission.storage.request();
         return status.isGranted;
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint(
+        '[HistoryService] storage permission request failed: '
+        '${e.runtimeType}',
+      );
       return false;
     }
   }
