@@ -23,11 +23,9 @@ class NotificationService {
   static const int testNotificationId = 7777;
 
   static const String mainChannelId = 'nra_uniquifier_channel_v2';
-  static const String processChannelId =
-      'nra_progress_silent_channel'; // <-- ID BARU (SUNYI)
+  static const String processChannelId = 'nra_progress_silent_channel';
   static const String legacyProcessChannelId = 'nra_video_processing_channel';
-  static const String completeChannelId =
-      'nra_complete_alert_channel'; // <-- ID BARU (BERSUSUARA)
+  static const String completeChannelId = 'nra_complete_alert_channel';
 
   static int _lastProgressPercent = -1;
   static DateTime _lastProgressTime = DateTime.fromMillisecondsSinceEpoch(0);
@@ -73,7 +71,7 @@ class NotificationService {
   static Future<void> _createNotificationChannels(
     AndroidFlutterLocalNotificationsPlugin plugin,
   ) async {
-    // 1. Channel Progres (SUNYI, TANPA POP-UP)
+    // 1. Progress channel (silent, no popup)
     await plugin.createNotificationChannel(
       const AndroidNotificationChannel(
         processChannelId,
@@ -86,7 +84,7 @@ class NotificationService {
       ),
     );
 
-    // 2. Channel Selesai (BERSUSUARA, POP-UP)
+    // 2. Complete channel (alerting, popup)
     await plugin.createNotificationChannel(
       const AndroidNotificationChannel(
         completeChannelId,
@@ -99,7 +97,7 @@ class NotificationService {
       ),
     );
 
-    // Channel lama (biarkan saja untuk kompatibilitas)
+    // Legacy channel (retained for backward compatibility)
     await plugin.createNotificationChannel(
       const AndroidNotificationChannel(
         mainChannelId,

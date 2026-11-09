@@ -8,9 +8,7 @@ class FfmpegFileHelper {
   static Future<File> stageInputFile(String inputPath) async {
     final inputFile = File(inputPath);
     if (!inputFile.existsSync() || inputFile.lengthSync() == 0) {
-      throw Exception(
-        'Source video file does not exist or is empty: $inputPath',
-      );
+      throw Exception('Source video file does not exist or is empty');
     }
     final tempDir = await getTemporaryDirectory();
     final ext = inputPath.contains('.') ? inputPath.split('.').last : 'mp4';

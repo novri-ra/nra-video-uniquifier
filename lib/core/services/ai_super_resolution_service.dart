@@ -118,7 +118,7 @@ class AiSuperResolutionService {
       final vulkanAvailable = await isVulkanSupported();
       if (!vulkanAvailable) {
         debugPrint(
-          '[AiSuperResolution] Vulkan compute unavailable on this device. Transparent fallback: Real-ESRGAN -> Lanczos3.',
+          '[AiSuperResolutionService] Vulkan compute unavailable on this device. Transparent fallback: Real-ESRGAN -> Lanczos3.',
         );
       }
       return AiSuperResolutionPlan(
