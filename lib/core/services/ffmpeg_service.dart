@@ -462,7 +462,8 @@ class FfmpegService {
       } catch (e) {
         debugPrint(
           '[FfmpegService] delete staged file failed for '
-          '${meta.stagedFile?.path}: $e',
+          "${meta.stagedFile?.path.split(RegExp(r'[/\\]')).last}: "
+          '${e.runtimeType}',
         );
       }
     }
@@ -480,7 +481,10 @@ class FfmpegService {
     try {
       stagedFile = await stageInputFile(inputPath);
     } catch (e) {
-      debugPrint('[FfmpegService] stage input failed for $inputPath: $e');
+      debugPrint(
+        '[FfmpegService] stage input failed for '
+        "${inputPath.split(RegExp(r'[/\\]')).last}: ${e.runtimeType}",
+      );
     }
     final effectiveInput = stagedFile?.path ?? inputPath;
     final inputFile = File(effectiveInput);

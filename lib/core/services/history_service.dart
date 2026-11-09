@@ -248,7 +248,7 @@ class HistoryService {
     } catch (e) {
       debugPrint(
         '[HistoryService] Thumbnail cleanup skipped for '
-        '${videoFile.path.split(RegExp(r'[/\\]')).last}: $e',
+        '${videoFile.path.split(RegExp(r'[/\\]')).last}: ${e.runtimeType}',
       );
     }
   }
@@ -274,7 +274,8 @@ class HistoryService {
     } catch (e, stackTrace) {
       debugPrint(
         '[HistoryService] Failed to delete file '
-        '${file.path.split(RegExp(r'[/\\]')).last}: $e\n$stackTrace',
+        '${file.path.split(RegExp(r'[/\\]')).last}: ${e.runtimeType}\n'
+        '$stackTrace',
       );
       return false;
     }
@@ -323,7 +324,7 @@ class HistoryService {
       } catch (e) {
         debugPrint(
           '[HistoryService] Failed to delete file '
-          '${item.file.path.split(RegExp(r'[/\\]')).last}: $e',
+          '${item.file.path.split(RegExp(r'[/\\]')).last}: ${e.runtimeType}',
         );
       }
     }

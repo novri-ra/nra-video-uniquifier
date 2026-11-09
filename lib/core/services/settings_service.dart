@@ -181,8 +181,8 @@ class SettingsService {
 
   static Future<void> setUpscaleResolution(TargetResolution resolution) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(keyUpscaleResolution, resolution.key);
     upscaleResolutionNotifier.value = resolution;
+    await prefs.setString(keyUpscaleResolution, resolution.key);
   }
 
   static final ValueNotifier<UpscaleEngine> upscaleEngineNotifier =
@@ -198,8 +198,8 @@ class SettingsService {
 
   static Future<void> setUpscaleEngine(UpscaleEngine engine) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(keyUpscaleEngine, engine.key);
     upscaleEngineNotifier.value = engine;
+    await prefs.setString(keyUpscaleEngine, engine.key);
   }
 
   static Future<bool> getRemoveMetadata() => _getBool(keyRemoveMetadata, true);
