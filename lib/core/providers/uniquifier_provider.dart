@@ -249,6 +249,13 @@ class UniquifierProvider extends ChangeNotifier
   }) {
     _previewDebounceTimer?.cancel();
 
+    if (_isHeavyPreviewEffect()) {
+      _renderedPreviewFramePath = null;
+      _isPreviewRendering = false;
+      notifyListeners();
+      return;
+    }
+
     final input = selectedFilePath;
     if (input == null || input.isEmpty) {
       _renderedPreviewFramePath = null;
@@ -271,6 +278,20 @@ class UniquifierProvider extends ChangeNotifier
         );
       });
     }
+  }
+
+  static const Set<UnifiedVisualEffect> _heavyPreviewEffects = {
+    UnifiedVisualEffect.blurredCanvas,
+    UnifiedVisualEffect.motionEcho,
+    UnifiedVisualEffect.rgbSplit,
+    UnifiedVisualEffect.dreamyBloom,
+    UnifiedVisualEffect.dynamicGrain,
+  };
+
+  /// Heavy filtergraphs crash ARM swscale; let the Flutter simulation render.
+  bool _isHeavyPreviewEffect() {
+    if (enableBlurredCanvas) return true;
+    return activeVisualEffects.any(_heavyPreviewEffects.contains);
   }
 
   Future<void> _executePreviewRender({

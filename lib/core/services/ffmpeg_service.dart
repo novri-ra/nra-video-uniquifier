@@ -138,7 +138,7 @@ class FfmpegService {
           targetPath ??
           '${tempDir.path}/thumb_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final cmd =
-          '-y -ss 00:00:00.500 -i "${_escapePath(inputPath)}" '
+          '-y -cpuflags 0 -ss 00:00:00.500 -i "${_escapePath(inputPath)}" '
           '-sws_flags bilinear -vf "scale=iw-2:ih-2,format=yuvj420p" '
           '-vframes 1 -q:v 2 "${_escapePath(thumbPath)}"';
       final session = await FFmpegKit.execute(cmd);
@@ -214,7 +214,7 @@ class FfmpegService {
 
       // Gunakan frameArg yang sudah dinamis
       final cmd =
-          '-ss $ssParam -i "${_escapePath(inputPath)}" $frameArg -preset ultrafast -sws_flags bilinear $vfOption -y "${_escapePath(outputPath)}"';
+          '-ss $ssParam -cpuflags 0 -i "${_escapePath(inputPath)}" $frameArg -preset ultrafast -sws_flags bilinear $vfOption -y "${_escapePath(outputPath)}"';
 
       final completer = Completer<String?>();
       final session = await FFmpegKit.executeAsync(cmd, (session) async {
