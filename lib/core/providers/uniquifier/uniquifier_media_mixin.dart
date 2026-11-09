@@ -15,6 +15,7 @@ mixin UniquifierMediaMixin on ChangeNotifier {
       _sha256 = '';
   bool _isPortrait = true;
   int _totalDurationMs = 0;
+  int _videoWidth = 0, _videoHeight = 0;
 
   String? get selectedFileName => _selectedFileName;
   String? get selectedFilePath => _selectedFilePath;
@@ -49,9 +50,11 @@ mixin UniquifierMediaMixin on ChangeNotifier {
     _audioInfo = 'AAC 48kHz';
     _duration = '0:00';
     _sha256 = '${name.hashCode.toRadixString(16).padLeft(8, '0')}…';
+    _videoWidth = 0;
+    _videoHeight = 0;
     notifyListeners();
 
-    _extractThumbnailAsync(path);
+    // Probe first: its dimension guard must pass before any swscale call.
     _probeMediaInfo(path);
   }
 
@@ -76,14 +79,48 @@ mixin UniquifierMediaMixin on ChangeNotifier {
       final mediaInfo = session.getMediaInformation();
       if (mediaInfo != null) {
         _applyMediaStreams(mediaInfo.getStreams());
+        if (!_validateDimensions()) return;
         _applyMediaDuration(mediaInfo.getDuration());
         notifyListeners();
+        _extractThumbnailAsync(path);
       }
     } catch (e) {
       debugPrint(
         '[UniquifierMediaMixin] media info probe failed: ${e.runtimeType}',
       );
     }
+  }
+
+  /// Blocks frames that would crash swscale; odd sizes only warn (scale guard).
+  bool _validateDimensions() {
+    if (_videoWidth <= 0 || _videoHeight <= 0) {
+      debugPrint(
+        '[UniquifierMediaMixin] invalid dimensions '
+        '$_videoWidth×$_videoHeight',
+      );
+      _rejectMedia();
+      return false;
+    }
+    if (_videoWidth > 8192 || _videoHeight > 8192) {
+      debugPrint(
+        '[UniquifierMediaMixin] dimensions exceed limit '
+        '$_videoWidth×$_videoHeight',
+      );
+      _rejectMedia();
+      return false;
+    }
+    if (_videoWidth.isOdd || _videoHeight.isOdd) {
+      debugPrint(
+        '[UniquifierMediaMixin] odd dimensions '
+        '$_videoWidth×$_videoHeight, proceeding with scale guard',
+      );
+    }
+    return true;
+  }
+
+  void _rejectMedia() {
+    clearMediaSelection();
+    notifyListeners();
   }
 
   void _applyMediaStreams(dynamic streams) {
@@ -101,6 +138,8 @@ mixin UniquifierMediaMixin on ChangeNotifier {
   void _applyVideoStream(dynamic s) {
     final width = s.getWidth(), height = s.getHeight();
     if (width != null && height != null) {
+      _videoWidth = width;
+      _videoHeight = height;
       _fileResolution = '$width×$height';
       _isPortrait = height >= width;
     }
