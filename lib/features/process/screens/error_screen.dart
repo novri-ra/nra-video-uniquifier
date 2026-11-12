@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/path_redactor.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 
 class ErrorScreen extends StatelessWidget {
@@ -186,13 +187,6 @@ class _TelemetryLogBox extends StatelessWidget {
   final String? errorDetails;
   const _TelemetryLogBox({this.errorDetails});
 
-  String _redactPath(String text) {
-    return text.replaceAll(
-      RegExp(r'/storage/emulated/0/[^\s]+'),
-      '<external storage>/...',
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final raw =
@@ -200,7 +194,7 @@ class _TelemetryLogBox extends StatelessWidget {
         '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
             'Reason: Signal 9 (SIGKILL) - Memory pressure threshold exceeded.\n'
             'Native pipeline state: 0/4 stages completed.';
-    final redacted = _redactPath(raw);
+    final redacted = redactFileSystemPaths(raw);
     final summary = redacted
         .split('\n')
         .firstWhere(
