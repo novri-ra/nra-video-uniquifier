@@ -21,14 +21,15 @@ void main() async {
   try {
     FFmpegKitConfig.setSessionHistorySize(3);
   } catch (e) {
-    debugPrint('[Main] FFmpeg init failed: $e');
+    // Raw $e can echo FFmpegKit / plugin channel identifiers on some devices.
+    debugPrint('[Main] FFmpeg init failed: ${e.runtimeType}');
   }
 
   try {
     await StorageService.pruneStaleFiles();
     await SettingsService.purgeTempCache();
   } catch (e) {
-    debugPrint('[Main] Cache cleanup failed: $e');
+    debugPrint('[Main] Cache cleanup failed: ${e.runtimeType}');
   }
 
   try {
@@ -36,7 +37,7 @@ void main() async {
     await NotificationService.requestPermission();
     ConnectivityService.instance.initialize();
   } catch (e) {
-    debugPrint('[Main] Service init failed: $e');
+    debugPrint('[Main] Service init failed: ${e.runtimeType}');
   }
 
   runApp(

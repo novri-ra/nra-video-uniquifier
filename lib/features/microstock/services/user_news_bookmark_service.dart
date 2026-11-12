@@ -24,7 +24,10 @@ class UserNewsBookmarkService {
       _initialized = true;
     } catch (e) {
       // Offline fallback: keep in-memory set
-      debugPrint('[UserNewsBookmarkService] bookmark init failed: $e');
+      // $e from SharedPreferences can carry plugin channel noise.
+      debugPrint(
+        '[UserNewsBookmarkService] bookmark init failed: ${e.runtimeType}',
+      );
       _initialized = true;
     }
   }
@@ -54,7 +57,9 @@ class UserNewsBookmarkService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList(_bookmarkKey, _cachedIds.toList());
     } catch (e) {
-      debugPrint('[UserNewsBookmarkService] bookmark save failed: $e');
+      debugPrint(
+        '[UserNewsBookmarkService] bookmark save failed: ${e.runtimeType}',
+      );
     }
   }
 
