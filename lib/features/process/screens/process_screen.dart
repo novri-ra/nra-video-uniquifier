@@ -47,7 +47,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error selecting file: $e'),
+            content: const Text('Failed to open file picker.'),
             backgroundColor: AppColors.errorContainer,
           ),
         );

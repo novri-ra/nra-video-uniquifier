@@ -124,7 +124,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Share error: $e'),
+            content: const Text('Failed to share video.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -149,7 +149,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Open error: $e'),
+              content: const Text('Failed to open video.'),
               backgroundColor: AppColors.error,
             ),
           );
