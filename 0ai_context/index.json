@@ -1,5 +1,5 @@
 {
-  "next_report_number": 113,
+  "next_report_number": 118,
   "reports": [
     {
       "number": 103,
@@ -25,6 +25,31 @@
       "number": 113,
       "type": "mapper",
       "path": "reports/113-mapper-refresh.md"
+    },
+    {
+      "number": 114,
+      "type": "fix",
+      "path": "reports/114-fix-narrow-log-batch-1.md"
+    },
+    {
+      "number": 115,
+      "type": "fix",
+      "path": "reports/115-fix-narrow-ui-batch-2.md"
+    },
+    {
+      "number": 116,
+      "type": "fix",
+      "path": "reports/116-fix-narrow-ui-batch-3.md"
+    },
+    {
+      "number": 117,
+      "type": "mapper",
+      "path": "reports/117-mapper-refresh-2.md"
+    },
+    {
+      "number": 118,
+      "type": "fix",
+      "path": "reports/118-fix-streaming-compute-hash.md"
     }
   ]
 }

@@ -4,5 +4,10 @@
 - [111-fix-silent-catch-thumbnail-resolve.md](111-fix-silent-catch-thumbnail-resolve.md) — Log runtimeType in thumbnail resolve catch (AUDIT-20261108-031)
 - [112-fix-path-redaction.md](112-fix-path-redaction.md) — Expand filesystem path redaction via new `path_redactor` utility (AUDIT-20261108-032)
 - [113-mapper-refresh.md](113-mapper-refresh.md) — Mapper refresh after reports 105–112; registers candidates 030–035
+- [114-fix-narrow-log-batch-1.md](114-fix-narrow-log-batch-1.md) — Narrow 5 log-only `$e` sites to `runtimeType` (AUDIT-20261108-030 batch 1/3)
+- [115-fix-narrow-ui-batch-2.md](115-fix-narrow-ui-batch-2.md) — Replace 6 UI-visible `$e` sites with generic copy (AUDIT-20261108-030 batch 2/3)
+- [116-fix-narrow-ui-batch-3.md](116-fix-narrow-ui-batch-3.md) — Replace 3 SnackBar `$e` sites; closes AUDIT-20261108-030 (14/14)
+- [117-mapper-refresh-2.md](117-mapper-refresh-2.md) — Close 030, register 036, correct numbering drift 113 → 118
+- [118-fix-streaming-compute-hash.md](118-fix-streaming-compute-hash.md) — Stream SHA-256 in `SuccessScreen.computeFileHash` (AUDIT-20261108-035)
 - Reports 88–102 — Silent catch remediation batches 1-6 & privacy fixes
 - Reports 01–86 — Historical audits and releases

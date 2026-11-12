@@ -80,7 +80,8 @@
     "severity": "P3",
     "category": "privacy",
     "description": "14 raw $e interpolation sites in UI layer: main.dart(3), recent_history_screen.dart(5), process_screen.dart(1), success_screen.dart(2), user_news_bookmark_service.dart(2). 8 UI-visible (AppToast, SnackBar, _error state) + 6 debugPrint.",
-    "status": "active"
+    "status": "resolved",
+    "resolved_by": "reports 114-116"
   },
   {
     "id": "AUDIT-20261108-031",
@@ -119,6 +120,13 @@
     "severity": "P3",
     "category": "quality",
     "description": "SuccessScreen.computeFileHash reads whole output video into memory before SHA-256; switch to streaming to avoid OOM on large exports.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-036",
+    "severity": "P3",
+    "category": "infra",
+    "description": "Dual findings.json locations: 0ai_context/findings.json (canonical, created report 113) and 0ai_context/raw/findings.json (stale pre-113 snapshot). Mapper tooling must pick one path.",
     "status": "active"
   }
 ]
