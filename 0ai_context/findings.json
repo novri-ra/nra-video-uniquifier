@@ -1,0 +1,124 @@
+[
+  {
+    "id": "AUDIT-20261108-019",
+    "severity": "P3",
+    "category": "documentation",
+    "description": "Indonesian comments in notification_service.dart:24-25 after English-only i18n policy.",
+    "status": "resolved",
+    "resolved_by": "report 106"
+  },
+  {
+    "id": "AUDIT-20261108-020",
+    "severity": "P3",
+    "category": "quality",
+    "description": "23x catch (_) silent non-empty handlers producing no log. Needs re-verification, count unknown.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-021",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "history_service.dart logs basename + $e + stack trace in delete/cleanup.",
+    "status": "resolved",
+    "resolved_by": "report 107"
+  },
+  {
+    "id": "AUDIT-20261108-022",
+    "severity": "P2",
+    "category": "privacy",
+    "description": "microstock_news_service.dart logs cache read failed with article JSON via $e.",
+    "status": "resolved",
+    "resolved_by": "report 105"
+  },
+  {
+    "id": "AUDIT-20261108-023",
+    "severity": "P3",
+    "category": "correctness",
+    "description": "SettingsService setUpscaleResolution/setUpscaleEngine write prefs before updating ValueNotifier.",
+    "status": "resolved",
+    "resolved_by": "report 107"
+  },
+  {
+    "id": "AUDIT-20261108-024",
+    "severity": "P2",
+    "category": "quality",
+    "description": "Temp-cache walk duplicated across settings_service, storage_service, and ffmpeg_file_helper.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-025",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "FfmpegFileHelper.stageInputFile throws Exception with absolute inputPath.",
+    "status": "resolved",
+    "resolved_by": "report 106"
+  },
+  {
+    "id": "AUDIT-20261108-026",
+    "severity": "P3",
+    "category": "cosmetic",
+    "description": "ai_super_resolution_service.dart mixes log prefixes [AiSuperResolution] and [AiSuperResolutionService].",
+    "status": "resolved",
+    "resolved_by": "report 106"
+  },
+  {
+    "id": "AUDIT-20261108-027",
+    "severity": "P3",
+    "category": "infra",
+    "description": "MCP index_status exited with code 1 once during preflight; retry succeeded.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-028",
+    "severity": "P3",
+    "category": "policy",
+    "description": "Ambiguity in HANDOFF §14 regarding whether user video basenames are allowed in log messages.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-030",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "14 raw $e interpolation sites in UI layer: main.dart(3), recent_history_screen.dart(5), process_screen.dart(1), success_screen.dart(2), user_news_bookmark_service.dart(2). 8 UI-visible (AppToast, SnackBar, _error state) + 6 debugPrint.",
+    "status": "active"
+  },
+  {
+    "id": "AUDIT-20261108-031",
+    "severity": "P3",
+    "category": "quality",
+    "description": "Silent catch (_) {} in _ThumbnailBadgeState._resolveThumbnail (history_item_card.dart) swallows thumbnail extraction failures without logging.",
+    "status": "resolved",
+    "resolved_by": "report 111"
+  },
+  {
+    "id": "AUDIT-20261108-032",
+    "severity": "P3",
+    "category": "privacy",
+    "description": "ErrorScreen._redactPath only matched /storage/emulated/0/, leaking /data, /sdcard, /mnt, /system, /proc, /home, and Windows drive paths into the rendered error summary.",
+    "status": "resolved",
+    "resolved_by": "report 112"
+  },
+  {
+    "id": "AUDIT-20261108-033",
+    "severity": "P3",
+    "category": "infra",
+    "description": "Impeller/SkSL 4-test failure signature (shaders/ink_sparkle.frag, Found stages: Vulkan) observed on another host.",
+    "status": "resolved",
+    "resolved_by": "report 113 (not reproducible on dev host)"
+  },
+  {
+    "id": "AUDIT-20261108-034",
+    "severity": "P3",
+    "category": "documentation",
+    "description": "Indonesian inline comments in modifiers_card.dart preset chips violate the English-only comment policy.",
+    "status": "resolved",
+    "resolved_by": "report 110"
+  },
+  {
+    "id": "AUDIT-20261108-035",
+    "severity": "P3",
+    "category": "quality",
+    "description": "SuccessScreen.computeFileHash reads whole output video into memory before SHA-256; switch to streaming to avoid OOM on large exports.",
+    "status": "active"
+  }
+]

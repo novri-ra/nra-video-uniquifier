@@ -1,10 +1,30 @@
 {
-  "next_report_number": 104,
+  "next_report_number": 113,
   "reports": [
     {
       "number": 103,
       "path": "reports/103-audit.md",
       "type": "audit"
+    },
+    {
+      "number": 110,
+      "type": "fix",
+      "path": "reports/110-fix-i18n-modifiers-card.md"
+    },
+    {
+      "number": 111,
+      "type": "fix",
+      "path": "reports/111-fix-silent-catch-thumbnail-resolve.md"
+    },
+    {
+      "number": 112,
+      "type": "fix",
+      "path": "reports/112-fix-path-redaction.md"
+    },
+    {
+      "number": 113,
+      "type": "mapper",
+      "path": "reports/113-mapper-refresh.md"
     }
   ]
 }
