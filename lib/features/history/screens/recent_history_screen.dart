@@ -85,7 +85,10 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       }
     } catch (e) {
       // Fallback: If SharedPreferences fails, do not spam dialog
-      debugPrint('[RecentHistoryScreen] storage permission prompt failed: $e');
+      debugPrint(
+        '[RecentHistoryScreen] storage permission prompt failed: '
+        '${e.runtimeType}',
+      );
     }
   }
 
@@ -212,7 +215,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = e.toString();
+          _error = '${e.runtimeType}';
           _isLoading = false;
         });
       }
@@ -331,7 +334,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       if (mounted) {
         AppToast.show(
           context,
-          message: 'Error deleting videos: $e',
+          message: 'Unexpected error while deleting videos.',
           isError: true,
         );
       }
@@ -401,7 +404,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       if (mounted) {
         AppToast.show(
           context,
-          message: 'Error deleting video: $e',
+          message: 'Unexpected error while deleting video.',
           isError: true,
         );
       }
@@ -415,7 +418,11 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       ], text: 'Exported video: ${item.fileName}');
     } catch (e) {
       if (mounted) {
-        AppToast.show(context, message: 'Share error: $e', isError: true);
+        AppToast.show(
+          context,
+          message: 'Failed to share video.',
+          isError: true,
+        );
       }
     }
   }
@@ -432,7 +439,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
       }
     } catch (e) {
       if (mounted) {
-        AppToast.show(context, message: 'Open error: $e', isError: true);
+        AppToast.show(context, message: 'Failed to open video.', isError: true);
       }
     }
   }
