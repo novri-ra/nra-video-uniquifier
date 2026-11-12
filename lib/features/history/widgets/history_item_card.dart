@@ -147,7 +147,10 @@ class _ThumbnailBadgeState extends State<_ThumbnailBadge> {
       if (mounted && extracted != null && await File(extracted).exists()) {
         setState(() => _thumbPath = extracted);
       }
-    } catch (_) {
+    } catch (e) {
+      debugPrint(
+        '[HistoryItemCard] thumbnail resolve failed: ${e.runtimeType}',
+      );
     } finally {
       _isExtracting = false;
     }

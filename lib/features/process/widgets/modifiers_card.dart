@@ -30,20 +30,20 @@ class PresetChipRow extends StatelessWidget {
               upscale1080p: false,
               upscaleTarget: '1080p',
 
-              // Filter Evasi Maksimal
+              // Maximum evasion stack
               enableEnhanceAndDenoise: false,
               enableDeepAntiFingerprint:
                   true, // (Crop 8-12%, Speed Warp, Pitch Shift)
               enableHorizontalFlip: true, // (Mirroring)
-              enableAutoTrim: true, // (Potong Frame Awal/Akhir)
-              // Blurred Canvas (Wajib untuk estetika TikTok)
+              enableAutoTrim: true, // (Trim first/last frames)
+              // Blurred canvas (required for TikTok aesthetic)
               enableBlurredCanvas: true,
-              canvasScalePercent: 90.0, // Skala 90% (lebih agresif dari 95%)
-              // Filter Tambahan
-              enableChromaShift: true, // (Geser warna)
-              enableMicroOverlay: true, // (Noise tambahan)
+              canvasScalePercent: 90.0, // 90% scale (more aggressive than 95%)
+              // Additional filters
+              enableChromaShift: true, // (Color shift)
+              enableMicroOverlay: true, // (Extra noise)
               enableAggressiveAudio: true, // (Pink noise)
-              // Filter Berat (Tetap dimatikan agar HP tidak overheat)
+              // Heavy filters (kept off to prevent phone overheating)
               enableDynamicZoom: false,
               enableFrameSkip: false,
 
@@ -52,20 +52,20 @@ class PresetChipRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 6),
-          // --- TAMBAHKAN PRESET MICROSTOCK DI SINI ---
+          // --- ADD MICROSTOCK PRESET HERE ---
           _PresetChip(
             label: 'Microstock 4K',
             isSelected: provider.activePreset == 'Microstock 4K',
             onTap: () => provider.applyPreset(
-              removeMetadata: true, // Wajib bersih dari EXIF/GPS
-              modifyAudio: false, // Audio asli tidak diubah
-              modifyVisuals: false, // Tidak ada crop atau speed warp
-              upscale1080p: true, // Nyalakan upscaler
+              removeMetadata: true, // Must be clean of EXIF/GPS
+              modifyAudio: false, // Original audio unchanged
+              modifyVisuals: false, // No crop or speed warp
+              upscale1080p: true, // Enable upscaler
               upscaleTarget:
-                  '4k', // Target 4K (kualitas tertinggi untuk agensi)
+                  '4k', // 4K target (highest quality tier for agencies)
               enableEnhanceAndDenoise:
-                  true, // Beri sentuhan jernih (Unsharp mask)
-              enableDeepAntiFingerprint: false, // Matikan (tidak perlu evasi)
+                  true, // Adds a clarity pass (unsharp mask)
+              enableDeepAntiFingerprint: false, // Off (no evasion needed)
               enableHorizontalFlip: false,
               enableAutoTrim: false,
               enableDynamicZoom: false,
@@ -76,7 +76,6 @@ class PresetChipRow extends StatelessWidget {
               presetName: 'Microstock 4K',
             ),
           ),
-          // ------------------------------------------
           const SizedBox(width: 6),
           _PresetChip(
             label: 'TikTok / Reels',
