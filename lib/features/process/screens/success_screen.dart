@@ -25,8 +25,8 @@ class SuccessScreen extends StatefulWidget {
       try {
         final file = File(filePath);
         if (!await file.exists()) return '0x0000..0000 (UNAVAILABLE)';
-        final bytes = await file.readAsBytes();
-        final digest = sha256.convert(bytes);
+        // Stream the file so large exports never sit in memory as one buffer.
+        final digest = await file.openRead().transform(sha256).first;
         final hex = digest.toString().toUpperCase();
         return '0x${hex.substring(0, 4)}..${hex.substring(hex.length - 4)} (VERIFIED)';
       } catch (_) {
