@@ -54,10 +54,12 @@ class FfmpegCommandBuilder {
             ? VariationGenerator.generate()
             : VideoVariations.fallback);
     final buffer = StringBuffer('-y');
+    // `enableHardwareAcceleration` is intentionally ignored: input decoding is
+    // always software now (see writeInputOptions) because hardware decoders
+    // stall on heavy filter chains.
     writeInputOptions(
       buffer,
       inputPath,
-      enableHardwareAcceleration,
       enableAutoTrim,
       totalDurationMs,
       thermalThrottle,
@@ -129,17 +131,19 @@ class FfmpegCommandBuilder {
     return buffer.toString();
   }
 
-  /// Appends input, hardware acceleration, and auto-trim arguments.
+  /// Appends input, decoder, and auto-trim arguments.
   static void writeInputOptions(
     StringBuffer buffer,
     String inputPath,
-    bool hwAccel,
     bool autoTrim,
     int durationMs,
     bool thermalThrottle, [
     double introTrimOffset = 0.5,
   ]) {
-    if (hwAccel) buffer.write(' -hwaccel auto');
+    // Software decoding is locked in: MediaCodec / VAAPI hardware decode stalls
+    // ("100 buffers queued in out_0_0") when fed heavy filter chains, so the
+    // CPU decoder is the only deterministic path.
+    buffer.write(' -hwaccel none');
     buffer.write(thermalThrottle ? ' -threads 4' : ' -threads 0');
     if (autoTrim) {
       final ss = introTrimOffset.clamp(0.0, 3.0);

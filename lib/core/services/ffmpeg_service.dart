@@ -219,6 +219,7 @@ class FfmpegService {
           '-ss $ssParam -cpuflags 0 -i "${_escapePath(inputPath)}" $frameArg -preset ultrafast -sws_flags bilinear $vfOption -y "${_escapePath(outputPath)}"';
 
       final completer = Completer<String?>();
+      debugPrint('[FFmpeg Audit] Executing preview: $cmd');
       final session = await FFmpegKit.executeAsync(cmd, (session) async {
         final returnCode = await session.getReturnCode();
         if (ReturnCode.isSuccess(returnCode) && File(outputPath).existsSync()) {
@@ -618,6 +619,7 @@ class FfmpegService {
     String? sourcePath,
   }) async {
     try {
+      debugPrint('[FFmpeg Audit] Executing: $command');
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) return outputPath;

@@ -36,7 +36,7 @@ void main() {
         modifyVisuals: false,
         upscale1080p: false,
       );
-      expect(cmd, contains('-y -threads 0 -i "/path/input.mp4"'));
+      expect(cmd, contains('-y -hwaccel none -threads 0 -i "/path/input.mp4"'));
       expect(cmd, contains('-map_metadata -1 -map_chapters -1 -bitexact'));
       expect(cmd, contains('-c copy'));
       expect(cmd, contains('"/path/output.mp4"'));
@@ -1009,14 +1009,15 @@ void main() {
     );
 
     test(
-      'D1-02: buildCommand emits -hwaccel auto when enableHardwareAcceleration is true',
+      'D1-02: buildCommand locks software decoding (-hwaccel none) regardless of enableHardwareAcceleration',
       () {
         final cmd = FfmpegService.buildCommand(
           inputPath: '/input.mp4',
           outputPath: '/output.mp4',
           enableHardwareAcceleration: true,
         );
-        expect(cmd, contains('-y -hwaccel auto -threads 0 -i "/input.mp4"'));
+        expect(cmd, contains('-y -hwaccel none -threads 0 -i "/input.mp4"'));
+        expect(cmd, isNot(contains('-hwaccel auto')));
       },
     );
 
