@@ -619,7 +619,17 @@ class FfmpegService {
     String? sourcePath,
   }) async {
     try {
-      debugPrint('[FFmpeg Audit] Executing: $command');
+      // Split the command on flag boundaries so each argument is its own
+      // Logcat line; a single multi-kilobyte line gets truncated by logcat.
+      debugPrint('[FFmpeg Audit] Command length: ${command.length}');
+      final chunks = command.split(' -');
+      for (var i = 0; i < chunks.length; i++) {
+        if (i == 0) {
+          debugPrint('[FFmpeg Audit] Start: ${chunks[i]}');
+        } else {
+          debugPrint('[FFmpeg Audit] Arg: -${chunks[i]}');
+        }
+      }
       final session = await FFmpegKit.execute(command);
       final returnCode = await session.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) return outputPath;
