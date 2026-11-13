@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
 
-/// Configurable video codec selector card supporting H.264/AVC and H.265/HEVC rendering profiles.
+/// Configurable video codec selector card. H.264/AVC is permanently locked as
+/// the software stability engine; H.265/HEVC is disabled.
 class CodecSelectorCard extends StatelessWidget {
   final VideoCodec currentCodec;
   final ValueChanged<VideoCodec> onSelect;
@@ -25,23 +26,22 @@ class CodecSelectorCard extends StatelessWidget {
         _CodecTile(
           title: 'H.264 / AVC (TikTok Universal)',
           description:
-              'CRF 22 • Maximum compatibility across TikTok, Reels, & MediaCodec',
-          badge: 'TIKTOK UNIVERSAL',
+              'CRF 18 • Preset fast • Studio-grade software encoding engine',
+          badge: 'STABILITY PRIORITY',
           badgeColor: primaryBadge,
-          isSelected: currentCodec == VideoCodec.h264,
+          isSelected: true,
           isDark: isDark,
           onTap: () => onSelect(VideoCodec.h264),
         ),
         const SizedBox(height: 8),
         _CodecTile(
           title: 'H.265 / HEVC (High Efficiency)',
-          description:
-              'CRF 26 • ~40% higher compression efficiency with -tag:v hvc1',
-          badge: 'HIGH EFFICIENCY',
-          badgeColor: isDark ? AppColors.skyPastel : AppColors.forestDeep,
-          isSelected: currentCodec == VideoCodec.h265,
+          description: 'Disabled to guarantee 100% stability (software H.264)',
+          badge: 'DISABLED (STABILITY PRIORITY)',
+          badgeColor: AppColors.outline,
+          isSelected: false,
           isDark: isDark,
-          onTap: () => onSelect(VideoCodec.h265),
+          onTap: null,
         ),
       ],
     );
@@ -52,7 +52,7 @@ class _CodecTile extends StatelessWidget {
   final String title, description, badge;
   final Color badgeColor;
   final bool isSelected, isDark;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const _CodecTile({
     required this.title,
@@ -74,13 +74,20 @@ class _CodecTile extends StatelessWidget {
     final inactiveBorder = isDark
         ? AppColors.outlineVariant
         : AppColors.lightOutlineVariant;
-    final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
-    final descColor = isDark
-        ? AppColors.onSurfaceVariant
-        : AppColors.lightOnSurfaceVariant;
-    final iconColor = isSelected
-        ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
-        : AppColors.outline;
+    final isEnabled = onTap != null;
+    final textColor = !isEnabled
+        ? AppColors.outline
+        : (isDark ? AppColors.onSurface : AppColors.lightOnSurface);
+    final descColor = !isEnabled
+        ? AppColors.outline
+        : (isDark
+              ? AppColors.onSurfaceVariant
+              : AppColors.lightOnSurfaceVariant);
+    final iconColor = !isEnabled
+        ? AppColors.outline
+        : (isSelected
+              ? (isDark ? AppColors.mintSage : AppColors.forestDeep)
+              : AppColors.outline);
 
     return InkWell(
       onTap: onTap,
@@ -130,25 +137,29 @@ class _CodecTile extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 5,
-                          vertical: 1.5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: badgeColor.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(3),
-                          border: Border.all(
-                            color: badgeColor.withValues(alpha: 0.5),
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 1.5,
                           ),
-                        ),
-                        child: Text(
-                          badge,
-                          style: TextStyle(
-                            color: badgeColor,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'monospace',
+                          decoration: BoxDecoration(
+                            color: badgeColor.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(3),
+                            border: Border.all(
+                              color: badgeColor.withValues(alpha: 0.5),
+                            ),
+                          ),
+                          child: Text(
+                            badge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: badgeColor,
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'monospace',
+                            ),
                           ),
                         ),
                       ),

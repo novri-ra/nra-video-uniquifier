@@ -254,17 +254,18 @@ class FfmpegService {
       final files = dir.listSync();
       for (final entity in files) {
         if (entity is File) {
-          final fileName = entity.path.split(RegExp(r'[/\\]')).last;
+          final filePath = entity.absolute.path;
+          final fileName = filePath.split(RegExp(r'[/\\]')).last;
           // Cari file yang berawalan 'preview_' dan berekstensi '.jpg'
           if (fileName.startsWith('preview_') && fileName.endsWith('.jpg')) {
             // Jangan hapus file yang baru saja dibuat (currentPath)
-            if (entity.path != currentPath) {
+            if (filePath != currentPath) {
               try {
                 entity.deleteSync();
               } catch (e) {
                 debugPrint(
                   '[FfmpegService] delete old preview failed for '
-                  '${entity.path}: $e',
+                  '$fileName: ${e.runtimeType}',
                 );
               }
             }

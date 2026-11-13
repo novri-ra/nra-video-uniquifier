@@ -63,6 +63,13 @@ class FfmpegCommandBuilder {
       introTrimOffset,
     );
 
+    // Stability priority: force sequential filter processing and a generous
+    // muxing queue so heavy Real-ESRGAN / Blur / 2K chains cannot OOM.
+    buffer.write(
+      ' -filter_threads 1 -filter_complex_threads 1 '
+      '-max_muxing_queue_size 4096',
+    );
+
     // --- METADATA SANITIZATION & SPOOFING LOGIC ---
     if (removeMetadata) {
       // 1. SELALU hapus metadata asli, stream-level, & chapter
@@ -116,8 +123,6 @@ class FfmpegCommandBuilder {
     if (outputPath.toLowerCase().endsWith('.mp4')) {
       buffer.write(' -bsf:v filter_units=remove_types=6');
     }
-
-    buffer.write(' -max_muxing_queue_size 4096');
 
     buffer.write(' "${escapePath(outputPath)}"');
     return buffer.toString();
@@ -246,5 +251,14 @@ class FfmpegCommandBuilder {
               : vars.outputFps.toStringAsFixed(2));
     if (hasVisual) buffer.write(' -fps_mode cfr -r $fpsStr');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
+
+    if (hasVisual) {
+      // Stability priority: always finish with software-only H.264 encoding.
+      // Written last so it overrides any provider-selected codec arguments
+      // (H.265 / hardware encoders) emitted by FilterBuilders.
+      buffer.write(
+        ' -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1',
+      );
+    }
   }
 }

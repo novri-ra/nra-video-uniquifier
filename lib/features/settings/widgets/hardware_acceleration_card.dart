@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/services/settings_service.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/widgets/setting_toggle_row.dart';
 
 class HardwareAccelerationCard extends StatelessWidget {
   final bool? enabled;
@@ -13,36 +10,60 @@ class HardwareAccelerationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context);
-    final subtitle =
-        l10n?.hardwareAccelerationDesc ??
-        'Force OpenGLES/Metal Shader Pipeline';
+    final titleColor = isDark
+        ? AppColors.onSurfaceVariant
+        : AppColors.lightOnSurfaceVariant;
 
-    return ValueListenableBuilder<bool>(
-      valueListenable: SettingsService.hardwareAccelerationNotifier,
-      builder: (context, hwAccel, _) {
-        final active = enabled ?? hwAccel;
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.surfaceContainerLow
-                : AppColors.lightSurface,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: isDark
-                  ? AppColors.surfaceContainerHighest
-                  : AppColors.lightOutlineVariant,
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceContainerLow : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isDark
+              ? AppColors.surfaceContainerHighest
+              : AppColors.lightOutlineVariant,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            const Icon(Icons.memory, color: AppColors.outline, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hardware Acceleration',
+                    style: TextStyle(
+                      color: titleColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const Text(
+                    'Permanently Disabled (Software Engine Active for 100% '
+                    'Quality)',
+                    style: TextStyle(
+                      color: AppColors.outline,
+                      fontSize: 10,
+                      fontFamily: 'monospace',
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: SettingToggleRow(
-            icon: Icons.memory,
-            title: 'Hardware Acceleration',
-            subtitle: subtitle,
-            value: active,
-            onChanged: onToggle ?? SettingsService.setHardwareAcceleration,
-          ),
-        );
-      },
+            const SizedBox(width: 8),
+            // onChanged: null keeps the switch permanently locked.
+            const Switch(value: false, onChanged: null),
+          ],
+        ),
+      ),
     );
   }
 }
