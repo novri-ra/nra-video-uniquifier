@@ -1,5 +1,5 @@
 {
-  "next_report_number": 118,
+  "next_report_number": 120,
   "reports": [
     {
       "number": 103,
@@ -50,6 +50,11 @@
       "number": 118,
       "type": "fix",
       "path": "reports/118-fix-streaming-compute-hash.md"
+    },
+    {
+      "number": 119,
+      "type": "mapper",
+      "path": "reports/119-mapper-touch-close-035.md"
     }
   ]
 }

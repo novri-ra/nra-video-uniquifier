@@ -2,10 +2,10 @@
 
 ## 1. Project DNA & Executive Summary
 - Name: `nra_video_uniquifier`
-- Current Commit: `4dec917` (fix(privacy): narrow UI $e to generic copy (batch 3/3))
+- Current Commit: `2e92723` (fix(perf): stream SHA-256 in computeFileHash (finding 035))
 - Branch: `development`
-- Health Status: Analyze exit 0, Test 224/224 passed, Format exit 0 (0 changed).
-- Executive Summary: Context mapper refreshed after reports 114–116 closed AUDIT-20261108-030 (all 14 raw `$e` sites narrowed); candidate 036 (dual findings.json locations) registered, numbering drift 113 → 118 corrected.
+- Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
+- Executive Summary: Mapper touch after report 118 closed AUDIT-20261108-035 (streaming SHA-256 in `SuccessScreen.computeFileHash`, 5 new tests). Reports 114–116 previously closed AUDIT-20261108-030; candidate 036 (dual findings.json locations) remains active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -18,15 +18,15 @@
 - Packages: provider, shared_preferences, path_provider, ffmpeg_kit_flutter_new, http, html, intl, local_notifications, etc.
 
 ## 4. Current Environment & Health
-- Git status: clean, HEAD 4dec917.
+- Git status: clean, HEAD 2e92723.
 - Analysis: 0 issues.
-- Tests: 224/224 passing.
+- Tests: 229/229 passing.
 - Format: exit 0 (fully compliant with dart format).
 
 ## 5. Directory Structure & Key Paths
 - `lib/core/services/`: core business logic, FFmpeg rendering, storage, network.
 - `lib/features/`: UI screens and widgets (Studio, History, Microstock, Settings).
-- `test/`: unit and widget test suite (224 tests).
+- `test/`: unit and widget test suite (229 tests).
 - `0ai_context/`: context mapper state, reports, raw files.
 
 ## 6. Build, Test & Verification Commands
@@ -41,11 +41,11 @@
 - None. Working tree clean.
 
 ## 9. Blockers, Risks & Technical Debt
-- 6 active findings (0 P0, 0 P1, 1 P2, 5 P3).
+- 5 active findings (0 P0, 0 P1, 1 P2, 4 P3).
 - Privacy and caching considerations in microstock and history services.
 
 ## 10. Findings Inventory (Active)
-*(resolved by reports 105-116: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034 — omitted from active inventory)*
+*(resolved by reports 105-118: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035 — omitted from active inventory)*
 
 | ID | Severity | Category | Description |
 |---|---|---|---|
@@ -53,7 +53,6 @@
 | `AUDIT-20261108-024` | P2 | quality | Duplicated temp-cache walk logic in settings/storage/ffmpeg helpers. |
 | `AUDIT-20261108-027` | P3 | infra | MCP index server intermittent exit code 1. |
 | `AUDIT-20261108-028` | P3 | policy | Policy ambiguity on user video basenames in log output. |
-| `AUDIT-20261108-035` | P3 | quality | `SuccessScreen.computeFileHash` reads whole video into memory before SHA-256. |
 | `AUDIT-20261108-036` | P3 | infra | Dual findings.json locations: canonical `0ai_context/findings.json` plus stale `0ai_context/raw/findings.json`. |
 
 ## 11. Code Snippets & Key Patterns
@@ -89,14 +88,15 @@ The boundary group (`^`, whitespace, quote, bracket, `=`, `,`, `:`, `;`, or back
 ## 14. Troubleshooting & Known Gotchas
 - FFmpeg native method channel requires mock handling in unit tests.
 - SharedPreferences plugin binding in tests.
+- `dart format` may abort with `PathNotFoundException ...\*` when an Android build leaves `build/<plugin>/.transforms/` entries with a literal `*` in the directory name. Deleting those gitignored directories restores the format gate. Observed once (report 118); register as a finding only on recurrence.
 
 ## 15. Next Immediate Actions
-- Fix `AUDIT-20261108-035` (streaming SHA-256 in `SuccessScreen.computeFileHash`) as report 118.
 - Decide the canonical `findings.json` path and retire `0ai_context/raw/findings.json` (candidate 036).
+- Re-verify candidate 020 (silent catch count) or close it as superseded by reports 88–102.
 
 ## 16. Run Manifest & Next Prompt Pointer
-- Generated at commit 4dec917.
-- Next fix prompt run number: `next_n=118`.
+- Generated at commit 2e92723.
+- Next fix prompt run number: `next_n=120`.
 
 <!-- Context Mapper v6.0 pad line to meet spec line count -->
 

@@ -9,5 +9,6 @@
 - [116-fix-narrow-ui-batch-3.md](116-fix-narrow-ui-batch-3.md) — Replace 3 SnackBar `$e` sites; closes AUDIT-20261108-030 (14/14)
 - [117-mapper-refresh-2.md](117-mapper-refresh-2.md) — Close 030, register 036, correct numbering drift 113 → 118
 - [118-fix-streaming-compute-hash.md](118-fix-streaming-compute-hash.md) — Stream SHA-256 in `SuccessScreen.computeFileHash` (AUDIT-20261108-035)
+- [119-mapper-touch-close-035.md](119-mapper-touch-close-035.md) — Close AUDIT-20261108-035, test count 229, numbering 118 → 120
 - Reports 88–102 — Silent catch remediation batches 1-6 & privacy fixes
 - Reports 01–86 — Historical audits and releases

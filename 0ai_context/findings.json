@@ -120,7 +120,8 @@
     "severity": "P3",
     "category": "quality",
     "description": "SuccessScreen.computeFileHash reads whole output video into memory before SHA-256; switch to streaming to avoid OOM on large exports.",
-    "status": "active"
+    "status": "resolved",
+    "resolved_by": "report 118"
   },
   {
     "id": "AUDIT-20261108-036",
