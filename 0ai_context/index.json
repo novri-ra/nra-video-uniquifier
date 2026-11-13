@@ -1,60 +1,65 @@
 {
-  "next_report_number": 120,
+  "next_report_number": 121,
   "reports": [
     {
       "number": 103,
-      "path": "reports/103-audit.md",
+      "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md",
       "type": "audit"
     },
     {
       "number": 110,
       "type": "fix",
-      "path": "reports/110-fix-i18n-modifiers-card.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md"
     },
     {
       "number": 111,
       "type": "fix",
-      "path": "reports/111-fix-silent-catch-thumbnail-resolve.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/111-fix-silent-catch-thumbnail-resolve.md"
     },
     {
       "number": 112,
       "type": "fix",
-      "path": "reports/112-fix-path-redaction.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/112-fix-path-redaction.md"
     },
     {
       "number": 113,
       "type": "mapper",
-      "path": "reports/113-mapper-refresh.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/113-mapper-refresh.md"
     },
     {
       "number": 114,
       "type": "fix",
-      "path": "reports/114-fix-narrow-log-batch-1.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/114-fix-narrow-log-batch-1.md"
     },
     {
       "number": 115,
       "type": "fix",
-      "path": "reports/115-fix-narrow-ui-batch-2.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/115-fix-narrow-ui-batch-2.md"
     },
     {
       "number": 116,
       "type": "fix",
-      "path": "reports/116-fix-narrow-ui-batch-3.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/116-fix-narrow-ui-batch-3.md"
     },
     {
       "number": 117,
       "type": "mapper",
-      "path": "reports/117-mapper-refresh-2.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/117-mapper-refresh-2.md"
     },
     {
       "number": 118,
       "type": "fix",
-      "path": "reports/118-fix-streaming-compute-hash.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/118-fix-streaming-compute-hash.md"
     },
     {
       "number": 119,
       "type": "mapper",
-      "path": "reports/119-mapper-touch-close-035.md"
+      "path": "reports/archive/phase4-v1.0.5-fixes/119-mapper-touch-close-035.md"
+    },
+    {
+      "number": 120,
+      "type": "fix",
+      "path": "reports/archive/phase4-v1.0.5-fixes/120-fix-extract-temp-cache-walk.md"
     }
   ]
 }
