@@ -71,6 +71,7 @@ class FfmpegService {
     double introTrimOffset = 0.5,
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
+    String? lutName,
   }) => FfmpegCommandBuilder.buildCommand(
     inputPath: inputPath,
     outputPath: outputPath,
@@ -107,6 +108,7 @@ class FfmpegService {
     introTrimOffset: introTrimOffset,
     rotateAngle: rotateAngle,
     activeVisualEffects: activeVisualEffects,
+    lutName: lutName,
   );
 
   /// Cancels any currently running FFmpeg operations.

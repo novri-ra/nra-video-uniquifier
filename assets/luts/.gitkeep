@@ -1,0 +1,3 @@
+# Placeholder so the LUT asset directory is tracked.
+# Drop `.cube` files here; the FFmpeg engine resolves them as
+# assets/luts/<name>.cube for `lut3d` filter injection.

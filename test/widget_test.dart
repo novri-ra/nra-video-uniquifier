@@ -7,6 +7,7 @@ import 'package:nra_video_uniquifier/core/providers/locale_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/theme_provider.dart';
 import 'package:nra_video_uniquifier/core/providers/uniquifier_provider.dart';
 import 'package:nra_video_uniquifier/features/navigation/screens/root_navigation_screen.dart';
+import 'package:nra_video_uniquifier/features/microstock/screens/microstock_news_screen.dart';
 import 'package:nra_video_uniquifier/features/profile/screens/profile_placeholder_screen.dart';
 import 'package:nra_video_uniquifier/main.dart';
 import 'package:nra_video_uniquifier/features/process/widgets/modifiers_card.dart';
@@ -28,7 +29,7 @@ void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
-  Widget createTestWidget({required Size surfaceSize, int tabIndex = 2}) {
+  Widget createTestWidget({required Size surfaceSize, int tabIndex = 1}) {
     final provider = UniquifierProvider()..setTabIndex(tabIndex);
     return MultiProvider(
       providers: [
@@ -185,7 +186,7 @@ void main() {
     testWidgets(
       'D2-01: Double-tap on start action button triggers exactly one route push',
       (tester) async {
-        final uniquifierProvider = UniquifierProvider()..setTabIndex(2);
+        final uniquifierProvider = UniquifierProvider()..setTabIndex(1);
         final batchQueueProvider = BatchQueueProvider();
 
         uniquifierProvider.setVideoFile(
@@ -459,13 +460,12 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 100));
 
-        // 5 destinations in floating navbar
+        // 4 destinations in floating navbar
         final navBar = find.byType(FloatingCapsuleNavBar);
         expect(navBar, findsOneWidget);
 
-        // Verify 5 navigation items: Home, Intel, Studio, History, Profile
+        // Verify 4 navigation items: Home, Studio, History, Profile
         expect(find.text('Home'), findsOneWidget);
-        expect(find.text('Intel'), findsOneWidget);
         expect(
           find.text('Studio'),
           findsNothing,
@@ -476,12 +476,7 @@ void main() {
         // Dashboard is mounted initially
         expect(find.textContaining('SEASONAL WINDOW'), findsOneWidget);
 
-        // Slot 1: Tap Intel directly routes to MicrostockNewsScreen
-        await tester.tap(find.text('Intel'));
-        await tester.pumpAndSettle();
-        expect(find.text('MICROSTOCK INTEL & NEWS'), findsOneWidget);
-
-        // Slot 2: Tap '+' Studio hero action directly routes to ProcessScreen
+        // Slot 1: Tap '+' Studio hero action directly routes to ProcessScreen
         await tester.tap(
           find.byWidgetPredicate((widget) {
             return widget is SvgPicture &&
@@ -556,8 +551,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Navigate to Intel tab (slot 1)
-        await tester.tap(find.text('Intel'));
+        // The news tab is gone from the shell; open the standalone screen
+        // directly to exercise the reader sheet.
+        final navigator = tester.state<NavigatorState>(
+          find.byType(Navigator).first,
+        );
+        navigator.push(
+          MaterialPageRoute<void>(builder: (_) => const MicrostockNewsScreen()),
+        );
         await tester.pumpAndSettle();
         expect(find.text('MICROSTOCK INTEL & NEWS'), findsOneWidget);
 
@@ -630,7 +631,11 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('MICROSTOCK INTEL READER'), findsNothing);
 
-        // Navigate to Studio tab (slot 2)
+        // Leave the standalone news route so the shell navbar is reachable
+        navigator.pop();
+        await tester.pumpAndSettle();
+
+        // Navigate to Studio tab (slot 1)
         await tester.tap(
           find.byWidgetPredicate((widget) {
             return widget is SvgPicture &&
@@ -640,7 +645,7 @@ void main() {
           }),
         );
         await tester.pumpAndSettle();
-        expect(provider.currentTabIndex, equals(2));
+        expect(provider.currentTabIndex, equals(1));
         expect(find.text('SOURCE FILE'), findsOneWidget);
 
         // Tap preset chip 'TikTok / Reels' in Studio
@@ -649,8 +654,8 @@ void main() {
         await tester.tap(presetChip);
         await tester.pumpAndSettle();
 
-        // Navigation must stay in Studio tab (index 2), not kicked to Home (index 0)
-        expect(provider.currentTabIndex, equals(2));
+        // Navigation must stay in Studio tab (index 1), not kicked to Home (index 0)
+        expect(provider.currentTabIndex, equals(1));
         expect(find.text('SOURCE FILE'), findsOneWidget);
         expect(find.text('TikTok / Reels'), findsOneWidget);
 

@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Floating capsule navigation bar with balanced 5-slot layout.
+/// Floating capsule navigation bar with balanced 4-slot layout.
 class FloatingCapsuleNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -17,36 +17,30 @@ class FloatingCapsuleNavBar extends StatelessWidget {
 
   static List<_NavItemData> _navItems(AppLocalizations? l10n) {
     return [
-      _NavItemData(
+      const _NavItemData(
         svgAsset: 'assets/home-icon.svg',
         fallbackIcon: Icons.home_rounded,
         label: 'Home',
         index: 0,
       ),
       const _NavItemData(
-        svgAsset: 'assets/analytics-icon.svg',
-        fallbackIcon: Icons.analytics_outlined,
-        label: 'Intel',
-        index: 1,
-      ),
-      _NavItemData(
         svgAsset: 'assets/plus-icon.svg',
         fallbackIcon: Icons.add_rounded,
         label: 'Studio',
         isHeroAction: true,
-        index: 2,
+        index: 1,
       ),
       const _NavItemData(
         svgAsset: 'assets/bell-icon.svg',
         fallbackIcon: Icons.notifications_none_rounded,
         label: 'History',
-        index: 3,
+        index: 2,
       ),
       const _NavItemData(
         svgAsset: 'assets/people-icon.svg',
         fallbackIcon: Icons.person_outline_rounded,
         label: 'Profile',
-        index: 4,
+        index: 3,
       ),
     ];
   }

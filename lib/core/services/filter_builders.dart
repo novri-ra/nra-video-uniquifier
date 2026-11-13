@@ -346,6 +346,7 @@ class FilterBuilders {
     String cropAnchor = 'center',
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
+    String? lutName,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
@@ -378,8 +379,19 @@ class FilterBuilders {
               rotateAngle: rotateAngle,
               activeVisualEffects: activeVisualEffects,
             ).join(',');
+      // LUT (color grading) is inserted immediately before the final pixel
+      // format conversion so it operates on the finished frame.
+      final lutFilter = (lutName == null || lutName.isEmpty)
+          ? null
+          : "lut3d='assets/luts/$lutName.cube'";
+      final vfChain = lutFilter == null
+          ? vfString
+          : vfString.replaceFirst(
+              'format=yuv420p',
+              '$lutFilter,format=yuv420p',
+            );
       final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
-      return ' -vf "$vfString" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
+      return ' -vf "$vfChain" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
     } catch (_) {
       return _fallbackVideoFilter(
         hasVisual: hasVisual,
