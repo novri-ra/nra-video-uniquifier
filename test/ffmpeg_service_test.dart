@@ -434,7 +434,7 @@ void main() {
         modifyAudio: true,
         enableAggressiveAudio: true,
       );
-      expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.003[noise]'));
+      expect(cmd, contains('anoisesrc=d=60:c=pink:a=0.003[noise]'));
       expect(
         cmd,
         contains(
@@ -656,7 +656,7 @@ void main() {
               '-metadata:s:a:0 handler_name="${vars.deviceProfile.audioHandler}"',
             ),
           );
-          expect(cmd, contains('anoisesrc=d=7200:c=pink:a=0.0015'));
+          expect(cmd, contains('anoisesrc=d=60:c=pink:a=0.0015'));
           expect(cmd, contains('-r ${vars.outputFps.toStringAsFixed(2)}'));
         }
       },

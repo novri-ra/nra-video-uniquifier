@@ -584,15 +584,29 @@ class FfmpegService {
         'Output failed integrity: truncated or null dimensions (${diag.width}x${diag.height})',
       );
     }
-    final exportedPath = await FfmpegFileHelper.exportStagedFile(
-      stagedRenderedPath,
-      finalDestPath,
-    );
+    final exportedPath =
+        await FfmpegFileHelper.exportStagedFile(
+          stagedRenderedPath,
+          finalDestPath,
+        ).timeout(
+          const Duration(seconds: 30),
+          onTimeout: () {
+            // Scoped-storage copy can stall; never leave the UI at 99% forever.
+            // Fall back to the staged render so the result is not lost.
+            debugPrint(
+              '[FfmpegService] export copy timed out after 30s; '
+              'keeping staged file',
+            );
+            return stagedRenderedPath;
+          },
+        );
     await MediaScannerService.scanFile(exportedPath);
-    FfmpegFileHelper.deletePartialFile(
-      stagedOutputPath,
-      sourcePath: effectiveInput,
-    );
+    if (exportedPath != stagedOutputPath) {
+      FfmpegFileHelper.deletePartialFile(
+        stagedOutputPath,
+        sourcePath: effectiveInput,
+      );
+    }
     if (!suppressCompleteNotification) {
       final name = exportedPath.split(RegExp(r"[/\\]")).last;
       final lang = await SettingsService.getAppLanguageCode();

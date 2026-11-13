@@ -66,12 +66,11 @@ class FfmpegCommandBuilder {
       introTrimOffset,
     );
 
-    // Stability priority: force sequential filter processing and a generous
-    // muxing queue so heavy Real-ESRGAN / Blur / 2K chains cannot OOM.
-    buffer.write(
-      ' -filter_threads 1 -filter_complex_threads 1 '
-      '-max_muxing_queue_size 4096',
-    );
+    // Stability priority: keep a generous muxing queue so heavy 2K / Blur
+    // chains cannot overflow, but leave filter threading at FFmpeg's default.
+    // Sequential filter threading starved the encoder on heavy graphs and
+    // surfaced as "100 buffers queued in out_0_0".
+    buffer.write(' -max_muxing_queue_size 4096');
 
     // --- METADATA SANITIZATION & SPOOFING LOGIC ---
     if (removeMetadata) {

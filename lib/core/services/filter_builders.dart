@@ -438,10 +438,10 @@ class FilterBuilders {
         return ' -af "volume=0.01,$pitchChain,atempo=$tempo" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableAggressiveAudio) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.003[noise];aevalsrc=exprs=0.0008*sin(2*PI*24*t)+0.0006*sin(2*PI*18200*t):d=7200:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.003[noise];aevalsrc=exprs=0.0008*sin(2*PI*24*t)+0.0006*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=7200:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=7200:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
       }
       return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1:first_pts=0,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
     } catch (_) {
