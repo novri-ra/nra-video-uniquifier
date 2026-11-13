@@ -1,5 +1,5 @@
 {
-  "next_report_number": 121,
+  "next_report_number": 130,
   "reports": [
     {
       "number": 103,
@@ -60,6 +60,41 @@
       "number": 120,
       "type": "fix",
       "path": "reports/archive/phase4-v1.0.5-fixes/120-fix-extract-temp-cache-walk.md"
+    },
+    {
+      "number": 123,
+      "type": "fix",
+      "path": "reports/123-ultimate-stability-and-quality.md"
+    },
+    {
+      "number": 124,
+      "type": "fix",
+      "path": "reports/124-master-fix-and-lut-setup.md"
+    },
+    {
+      "number": 125,
+      "type": "fix",
+      "path": "reports/125-fix-navigation-tests.md"
+    },
+    {
+      "number": 126,
+      "type": "audit",
+      "path": "reports/126-audit-ffmpeg-stall.md"
+    },
+    {
+      "number": 127,
+      "type": "fix",
+      "path": "reports/127-fix-audit-logging.md"
+    },
+    {
+      "number": 128,
+      "type": "fix",
+      "path": "reports/128-fix-filter-bottleneck-and-audio-leak.md"
+    },
+    {
+      "number": 129,
+      "type": "mapper",
+      "path": "reports/129-mapper-refresh-final.md"
     }
   ]
 }
