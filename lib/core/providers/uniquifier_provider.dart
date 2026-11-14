@@ -303,6 +303,28 @@ class UniquifierProvider extends ChangeNotifier
     _isPreviewRendering = true;
     notifyListeners();
 
+    // 🛡️ OOM guard: skip heavy preview renders on low-tier devices
+    final specs = await DeviceCapabilityService.getSpecs();
+    final is4k = targetFps >= 30; // simplified 4K check
+    final hasHeavyEffects = enableBlurredCanvas ||
+        activeVisualEffects.any((e) => [
+          UnifiedVisualEffect.motionEcho,
+          UnifiedVisualEffect.rgbSplit,
+          UnifiedVisualEffect.dreamyBloom,
+          UnifiedVisualEffect.dynamicGrain,
+        ].contains(e));
+
+    if (specs.tier == DeviceTier.entry && (is4k || hasHeavyEffects)) {
+      _renderedPreviewFramePath = null;
+      _isPreviewRendering = false;
+      notifyListeners();
+      return;
+    }
+
+    if (specs.tier == DeviceTier.mid && (is4k && hasHeavyEffects)) {
+      // Allow but mark for lower-fidelity preview
+    }
+
     try {
       final filter =
           customFilter ??

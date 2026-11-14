@@ -33,6 +33,7 @@ moved into the current phase folder once that phase closes.
 - **139** — Deep System Audit (`reports/139-deep-system-audit.md`).
 - **140** — FFmpeg Buffer Queue & Dead Code Fix (`reports/140-fix-ffmpeg-buffer-queue-and-dead-code.md`).
 - **141** — Popup Preview & Effect Stacking Audit (`reports/141-popup-preview-and-effect-stacking-audit.md`).
+- **142** — FFmpeg Exit Code 1 / OOM Fix and Adaptive Resource Safeguards (`reports/142-fix-ffmpeg-exit-code-1-oom.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.

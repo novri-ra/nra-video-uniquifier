@@ -17,6 +17,7 @@ import 'notification_service.dart';
 import 'render_diagnostic_service.dart';
 import 'settings_service.dart';
 import 'storage_service.dart';
+import 'device_capability_service.dart';
 import 'wakelock_service.dart';
 
 export '../models/unified_effect_preset.dart';
@@ -334,6 +335,20 @@ class FfmpegService {
         'Insufficient storage space (less than 1.5 GB). Please free up storage.',
       );
     }
+
+    // 🛡️ OOM SAFETY: Adaptive resource guard for entry/mid-tier devices
+    final specs = await DeviceCapabilityService.getSpecs();
+    final isHighRisk = _isHighOomRisk(
+      targetResolution: targetResolution,
+      activeVisualEffects: activeVisualEffects,
+      deviceTier: specs.tier,
+    );
+    if (isHighRisk != null) {
+      throw Exception(
+        isHighRisk,
+      );
+    }
+
     final meta = await _resolveInputMeta(
       inputPath,
       isPortrait,
@@ -778,6 +793,54 @@ class FfmpegService {
     }
   }
 
+  /// Determines if the current configuration poses a high OOM risk on the detected device tier.
+  /// Returns a descriptive error message if high risk, or null if safe to proceed.
+  static String? _isHighOomRisk({
+    required TargetResolution targetResolution,
+    required Set<UnifiedVisualEffect>? activeVisualEffects,
+    required DeviceTier deviceTier,
+  }) {
+    final is4k = targetResolution == TargetResolution.r4k ||
+        targetResolution == TargetResolution.r2k;
+    final hasHeavyEffects = activeVisualEffects != null &&
+        activeVisualEffects.any((e) => [
+          UnifiedVisualEffect.blurredCanvas,
+          UnifiedVisualEffect.motionEcho,
+          UnifiedVisualEffect.rgbSplit,
+          UnifiedVisualEffect.dreamyBloom,
+          UnifiedVisualEffect.dynamicGrain,
+        ].contains(e));
+
+    // Entry tier: 4K + any heavy effect = very high risk
+    if (deviceTier == DeviceTier.entry) {
+      if (is4k && hasHeavyEffects) {
+        return 'Device terlalu lemah untuk 4K dengan efek berat. Gunakan 1080p atau kurangi efek.';
+      }
+      if (is4k) {
+        return 'Device terlalu lemah untuk 4K. Gunakan 1080p.';
+      }
+      if (hasHeavyEffects) {
+        return 'Efek berat terlalu besar untuk device entry tier.';
+      }
+    }
+
+    // Mid tier: 4K + heavy effects = high risk; 4K alone = moderate
+    if (deviceTier == DeviceTier.mid) {
+      if (is4k && hasHeavyEffects) {
+        return 'Hardware sedang terlalu berat untuk 4K dengan kombinasi banyak efek. Coba 1080p atau kurangi efek.';
+      }
+      if (is4k) {
+        return 'Hardware sedang menahan 4K. Kurangi efek visual untuk hasil yang lebih stabil.';
+      }
+      if (hasHeavyEffects) {
+        return 'Efek banyak terlalu besar untuk device mid tier. Kurangi efek.';
+      }
+    }
+
+    // Flagship: allow everything
+    return null;
+  }
+
   static Future<String> _executeFFmpeg(
     String command,
     String outputPath, {
@@ -807,7 +870,33 @@ class FfmpegService {
       final err =
           'FFmpeg failed with code $returnCode${logs != null ? '\n$logs' : ''}';
       debugPrint(err);
-      throw Exception(err);
+
+      // 🛡️ OOM-aware error translation: map common exit code 1 patterns to user-friendly advice
+      final lowerLogs = logs?.toLowerCase() ?? '';
+      if (returnCode?.getValue() == 1) {
+        final isOomPattern =
+            lowerLogs.contains('out of memory') ||
+                lowerLogs.contains('malloc failed') ||
+                lowerLogs.contains('buffer overflow') ||
+                lowerLogs.contains('queued in out') ||
+                lowerLogs.contains('cannot allocate video buffer');
+        if (isOomPattern) {
+          throw Exception(
+            'FFmpeg gagal (exit code 1): Out of Memory. '
+            'Coba: (1) turunkan resolusi ke 1080p, (2) kurangi efek visual, (3) nonaktifkan audio masking, (4) gunakan device yang lebih kuat.\n'
+            'Detail: $logs',
+          );
+        }
+      }
+
+      if (ReturnCode.isCancel(returnCode)) {
+        throw Exception('FFmpeg execution was canceled');
+      }
+
+      final err2 =
+          'FFmpeg failed with code $returnCode${logs != null ? '\n$logs' : ''}';
+      debugPrint(err2);
+      throw Exception(err2);
     } catch (e) {
       debugPrint('[FfmpegService] _executeFFmpeg error: $e');
       FfmpegFileHelper.deletePartialFile(outputPath, sourcePath: sourcePath);
