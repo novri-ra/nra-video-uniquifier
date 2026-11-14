@@ -4,13 +4,9 @@
 - Name: `nra_video_uniquifier`
 - Current Commit: `3d4d4ed` (fix(core): resolve filter bottleneck, audio leak, and export hang)
 - Branch: `development`
-- Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
-- Executive Summary: Reports 123–128 locked the app to software H.264 (`libx264`,
-  CRF 18, `-hwaccel none`), disabled H.265 and hardware acceleration in the UI,
-  removed the Intel/News tab from the 4-slot shell, added the LUT (`lut3d`) asset
-  pipeline, chunked the FFmpeg audit log for logcat, fixed the 2-hour audio noise
-  leak, removed the filter-thread bottleneck, and added a 30 s gallery-export
-  timeout. Finding 037 is resolved; 024 is invalid; 020/027/028/036 remain active.
+- Health Status: Analyze exit 0, Test 240/240 passed, Format exit 0 (0 changed).
+- Executive Summary: Reports 123–135 locked the app to software H.264 (`libx264`,
+  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, and converted all remaining silent + empty catch handlers to `debugPrint` (AUDIT-20261108-020 resolved). Finding 037/020 are resolved; 024 is invalid; 027/028/036 remain active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -48,20 +44,18 @@
 - None. Working tree clean.
 
 ## 9. Blockers, Risks & Technical Debt
-- 4 active findings (0 P0, 0 P1, 0 P2, 4 P3): 020, 027, 028, 036.
+- 2 active findings (0 P0, 0 P1, 0 P2, 2 P3): 027, 028.
 - The News/Intel tab was removed from the shell; the microstock screens and
   services still exist in the tree but are unreachable from navigation.
 - Privacy and caching considerations in the history service.
 
 ## 10. Findings Inventory (Active)
-*(resolved by reports 105-123: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037 — omitted from active inventory. AUDIT-20261108-024 is invalid per report 120.)*
+*(resolved by reports 105-123: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037 — omitted from active inventory. AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 resolved by report 137.)*
 
 | ID | Severity | Category | Description |
 |---|---|---|---|
-| `AUDIT-20261108-020` | P3 | quality | Silent non-empty catch handlers; needs re-verification, count unknown. |
 | `AUDIT-20261108-027` | P3 | infra | MCP index server intermittent exit code 1. |
 | `AUDIT-20261108-028` | P3 | policy | Policy ambiguity on user video basenames in log output. |
-| `AUDIT-20261108-036` | P3 | infra | Dual findings.json locations: canonical `0ai_context/findings.json` plus stale `0ai_context/raw/findings.json`. |
 
 ## 11. Code Snippets & Key Patterns
 - `FfmpegService`: manages video rendering pipeline and multi-pass evasion filters.

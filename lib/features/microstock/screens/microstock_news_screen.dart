@@ -78,7 +78,8 @@ class _MicrostockNewsScreenState extends State<MicrostockNewsScreen> {
         _isLoading = false;
       });
       _updateSyncStatus();
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MicrostockNewsScreen] load news feed failed: $e');
       if (!mounted) return;
       setState(() => _isLoading = false);
     }

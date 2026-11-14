@@ -21,7 +21,7 @@ Recent commits:
 
 ## 4. Health Summary
 - Analyze: exit 0 — No issues found!
-- Test: 229/229 passed (exit 0)
+- Test: 240/240 passed (exit 0)
 - Format: exit 0 — 0 files changed (PASS)
 
 ## 5. Graph Index Health
@@ -48,6 +48,7 @@ Recent commits:
 
 ## 10. Incident Log
 - MCP index_status exit code 1 once during preflight; retry succeeded (finding 027).
+- Finding 036 (dual findings.json) resolved by report 137.
 
 ## 11. Update-Mode Incidents
 - Format gate is green (exit 0); 127 files, 0 changed.
@@ -57,15 +58,15 @@ Recent commits:
 - News/Intel tab removed from `FloatingCapsuleNavBar` and `RootNavigationScreen`
   (4 tabs: Home, Studio, History, Profile); `microstock_news_screen.dart` and its
   services remain in the tree but are no longer reachable from the shell.
-- 4 active findings (0 P0, 0 P1, 0 P2, 4 P3): 020, 027, 028, 036.
+- 2 active findings (0 P0, 0 P1, 0 P2, 2 P3): 027, 028.
 
 ## 13. Security & Safety Risks
 - AUDIT-20261108-022 (P2) is resolved (report 105).
 - AUDIT-20261108-024 (P2) is invalid (report 120 — the temp-cache walks diverge).
 - AUDIT-20261108-037 (P2) is resolved (report 123 — `_cleanupOldPreviews` logs
   basename + `e.runtimeType` only).
-- Remaining P3 items: silent catches (020), MCP flakiness (027), basename policy
-  ambiguity (028), dual findings.json locations (036).
+- Remaining P3 items: MCP flakiness (027), basename policy
+  ambiguity (028), dual findings.json locations (036). (Finding 020 resolved via reports 134-135).
 
 ## 14. Missing / Unverified
 - Basename vs absolute path policy in logs (finding 028).

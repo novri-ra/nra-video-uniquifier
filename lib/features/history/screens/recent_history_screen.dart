@@ -213,6 +213,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         });
       }
     } catch (e) {
+      debugPrint('[RecentHistoryScreen] load history failed: $e');
       if (mounted) {
         setState(() {
           _error = '${e.runtimeType}';
@@ -331,6 +332,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         }
       }
     } catch (e) {
+      debugPrint('[RecentHistoryScreen] delete multiple items failed: $e');
       if (mounted) {
         AppToast.show(
           context,
@@ -401,6 +403,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         }
       }
     } catch (e) {
+      debugPrint('[RecentHistoryScreen] delete item failed: $e');
       if (mounted) {
         AppToast.show(
           context,
@@ -417,6 +420,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         XFile(item.file.path, mimeType: 'video/mp4'),
       ], text: 'Exported video: ${item.fileName}');
     } catch (e) {
+      debugPrint('[RecentHistoryScreen] share item failed: $e');
       if (mounted) {
         AppToast.show(
           context,
@@ -438,6 +442,7 @@ class _RecentHistoryScreenState extends State<RecentHistoryScreen>
         );
       }
     } catch (e) {
+      debugPrint('[RecentHistoryScreen] open item failed: $e');
       if (mounted) {
         AppToast.show(context, message: 'Failed to open video.', isError: true);
       }

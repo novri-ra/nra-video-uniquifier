@@ -34,7 +34,8 @@ class ConnectivityService {
     try {
       final result = await _connectivity.checkConnectivity();
       _updateConnectionStatus(result);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ConnectivityService] check initial connectivity failed: $e');
       isOnline.value = false;
     }
   }

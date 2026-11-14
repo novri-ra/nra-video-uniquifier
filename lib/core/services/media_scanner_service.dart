@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class MediaScannerService {
@@ -15,7 +16,8 @@ class MediaScannerService {
         'path': filePath,
       });
       return res ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MediaScannerService] scanFile failed: $e');
       return false;
     }
   }
@@ -33,7 +35,8 @@ class MediaScannerService {
         'path': filePath,
       });
       return res ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MediaScannerService] openGallery failed: $e');
       return false;
     }
   }

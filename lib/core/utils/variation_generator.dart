@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 
 /// Hardware metadata profile to obfuscate container signatures and defeat device clustering.
 class DeviceProfile {
@@ -179,7 +180,8 @@ class VariationGenerator {
         curves: curves,
         deviceProfile: profile,
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[VariationGenerator] generate failed: $e');
       return VideoVariations.fallback;
     }
   }

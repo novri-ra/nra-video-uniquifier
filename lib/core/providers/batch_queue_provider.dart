@@ -124,6 +124,7 @@ class BatchQueueProvider extends ChangeNotifier {
       current.outputPath = outputPath;
       current.progress = 1.0;
     } catch (e) {
+      debugPrint('[BatchQueueProvider] process single item failed: $e');
       current.status = _isCancelled
           ? BatchItemStatus.cancelled
           : BatchItemStatus.failed;

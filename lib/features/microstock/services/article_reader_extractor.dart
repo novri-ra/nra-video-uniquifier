@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:html/parser.dart' as html_parser;
 
 /// Extracted article content from on-demand web scraping.
@@ -39,7 +40,8 @@ class ArticleReaderExtractor {
       final html = await _fetchHtml(uri, timeout);
       if (html == null || html.isEmpty) return null;
       return _parseHtml(html);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ArticleReaderExtractor] extract failed: $e');
       return null;
     }
   }
@@ -86,7 +88,8 @@ class ArticleReaderExtractor {
       if (response.statusCode != 200) return null;
       final body = await response.transform(utf8.decoder).join();
       return body;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ArticleReaderExtractor] _fetchHtml failed: $e');
       return null;
     } finally {
       client.close(force: true);
@@ -207,7 +210,8 @@ class ArticleReaderExtractor {
         return Uri.tryParse(decodedUrl);
       }
       return null;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[ArticleReaderExtractor] _resolveGoogleNewsUrl failed: $e');
       return null;
     } finally {
       client.close(force: true);

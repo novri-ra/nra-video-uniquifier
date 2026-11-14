@@ -275,8 +275,8 @@ class FfmpegService {
           }
         }
       }
-    } catch (_) {
-      // Abaikan error cleanup agar tidak mengganggu proses rendering utama
+    } catch (e) {
+      debugPrint('[FfmpegService] cleanup old previews error: $e');
     }
   }
 
@@ -590,15 +590,11 @@ class FfmpegService {
           finalDestPath,
         ).timeout(
           const Duration(seconds: 30),
-          onTimeout: () {
-            // Scoped-storage copy can stall; never leave the UI at 99% forever.
-            // Fall back to the staged render so the result is not lost.
-            debugPrint(
-              '[FfmpegService] export copy timed out after 30s; '
-              'keeping staged file',
-            );
-            return stagedRenderedPath;
-          },
+          onTimeout: () => recoverTimedOutExport(
+            stagedPath: stagedRenderedPath,
+            finalDestPath: finalDestPath,
+            sourcePath: effectiveInput,
+          ),
         );
     await MediaScannerService.scanFile(exportedPath);
     if (exportedPath != stagedOutputPath) {
@@ -626,6 +622,161 @@ class FfmpegService {
   /// Inspects rendered video using FFprobe to produce diagnostic report.
   static Future<RenderDiagnosticInfo?> inspectRenderedFile(String filePath) =>
       RenderDiagnosticService.inspectRenderedFile(filePath);
+
+  /// Recovers a render whose gallery export exceeded the 30 s budget.
+  ///
+  /// `File.copy` cannot be cancelled, so the original copy may still complete
+  /// at [finalDestPath] after this method returns. Recovery therefore writes
+  /// to a distinct `_recovered_` name and never overwrites that in-flight file.
+  ///
+  /// Preference order:
+  /// 1. Atomic rename into the normal export directory.
+  /// 2. Bounded copy into the normal export directory.
+  /// 3. Atomic rename/copy into the app documents directory, which survives
+  ///    [SettingsService.purgeTempCache] and OS cache eviction.
+  /// 4. Rename inside the temp directory to a non-`staged_` prefix.
+  ///
+  /// Returns the original staged path only when every durable option fails.
+  @visibleForTesting
+  static Future<String> recoverTimedOutExport({
+    required String stagedPath,
+    required String finalDestPath,
+    String? sourcePath,
+    Duration copyBudget = const Duration(seconds: 10),
+  }) async {
+    final stagedFile = File(stagedPath);
+    if (!stagedFile.existsSync()) return stagedPath;
+
+    final recoveredName = _recoveredFileName(finalDestPath);
+    final exportDir = File(finalDestPath).parent;
+    final exportPath = '${exportDir.path}/$recoveredName';
+
+    final renamedToExport = await _tryRecoverRename(stagedFile, exportPath);
+    if (renamedToExport != null) {
+      debugPrint(
+        '[FfmpegService] export timed out after 30s; recovered render moved '
+        'to the export directory',
+      );
+      return renamedToExport;
+    }
+
+    final copiedToExport = await _tryRecoverCopy(
+      stagedFile,
+      exportPath,
+      copyBudget,
+    );
+    if (copiedToExport != null) {
+      FfmpegFileHelper.deletePartialFile(stagedPath, sourcePath: sourcePath);
+      debugPrint(
+        '[FfmpegService] export timed out after 30s; recovered render copied '
+        'to the export directory',
+      );
+      return copiedToExport;
+    }
+
+    try {
+      final docs = await getApplicationDocumentsDirectory();
+      final docsDir = Directory('${docs.path}/Movies/Uniquifier');
+      await docsDir.create(recursive: true);
+      final docsPath = '${docsDir.path}/$recoveredName';
+      final renamedToDocs = await _tryRecoverRename(stagedFile, docsPath);
+      if (renamedToDocs != null) {
+        debugPrint(
+          '[FfmpegService] export timed out after 30s; recovered render moved '
+          'to app documents',
+        );
+        return renamedToDocs;
+      }
+      final copiedToDocs = await _tryRecoverCopy(
+        stagedFile,
+        docsPath,
+        copyBudget,
+      );
+      if (copiedToDocs != null) {
+        FfmpegFileHelper.deletePartialFile(stagedPath, sourcePath: sourcePath);
+        debugPrint(
+          '[FfmpegService] export timed out after 30s; recovered render copied '
+          'to app documents',
+        );
+        return copiedToDocs;
+      }
+    } catch (e) {
+      debugPrint(
+        '[FfmpegService] recovered render documents fallback failed: '
+        '${e.runtimeType}',
+      );
+    }
+
+    // Last resort: keep the render but move it out of the `staged_` prefix so
+    // startup purgeTempCache cannot delete it.
+    final tempRecovered =
+        '${stagedFile.parent.path}/recovered_out_'
+        '${DateTime.now().millisecondsSinceEpoch}.mp4';
+    final renamedInTemp = await _tryRecoverRename(stagedFile, tempRecovered);
+    if (renamedInTemp != null) {
+      debugPrint(
+        '[FfmpegService] export timed out after 30s; render kept outside the '
+        'staged_ purge prefix',
+      );
+      return renamedInTemp;
+    }
+
+    debugPrint(
+      '[FfmpegService] export timed out after 30s; durable recovery failed, '
+      'returning staged render (may be purged on next launch)',
+    );
+    return stagedPath;
+  }
+
+  static String _recoveredFileName(String finalDestPath) {
+    final name = finalDestPath.split(RegExp(r'[/\\]')).last;
+    final dot = name.lastIndexOf('.');
+    final base = dot > 0 ? name.substring(0, dot) : name;
+    return '${base}_recovered_'
+        '${DateTime.now().millisecondsSinceEpoch}.mp4';
+  }
+
+  static Future<String?> _tryRecoverRename(File source, String destPath) async {
+    try {
+      final dest = File(destPath);
+      if (!await dest.parent.exists()) {
+        await dest.parent.create(recursive: true);
+      }
+      final moved = await source.rename(destPath);
+      return moved.path;
+    } catch (e) {
+      debugPrint('[FfmpegService] recovery rename failed: ${e.runtimeType}');
+      return null;
+    }
+  }
+
+  static Future<String?> _tryRecoverCopy(
+    File source,
+    String destPath,
+    Duration budget,
+  ) async {
+    try {
+      final dest = File(destPath);
+      if (!await dest.parent.exists()) {
+        await dest.parent.create(recursive: true);
+      }
+      await source.copy(destPath).timeout(budget);
+      return destPath;
+    } catch (e) {
+      debugPrint('[FfmpegService] recovery copy failed: ${e.runtimeType}');
+      // The copy itself cannot be cancelled; best-effort remove a partial.
+      try {
+        final partial = File(destPath);
+        if (partial.existsSync()) partial.deleteSync();
+      } catch (cleanupError) {
+        debugPrint(
+          '[FfmpegService] recovery partial cleanup failed: '
+          '${cleanupError.runtimeType}',
+        );
+      }
+      return null;
+    }
+  }
 
   static Future<String> _executeFFmpeg(
     String command,
@@ -657,7 +808,8 @@ class FfmpegService {
           'FFmpeg failed with code $returnCode${logs != null ? '\n$logs' : ''}';
       debugPrint(err);
       throw Exception(err);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[FfmpegService] _executeFFmpeg error: $e');
       FfmpegFileHelper.deletePartialFile(outputPath, sourcePath: sourcePath);
       rethrow;
     }

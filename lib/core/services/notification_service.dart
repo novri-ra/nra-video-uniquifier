@@ -124,7 +124,8 @@ class NotificationService {
         await _createNotificationChannels(androidPlugin);
       }
       return true;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[NotificationService] _tryInitialize failed: $e');
       return false;
     }
   }
@@ -222,7 +223,10 @@ class NotificationService {
         body: body,
         notificationDetails: NotificationDetails(android: androidDetails),
       );
-    } catch (_) {
+    } catch (e) {
+      debugPrint(
+        '[NotificationService] show notification failed, trying fallback: $e',
+      );
       try {
         final fallback = AndroidNotificationDetails(
           androidDetails.channelId,

@@ -22,7 +22,8 @@ class WakeLockService {
     try {
       final res = await _channel.invokeMethod<bool>('acquireWakeLock');
       return res ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[WakeLockService] acquire failed: $e');
       return false;
     }
   }
@@ -35,7 +36,8 @@ class WakeLockService {
     try {
       final res = await _channel.invokeMethod<bool>('releaseWakeLock');
       return res ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[WakeLockService] release failed: $e');
       return false;
     }
   }
@@ -45,7 +47,8 @@ class WakeLockService {
     try {
       final res = await _channel.invokeMethod<bool>('isWakeLockHeld');
       return res ?? false;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[WakeLockService] isHeld failed: $e');
       return false;
     }
   }

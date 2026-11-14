@@ -176,7 +176,12 @@ class MicrostockNewsService {
         if (lastSync != null &&
             DateTime.now().difference(lastSync) > _cacheTtl) {
           unawaited(
-            fetchAndCacheNews().catchError((_) => <MicrostockNewsArticle>[]),
+            fetchAndCacheNews().catchError((e) {
+              debugPrint(
+                '[MicrostockNewsService] background fetch and cache failed: $e',
+              );
+              return <MicrostockNewsArticle>[];
+            }),
           );
         }
       }
@@ -188,7 +193,10 @@ class MicrostockNewsService {
       try {
         final online = await fetchAndCacheNews();
         if (online.isNotEmpty) return online;
-      } catch (_) {
+      } catch (e) {
+        debugPrint(
+          '[MicrostockNewsService] online fetch failed, falling back to cache: $e',
+        );
         if (cached.isNotEmpty) {
           triggerBackgroundDownload(cached);
           return cached;
@@ -767,7 +775,8 @@ class MicrostockNewsService {
     try {
       final prefs = await SharedPreferences.getInstance();
       return prefs.getString(_lastFetchedKey);
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[MicrostockNewsService] get last sync time failed: $e');
       return null;
     }
   }

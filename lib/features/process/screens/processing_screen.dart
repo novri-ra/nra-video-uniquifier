@@ -96,6 +96,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
         ),
       );
     } catch (e) {
+      debugPrint('[ProcessingScreen] process video failed: $e');
       if (!mounted || _isCancelled) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

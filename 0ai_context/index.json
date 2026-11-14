@@ -1,5 +1,5 @@
 {
-  "next_report_number": 130,
+  "next_report_number": 137,
   "reports": [
     {
       "number": 103,
@@ -95,6 +95,26 @@
       "number": 129,
       "type": "mapper",
       "path": "reports/129-mapper-refresh-final.md"
+    },
+    {
+      "number": 133,
+      "type": "fix",
+      "path": "reports/133-fix-045-audio-d60-and-048-path-redactor.md"
+    },
+    {
+      "number": 134,
+      "type": "fix",
+      "path": "reports/134-fix-020-silent-catch-batch-1.md"
+    },
+    {
+      "number": 135,
+      "type": "fix",
+      "path": "reports/135-fix-020-silent-catch-batch-2.md"
+    },
+    {
+      "number": 136,
+      "type": "mapper",
+      "path": "reports/136-commit-and-mapper-refresh.md"
     }
   ]
 }

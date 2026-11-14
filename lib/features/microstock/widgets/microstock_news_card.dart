@@ -62,6 +62,7 @@ class _MicrostockNewsCardState extends State<MicrostockNewsCard> {
         _isTranslating = false;
       });
     } catch (e) {
+      debugPrint('[MicrostockNewsCard] translation failed: $e');
       if (!mounted) return;
       setState(() => _isTranslating = false);
       ScaffoldMessenger.of(context).showSnackBar(

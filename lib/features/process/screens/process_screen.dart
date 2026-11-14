@@ -44,6 +44,7 @@ class _ProcessScreenState extends State<ProcessScreen> {
         if (validFiles.isNotEmpty) _applyPickedFiles(context, validFiles);
       }
     } catch (e) {
+      debugPrint('[ProcessScreen] pick video failed: $e');
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

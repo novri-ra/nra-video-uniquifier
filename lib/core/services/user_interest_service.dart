@@ -76,7 +76,8 @@ class UserInterestService {
     try {
       final prefs = await SharedPreferences.getInstance();
       _configuredWebhookUrl = prefs.getString(_webhookKey) ?? defaultWebhookUrl;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[UserInterestService] get webhook url failed: $e');
       _configuredWebhookUrl = defaultWebhookUrl;
     }
     return _configuredWebhookUrl ?? defaultWebhookUrl;
