@@ -262,6 +262,8 @@ class FfmpegCommandBuilder {
       // Stability priority: always finish with software-only H.264 encoding.
       // Written last so it overrides any provider-selected codec arguments
       // (H.265 / hardware encoders) emitted by FilterBuilders.
+      // Guard: limit muxing queue depth to prevent buffer overflow on heavy filtergraphs
+      buffer.write(' -max_muxing_queue_size 20');
       buffer.write(
         ' -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1',
       );

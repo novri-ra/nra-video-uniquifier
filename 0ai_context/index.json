@@ -1,120 +1,32 @@
 {
-  "next_report_number": 137,
+  "next_report_number": 141,
   "reports": [
-    {
-      "number": 103,
-      "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md",
-      "type": "audit"
-    },
-    {
-      "number": 110,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md"
-    },
-    {
-      "number": 111,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/111-fix-silent-catch-thumbnail-resolve.md"
-    },
-    {
-      "number": 112,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/112-fix-path-redaction.md"
-    },
-    {
-      "number": 113,
-      "type": "mapper",
-      "path": "reports/archive/phase4-v1.0.5-fixes/113-mapper-refresh.md"
-    },
-    {
-      "number": 114,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/114-fix-narrow-log-batch-1.md"
-    },
-    {
-      "number": 115,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/115-fix-narrow-ui-batch-2.md"
-    },
-    {
-      "number": 116,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/116-fix-narrow-ui-batch-3.md"
-    },
-    {
-      "number": 117,
-      "type": "mapper",
-      "path": "reports/archive/phase4-v1.0.5-fixes/117-mapper-refresh-2.md"
-    },
-    {
-      "number": 118,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/118-fix-streaming-compute-hash.md"
-    },
-    {
-      "number": 119,
-      "type": "mapper",
-      "path": "reports/archive/phase4-v1.0.5-fixes/119-mapper-touch-close-035.md"
-    },
-    {
-      "number": 120,
-      "type": "fix",
-      "path": "reports/archive/phase4-v1.0.5-fixes/120-fix-extract-temp-cache-walk.md"
-    },
-    {
-      "number": 123,
-      "type": "fix",
-      "path": "reports/123-ultimate-stability-and-quality.md"
-    },
-    {
-      "number": 124,
-      "type": "fix",
-      "path": "reports/124-master-fix-and-lut-setup.md"
-    },
-    {
-      "number": 125,
-      "type": "fix",
-      "path": "reports/125-fix-navigation-tests.md"
-    },
-    {
-      "number": 126,
-      "type": "audit",
-      "path": "reports/126-audit-ffmpeg-stall.md"
-    },
-    {
-      "number": 127,
-      "type": "fix",
-      "path": "reports/127-fix-audit-logging.md"
-    },
-    {
-      "number": 128,
-      "type": "fix",
-      "path": "reports/128-fix-filter-bottleneck-and-audio-leak.md"
-    },
-    {
-      "number": 129,
-      "type": "mapper",
-      "path": "reports/129-mapper-refresh-final.md"
-    },
-    {
-      "number": 133,
-      "type": "fix",
-      "path": "reports/133-fix-045-audio-d60-and-048-path-redactor.md"
-    },
-    {
-      "number": 134,
-      "type": "fix",
-      "path": "reports/134-fix-020-silent-catch-batch-1.md"
-    },
-    {
-      "number": 135,
-      "type": "fix",
-      "path": "reports/135-fix-020-silent-catch-batch-2.md"
-    },
-    {
-      "number": 136,
-      "type": "mapper",
-      "path": "reports/136-commit-and-mapper-refresh.md"
-    }
+    { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
+    { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
+    { "number": 111, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/111-fix-silent-catch-thumbnail-resolve.md" },
+    { "number": 112, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/112-fix-path-redaction.md" },
+    { "number": 113, "type": "mapper", "path": "reports/archive/phase4-v1.0.5-fixes/113-mapper-refresh.md" },
+    { "number": 114, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/114-fix-narrow-log-batch-1.md" },
+    { "number": 115, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/115-fix-narrow-ui-batch-2.md" },
+    { "number": 116, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/116-fix-narrow-ui-batch-3.md" },
+    { "number": 117, "type": "mapper", "path": "reports/archive/phase4-v1.0.5-fixes/117-mapper-refresh-2.md" },
+    { "number": 118, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/118-fix-streaming-compute-hash.md" },
+    { "number": 119, "type": "mapper", "path": "reports/archive/phase4-v1.0.5-fixes/119-mapper-touch-close-035.md" },
+    { "number": 120, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/120-fix-extract-temp-cache-walk.md" },
+    { "number": 123, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/123-ultimate-stability-and-quality.md" },
+    { "number": 124, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/124-master-fix-and-lut-setup.md" },
+    { "number": 125, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/125-fix-navigation-tests.md" },
+    { "number": 126, "type": "audit", "path": "reports/archive/phase5-v1.0.5-audit/126-audit-ffmpeg-stall.md" },
+    { "number": 127, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/127-fix-audit-logging.md" },
+    { "number": 128, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/128-fix-filter-bottleneck-and-audio-leak.md" },
+    { "number": 129, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/129-mapper-refresh-final.md" },
+    { "number": 133, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/133-fix-045-audio-d60-and-048-path-redactor.md" },
+    { "number": 134, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/134-fix-020-silent-catch-batch-1.md" },
+    { "number": 135, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/135-fix-020-silent-catch-batch-2.md" },
+    { "number": 136, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/136-commit-and-mapper-refresh.md" },
+    { "number": 137, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/137-fix-036-and-final-polish.md" },
+    { "number": 138, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/138-migrate-legacy.md" },
+    { "number": 139, "type": "audit", "path": "reports/139-deep-system-audit.md" },
+    { "number": 140, "type": "fix", "path": "reports/140-fix-ffmpeg-buffer-queue-and-dead-code.md" }
   ]
 }

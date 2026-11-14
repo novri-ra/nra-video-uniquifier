@@ -96,6 +96,7 @@ class FilterBuilders {
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'fps=$targetFps',
       'setpts=PTS-STARTPTS',
+      'fifo',
       'format=yuv420p',
     ];
   }
@@ -276,6 +277,7 @@ class FilterBuilders {
 
       // 3. Tambahkan watermark kotak kecil transparan (Anti-crash, tidak butuh font)
       'drawbox=x=iw-20:y=ih-20:w=10:h=10:color=white@0.05:t=fill',
+      'fifo',
       'format=yuv420p',
     ];
   }
