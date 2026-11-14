@@ -1,5 +1,5 @@
 {
-  "next_report_number": 141,
+  "next_report_number": 142,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -27,6 +27,7 @@
     { "number": 137, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/137-fix-036-and-final-polish.md" },
     { "number": 138, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/138-migrate-legacy.md" },
     { "number": 139, "type": "audit", "path": "reports/139-deep-system-audit.md" },
-    { "number": 140, "type": "fix", "path": "reports/140-fix-ffmpeg-buffer-queue-and-dead-code.md" }
+    { "number": 140, "type": "fix", "path": "reports/140-fix-ffmpeg-buffer-queue-and-dead-code.md" },
+    { "number": 141, "type": "audit", "path": "reports/141-popup-preview-and-effect-stacking-audit.md" }
   ]
 }

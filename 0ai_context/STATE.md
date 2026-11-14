@@ -57,6 +57,7 @@ parent_report: null
 - [2026-11-15] Migrated legacy 0ai_context to schema_version 3.1.
 - [2026-11-15] Archived loose reports 123–138 into `0ai_context/reports/archive/phase5-v1.0.5-audit/` and generated Report 139 (Deep System Audit).
 - [2026-11-15] Fixed FFmpeg buffer queue overflow in filtergraph pipeline: inserted `fifo` drain node, added `-max_muxing_queue_size 20`, enforced CFR (`-fps_mode cfr -r 30`). Cleaned up dead code: removed `MicrostockAiScreen` reference, duplicate `cropZoomScale` parameter, stale `crop` fallback branch.
+- [2026-11-15] Audited Popup Preview lifecycle (`UniquifierProvider`): debounce timer disposal verified, `_isDisposed` guards confirmed, `_heavyPreviewEffects` short-circuit logic validated. Stress-tested extreme multi-effect stacking (10 concurrent effects + 4K upscale + audio masking). No buffer overflows or deadlocks observed. Inventoried dead code: `cropZoomScale` parameter identified as dead weight; duplicate `crop` fallback removed. Generated Report 141 (`0ai_context/reports/141-popup-preview-and-effect-stacking-audit.md`).
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->
