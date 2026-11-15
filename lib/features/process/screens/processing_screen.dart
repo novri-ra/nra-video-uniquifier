@@ -259,7 +259,11 @@ class _ProcessingScreenState extends State<ProcessingScreen>
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _CentralModuleCard(progress: _progress, step: _step),
+                _CentralModuleCard(
+                  progress: _progress,
+                  step: _step,
+                  lutName: provider.lutName,
+                ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ProcessingLogViewer(
@@ -287,8 +291,21 @@ class _ProcessingScreenState extends State<ProcessingScreen>
 class _CentralModuleCard extends StatelessWidget {
   final double progress;
   final int step;
+  final String lutName;
 
-  const _CentralModuleCard({required this.progress, required this.step});
+  const _CentralModuleCard({
+    required this.progress,
+    required this.step,
+    required this.lutName,
+  });
+
+  String _formatLutName(String rawLut) {
+    if (rawLut.isEmpty) return '';
+    if (rawLut.contains('/') || rawLut.contains('\\')) {
+      return rawLut.split(RegExp(r'[/\\]')).last;
+    }
+    return rawLut;
+  }
 
   String _getStageDescription(double p) {
     if (p < 0.10) return 'Preparing staging environment & reading metadata...';
@@ -312,6 +329,7 @@ class _CentralModuleCard extends StatelessWidget {
         ? AppColors.surfaceContainerHighest
         : AppColors.hairlineBorder;
     final textColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final formattedLut = _formatLutName(lutName);
 
     return Container(
       width: double.infinity,
@@ -342,6 +360,47 @@ class _CentralModuleCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(color: AppColors.outline, fontSize: 12),
           ),
+          if (formattedLut.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 6,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.mintSage.withValues(alpha: 0.15)
+                        : AppColors.forestDeep.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.color_lens_outlined,
+                        size: 11,
+                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'LUT: $formattedLut',
+                        style: TextStyle(
+                          color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           ProcessingStageTracker(currentStep: step),
         ],

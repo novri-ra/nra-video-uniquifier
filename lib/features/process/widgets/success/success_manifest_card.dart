@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/uniquifier_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Manifest summary card showing video thumbnail, file path, and mutation tags.
@@ -109,18 +111,42 @@ class _ManifestDetailsColumn extends StatelessWidget {
     this.activeMutations,
   });
 
+  String _formatLutName(String rawLut) {
+    if (rawLut.isEmpty) return '';
+    if (rawLut.contains('/') || rawLut.contains('\\')) {
+      return rawLut.split(RegExp(r'[/\\]')).last;
+    }
+    return rawLut;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<UniquifierProvider>();
+    final rawLut = provider.lutName;
+    final formattedLut = _formatLutName(rawLut);
+
     final fileNameColor = isDark ? Colors.white : AppColors.textDark;
     final dirColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
     final metaColor = isDark
         ? AppColors.onSurfaceVariant
         : AppColors.lightOnSurfaceVariant;
 
-    final mutationsText =
-        (activeMutations != null && activeMutations!.isNotEmpty)
-        ? activeMutations!.join(' • ')
-        : 'Metadata stripped • PTS & Audio shifted • Micro-cropped • Color EQ';
+    final list = <String>[];
+    if (activeMutations != null && activeMutations!.isNotEmpty) {
+      list.addAll(activeMutations!);
+    } else {
+      list.addAll([
+        'Metadata stripped',
+        'PTS & Audio shifted',
+        'Micro-cropped',
+        'Color EQ',
+      ]);
+    }
+    if (formattedLut.isNotEmpty) {
+      list.add('Color Grading LUT: $formattedLut');
+    }
+
+    final mutationsText = list.join(' • ');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

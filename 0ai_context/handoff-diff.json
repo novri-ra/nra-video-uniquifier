@@ -12,7 +12,8 @@
     "AUDIT-20261115-038": "P1 correctness: LUT pipeline end-to-end integration completed in Report 148, Custom LUT import in Report 149.",
     "AUDIT-20261108-027": "Resolved in Report 151: MCP index intermittent exit code 1 documented as accepted risk with retry protocol.",
     "AUDIT-20261108-028": "Resolved in Report 151: Video basenames explicitly permitted in debugPrint logs.",
-    "REPORT-151": "Resolved final two P3 findings and achieved Zero Active Findings."
+    "REPORT-151": "Resolved final two P3 findings and achieved Zero Active Findings.",
+    "REPORT-152": "UI Polish: Active LUT indicator chip on ProcessingScreen and Color Grading LUT manifest entry on SuccessManifestCard with clean filename extraction."
   },
   "health_change": {
     "analyze": "0 -> 0",
