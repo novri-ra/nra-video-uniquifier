@@ -11,7 +11,7 @@
   ],
   "notes": {
     "AUDIT-20261115-038": "P1 correctness: LUT pipeline end-to-end integration (batch, startup restore, preview filter chain) completed in Report 148, and Custom LUT import feature via file_picker shipped in Report 149.",
-    "REPORT-149": "Implemented Custom LUT import feature (.cube files picked via file_picker copied to <documents>/custom_luts/) and absolute path resolution in FfmpegFileHelper.resolveLutPath."
+    "REPORT-150": "Hardened Custom LUT import feature with try-catch on FilePicker, 5MB file size validation, .cube header verification (LUT_3D_SIZE/TITLE), and Snackbar UI feedback."
   },
   "health_change": {
     "analyze": "0 -> 0",

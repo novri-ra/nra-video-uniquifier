@@ -6,7 +6,7 @@
 - Branch: `development`
 - Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
 - Executive Summary: Reports 123–145 locked the app to software H.264 (`libx264`,
-  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed duplicate findings.json deletion (AUDIT-20261108-036 closed). Report 147 expanded LUT presets. Reports 148 & 149 completed full P1 LUT wiring across batch execution, startup settings restore, and live preview filter chains, plus shipped the Custom LUT import feature via `file_picker`. AUDIT-20261115-038 is fully closed. Findings 024 is invalid; only 027/028 remain active.
+  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed duplicate findings.json deletion (AUDIT-20261108-036 closed). Report 147 expanded LUT presets. Reports 148 & 149 completed full P1 LUT wiring across batch execution, startup settings restore, and live preview filter chains, plus shipped the Custom LUT import feature via `file_picker`. Report 150 hardened the Custom LUT import feature with `try-catch` exception safety, 5MB file size validation, `.cube` header integrity verification (`LUT_3D_SIZE`/`TITLE`), and immediate SnackBar UI feedback. AUDIT-20261115-038 is fully closed. Findings 024 is invalid; only 027/028 remain active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -96,10 +96,9 @@ The boundary group (`^`, whitespace, quote, bracket, `=`, `,`, `:`, `;`, or back
   them per argument (`[FFmpeg Audit] Arg: ...`) in `_executeFFmpeg`.
 
 ## 15. Next Immediate Actions
-- **Fix `AUDIT-20261115-038` (P1):** forward `lutName` from `BatchQueueProvider._executeBatchItem`, and restore the persisted value by calling `SettingsService.getLutName()` in `UniquifierProvider._initResolution`.
-- Add `lutPath` to `FilterBuilders.buildPreviewFilterChain` so the LUT preview matches the export.
-- Validate LUT color grading rendering on a physical Android/iOS test device.
+- Validate Custom LUT hardening and import behavior on physical device / simulator.
 - Per-effect memory budget optimization for heavy preview stacks (Report 143 backlog).
+- UI Polish and styling refinement.
 
 ## 16. Run Manifest & Next Prompt Pointer
 - Generated at commit cf9ab60 (post-report 147).

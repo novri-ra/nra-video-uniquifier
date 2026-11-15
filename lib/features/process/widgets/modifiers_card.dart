@@ -700,21 +700,59 @@ class _LutSelectorRow extends StatelessWidget {
                       ),
                     ),
                     onPressed: () async {
-                      final result = await FilePicker.platform.pickFiles(
-                        type: FileType.custom,
-                        allowedExtensions: ['cube'],
-                      );
-                      if (result == null || result.files.single.path == null) return;
-                      final absPath = result.files.single.path!;
-                      final docsDir = await getApplicationDocumentsDirectory();
-                      final customDir = Directory('${docsDir.path}/custom_luts');
-                      if (!await customDir.exists()) {
-                        await customDir.create(recursive: true);
+                      try {
+                        final result = await FilePicker.platform.pickFiles(
+                          type: FileType.custom,
+                          allowedExtensions: ['cube'],
+                        );
+                        if (result == null || result.files.single.path == null) return;
+                        final absPath = result.files.single.path!;
+                        // Validasi ukuran file maksimal 5MB
+                        final fileSize = await File(absPath).length();
+                        if (fileSize > 5 * 1024 * 1024) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'File terlalu besar (maksimal 5MB). Ukuran: ${(fileSize / 1024 / 1024).toStringAsFixed(1)}MB',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        // Validasi header LUT (.cube) - baca 100 byte pertama
+                        final allBytes = await File(absPath).readAsBytes();
+                        final header = String.fromCharCodes(allBytes.sublist(0, 100));
+                        if (!header.contains('LUT_3D_SIZE') && !header.contains('TITLE')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'File LUT tidak valid. Header .cube tidak ditemukan (harus berisi LUT_3D_SIZE atau TITLE).',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        final docsDir = await getApplicationDocumentsDirectory();
+                        final customDir = Directory('${docsDir.path}/custom_luts');
+                        if (!await customDir.exists()) {
+                          await customDir.create(recursive: true);
+                        }
+                        final fileName = absPath.split(Platform.pathSeparator).last;
+                        final savedFile = await File(absPath).copy('${customDir.path}/$fileName');
+                        provider.lutName = savedFile.path;
+                        provider.requestFilteredPreviewDebounced(immediate: true);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('LUT kustom berhasil diimport!'),
+                          ),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Gagal mengimpor LUT: ${e.toString()}'),
+                          ),
+                        );
                       }
-                      final fileName = absPath.split(Platform.pathSeparator).last;
-                      final savedFile = await File(absPath).copy('${customDir.path}/$fileName');
-                      provider.lutName = savedFile.path;
-                      provider.requestFilteredPreviewDebounced(immediate: true);
                     },
                   ),
                 ),

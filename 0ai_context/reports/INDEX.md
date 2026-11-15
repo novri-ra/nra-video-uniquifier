@@ -28,6 +28,7 @@ moved into the current phase folder once that phase closes.
 - **147** — LUT Preset Expansion & ModifiersCard UI Selector (`reports/147-feat-lut-preset-expansion.md`).
 - **148** — LUT Full P1 Wiring for Batch, Startup, and Preview Filter Chain (`reports/148-fix-lut-wiring-p1.md`).
 - **149** — Custom LUT Import Feature & Absolute Path Resolution (`reports/149-feat-custom-lut-import.md`).
+- **150** — Hardening Custom LUT Import Feature (`reports/150-chore-harden-custom-lut-import.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.

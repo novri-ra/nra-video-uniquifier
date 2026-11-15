@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 149-feat-custom-lut-import.md
+parent_report: 150-chore-harden-custom-lut-import.md
 ---
 
 # Project Seed — nra_video_uniquifier
@@ -33,7 +33,7 @@ Read SEED first; cite E-NN or path:line; write report; update STATE after sessio
 - **Core Services**: `FfmpegService` (E-01), `StorageService` (E-02), `SettingsService`, `HistoryService`, `NotificationService`, `MicrostockNewsService`, `TranslationService`, `UserInterestService`, `ConnectivityService`.
 - **UI / Features**: Studio (ModifiersCard, Preview, ProcessingScreen), History, Profile, Settings.
 - **Rendering**: Software H.264 (`libx264`, `-preset fast -crf 18`, `-hwaccel none`) locked to ensure 100% stability on Android 15+ devices. Includes adaptive OOM safeguards for entry/mid-tier devices (`_isHighOomRisk` guard) and buffer queue depth guard (`-max_muxing_queue_size 20`).
-- **Color Grading (LUT)**: `lutName` persists via `SettingsService` (`app_lut_name`) → `UniquifierModifiersMixin` → restored on startup → forwarded in single, batch (`BatchQueueProvider`), and live preview (`FilterBuilders.buildPreviewFilterChain`) pipelines. `FfmpegFileHelper.resolveLutPath()` handles both bundled `.cube` assets (extracted via `rootBundle`) and user-imported custom `.cube` files (absolute paths from `file_picker` saved in `<documents>/custom_luts/`).
+- **Color Grading (LUT)**: `lutName` persists via `SettingsService` (`app_lut_name`) → `UniquifierModifiersMixin` → restored on startup → forwarded in single, batch (`BatchQueueProvider`), and live preview (`FilterBuilders.buildPreviewFilterChain`) pipelines. `FfmpegFileHelper.resolveLutPath()` handles both bundled `.cube` assets (extracted via `rootBundle`) and user-imported custom `.cube` files (absolute paths from `file_picker` saved in `<documents>/custom_luts/`), hardened with try-catch safety, 5MB size check, and `.cube` header validation (`LUT_3D_SIZE`/`TITLE`).
 <!-- 0AI_CONTEXT:AUTO:id=arch:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=deps:start -->
