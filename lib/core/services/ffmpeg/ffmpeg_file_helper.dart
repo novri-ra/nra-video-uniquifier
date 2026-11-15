@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import '../settings_service.dart';
 
 /// Helper responsible for FFmpeg file staging, target directory resolution, and export.
 class FfmpegFileHelper {
@@ -43,8 +44,25 @@ class FfmpegFileHelper {
     );
   }
 
-  /// Resolves the public target directory (/storage/emulated/0/Movies/Uniquifier).
+  /// Resolves the public target directory, prioritising any user-selected
+  /// custom export path stored in [SettingsService].
   static Future<Directory> resolveTargetDir() async {
+    // --- custom export directory (highest priority) ---
+    try {
+      final customPath = await SettingsService.getCustomOutputPath();
+      if (customPath != null && customPath.isNotEmpty) {
+        final customDir = Directory(customPath);
+        if (!await customDir.exists()) {
+          await customDir.create(recursive: true);
+        }
+        return customDir;
+      }
+    } catch (e) {
+      debugPrint(
+        '[FfmpegFileHelper] custom output path probe failed: ${e.runtimeType}',
+      );
+    }
+
     if (Platform.isAndroid) {
       final publicMovies = Directory('/storage/emulated/0/Movies/Uniquifier');
       try {

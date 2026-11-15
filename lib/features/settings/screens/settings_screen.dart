@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/providers/locale_provider.dart';
@@ -32,6 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int _cacheSizeBytes = 0;
   bool _notificationSound = true;
   bool _backgroundProcessing = true;
+  String? _customOutputPath;
 
   @override
   void initState() {
@@ -43,11 +45,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final bytes = await SettingsService.getTempCacheSize();
     final sound = await SettingsService.getNotificationSound();
     final bg = await SettingsService.getBackgroundProcessing();
+    final customPath = await SettingsService.getCustomOutputPath();
     if (mounted) {
       setState(() {
         _cacheSizeBytes = bytes;
         _notificationSound = sound;
         _backgroundProcessing = bg;
+        _customOutputPath = (customPath != null && customPath.isNotEmpty)
+            ? customPath
+            : null;
       });
     }
   }
@@ -83,6 +89,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context,
       message: 'Cache purged: $freedMb MB freed',
       icon: Icons.cleaning_services_outlined,
+    );
+  }
+
+  Future<void> _pickExportFolder() async {
+    final path = await FilePicker.platform.getDirectoryPath();
+    if (path == null || !mounted) return;
+    await SettingsService.setCustomOutputPath(path);
+    setState(() => _customOutputPath = path);
+    if (!mounted) return;
+    AppToast.show(
+      context,
+      message: 'Export folder updated',
+      icon: Icons.folder_open_rounded,
+    );
+  }
+
+  Future<void> _resetExportFolder() async {
+    await SettingsService.setCustomOutputPath('');
+    if (!mounted) return;
+    setState(() => _customOutputPath = null);
+    AppToast.show(
+      context,
+      message: 'Export folder reset to default',
+      icon: Icons.settings_backup_restore_rounded,
     );
   }
 
@@ -253,6 +283,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<Widget> _buildMaintenanceSection() {
     return [
       const _SettingsSectionHeader(
+        title: 'EXPORT FOLDER LOCATION',
+        subtitle: 'Select the folder where processed videos are saved',
+      ),
+      const SizedBox(height: 8),
+      _ExportFolderCard(
+        currentPath: _customOutputPath,
+        onPickFolder: _pickExportFolder,
+        onReset: _resetExportFolder,
+      ),
+      const SizedBox(height: 16),
+      const _SettingsSectionHeader(
         title: 'STORAGE & CACHE MAINTENANCE',
         subtitle: 'Staged input buffers and generated thumbnails',
       ),
@@ -415,6 +456,167 @@ class _AlertsSettingsCard extends StatelessWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExportFolderCard extends StatelessWidget {
+  final String? currentPath;
+  final VoidCallback onPickFolder;
+  final VoidCallback onReset;
+
+  const _ExportFolderCard({
+    required this.currentPath,
+    required this.onPickFolder,
+    required this.onReset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor =
+        isDark ? AppColors.onSurfaceVariant : AppColors.lightOnSurfaceVariant;
+    final accentColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+    final hasCustom = currentPath != null && currentPath!.isNotEmpty;
+    final displayPath = hasCustom
+        ? currentPath!
+        : '/storage/emulated/0/Movies/Uniquifier (default)';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceContainerLow : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isDark
+              ? AppColors.surfaceContainerHighest
+              : AppColors.lightOutlineVariant,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Current path display row
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.folder_outlined, size: 20, color: accentColor),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Export Location',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        displayPath,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: subColor,
+                          fontFamily: 'monospace',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(
+            height: 1,
+            color: isDark
+                ? AppColors.surfaceContainerHighest
+                : AppColors.lightOutlineVariant,
+          ),
+          // Pick folder button
+          InkWell(
+            onTap: onPickFolder,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.folder_open_rounded,
+                    size: 20,
+                    color: accentColor,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      'Choose Export Folder',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.chevron_right, size: 18, color: subColor),
+                ],
+              ),
+            ),
+          ),
+          if (hasCustom) ...[
+            Divider(
+              height: 1,
+              color: isDark
+                  ? AppColors.surfaceContainerHighest
+                  : AppColors.lightOutlineVariant,
+            ),
+            // Reset to default button
+            InkWell(
+              onTap: onReset,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.settings_backup_restore_rounded,
+                      size: 20,
+                      color: accentColor,
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        'Reset to Default Folder',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
