@@ -70,7 +70,7 @@ test/
 
 <!-- 0AI_CONTEXT:AUTO:id=continuation:start -->
 ## §7 Continuation Guide
-Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 161 implemented total OOM guard bypass for 1080p target resolution in `FfmpegService._isHighOomRisk`, enabling unrestricted visual effect usage on 1080p while preserving strict budget checks on 2K/4K. Next: proceed to Task 162 (Rebuild APK & Real Device Testing).
+Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 162 refactored `ErrorScreen` to eliminate hardcoded dark palette tokens and fully consume `Theme.of(context).colorScheme`, ensuring readable contrast in both Light Mode and Dark Mode. Next: proceed to Task 163 (Rebuild APK & Real Device Testing).
 <!-- 0AI_CONTEXT:AUTO:id=continuation:end -->
 
 <!-- 0AI_CONTEXT:HYBRID:id=glossary:start -->

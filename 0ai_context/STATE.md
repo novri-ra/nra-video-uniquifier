@@ -12,24 +12,24 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=ts:start -->
 ## Timestamp
-- UTC: 2026-11-15T15:00:00Z
+- UTC: 2026-11-15T15:20:00Z
 <!-- 0AI_CONTEXT:AUTO:id=ts:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
 - Version: 1.1.0+6
-- Status: modified (Fix: Bypass OOM guard for 1080p resolution in FfmpegService + Context Mapping sync)
+- Status: modified (Fix: Dynamic theme adaptation for ErrorScreen in Light Mode + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 161: Bypassed OOM guard for 1080p resolution in `FfmpegService._isHighOomRisk`, allowing unlimited visual effects on 1080p while preserving strict budget checks for 2K/4K. Zero analyze issues. 229/229 tests passed.
+- Completed Report 162: Refactored ErrorScreen to dynamically adapt to Light and Dark Mode colorScheme, eliminating hardcoded dark tokens, poor contrast, and clashing containers. Zero analyze issues. 229/229 tests passed.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Rebuild APK for physical device testing with 1080p OOM bypass (Task 162).
+- Siap untuk rebuild APK (Task 163).
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -52,6 +52,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - ConnectivityService: stable (event-driven network monitoring via `connectivity_plus`, 0% idle drain)
 - SettingsScreen: stable (custom export folder picker added: `_ExportFolderCard` with pick, display, and reset-to-default)
 - BatchProcessingScreen: stable (active LUT indicator chip added with AppColors.mintSage/forestDeep styling)
+- ErrorScreen: stable (fully theme-adaptive via Theme.of(context).colorScheme across Light and Dark modes)
 <!-- 0AI_CONTEXT:AUTO:id=health:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=hygiene:start -->
@@ -83,6 +84,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - [2026-11-15] Custom User Presets Persistence & UI (Report 159): Added JSON persistence for custom presets in `SettingsService` (`getCustomPresets`, `saveCustomPreset`); implemented snapshot & restore in `UniquifierPresetMixin` (`saveCurrentAsPreset`, `loadCustomPreset`); added dynamic custom preset chips and "+ Save Preset" dialog in `ModifiersCard`. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Release v1.1.0+6 Final Release & Production APK Build (Report 160): Bumped version to `1.1.0+6` in `pubspec.yaml`, updated `CHANGELOG.md` with complete v1.1.0 milestone release notes, executed `flutter clean` & `flutter pub get`, compiled production APK via `flutter build apk --release`, and verified 229/229 tests passing. Synchronized all 8 Context Mapping Files.
 - [2026-11-15] Bypass OOM Guard for 1080p Resolution (Report 161): Updated `FfmpegService._isHighOomRisk` to completely bypass complexity scoring budget limits when `targetResolution == TargetResolution.r1080p`, enabling full creative freedom with visual effects while retaining safety checks for 2K/4K. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
+- [2026-11-15] Dynamic Theme Adaptation for ErrorScreen (Report 162): Refactored `ErrorScreen` to eliminate hardcoded dark palette tokens (`AppColors.*`) in favor of dynamic `Theme.of(context).colorScheme` tokens (`surface`, `onSurface`, `errorContainer`, `onErrorContainer`, `primary`, `onPrimary`, `outlineVariant`), fixing unreadable contrast in Light Mode. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

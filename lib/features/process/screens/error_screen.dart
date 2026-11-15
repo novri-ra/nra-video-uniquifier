@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/path_redactor.dart';
 import '../../../shared/widgets/top_app_bar.dart';
 
@@ -10,7 +9,10 @@ class ErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: const TopAppBar(),
       body: SafeArea(
         child: LayoutBuilder(
@@ -52,6 +54,8 @@ class _ErrorHeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         const SizedBox(height: 12),
@@ -60,22 +64,22 @@ class _ErrorHeroHeader extends StatelessWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.surfaceContainerLow,
+              color: colorScheme.surfaceContainerLow,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.errorContainer),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
             child: Center(
               child: Container(
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.errorContainer.withValues(alpha: 0.2),
+                  color: colorScheme.errorContainer.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.error),
+                  border: Border.all(color: colorScheme.error),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.warning,
-                  color: AppColors.error,
+                  color: colorScheme.error,
                   size: 28,
                 ),
               ),
@@ -83,19 +87,19 @@ class _ErrorHeroHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
+        Text(
           'Processing Failed',
           style: TextStyle(
-            color: AppColors.onSurface,
+            color: colorScheme.onSurface,
             fontSize: 22,
             fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 4),
-        const Text(
+        Text(
           'Out of Memory or Unsupported Format',
           style: TextStyle(
-            color: AppColors.outline,
+            color: colorScheme.onSurface,
             fontSize: 12,
             fontFamily: 'monospace',
           ),
@@ -111,13 +115,15 @@ class _ErrorDiagnosticsLog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainer,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         children: [
@@ -135,6 +141,8 @@ class _TelemetryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -143,16 +151,16 @@ class _TelemetryHeader extends StatelessWidget {
             Container(
               width: 6,
               height: 6,
-              decoration: const BoxDecoration(
-                color: AppColors.error,
+              decoration: BoxDecoration(
+                color: colorScheme.error,
                 shape: BoxShape.circle,
               ),
             ),
             const SizedBox(width: 6),
-            const Text(
+            Text(
               'SANDBOX TELEMETRY',
               style: TextStyle(
-                color: AppColors.onSurfaceVariant,
+                color: colorScheme.onSurfaceVariant,
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.8,
@@ -164,14 +172,14 @@ class _TelemetryHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
-            color: AppColors.errorContainer.withValues(alpha: 0.3),
+            color: colorScheme.errorContainer.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(2),
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.4)),
+            border: Border.all(color: colorScheme.error.withValues(alpha: 0.4)),
           ),
-          child: const Text(
+          child: Text(
             'FATAL',
             style: TextStyle(
-              color: AppColors.error,
+              color: colorScheme.error,
               fontSize: 9,
               fontWeight: FontWeight.w700,
               fontFamily: 'monospace',
@@ -189,6 +197,7 @@ class _TelemetryLogBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final raw =
         errorDetails ??
         '[ERROR:0x8007000E] Isolated runner process was killed by OS.\n'
@@ -205,9 +214,9 @@ class _TelemetryLogBox extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
+        color: colorScheme.errorContainer,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Material(
         color: Colors.transparent,
@@ -218,17 +227,22 @@ class _TelemetryLogBox extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Text(
                 summary,
-                style: const TextStyle(
-                  color: AppColors.error,
+                style: TextStyle(
+                  color: colorScheme.onErrorContainer,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             ExpansionTile(
-              title: const Text(
+              iconColor: colorScheme.onErrorContainer,
+              collapsedIconColor: colorScheme.onErrorContainer,
+              title: Text(
                 'View technical details',
-                style: TextStyle(color: AppColors.outline, fontSize: 11),
+                style: TextStyle(
+                  color: colorScheme.onErrorContainer,
+                  fontSize: 11,
+                ),
               ),
               children: [
                 Padding(
@@ -238,8 +252,8 @@ class _TelemetryLogBox extends StatelessWidget {
                   ),
                   child: SelectableText(
                     redacted,
-                    style: const TextStyle(
-                      color: AppColors.error,
+                    style: TextStyle(
+                      color: colorScheme.onErrorContainer,
                       fontSize: 11,
                       fontFamily: 'monospace',
                       height: 1.4,
@@ -260,33 +274,35 @@ class _ErrorRecommendedFixes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.surfaceContainerHighest),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'RECOMMENDED ACTION',
             style: TextStyle(
-              color: AppColors.outline,
+              color: colorScheme.onSurfaceVariant,
               fontSize: 10,
               letterSpacing: 0.8,
               fontFamily: 'monospace',
             ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             '• Switch to Software (libx264) Safe Engine in Settings.\n'
             '• Toggle off Upscaling (or lower target resolution).\n'
             '• Clear temporary cache before retrying.',
             style: TextStyle(
-              color: AppColors.onSurface,
+              color: colorScheme.onSurface,
               fontSize: 12,
               height: 1.5,
             ),
@@ -302,12 +318,14 @@ class _ErrorActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primaryContainer,
-            foregroundColor: AppColors.onPrimary,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
@@ -324,8 +342,8 @@ class _ErrorActionButtons extends StatelessWidget {
         const SizedBox(height: 10),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.outline,
-            side: const BorderSide(color: AppColors.surfaceContainerHighest),
+            foregroundColor: colorScheme.onSurface,
+            side: BorderSide(color: colorScheme.outlineVariant),
             minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),
