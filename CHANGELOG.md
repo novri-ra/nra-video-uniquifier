@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.1.0+6] - 2026-11-15
+
+### Added
+- Full 3D LUT (Color Grading) support with custom .cube import.
+- Google Sheets Webhook Telemetry & Video Metadata Vault auto-dispatch.
+- Custom Export Directory via File Picker.
+- Custom User Presets (Save/Load modifier configurations).
+
+### Improved
+- Dynamic Memory Budget & Complexity Scoring to prevent OOM on low-end devices.
+- Accessibility (a11y) touch targets and semantics for LUT UI.
+- Batch Processing now displays active LUT indicator.
+
+### Fixed
+- Resolved all P3 findings and achieved zero active issues.
+- Fixed use_build_context_synchronously warnings.
+
 ## [Unreleased]
 
 ### Added

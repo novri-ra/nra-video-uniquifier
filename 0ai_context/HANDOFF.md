@@ -2,10 +2,11 @@
 
 ## 1. Project DNA & Executive Summary
 - Name: `nra_video_uniquifier`
-- Current Commit: Latest (Report 155: LUT Selector & Custom Import Accessibility Polish)
+- Version: `1.1.0+6`
+- Current Commit: Latest (Report 160: Release v1.1.0+6 Final Release & Production APK Build)
 - Branch: `development`
 - Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
-- Executive Summary: Reports 123–145 locked the app to software H.264 (`libx264`, CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144), fixed its runtime asset-path bug via `rootBundle` extraction (Report 145), expanded LUT presets (Report 147), completed full P1 LUT wiring across batch execution, startup settings restore, and live preview filter chains plus custom LUT import (Reports 148, 149), hardened custom LUT import (Report 150), resolved final P3 findings (Report 151), introduced UI Polish displaying the active LUT indicator chip on `ProcessingScreen` and the Color Grading LUT manifest entry on `SuccessManifestCard` (Report 152), implemented HTTP POST telemetry dispatch to Google Sheets Webhook with online-guard and offline fallback from `UserInterestService` (Report 153), automated the dispatch of `UserInterestService.dispatchVideoMetadataVault` upon successful video export in `UniquifierProgressMixin` (Report 154), and introduced accessibility polish on LUT Selector and Custom Import chips with Semantics labels and 48dp minimum tap targets in `ModifiersCard` (Report 155). Zero Active Findings maintained.
+- Executive Summary: Reports 123–160 delivered full 3D LUT Color Grading, Custom LUT Import, Google Sheets Webhook Telemetry & Vault Auto-Dispatch, Custom Export Directory via File Picker, Dynamic Memory Budget Complexity Scoring, and Custom User Presets. Zero Active Findings maintained across the entire repository. Application packaged for production release v1.1.0+6.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -105,4 +106,11 @@ static Future<void> _dispatchTelemetry(Map<String, dynamic> payload) async {
 - **Accepted Risk (`AUDIT-20261108-027`)**: MCP index tooling may intermittently fail with exit code 1 on the first run. The mapper must retry once before aborting.
 
 ## 15. Next Immediate Actions
-- Proceed to Task 160.
+- Proceed to Task 161 (Real Device Testing & Production Verification).
+
+## 16. Release Verification & Sign-Off
+- Version: `1.1.0+6`
+- Build Artifact: `build/app/outputs/flutter-apk/app-release.apk`
+- Test Suite: 229/229 passing
+- Static Analysis: 0 issues
+- Status: Production Ready

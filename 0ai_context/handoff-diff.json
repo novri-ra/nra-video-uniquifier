@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T14:23:00Z",
+  "generated_at": "2026-11-15T14:30:00Z",
   "previous_handoff": "0ai_context/raw/handoff-diff.json",
   "resolved": [],
   "added": [],
@@ -8,7 +8,8 @@
     "REPORT-156": "Custom Export Directory: activated FilePicker-based folder selection in SettingsScreen, prioritised in FfmpegFileHelper.resolveTargetDir() via SettingsService.getCustomOutputPath(). Zero new analyze issues. 229/229 tests passed.",
     "REPORT-157": "Cleaned 4 use_build_context_synchronously info warnings in ModifiersCard; added active LUT indicator chip in BatchProcessingScreen. Clean 0 analyze issues. 229/229 tests passed.",
     "REPORT-158": "Dynamic Memory Budget: added calculateComplexityScore and RAM safety limit thresholds to DeviceCapabilityService; replaced static OOM heuristic with dynamic score-based budget check in FfmpegService. Zero analyze issues. 229/229 tests passed.",
-    "REPORT-159": "Custom User Presets: added JSON persistence in SettingsService, saveCurrentAsPreset & loadCustomPreset in UniquifierPresetMixin, and dynamic preset chips with + Save Preset dialog in ModifiersCard. Zero analyze issues. 229/229 tests passed."
+    "REPORT-159": "Custom User Presets: added JSON persistence in SettingsService, saveCurrentAsPreset & loadCustomPreset in UniquifierPresetMixin, and dynamic preset chips with + Save Preset dialog in ModifiersCard. Zero analyze issues. 229/229 tests passed.",
+    "REPORT-160": "Release v1.1.0+6: bumped version to 1.1.0+6 in pubspec.yaml, updated CHANGELOG.md, compiled production release APK, and synchronized Context Mapping. Zero analyze issues. 229/229 tests passed."
   },
   "health_change": {
     "analyze": "0 -> 0",
