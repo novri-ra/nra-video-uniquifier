@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/ffmpeg_service.dart';
 import '../../utils/formatters.dart';
+import 'package:nra_video_uniquifier/core/services/user_interest_service.dart';
 
 /// Mixin managing real-time encoding stats, output destination, and diagnostics.
 mixin UniquifierProgressMixin on ChangeNotifier {
@@ -44,6 +45,7 @@ mixin UniquifierProgressMixin on ChangeNotifier {
     notifyListeners();
     _extractOutputThumbnailAsync(outputPath);
     _inspectOutputDiagnosticsAsync(outputPath);
+    _dispatchMetadataVaultTelemetry(outputPath);
   }
 
   Future<void> _inspectOutputDiagnosticsAsync(String outputPath) async {
@@ -75,5 +77,22 @@ mixin UniquifierProgressMixin on ChangeNotifier {
         '${e.runtimeType}',
       );
     }
+  }
+
+  Future<void> _dispatchMetadataVaultTelemetry(String outputPath) async {
+    final title = outputPath.split('/').last;
+    final techSpecs = _lastDiagnosticInfo != null
+        ? '${_lastDiagnosticInfo!.width}x${_lastDiagnosticInfo!.height} '
+            '${_lastDiagnosticInfo!.videoCodec} ${_lastDiagnosticInfo!.durationMs != null ? (_lastDiagnosticInfo!.durationMs! / 1000).toStringAsFixed(0) : '?'}s'
+        : '1080x1920 | H264 | 30fps';
+
+    await UserInterestService.dispatchVideoMetadataVault(
+      title: title,
+      description: 'Auto-exported via NRA Video Uniquifier',
+      keywords: ['#Uniquified', '#TikTokReady', '#AntiFingerprint'],
+      platforms: ['TikTok', 'Instagram Reels', 'YouTube Shorts'],
+      techSpecs: techSpecs,
+      category: 'Auto-Export',
+    );
   }
 }
