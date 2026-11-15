@@ -12,24 +12,24 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=ts:start -->
 ## Timestamp
-- UTC: 2026-11-15T14:30:00Z
+- UTC: 2026-11-15T15:00:00Z
 <!-- 0AI_CONTEXT:AUTO:id=ts:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
-- Version: 1.1.0+6 (Release Build)
-- Status: modified (Release v1.1.0+6 + APK Build + Context Mapping sync)
+- Version: 1.1.0+6
+- Status: modified (Fix: Bypass OOM guard for 1080p resolution in FfmpegService + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 160: Finalized release v1.1.0+6, updated CHANGELOG.md, compiled production release APK, and synchronized Context Mapping. Zero analyze issues. 229/229 tests passed.
+- Completed Report 161: Bypassed OOM guard for 1080p resolution in `FfmpegService._isHighOomRisk`, allowing unlimited visual effects on 1080p while preserving strict budget checks for 2K/4K. Zero analyze issues. 229/229 tests passed.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Ready for Real Device Testing (Task 161).
+- Rebuild APK for physical device testing with 1080p OOM bypass (Task 162).
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -40,7 +40,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=health:start -->
 ## Module Health
-- FfmpegService: stable (software H.264 lock, FIFO queue guard, dynamic complexity scoring OOM protection, LUT `lut3d` via extracted absolute path)
+- FfmpegService: stable (software H.264 lock, FIFO queue guard, dynamic complexity scoring OOM protection with 1080p full bypass, LUT `lut3d` via extracted absolute path)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache; `resolveTargetDir` now prioritises user-selected custom export path via `SettingsService.getCustomOutputPath()`)
 - DeviceCapabilityService: stable (mathematical complexity scoring via `calculateComplexityScore`, dynamic RAM budget thresholds `canHandleComplexity`)
 - UserInterestService: stable (HTTP telemetry dispatch to Google Sheets Webhook with online-guard, offline fallback, and error-handling via debugPrint)
@@ -82,6 +82,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - [2026-11-15] Dynamic Memory Budget & Complexity Scoring System (Report 158): Added `calculateComplexityScore` and dynamic RAM safety thresholds (`canHandleComplexity`) in `DeviceCapabilityService`; replaced static OOM heuristic in `FfmpegService` with score-based budget checks and informative error messages. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Custom User Presets Persistence & UI (Report 159): Added JSON persistence for custom presets in `SettingsService` (`getCustomPresets`, `saveCustomPreset`); implemented snapshot & restore in `UniquifierPresetMixin` (`saveCurrentAsPreset`, `loadCustomPreset`); added dynamic custom preset chips and "+ Save Preset" dialog in `ModifiersCard`. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Release v1.1.0+6 Final Release & Production APK Build (Report 160): Bumped version to `1.1.0+6` in `pubspec.yaml`, updated `CHANGELOG.md` with complete v1.1.0 milestone release notes, executed `flutter clean` & `flutter pub get`, compiled production APK via `flutter build apk --release`, and verified 229/229 tests passing. Synchronized all 8 Context Mapping Files.
+- [2026-11-15] Bypass OOM Guard for 1080p Resolution (Report 161): Updated `FfmpegService._isHighOomRisk` to completely bypass complexity scoring budget limits when `targetResolution == TargetResolution.r1080p`, enabling full creative freedom with visual effects while retaining safety checks for 2K/4K. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

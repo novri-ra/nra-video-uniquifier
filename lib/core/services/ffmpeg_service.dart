@@ -365,6 +365,7 @@ class FfmpegService {
       enableEnhanceAndDenoise: enableEnhanceAndDenoise,
     );
     final isHighRisk = _isHighOomRisk(
+      targetResolution: targetResolution,
       complexityScore: complexityScore,
       specs: specs,
     );
@@ -823,9 +824,13 @@ class FfmpegService {
   /// Evaluates whether the complexity score exceeds the device RAM safety threshold.
   /// Returns a descriptive error message mentioning the score vs limit if unsafe, or null if safe to proceed.
   static String? _isHighOomRisk({
+    required TargetResolution targetResolution,
     required int complexityScore,
     required DeviceSpecs specs,
   }) {
+    if (targetResolution == TargetResolution.r1080p) {
+      return null;
+    }
     if (!specs.canHandleComplexity(complexityScore)) {
       final maxScore = specs.maxComplexityScore;
       return 'Skor kompleksitas $complexityScore melebihi batas perangkat Anda ($maxScore). Kurangi efek atau resolusi.';
