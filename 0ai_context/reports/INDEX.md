@@ -35,6 +35,7 @@ moved into the current phase folder once that phase closes.
 - **154** — Auto-Dispatch Video Metadata Vault Telemetry (`reports/154-feat-auto-dispatch-video-metadata-vault.md`).
 - **155** — LUT Selector & Custom Import Accessibility Polish (`reports/155-feat-a11y-lut-selector-polish.md`).
 - **156** — Custom Export Directory Feature (`reports/156-feat-custom-export-directory.md`).
+- **157** — Clean BuildContext Async Warnings & Add Batch LUT Indicator (`reports/157-chore-fix-warnings-and-batch-ui.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.

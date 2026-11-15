@@ -26,9 +26,20 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
     });
   }
 
+  String _formatLutName(String rawLut) {
+    if (rawLut.isEmpty) return '';
+    if (rawLut.contains('/') || rawLut.contains('\\')) {
+      return rawLut.split(RegExp(r'[/\\]')).last;
+    }
+    return rawLut;
+  }
+
   @override
   Widget build(BuildContext context) {
     final queue = context.watch<BatchQueueProvider>();
+    final config = context.watch<UniquifierProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final formattedLut = _formatLutName(config.lutName);
 
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -41,6 +52,48 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (formattedLut.isNotEmpty) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? AppColors.mintSage.withValues(alpha: 0.15)
+                          : AppColors.forestDeep.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(
+                        color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.color_lens_outlined,
+                          size: 12,
+                          color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'LUT: $formattedLut',
+                          style: TextStyle(
+                            color: isDark ? AppColors.mintSage : AppColors.forestDeep,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'monospace',
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               _BatchProgressCard(queue: queue),
               const SizedBox(height: 16),
               const Text(

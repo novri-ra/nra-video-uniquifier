@@ -70,7 +70,7 @@ test/
 
 <!-- 0AI_CONTEXT:AUTO:id=continuation:start -->
 ## §7 Continuation Guide
-Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 156 shipped custom export directory selection via FilePicker in SettingsScreen and prioritized it in FfmpegFileHelper.resolveTargetDir(). Next: proceed to Task 157.
+Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 157 cleaned 4 BuildContext async warnings in ModifiersCard and added active LUT indicator chip in BatchProcessingScreen. Next: proceed to Task 158.
 <!-- 0AI_CONTEXT:AUTO:id=continuation:end -->
 
 <!-- 0AI_CONTEXT:HYBRID:id=glossary:start -->

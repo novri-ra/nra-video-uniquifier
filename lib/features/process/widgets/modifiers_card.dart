@@ -721,11 +721,13 @@ class _LutSelectorRow extends StatelessWidget {
                                 type: FileType.custom,
                                 allowedExtensions: ['cube'],
                               );
+                              if (!context.mounted) return;
                               if (result == null || result.files.single.path == null) return;
                               final absPath = result.files.single.path!;
                               // Validasi ukuran file maksimal 5MB
                               final fileSize = await File(absPath).length();
                               if (fileSize > 5 * 1024 * 1024) {
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -739,6 +741,7 @@ class _LutSelectorRow extends StatelessWidget {
                               final allBytes = await File(absPath).readAsBytes();
                               final header = String.fromCharCodes(allBytes.sublist(0, 100));
                               if (!header.contains('LUT_3D_SIZE') && !header.contains('TITLE')) {
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -757,12 +760,14 @@ class _LutSelectorRow extends StatelessWidget {
                               final savedFile = await File(absPath).copy('${customDir.path}/$fileName');
                               provider.lutName = savedFile.path;
                               provider.requestFilteredPreviewDebounced(immediate: true);
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('LUT kustom berhasil diimport!'),
                                 ),
                               );
                             } catch (e) {
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Gagal mengimpor LUT: ${e.toString()}'),
