@@ -348,7 +348,7 @@ class FilterBuilders {
     String cropAnchor = 'center',
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
-    String? lutName,
+    String? lutPath,
   }) {
     if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
     try {
@@ -383,9 +383,9 @@ class FilterBuilders {
             ).join(',');
       // LUT (color grading) is inserted immediately before the final pixel
       // format conversion so it operates on the finished frame.
-      final lutFilter = (lutName == null || lutName.isEmpty)
+      final lutFilter = (lutPath == null || lutPath.isEmpty)
           ? null
-          : "lut3d='assets/luts/$lutName.cube'";
+          : "lut3d='$lutPath'";
       final vfChain = lutFilter == null
           ? vfString
           : vfString.replaceFirst(

@@ -1,9 +1,32 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Helper responsible for FFmpeg file staging, target directory resolution, and export.
 class FfmpegFileHelper {
+  /// Resolves absolute file path for a bundled .cube LUT asset, extracting it to temp cache if needed.
+  static Future<String?> resolveLutPath(String? lutName) async {
+    if (lutName == null || lutName.isEmpty) return null;
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final lutsDir = Directory('${tempDir.path}/luts');
+      if (!await lutsDir.exists()) await lutsDir.create(recursive: true);
+      final target = File('${lutsDir.path}/$lutName.cube');
+      if (!await target.exists() || await target.length() == 0) {
+        final data = await rootBundle.load('assets/luts/$lutName.cube');
+        await target.writeAsBytes(
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+          flush: true,
+        );
+      }
+      return target.path;
+    } catch (e) {
+      debugPrint('[FfmpegFileHelper] resolveLutPath failed: ${e.runtimeType}');
+      return null;
+    }
+  }
+
   /// Safely copies an input video to app temp cache before feeding to native FFmpeg.
   static Future<File> stageInputFile(String inputPath) async {
     final inputFile = File(inputPath);

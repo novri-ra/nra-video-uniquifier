@@ -2,11 +2,11 @@
 
 ## 1. Project DNA & Executive Summary
 - Name: `nra_video_uniquifier`
-- Current Commit: `3d4d4ed` (fix(core): resolve filter bottleneck, audio leak, and export hang)
+- Current Commit: `5261086` (docs: archive reports 123-142, add Report 143, synchronize all Context Mapping Files)
 - Branch: `development`
-- Health Status: Analyze exit 0, Test 240/240 passed, Format exit 0 (0 changed).
-- Executive Summary: Reports 123–135 locked the app to software H.264 (`libx264`,
-  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, and converted all remaining silent + empty catch handlers to `debugPrint` (AUDIT-20261108-020 resolved). Finding 037/020 are resolved; 024 is invalid; 027/028/036 remain active.
+- Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
+- Executive Summary: Reports 123–145 locked the app to software H.264 (`libx264`,
+  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed the duplicate `0ai_context/raw/findings.json` is gone from both worktree and `HEAD`, deleted in commit `5f385bf` (AUDIT-20261108-036 closed). Findings 024 is invalid; only 027/028 remain active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -20,7 +20,7 @@
 - Video engine: software H.264 only (`libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1`, `-hwaccel none`); hardware acceleration and H.265 are disabled.
 
 ## 4. Current Environment & Health
-- Git status: clean, HEAD 3d4d4ed.
+- Git status: clean, HEAD 5261086.
 - Analysis: 0 issues.
 - Tests: 229/229 passing.
 - Format: exit 0 (fully compliant with dart format).
@@ -50,7 +50,7 @@
 - Privacy and caching considerations in the history service.
 
 ## 10. Findings Inventory (Active)
-*(resolved by reports 105-123: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037 — omitted from active inventory. AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 resolved by report 137.)*
+*(resolved by reports 105-123: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037 — omitted from active inventory. AUDIT-20261108-020 re-verified and closed by report 146 (0 empty catch blocks in `lib/`). AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 closed by report 146: duplicate `0ai_context/raw/findings.json` confirmed absent from worktree and `HEAD` (deleted in commit `5f385bf`), leaving `0ai_context/findings.json` as the sole canonical path.)*
 
 | ID | Severity | Category | Description |
 |---|---|---|---|
@@ -96,13 +96,13 @@ The boundary group (`^`, whitespace, quote, bracket, `=`, `,`, `:`, `;`, or back
   them per argument (`[FFmpeg Audit] Arg: ...`) in `_executeFFmpeg`.
 
 ## 15. Next Immediate Actions
-- Decide the canonical `findings.json` path and retire `0ai_context/raw/findings.json` (candidate 036).
-- Re-verify candidate 020 (silent catch count) or close it as superseded by reports 88–102.
-- Wire the LUT selector to `lutName` and ship the first `.cube` presets under `assets/luts/`.
+- Ship 2–4 additional `.cube` presets under `assets/luts/` and expose them in the LUT selector (Report 147).
+- Validate LUT rendering on a real device (FFmpeg `lut3d` extraction path from Report 145).
+- Per-effect memory budget optimization for heavy preview stacks (Report 143 backlog).
 
 ## 16. Run Manifest & Next Prompt Pointer
-- Generated at commit 3d4d4ed.
-- Next fix prompt run number: `next_n=130`.
+- Generated at commit 5261086 (post-report 146).
+- Next fix prompt run number: `next_n=147`.
 
 <!-- Context Mapper v6.0 pad line to meet spec line count -->
 

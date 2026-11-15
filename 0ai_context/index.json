@@ -1,5 +1,5 @@
 {
-  "next_report_number": 143,
+  "next_report_number": 147,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -26,9 +26,13 @@
     { "number": 136, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/136-commit-and-mapper-refresh.md" },
     { "number": 137, "type": "fix", "path": "reports/archive/phase5-v1.0.5-audit/137-fix-036-and-final-polish.md" },
     { "number": 138, "type": "mapper", "path": "reports/archive/phase5-v1.0.5-audit/138-migrate-legacy.md" },
-    { "number": 139, "type": "audit", "path": "reports/139-deep-system-audit.md" },
-    { "number": 140, "type": "fix", "path": "reports/140-fix-ffmpeg-buffer-queue-and-dead-code.md" },
-    { "number": 141, "type": "audit", "path": "reports/141-popup-preview-and-effect-stacking-audit.md" },
-    { "number": 142, "type": "fix", "path": "reports/142-fix-ffmpeg-exit-code-1-oom.md" }
+    { "number": 139, "type": "audit", "path": "reports/archive/phase6-ffmpeg-fixes/139-deep-system-audit.md" },
+    { "number": 140, "type": "fix", "path": "reports/archive/phase6-ffmpeg-fixes/140-fix-ffmpeg-buffer-queue-and-dead-code.md" },
+    { "number": 141, "type": "audit", "path": "reports/archive/phase7-preview-audit/141-popup-preview-and-effect-stacking-audit.md" },
+    { "number": 142, "type": "fix", "path": "reports/archive/phase7-preview-audit/142-fix-ffmpeg-exit-code-1-oom.md" },
+    { "number": 143, "type": "audit", "path": "reports/143-deep-audit-and-context-sync.md" },
+    { "number": 144, "type": "feat", "path": "reports/144-feat-lut-wiring.md" },
+    { "number": 145, "type": "fix", "path": "reports/145-fix-lut-absolute-path.md" },
+    { "number": 146, "type": "chore", "path": "reports/146-chore-hygiene-cleanup.md" }
   ]
 }

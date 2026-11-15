@@ -72,7 +72,7 @@ class FfmpegService {
     double introTrimOffset = 0.5,
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
-    String? lutName,
+    String? lutPath,
   }) => FfmpegCommandBuilder.buildCommand(
     inputPath: inputPath,
     outputPath: outputPath,
@@ -109,7 +109,7 @@ class FfmpegService {
     introTrimOffset: introTrimOffset,
     rotateAngle: rotateAngle,
     activeVisualEffects: activeVisualEffects,
-    lutName: lutName,
+    lutPath: lutPath,
   );
 
   /// Cancels any currently running FFmpeg operations.
@@ -329,6 +329,7 @@ class FfmpegService {
     double introTrimOffset = 0.5,
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
+    String? lutName,
   }) async {
     if (!await StorageService.hasEnoughSpace()) {
       throw Exception(
@@ -359,6 +360,7 @@ class FfmpegService {
     final stagedOut =
         '${tempDir.path}/staged_out_${DateTime.now().millisecondsSinceEpoch}.mp4';
 
+    final resolvedLutPath = await FfmpegFileHelper.resolveLutPath(lutName);
     final command = buildCommand(
       inputPath: meta.effectiveInput,
       outputPath: stagedOut,
@@ -394,6 +396,7 @@ class FfmpegService {
       introTrimOffset: introTrimOffset,
       rotateAngle: rotateAngle,
       activeVisualEffects: activeVisualEffects,
+      lutPath: resolvedLutPath,
     );
 
     _setupCallbacks(

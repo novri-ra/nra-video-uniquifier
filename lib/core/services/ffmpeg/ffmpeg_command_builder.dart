@@ -46,7 +46,7 @@ class FfmpegCommandBuilder {
     double introTrimOffset = 0.5,
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
-    String? lutName,
+    String? lutPath,
   }) {
     final vars =
         variations ??
@@ -187,7 +187,7 @@ class FfmpegCommandBuilder {
     String cropAnchor = 'center',
     double? rotateAngle,
     Set<UnifiedVisualEffect>? activeVisualEffects,
-    String? lutName,
+    String? lutPath,
   }) {
     final vars =
         variations ??
@@ -236,7 +236,7 @@ class FfmpegCommandBuilder {
         cropAnchor: cropAnchor,
         rotateAngle: rotateAngle,
         activeVisualEffects: activeVisualEffects,
-        lutName: lutName,
+        lutPath: lutPath,
       ),
     );
     buffer.write(

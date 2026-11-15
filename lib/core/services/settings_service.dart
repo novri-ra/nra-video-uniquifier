@@ -130,6 +130,7 @@ class SettingsService {
   static const String keyRotateAngle = 'app_rotate_angle';
   static const String keyTargetFps = 'app_target_fps';
   static const String keyAppLocale = 'app_language_code';
+  static const String keyLutName = 'app_lut_name';
   static const String keyAppTheme = 'app_theme_mode';
 
   static Future<bool> _getBool(String key, bool fallback) async =>
@@ -365,6 +366,16 @@ class SettingsService {
   static Future<void> setDefaultPreset(String preset) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyDefaultPreset, preset);
+  }
+
+  static Future<String?> getLutName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(keyLutName);
+  }
+
+  static Future<void> setLutName(String? val) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(keyLutName, val ?? '');
   }
 
   static Future<String?> getCustomOutputPath() async {

@@ -1,0 +1,23 @@
+{
+  "generated_at": "2026-11-15T00:00:00Z",
+  "previous_handoff": "0ai_context/raw/handoff-diff.json",
+  "resolved": [
+    "AUDIT-20261108-020",
+    "AUDIT-20261108-036"
+  ],
+  "added": [],
+  "persisted": [
+    "AUDIT-20261108-027",
+    "AUDIT-20261108-028"
+  ],
+  "notes": {
+    "AUDIT-20261108-020": "Re-verified in report 146: 0 empty catch blocks in lib/; the 4 remaining catch (_) sites are state-recovery or explicit fallbacks.",
+    "AUDIT-20261108-036": "Report 146 confirmed 0ai_context/raw/findings.json is absent from both worktree and HEAD (deleted in commit 5f385bf); 0ai_context/findings.json is the sole canonical path."
+  },
+  "health_change": {
+    "analyze": "0 -> 0",
+    "test": "229/229 -> 229/229",
+    "format": "unchanged",
+    "graph": "2908 nodes / 7070 edges (unchanged)"
+  }
+}

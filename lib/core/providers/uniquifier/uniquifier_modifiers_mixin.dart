@@ -22,7 +22,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
       _sharpeningLevel = 1.0,
       _saturationLevel = 1.0,
       _rotateAngle = 0.0;
-  String _cropAnchor = 'top', _activePreset = 'TikTok Fast';
+  String _cropAnchor = 'top', _activePreset = 'TikTok Fast', _lutName = '';
   bool _thermalThrottle = false, _hardwareAcceleration = true;
   int _targetFps = 30, _currentTabIndex = 0;
   TargetResolution _targetResolution = TargetResolution.r1080p;
@@ -56,6 +56,16 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
   double get rotateAngle => _rotateAngle;
   int get targetFps => _targetFps;
   String get activePreset => _activePreset;
+  String get lutName => _lutName;
+  set lutName(String val) {
+    _lutName = val;
+    try {
+      SettingsService.setLutName(val);
+    } catch (e) {
+      debugPrint('[UniquifierModifiersMixin] lutName persist failed: $e');
+    }
+    notifyListeners();
+  }
   TargetResolution get targetResolution => _targetResolution;
   UpscaleEngine get upscaleEngine => _upscaleEngine;
   VideoCodec get videoCodec => _videoCodec;
