@@ -8,6 +8,9 @@ class FfmpegFileHelper {
   /// Resolves absolute file path for a bundled .cube LUT asset, extracting it to temp cache if needed.
   static Future<String?> resolveLutPath(String? lutName) async {
     if (lutName == null || lutName.isEmpty) return null;
+    if (lutName.endsWith('.cube') || lutName.startsWith('/')) {
+      return lutName;
+    }
     try {
       final tempDir = await getTemporaryDirectory();
       final lutsDir = Directory('${tempDir.path}/luts');

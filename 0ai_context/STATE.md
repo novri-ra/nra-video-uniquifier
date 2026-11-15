@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 147-feat-lut-preset-expansion.md
+parent_report: 149-feat-custom-lut-import.md
 ---
 
 # Project State — nra_video_uniquifier
@@ -23,12 +23,12 @@ parent_report: 147-feat-lut-preset-expansion.md
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 147: expanded LUT presets (`moody_teal`, `vintage_film`, `high_contrast_bw`) and built the ModifiersCard UI selector.
+- Completed Report 148 & 149: full P1 LUT wiring (batch, startup, preview filter chain) and Custom LUT import feature via FilePicker with absolute path resolution (`file_picker`, `custom_luts/`).
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Fix `AUDIT-20261115-038` (P1): forward `lutName` in `BatchQueueProvider._executeBatchItem` and restore it via `SettingsService.getLutName()` on startup.
+- Ready for UI Polish, Memory Budget optimization per effect, or next feature task (Task 150).
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -42,12 +42,10 @@ parent_report: 147-feat-lut-preset-expansion.md
 - FfmpegService: stable (software H.264 lock, FIFO queue guard, OOM adaptive device-tier protection, LUT `lut3d` via extracted absolute path)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache)
 - ProcessingScreen: LUT forwarding restored in report 147 (`lutName: provider.lutName`)
-- BatchQueueProvider: **defect** — `_executeBatchItem` does not forward `lutName` (AUDIT-20261115-038)
-- UniquifierProvider: `lutName` is never restored from `SettingsService.getLutName()` on startup (AUDIT-20261115-038)
-- StorageService: stable
-- SettingsService: stable (`lutName` persisted under `app_lut_name`)
-- HistoryService: stable
-- NotificationService: stable
+- BatchQueueProvider: stable (`lutName` successfully forwarded in batch execution)
+- UniquifierProvider: stable (`lutName` restored on startup via `SettingsService.getLutName()`)
+- FfmpegFileHelper: stable (`resolveLutPath` handles both bundled assets and absolute custom `.cube` paths)
+- ModifiersCard: stable (includes Custom LUT import picker and dynamic chip representation)
 <!-- 0AI_CONTEXT:AUTO:id=health:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=hygiene:start -->

@@ -9,6 +9,9 @@ import '../../../../shared/widgets/interactive_preview_slider.dart';
 import '../../../../shared/widgets/setting_fps_selector_row.dart';
 import '../../../../shared/widgets/setting_toggle_row.dart';
 import 'studio_custom_sliders_card.dart';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 class PresetChipRow extends StatelessWidget {
   final UniquifierProvider provider;
@@ -464,6 +467,7 @@ class ModifiersCard extends StatelessWidget {
                     provider.lutName = val;
                     provider.requestFilteredPreviewDebounced(immediate: true);
                   },
+                  provider: provider,
                 ),
 
                 // --- PROGRESSIVE DISCLOSURE: SHARPENING ---
@@ -592,8 +596,13 @@ class ModifiersCard extends StatelessWidget {
 class _LutSelectorRow extends StatelessWidget {
   final String selectedLut;
   final ValueChanged<String> onChanged;
+  final UniquifierProvider provider;
 
-  const _LutSelectorRow({required this.selectedLut, required this.onChanged});
+  const _LutSelectorRow({
+    required this.selectedLut,
+    required this.onChanged,
+    required this.provider,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -604,13 +613,21 @@ class _LutSelectorRow extends StatelessWidget {
         : AppColors.lightOnSurfaceVariant;
     final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
 
-    final presets = [
+    final basePresets = [
       ('', 'None'),
       ('cinematic_warm', 'Cinematic Warm'),
       ('moody_teal', 'Moody Teal'),
       ('vintage_film', 'Vintage Film'),
       ('high_contrast_bw', 'High Contrast B&W'),
     ];
+
+    String? customLabel;
+    if (selectedLut.isNotEmpty && (selectedLut.endsWith('.cube') || selectedLut.startsWith('/'))) {
+      if (!basePresets.any((p) => p.$1 == selectedLut)) {
+        final fileName = selectedLut.split(Platform.pathSeparator).last.replaceAll('.cube', '');
+        customLabel = fileName.length > 15 ? '${fileName.substring(0, 12)}...' : fileName;
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -647,19 +664,61 @@ class _LutSelectorRow extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: presets.map((preset) {
-                final key = preset.$1;
-                final label = preset.$2;
-                final isSelected = selectedLut == key;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: _PresetChip(
-                    label: label,
-                    isSelected: isSelected,
-                    onTap: () => onChanged(key),
+              children: [
+                ...basePresets.map((preset) {
+                  final key = preset.$1;
+                  final label = preset.$2;
+                  final isSelected = selectedLut == key;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: _PresetChip(
+                      label: label,
+                      isSelected: isSelected,
+                      onTap: () => onChanged(key),
+                    ),
+                  );
+                }),
+                if (customLabel != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: _PresetChip(
+                      label: 'Custom: $customLabel',
+                      isSelected: true,
+                      onTap: () {},
+                    ),
                   ),
-                );
-              }).toList(),
+                ],
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ActionChip(
+                    label: const Text(
+                      '+ Import Custom LUT...',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    onPressed: () async {
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['cube'],
+                      );
+                      if (result == null || result.files.single.path == null) return;
+                      final absPath = result.files.single.path!;
+                      final docsDir = await getApplicationDocumentsDirectory();
+                      final customDir = Directory('${docsDir.path}/custom_luts');
+                      if (!await customDir.exists()) {
+                        await customDir.create(recursive: true);
+                      }
+                      final fileName = absPath.split(Platform.pathSeparator).last;
+                      final savedFile = await File(absPath).copy('${customDir.path}/$fileName');
+                      provider.lutName = savedFile.path;
+                      provider.requestFilteredPreviewDebounced(immediate: true);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],

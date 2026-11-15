@@ -6,7 +6,7 @@
 - Branch: `development`
 - Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
 - Executive Summary: Reports 123–145 locked the app to software H.264 (`libx264`,
-  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed the duplicate `0ai_context/raw/findings.json` is gone from both worktree and `HEAD`, deleted in commit `5f385bf` (AUDIT-20261108-036 closed). Report 147 expanded LUT presets (`moody_teal`, `vintage_film`, `high_contrast_bw`), built the ModifiersCard UI selector, and **discovered that the LUT pipeline was dead code** — `lutName` was never forwarded to `FfmpegService.processVideo`; the single-export path is now fixed, batch export and startup restore remain open as `AUDIT-20261115-038` (P1, active). Findings 024 is invalid; only 027/028 remain active.
+  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed duplicate findings.json deletion (AUDIT-20261108-036 closed). Report 147 expanded LUT presets. Reports 148 & 149 completed full P1 LUT wiring across batch execution, startup settings restore, and live preview filter chains, plus shipped the Custom LUT import feature via `file_picker`. AUDIT-20261115-038 is fully closed. Findings 024 is invalid; only 027/028 remain active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -44,19 +44,16 @@
 - None. Working tree clean.
 
 ## 9. Blockers, Risks & Technical Debt
-- 3 active findings (0 P0, 1 P1, 0 P2, 2 P3): 038 (P1), 027, 028.
-- **`AUDIT-20261115-038` (P1):** the LUT pipeline was dead code until report 147 — `lutName` was never forwarded to `FfmpegService.processVideo`. The single-export path is fixed; batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` never called) remain broken.
-- The LUT preview never shows the grade: `FilterBuilders.buildPreviewFilterChain` has no `lutPath` parameter, so only the final export applies `lut3d`.
+- 2 active findings (0 P0, 0 P1, 0 P2, 2 P3): 027, 028.
 - The News/Intel tab was removed from the shell; the microstock screens and
   services still exist in the tree but are unreachable from navigation.
 - Privacy and caching considerations in the history service.
 
 ## 10. Findings Inventory (Active)
-*(resolved by reports 105-123: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037 — omitted from active inventory. AUDIT-20261108-020 re-verified and closed by report 146 (0 empty catch blocks in `lib/`). AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 closed by report 146: duplicate `0ai_context/raw/findings.json` confirmed absent from worktree and `HEAD` (deleted in commit `5f385bf`), leaving `0ai_context/findings.json` as the sole canonical path.)*
+*(resolved by reports 105-123 & 148-149: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037, AUDIT-20261115-038 — omitted from active inventory. AUDIT-20261108-020 re-verified and closed by report 146 (0 empty catch blocks in `lib/`). AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 closed by report 146. AUDIT-20261115-038 closed by reports 148 & 149).*
 
 | ID | Severity | Category | Description |
 |---|---|---|---|
-| `AUDIT-20261115-038` | P1 | correctness | LUT pipeline was dead code: `lutName` never forwarded to `processVideo`. Single-export fixed in report 147; batch export + startup restore still open. |
 | `AUDIT-20261108-027` | P3 | infra | MCP index server intermittent exit code 1. |
 | `AUDIT-20261108-028` | P3 | policy | Policy ambiguity on user video basenames in log output. |
 

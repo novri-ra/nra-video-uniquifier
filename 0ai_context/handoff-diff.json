@@ -1,22 +1,22 @@
 {
   "generated_at": "2026-11-15T00:00:00Z",
   "previous_handoff": "0ai_context/raw/handoff-diff.json",
-  "resolved": [],
-  "added": [
+  "resolved": [
     "AUDIT-20261115-038"
   ],
+  "added": [],
   "persisted": [
     "AUDIT-20261108-027",
     "AUDIT-20261108-028"
   ],
   "notes": {
-    "AUDIT-20261115-038": "P1 correctness: LUT pipeline was dead code — provider.lutName was never forwarded to FfmpegService.processVideo by either export entry point, and SettingsService.getLutName() had zero call sites. Report 147 fixed the single-export path only; batch export and startup restore remain open.",
-    "REPORT-147": "Added moody_teal.cube, vintage_film.cube, high_contrast_bw.cube and the ModifiersCard _LutSelectorRow. Also corrected an over-lifted black point in the first moody_teal draft."
+    "AUDIT-20261115-038": "P1 correctness: LUT pipeline end-to-end integration (batch, startup restore, preview filter chain) completed in Report 148, and Custom LUT import feature via file_picker shipped in Report 149.",
+    "REPORT-149": "Implemented Custom LUT import feature (.cube files picked via file_picker copied to <documents>/custom_luts/) and absolute path resolution in FfmpegFileHelper.resolveLutPath."
   },
   "health_change": {
     "analyze": "0 -> 0",
     "test": "229/229 -> 229/229",
-    "format": "modifiers_card.dart reformatted in report 147",
+    "format": "No formatting issues",
     "graph": "2908 nodes / 7070 edges (unchanged)"
   }
 }
