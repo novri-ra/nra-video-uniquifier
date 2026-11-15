@@ -1,5 +1,5 @@
 {
-  "next_report_number": 147,
+  "next_report_number": 148,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -33,6 +33,7 @@
     { "number": 143, "type": "audit", "path": "reports/143-deep-audit-and-context-sync.md" },
     { "number": 144, "type": "feat", "path": "reports/144-feat-lut-wiring.md" },
     { "number": 145, "type": "fix", "path": "reports/145-fix-lut-absolute-path.md" },
-    { "number": 146, "type": "chore", "path": "reports/146-chore-hygiene-cleanup.md" }
+    { "number": 146, "type": "chore", "path": "reports/146-chore-hygiene-cleanup.md" },
+    { "number": 147, "type": "feat", "path": "reports/147-feat-lut-preset-expansion.md" }
   ]
 }

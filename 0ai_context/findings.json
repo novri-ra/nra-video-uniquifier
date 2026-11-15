@@ -140,5 +140,15 @@
     "description": "FfmpegService._cleanupOldPreviews logged the absolute preview path and raw $e on delete failure.",
     "status": "resolved",
     "resolved_by": "report 123"
+  },
+  {
+    "id": "AUDIT-20261115-038",
+    "severity": "P1",
+    "category": "correctness",
+    "description": "LUT pipeline was dead code end-to-end: provider.lutName was never forwarded to FfmpegService.processVideo by either ProcessingScreen._processWithNative or BatchQueueProvider._executeBatchItem, and SettingsService.getLutName() had zero call sites, so the persisted LUT selection was never restored on startup. Selecting any LUT preset had no effect on the exported video.",
+    "status": "active",
+    "resolved_by": null,
+    "progress": "report 147 fixed the single-export path only (ProcessingScreen now forwards lutName: provider.lutName at processing_screen.dart:171).",
+    "remaining_work": "BatchQueueProvider._executeBatchItem and provider start-up restore (SettingsService.getLutName) still do not forward/load the LUT; batch exports ignore the selection and the selection is not restored across app restarts."
   }
 ]

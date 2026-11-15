@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 146-chore-hygiene-cleanup.md
+parent_report: 147-feat-lut-preset-expansion.md
 ---
 
 # Project State — nra_video_uniquifier
@@ -23,13 +23,12 @@ parent_report: 146-chore-hygiene-cleanup.md
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Report 144/145: LUT pipeline wired end-to-end, then fixed to pass absolute filesystem paths to `lut3d`.
-- Completed Report 146: closed findings 020 and 036; `raw/findings.json` confirmed gone from worktree and `HEAD` (deleted in `5f385bf`).
+- Completed Report 147: expanded LUT presets (`moody_teal`, `vintage_film`, `high_contrast_bw`) and built the ModifiersCard UI selector.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Expand LUT presets (2–4 additional `.cube` files) and surface them in the ModifiersCard selector; validate on a real device.
+- Fix `AUDIT-20261115-038` (P1): forward `lutName` in `BatchQueueProvider._executeBatchItem` and restore it via `SettingsService.getLutName()` on startup.
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -42,6 +41,9 @@ parent_report: 146-chore-hygiene-cleanup.md
 ## Module Health
 - FfmpegService: stable (software H.264 lock, FIFO queue guard, OOM adaptive device-tier protection, LUT `lut3d` via extracted absolute path)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache)
+- ProcessingScreen: LUT forwarding restored in report 147 (`lutName: provider.lutName`)
+- BatchQueueProvider: **defect** — `_executeBatchItem` does not forward `lutName` (AUDIT-20261115-038)
+- UniquifierProvider: `lutName` is never restored from `SettingsService.getLutName()` on startup (AUDIT-20261115-038)
 - StorageService: stable
 - SettingsService: stable (`lutName` persisted under `app_lut_name`)
 - HistoryService: stable
@@ -65,6 +67,8 @@ parent_report: 146-chore-hygiene-cleanup.md
 - [2026-11-15] LUT wiring (Report 144): shipped `assets/luts/cinematic_warm.cube` (16×16×16 3D LUT), persisted `lutName` in `SettingsService`, exposed it via `UniquifierModifiersMixin`, and added the selector in `ModifiersCard`.
 - [2026-11-15] LUT absolute-path fix (Report 145): added `FfmpegFileHelper.resolveLutPath()` to extract bundled `.cube` assets via `rootBundle` into temp cache; renamed `lutName` → `lutPath` through `FfmpegCommandBuilder` and `FilterBuilders`.
 - [2026-11-15] Hygiene cleanup (Report 146): re-verified 0 empty catch blocks in `lib/` (finding 020 closed), confirmed `0ai_context/raw/findings.json` is absent from worktree and `HEAD` (deleted in commit `5f385bf`, finding 036 closed), leaving only 027/028 active.
+- [2026-11-15] LUT preset expansion (Report 147): generated 3 new 3D LUT presets (`moody_teal.cube`, `vintage_film.cube`, `high_contrast_bw.cube`) under `assets/luts/` and added the horizontal ChoiceChip selector in `ModifiersCard` under FRAMING & TEXTURE.
+- [2026-11-15] P1 defect found & partially fixed (Report 147): the LUT pipeline was dead code end-to-end — `provider.lutName` was never forwarded to `FfmpegService.processVideo`, so no `lut3d` filter was ever emitted. Fixed `ProcessingScreen._processWithNative` (single export). Batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` has zero call sites) remain broken; registered as `AUDIT-20261115-038` (P1, active).
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

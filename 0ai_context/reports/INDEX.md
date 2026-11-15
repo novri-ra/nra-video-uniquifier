@@ -25,6 +25,7 @@ moved into the current phase folder once that phase closes.
 - **144** — LUT (Color Grading) Feature End-to-End Wiring (`reports/144-feat-lut-wiring.md`).
 - **145** — Fix LUT Absolute Path Resolution & Asset Extraction (`reports/145-fix-lut-absolute-path.md`).
 - **146** — Hygiene Cleanup: Findings 020 & 036 Closure (`reports/146-chore-hygiene-cleanup.md`).
+- **147** — LUT Preset Expansion & ModifiersCard UI Selector (`reports/147-feat-lut-preset-expansion.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.

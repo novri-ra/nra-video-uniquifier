@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 146-chore-hygiene-cleanup.md
+parent_report: 147-feat-lut-preset-expansion.md
 ---
 
 # Project Seed — nra_video_uniquifier
@@ -33,14 +33,15 @@ Read SEED first; cite E-NN or path:line; write report; update STATE after sessio
 - **Core Services**: `FfmpegService` (E-01), `StorageService` (E-02), `SettingsService`, `HistoryService`, `NotificationService`, `MicrostockNewsService`, `TranslationService`, `UserInterestService`, `ConnectivityService`.
 - **UI / Features**: Studio (ModifiersCard, Preview, ProcessingScreen), History, Profile, Settings.
 - **Rendering**: Software H.264 (`libx264`, `-preset fast -crf 18`, `-hwaccel none`) locked to ensure 100% stability on Android 15+ devices. Includes adaptive OOM safeguards for entry/mid-tier devices (`_isHighOomRisk` guard) and buffer queue depth guard (`-max_muxing_queue_size 20`).
-- **Color Grading (LUT)**: `lutName` persists via `SettingsService` (`app_lut_name`) → `UniquifierModifiersMixin` → `FfmpegService.processVideo` → `FfmpegFileHelper.resolveLutPath()` extracts `assets/luts/<name>.cube` via `rootBundle` into `<temp>/luts/` → `FilterBuilders.buildVideoFilter` injects `lut3d='<absolute path>'` immediately before `format=yuv420p`.
+- **Color Grading (LUT)**: `lutName` persists via `SettingsService` (`app_lut_name`) → `UniquifierModifiersMixin` → `ProcessingScreen._processWithNative` forwards `lutName: provider.lutName` → `FfmpegService.processVideo` → `FfmpegFileHelper.resolveLutPath()` extracts `assets/luts/<name>.cube` via `rootBundle` into `<temp>/luts/` → `FilterBuilders.buildVideoFilter` injects `lut3d='<absolute path>'` immediately before `format=yuv420p`.
+  - **Known gap (AUDIT-20261115-038):** `BatchQueueProvider._executeBatchItem` does not forward `lutName`, and `SettingsService.getLutName()` has no call sites (no startup restore). The LUT preview also never shows the grade because `buildPreviewFilterChain` has no `lutPath` parameter.
 <!-- 0AI_CONTEXT:AUTO:id=arch:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=deps:start -->
 ## §4 Module Dependency Map
 - Top dependencies: `path_provider`, `provider`, `shared_preferences`, `ffmpeg_kit_flutter_new_https`, `http`, `sqflite`.
 - Folder-level top relationships: `lib/services/` -> `lib/models/`, `lib/ui/` -> `lib/services/`.
-- Asset flow: `assets/luts/*.cube` (declared in `pubspec.yaml`) → `FfmpegFileHelper.resolveLutPath` (rootBundle + temp cache) → `FilterBuilders.lutPath`.
+- Asset flow: `assets/luts/*.cube` (`cinematic_warm`, `moody_teal`, `vintage_film`, `high_contrast_bw` declared in `pubspec.yaml`) → `FfmpegFileHelper.resolveLutPath` (rootBundle + temp cache) → `FilterBuilders.lutPath`.
 - Findings source of truth: `0ai_context/findings.json` only (`0ai_context/raw/findings.json` removed in commit `5f385bf`; confirmed in report 146).
 <!-- 0AI_CONTEXT:AUTO:id=deps:end -->
 

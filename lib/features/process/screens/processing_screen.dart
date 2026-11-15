@@ -168,6 +168,7 @@ class _ProcessingScreenState extends State<ProcessingScreen>
       introTrimOffset: provider.introTrimOffset,
       rotateAngle: provider.rotateAngle,
       activeVisualEffects: provider.activeVisualEffects,
+      lutName: provider.lutName,
       onProgress: (p, speed, timeMs) =>
           _handleProgress(p, speed, timeMs, provider),
       onLog: _handleEngineLog,

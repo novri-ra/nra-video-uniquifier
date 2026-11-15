@@ -2,11 +2,11 @@
 
 ## 1. Project DNA & Executive Summary
 - Name: `nra_video_uniquifier`
-- Current Commit: `5261086` (docs: archive reports 123-142, add Report 143, synchronize all Context Mapping Files)
+- Current Commit: `cf9ab60` (chore(context): sync mapping files, add LUT assets, and resolve findings 020 & 036)
 - Branch: `development`
 - Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
 - Executive Summary: Reports 123–145 locked the app to software H.264 (`libx264`,
-  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed the duplicate `0ai_context/raw/findings.json` is gone from both worktree and `HEAD`, deleted in commit `5f385bf` (AUDIT-20261108-036 closed). Findings 024 is invalid; only 027/028 remain active.
+  CRF 18, `-hwaccel none`), added timeout recovery, blurred-canvas effects, diagnostic path redaction, audio d=60 masking, path redactor hardening, converted all remaining silent + empty catch handlers to `debugPrint`, shipped the LUT color-grading pipeline end-to-end (Report 144) and fixed its runtime asset-path bug via `rootBundle` extraction (Report 145). Report 146 re-verified 0 empty catch blocks in `lib/` (AUDIT-20261108-020 closed) and confirmed the duplicate `0ai_context/raw/findings.json` is gone from both worktree and `HEAD`, deleted in commit `5f385bf` (AUDIT-20261108-036 closed). Report 147 expanded LUT presets (`moody_teal`, `vintage_film`, `high_contrast_bw`), built the ModifiersCard UI selector, and **discovered that the LUT pipeline was dead code** — `lutName` was never forwarded to `FfmpegService.processVideo`; the single-export path is now fixed, batch export and startup restore remain open as `AUDIT-20261115-038` (P1, active). Findings 024 is invalid; only 027/028 remain active.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -20,10 +20,10 @@
 - Video engine: software H.264 only (`libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1`, `-hwaccel none`); hardware acceleration and H.265 are disabled.
 
 ## 4. Current Environment & Health
-- Git status: clean, HEAD 5261086.
+- Git status: clean working tree at start; HEAD `cf9ab60`. Report 147 changes are uncommitted.
 - Analysis: 0 issues.
 - Tests: 229/229 passing.
-- Format: exit 0 (fully compliant with dart format).
+- Format: `modifiers_card.dart` required reformatting in report 147 (now compliant).
 
 ## 5. Directory Structure & Key Paths
 - `lib/core/services/`: core business logic, FFmpeg rendering, storage, network.
@@ -44,7 +44,9 @@
 - None. Working tree clean.
 
 ## 9. Blockers, Risks & Technical Debt
-- 2 active findings (0 P0, 0 P1, 0 P2, 2 P3): 027, 028.
+- 3 active findings (0 P0, 1 P1, 0 P2, 2 P3): 038 (P1), 027, 028.
+- **`AUDIT-20261115-038` (P1):** the LUT pipeline was dead code until report 147 — `lutName` was never forwarded to `FfmpegService.processVideo`. The single-export path is fixed; batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` never called) remain broken.
+- The LUT preview never shows the grade: `FilterBuilders.buildPreviewFilterChain` has no `lutPath` parameter, so only the final export applies `lut3d`.
 - The News/Intel tab was removed from the shell; the microstock screens and
   services still exist in the tree but are unreachable from navigation.
 - Privacy and caching considerations in the history service.
@@ -54,6 +56,7 @@
 
 | ID | Severity | Category | Description |
 |---|---|---|---|
+| `AUDIT-20261115-038` | P1 | correctness | LUT pipeline was dead code: `lutName` never forwarded to `processVideo`. Single-export fixed in report 147; batch export + startup restore still open. |
 | `AUDIT-20261108-027` | P3 | infra | MCP index server intermittent exit code 1. |
 | `AUDIT-20261108-028` | P3 | policy | Policy ambiguity on user video basenames in log output. |
 
@@ -96,13 +99,14 @@ The boundary group (`^`, whitespace, quote, bracket, `=`, `,`, `:`, `;`, or back
   them per argument (`[FFmpeg Audit] Arg: ...`) in `_executeFFmpeg`.
 
 ## 15. Next Immediate Actions
-- Ship 2–4 additional `.cube` presets under `assets/luts/` and expose them in the LUT selector (Report 147).
-- Validate LUT rendering on a real device (FFmpeg `lut3d` extraction path from Report 145).
+- **Fix `AUDIT-20261115-038` (P1):** forward `lutName` from `BatchQueueProvider._executeBatchItem`, and restore the persisted value by calling `SettingsService.getLutName()` in `UniquifierProvider._initResolution`.
+- Add `lutPath` to `FilterBuilders.buildPreviewFilterChain` so the LUT preview matches the export.
+- Validate LUT color grading rendering on a physical Android/iOS test device.
 - Per-effect memory budget optimization for heavy preview stacks (Report 143 backlog).
 
 ## 16. Run Manifest & Next Prompt Pointer
-- Generated at commit 5261086 (post-report 146).
-- Next fix prompt run number: `next_n=147`.
+- Generated at commit cf9ab60 (post-report 147).
+- Next fix prompt run number: `next_n=148`.
 
 <!-- Context Mapper v6.0 pad line to meet spec line count -->
 

@@ -252,6 +252,7 @@ class ModifiersCard extends StatelessWidget {
             (provider.enableBlurredCanvas ? 1 : 0) +
             (provider.enableChromaShift ? 1 : 0) +
             (provider.enableMicroOverlay ? 1 : 0) +
+            (provider.lutName.isNotEmpty ? 1 : 0) +
             (provider.sharpeningLevel != 1.0 ? 1 : 0) +
             (provider.saturationLevel != 1.0 ? 1 : 0);
 
@@ -391,7 +392,7 @@ class ModifiersCard extends StatelessWidget {
               title: 'FRAMING & TEXTURE',
               icon: Icons.auto_awesome_mosaic,
               activeCount: textureActive,
-              totalCount: 5,
+              totalCount: 6,
               initiallyExpanded: true,
               children: [
                 SettingToggleRow(
@@ -452,6 +453,17 @@ class ModifiersCard extends StatelessWidget {
                   subtitle: 'Temporal noise texture overlay',
                   value: provider.enableMicroOverlay,
                   onChanged: provider.toggleMicroOverlay,
+                ),
+                const Divider(
+                  color: AppColors.surfaceContainerHighest,
+                  height: 1,
+                ),
+                _LutSelectorRow(
+                  selectedLut: provider.lutName,
+                  onChanged: (val) {
+                    provider.lutName = val;
+                    provider.requestFilteredPreviewDebounced(immediate: true);
+                  },
                 ),
 
                 // --- PROGRESSIVE DISCLOSURE: SHARPENING ---
@@ -573,6 +585,85 @@ class ModifiersCard extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _LutSelectorRow extends StatelessWidget {
+  final String selectedLut;
+  final ValueChanged<String> onChanged;
+
+  const _LutSelectorRow({required this.selectedLut, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.onSurface : AppColors.lightOnSurface;
+    final subColor = isDark
+        ? AppColors.outline
+        : AppColors.lightOnSurfaceVariant;
+    final iconColor = isDark ? AppColors.mintSage : AppColors.forestDeep;
+
+    final presets = [
+      ('', 'None'),
+      ('cinematic_warm', 'Cinematic Warm'),
+      ('moody_teal', 'Moody Teal'),
+      ('vintage_film', 'Vintage Film'),
+      ('high_contrast_bw', 'High Contrast B&W'),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.color_lens_outlined, color: iconColor, size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Color Grading LUT',
+                      style: TextStyle(
+                        color: titleColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '3D LUT color filter preset (.cube)',
+                      style: TextStyle(color: subColor, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: presets.map((preset) {
+                final key = preset.$1;
+                final label = preset.$2;
+                final isSelected = selectedLut == key;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: _PresetChip(
+                    label: label,
+                    isSelected: isSelected,
+                    onTap: () => onChanged(key),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
