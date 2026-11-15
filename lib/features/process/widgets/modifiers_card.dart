@@ -13,9 +13,96 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-class PresetChipRow extends StatelessWidget {
+class PresetChipRow extends StatefulWidget {
   final UniquifierProvider provider;
   const PresetChipRow({super.key, required this.provider});
+
+  @override
+  State<PresetChipRow> createState() => _PresetChipRowState();
+}
+
+class _PresetChipRowState extends State<PresetChipRow> {
+  List<String> _customPresetNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCustomPresets();
+  }
+
+  @override
+  void didUpdateWidget(covariant PresetChipRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.provider.activePreset != widget.provider.activePreset) {
+      _loadCustomPresets();
+    }
+  }
+
+  Future<void> _loadCustomPresets() async {
+    final list = await SettingsService.getCustomPresets();
+    if (mounted) {
+      setState(() {
+        _customPresetNames = list
+            .map((e) => e['name'] as String? ?? '')
+            .where((n) => n.isNotEmpty)
+            .toList();
+      });
+    }
+  }
+
+  Future<void> _showSavePresetDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor:
+              isDark ? AppColors.surfaceContainerLow : Colors.white,
+          title: const Text(
+            'Save Custom Preset',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            style: TextStyle(
+              color: isDark ? AppColors.onSurface : AppColors.lightOnSurface,
+            ),
+            decoration: const InputDecoration(
+              hintText: 'Enter preset name...',
+              labelText: 'Preset Name',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final trimmed = controller.text.trim();
+                if (trimmed.isNotEmpty) {
+                  Navigator.of(ctx).pop(trimmed);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!context.mounted) return;
+    if (name != null && name.isNotEmpty) {
+      await widget.provider.saveCurrentAsPreset(name);
+      await _loadCustomPresets();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Preset "$name" berhasil disimpan!')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +112,8 @@ class PresetChipRow extends StatelessWidget {
         children: [
           _PresetChip(
             label: 'TikTok Extreme',
-            isSelected: provider.activePreset == 'TikTok Extreme',
-            onTap: () => provider.applyPreset(
+            isSelected: widget.provider.activePreset == 'TikTok Extreme',
+            onTap: () => widget.provider.applyPreset(
               removeMetadata: true,
               modifyAudio: true,
               modifyVisuals: true,
@@ -58,8 +145,8 @@ class PresetChipRow extends StatelessWidget {
           // --- ADD MICROSTOCK PRESET HERE ---
           _PresetChip(
             label: 'Microstock 4K',
-            isSelected: provider.activePreset == 'Microstock 4K',
-            onTap: () => provider.applyPreset(
+            isSelected: widget.provider.activePreset == 'Microstock 4K',
+            onTap: () => widget.provider.applyPreset(
               removeMetadata: true, // Must be clean of EXIF/GPS
               modifyAudio: false, // Original audio unchanged
               modifyVisuals: false, // No crop or speed warp
@@ -82,8 +169,8 @@ class PresetChipRow extends StatelessWidget {
           const SizedBox(width: 6),
           _PresetChip(
             label: 'TikTok / Reels',
-            isSelected: provider.activePreset == 'TikTok / Reels',
-            onTap: () => provider.applyPreset(
+            isSelected: widget.provider.activePreset == 'TikTok / Reels',
+            onTap: () => widget.provider.applyPreset(
               removeMetadata: true,
               modifyAudio: true,
               modifyVisuals: true,
@@ -103,8 +190,8 @@ class PresetChipRow extends StatelessWidget {
           const SizedBox(width: 6),
           _PresetChip(
             label: 'Cinematic 2K/4K',
-            isSelected: provider.activePreset == 'Cinematic 2K/4K',
-            onTap: () => provider.applyPreset(
+            isSelected: widget.provider.activePreset == 'Cinematic 2K/4K',
+            onTap: () => widget.provider.applyPreset(
               removeMetadata: true,
               modifyAudio: true,
               modifyVisuals: true,
@@ -120,8 +207,8 @@ class PresetChipRow extends StatelessWidget {
           const SizedBox(width: 6),
           _PresetChip(
             label: 'Quick Export',
-            isSelected: provider.activePreset == 'Quick Export',
-            onTap: () => provider.applyPreset(
+            isSelected: widget.provider.activePreset == 'Quick Export',
+            onTap: () => widget.provider.applyPreset(
               removeMetadata: true,
               modifyAudio: false,
               modifyVisuals: false,
@@ -132,6 +219,36 @@ class PresetChipRow extends StatelessWidget {
               enableHorizontalFlip: false,
               enableBlurredCanvas: false,
               presetName: 'Quick Export',
+            ),
+          ),
+          for (final customName in _customPresetNames) ...[
+            const SizedBox(width: 6),
+            _PresetChip(
+              label: customName,
+              isSelected: widget.provider.activePreset == customName,
+              onTap: () => widget.provider.loadCustomPreset(customName),
+            ),
+          ],
+          const SizedBox(width: 6),
+          Semantics(
+            button: true,
+            label: 'Simpan preset kustom',
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 48, minWidth: 48),
+              child: Center(
+                child: ActionChip(
+                  avatar: const Icon(Icons.bookmark_add_outlined, size: 16),
+                  label: const Text(
+                    '+ Save Preset',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  onPressed: () => _showSavePresetDialog(context),
+                ),
+              ),
             ),
           ),
         ],

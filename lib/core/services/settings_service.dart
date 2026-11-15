@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
@@ -100,6 +101,7 @@ enum TargetResolution {
 class SettingsService {
   static const String keyHardwareAcceleration = 'app_hardware_acceleration';
   static const String keyDefaultPreset = 'app_default_preset';
+  static const String keyCustomPresets = 'app_custom_presets';
   static const String keyCustomOutputPath = 'app_output_path';
   static const String keyUpscaleResolution = 'app_upscale_resolution';
   static const String keyUpscaleEngine = 'app_upscale_engine';
@@ -366,6 +368,58 @@ class SettingsService {
   static Future<void> setDefaultPreset(String preset) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(keyDefaultPreset, preset);
+  }
+
+  static Future<List<Map<String, dynamic>>> getCustomPresets() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(keyCustomPresets);
+      if (raw == null || raw.isEmpty) return [];
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('[SettingsService] getCustomPresets failed: $e');
+    }
+    return [];
+  }
+
+  static Future<void> saveCustomPreset(
+    String name,
+    Map<String, dynamic> config,
+  ) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = await getCustomPresets();
+      final existingIndex = list.indexWhere((item) => item['name'] == name);
+      final entry = <String, dynamic>{
+        'name': name,
+        'config': config,
+      };
+      if (existingIndex >= 0) {
+        list[existingIndex] = entry;
+      } else {
+        list.add(entry);
+      }
+      await prefs.setString(keyCustomPresets, jsonEncode(list));
+    } catch (e) {
+      debugPrint('[SettingsService] saveCustomPreset failed: $e');
+    }
+  }
+
+  static Future<void> deleteCustomPreset(String name) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = await getCustomPresets();
+      list.removeWhere((item) => item['name'] == name);
+      await prefs.setString(keyCustomPresets, jsonEncode(list));
+    } catch (e) {
+      debugPrint('[SettingsService] deleteCustomPreset failed: $e');
+    }
   }
 
   static Future<String?> getLutName() async {

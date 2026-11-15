@@ -70,7 +70,7 @@ test/
 
 <!-- 0AI_CONTEXT:AUTO:id=continuation:start -->
 ## §7 Continuation Guide
-Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 158 shipped mathematical complexity scoring in DeviceCapabilityService and dynamic RAM budget OOM protection in FfmpegService. Next: proceed to Task 159.
+Acknowledged SEED v3.1. Current STATE: development@HEAD. Context mapping files fully synchronized (INDEX.md, index.json, STATE.md, HANDOFF.md, SEED.md, findings.json, handoff-diff.json). Zero Active Findings maintained. Report 159 shipped Custom User Presets persistence via SettingsService, snapshot/restore in UniquifierPresetMixin, and dynamic UI in ModifiersCard. Next: proceed to Task 160.
 <!-- 0AI_CONTEXT:AUTO:id=continuation:end -->
 
 <!-- 0AI_CONTEXT:HYBRID:id=glossary:start -->

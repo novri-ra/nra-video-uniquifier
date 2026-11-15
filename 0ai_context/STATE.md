@@ -12,23 +12,23 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=ts:start -->
 ## Timestamp
-- UTC: 2026-11-15T14:10:00Z
+- UTC: 2026-11-15T14:23:00Z
 <!-- 0AI_CONTEXT:AUTO:id=ts:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
-- Status: modified (Dynamic memory budget complexity scoring + Context Mapping sync)
+- Status: modified (Custom User Presets persistence & UI + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 158: Implemented dynamic complexity scoring in DeviceCapabilityService and dynamic OOM protection in FfmpegService. Zero analyze issues. 229/229 tests passed.
+- Completed Report 159: Implemented Custom User Presets with JSON persistence in SettingsService, state capture/load in UniquifierPresetMixin, and dynamic chip row with Save Preset dialog in ModifiersCard. Zero analyze issues. 229/229 tests passed.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Ready for Task 159.
+- Ready for Task 160.
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -46,8 +46,8 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - ProcessingScreen: stable (active LUT indicator chip added with AppColors.mintSage/electricIce styling)
 - SuccessManifestCard: stable (Color Grading LUT manifest entry added with clean filename formatting)
 - BatchQueueProvider: stable (`lutName` successfully forwarded in batch execution)
-- UniquifierProvider: stable (`lutName` restored on startup via `SettingsService.getLutName()`)
-- ModifiersCard: stable (includes Custom LUT import picker with try-catch hardening, size limit, header validation, and context.mounted async guards)
+- UniquifierProvider: stable (`lutName` restored on startup via `SettingsService.getLutName()`, custom user presets supported via `UniquifierPresetMixin`)
+- ModifiersCard: stable (includes Custom LUT import picker, dynamic Custom Preset chips, and "+ Save Preset" dialog with accessible touch targets)
 - ConnectivityService: stable (event-driven network monitoring via `connectivity_plus`, 0% idle drain)
 - SettingsScreen: stable (custom export folder picker added: `_ExportFolderCard` with pick, display, and reset-to-default)
 - BatchProcessingScreen: stable (active LUT indicator chip added with AppColors.mintSage/forestDeep styling)
@@ -79,6 +79,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - [2026-11-15] Custom Export Directory Feature (Report 156): Activated `SettingsService.getCustomOutputPath()` priority in `FfmpegFileHelper.resolveTargetDir()`; added `_ExportFolderCard` UI in `SettingsScreen` with FilePicker, Reset-to-Default, and AppToast confirmations. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Clean BuildContext Async Warnings & Add Batch LUT Indicator (Report 157): Fixed 4 `use_build_context_synchronously` info warnings with `context.mounted` guards in `ModifiersCard`; added active LUT indicator chip in `BatchProcessingScreen`. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Dynamic Memory Budget & Complexity Scoring System (Report 158): Added `calculateComplexityScore` and dynamic RAM safety thresholds (`canHandleComplexity`) in `DeviceCapabilityService`; replaced static OOM heuristic in `FfmpegService` with score-based budget checks and informative error messages. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
+- [2026-11-15] Custom User Presets Persistence & UI (Report 159): Added JSON persistence for custom presets in `SettingsService` (`getCustomPresets`, `saveCustomPreset`); implemented snapshot & restore in `UniquifierPresetMixin` (`saveCurrentAsPreset`, `loadCustomPreset`); added dynamic custom preset chips and "+ Save Preset" dialog in `ModifiersCard`. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

@@ -1,5 +1,5 @@
 {
-  "next_report_number": 159,
+  "next_report_number": 160,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -45,6 +45,7 @@
     { "number": 155, "type": "feat", "path": "reports/155-feat-a11y-lut-selector-polish.md" },
     { "number": 156, "type": "feat", "path": "reports/156-feat-custom-export-directory.md" },
     { "number": 157, "type": "chore", "path": "reports/157-chore-fix-warnings-and-batch-ui.md" },
-    { "number": 158, "type": "feat", "path": "reports/158-feat-dynamic-memory-budget.md" }
+    { "number": 158, "type": "feat", "path": "reports/158-feat-dynamic-memory-budget.md" },
+    { "number": 159, "type": "feat", "path": "reports/159-feat-custom-user-presets.md" }
   ]
 }
