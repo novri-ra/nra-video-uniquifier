@@ -12,23 +12,23 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=ts:start -->
 ## Timestamp
-- UTC: 2026-11-15T14:02:00Z
+- UTC: 2026-11-15T14:10:00Z
 <!-- 0AI_CONTEXT:AUTO:id=ts:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
-- Status: modified (Async warnings clean + Batch LUT indicator + Context Mapping sync)
+- Status: modified (Dynamic memory budget complexity scoring + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 157: Remediated 4 BuildContext async warnings in ModifiersCard, added active LUT indicator chip to BatchProcessingScreen. Zero analyze issues. 229/229 tests passed.
+- Completed Report 158: Implemented dynamic complexity scoring in DeviceCapabilityService and dynamic OOM protection in FfmpegService. Zero analyze issues. 229/229 tests passed.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Ready for Task 158.
+- Ready for Task 159.
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -39,8 +39,9 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=health:start -->
 ## Module Health
-- FfmpegService: stable (software H.264 lock, FIFO queue guard, OOM adaptive device-tier protection, LUT `lut3d` via extracted absolute path)
+- FfmpegService: stable (software H.264 lock, FIFO queue guard, dynamic complexity scoring OOM protection, LUT `lut3d` via extracted absolute path)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache; `resolveTargetDir` now prioritises user-selected custom export path via `SettingsService.getCustomOutputPath()`)
+- DeviceCapabilityService: stable (mathematical complexity scoring via `calculateComplexityScore`, dynamic RAM budget thresholds `canHandleComplexity`)
 - UserInterestService: stable (HTTP telemetry dispatch to Google Sheets Webhook with online-guard, offline fallback, and error-handling via debugPrint)
 - ProcessingScreen: stable (active LUT indicator chip added with AppColors.mintSage/electricIce styling)
 - SuccessManifestCard: stable (Color Grading LUT manifest entry added with clean filename formatting)
@@ -77,6 +78,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - [2026-11-15] P1 defect found & partially fixed (Report 147): the LUT pipeline was dead code end-to-end — `provider.lutName` was never forwarded to `FfmpegService.processVideo`, so no `lut3d` filter was ever emitted. Fixed `ProcessingScreen._processWithNative` (single export). Batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` has zero call sites) remain broken; registered as `AUDIT-20261115-038` (P1, active).
 - [2026-11-15] Custom Export Directory Feature (Report 156): Activated `SettingsService.getCustomOutputPath()` priority in `FfmpegFileHelper.resolveTargetDir()`; added `_ExportFolderCard` UI in `SettingsScreen` with FilePicker, Reset-to-Default, and AppToast confirmations. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Clean BuildContext Async Warnings & Add Batch LUT Indicator (Report 157): Fixed 4 `use_build_context_synchronously` info warnings with `context.mounted` guards in `ModifiersCard`; added active LUT indicator chip in `BatchProcessingScreen`. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
+- [2026-11-15] Dynamic Memory Budget & Complexity Scoring System (Report 158): Added `calculateComplexityScore` and dynamic RAM safety thresholds (`canHandleComplexity`) in `DeviceCapabilityService`; replaced static OOM heuristic in `FfmpegService` with score-based budget checks and informative error messages. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

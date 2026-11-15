@@ -355,12 +355,18 @@ class FfmpegService {
       );
     }
 
-    // 🛡️ OOM SAFETY: Adaptive resource guard for entry/mid-tier devices
+    // 🛡️ OOM SAFETY: Adaptive dynamic complexity scoring & resource guard
     final specs = await DeviceCapabilityService.getSpecs();
+    final complexityScore = DeviceCapabilityService.calculateComplexityScore(
+      res: targetResolution,
+      activeEffectsCount: activeVisualEffects?.length ?? 0,
+      enableBlurredCanvas: enableBlurredCanvas,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+    );
     final isHighRisk = _isHighOomRisk(
-      targetResolution: targetResolution,
-      activeVisualEffects: activeVisualEffects,
-      deviceTier: specs.tier,
+      complexityScore: complexityScore,
+      specs: specs,
     );
     if (isHighRisk != null) {
       throw Exception(
@@ -814,51 +820,16 @@ class FfmpegService {
     }
   }
 
-  /// Determines if the current configuration poses a high OOM risk on the detected device tier.
-  /// Returns a descriptive error message if high risk, or null if safe to proceed.
+  /// Evaluates whether the complexity score exceeds the device RAM safety threshold.
+  /// Returns a descriptive error message mentioning the score vs limit if unsafe, or null if safe to proceed.
   static String? _isHighOomRisk({
-    required TargetResolution targetResolution,
-    required Set<UnifiedVisualEffect>? activeVisualEffects,
-    required DeviceTier deviceTier,
+    required int complexityScore,
+    required DeviceSpecs specs,
   }) {
-    final is4k = targetResolution == TargetResolution.r4k ||
-        targetResolution == TargetResolution.r2k;
-    final hasHeavyEffects = activeVisualEffects != null &&
-        activeVisualEffects.any((e) => [
-              UnifiedVisualEffect.blurredCanvas,
-              UnifiedVisualEffect.motionEcho,
-              UnifiedVisualEffect.rgbSplit,
-              UnifiedVisualEffect.dreamyBloom,
-              UnifiedVisualEffect.dynamicGrain,
-            ].contains(e));
-
-    // Entry tier: 4K + any heavy effect = very high risk
-    if (deviceTier == DeviceTier.entry) {
-      if (is4k && hasHeavyEffects) {
-        return 'Device terlalu lemah untuk 4K dengan efek berat. Gunakan 1080p atau kurangi efek.';
-      }
-      if (is4k) {
-        return 'Device terlalu lemah untuk 4K. Gunakan 1080p.';
-      }
-      if (hasHeavyEffects) {
-        return 'Efek berat terlalu besar untuk device entry tier.';
-      }
+    if (!specs.canHandleComplexity(complexityScore)) {
+      final maxScore = specs.maxComplexityScore;
+      return 'Skor kompleksitas $complexityScore melebihi batas perangkat Anda ($maxScore). Kurangi efek atau resolusi.';
     }
-
-    // Mid tier: 4K + heavy effects = high risk; 4K alone = moderate
-    if (deviceTier == DeviceTier.mid) {
-      if (is4k && hasHeavyEffects) {
-        return 'Hardware sedang terlalu berat untuk 4K dengan kombinasi banyak efek. Coba 1080p atau kurangi efek.';
-      }
-      if (is4k) {
-        return 'Hardware sedang menahan 4K. Kurangi efek visual untuk hasil yang lebih stabil.';
-      }
-      if (hasHeavyEffects) {
-        return 'Efek banyak terlalu besar untuk device mid tier. Kurangi efek.';
-      }
-    }
-
-    // Flagship: allow everything
     return null;
   }
 

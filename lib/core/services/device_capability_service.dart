@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'settings_service.dart';
 
 enum DeviceTier {
   entry('Entry Tier', 'Limited RAM / CPU'),
@@ -35,6 +36,19 @@ class DeviceSpecs {
 
   double get totalRamGb => totalRamBytes / (1024 * 1024 * 1024);
   double get availRamGb => availRamBytes / (1024 * 1024 * 1024);
+
+  /// Safe complexity limit derived dynamically from available RAM:
+  /// - < 4GB RAM  -> limit 40
+  /// - 4-6GB RAM  -> limit 70
+  /// - > 6GB RAM  -> limit 100
+  int get maxComplexityScore {
+    if (availRamGb < 4.0) return 40;
+    if (availRamGb <= 6.0) return 70;
+    return 100;
+  }
+
+  /// Checks if available RAM can safely sustain the requested complexity score.
+  bool canHandleComplexity(int score) => score <= maxComplexityScore;
 
   static DeviceTier classifyTier({
     required int totalRamBytes,
@@ -142,5 +156,58 @@ class DeviceCapabilityService {
       if (targetKey == '4k') return 'BEBAN TINGGI';
     }
     return null;
+  }
+
+  /// Calculates a mathematical complexity score for FFmpeg video processing pipeline:
+  /// - Base score: 1080p = 10, 2K = 30, 4K = 60
+  /// - Heavy effects: +15 for blurred canvas, +15 per active visual effect
+  /// - Evasion & filtering: +10 for deep anti-fingerprint, +5 for enhance/denoise
+  static int calculateComplexityScore({
+    required TargetResolution res,
+    required int activeEffectsCount,
+    required bool enableBlurredCanvas,
+    required bool enableDeepAntiFingerprint,
+    required bool enableEnhanceAndDenoise,
+  }) {
+    int score = 0;
+    switch (res) {
+      case TargetResolution.r1080p:
+        score += 10;
+        break;
+      case TargetResolution.r2k:
+        score += 30;
+        break;
+      case TargetResolution.r4k:
+        score += 60;
+        break;
+    }
+
+    if (enableBlurredCanvas) {
+      score += 15;
+    }
+    score += activeEffectsCount * 15;
+
+    if (enableDeepAntiFingerprint) {
+      score += 10;
+    }
+    if (enableEnhanceAndDenoise) {
+      score += 5;
+    }
+
+    return score;
+  }
+
+  /// Checks whether device available RAM can safely handle the given complexity score.
+  static bool canHandleComplexity(int score, [DeviceSpecs? specs]) {
+    final effectiveSpecs =
+        specs ?? _cachedSpecs ?? DeviceSpecs.defaultFallback();
+    return effectiveSpecs.canHandleComplexity(score);
+  }
+
+  /// Returns the maximum allowed complexity score for a device configuration.
+  static int getMaxComplexityScore([DeviceSpecs? specs]) {
+    final effectiveSpecs =
+        specs ?? _cachedSpecs ?? DeviceSpecs.defaultFallback();
+    return effectiveSpecs.maxComplexityScore;
   }
 }

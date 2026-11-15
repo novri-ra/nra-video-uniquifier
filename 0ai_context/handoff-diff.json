@@ -1,15 +1,16 @@
 {
-  "generated_at": "2026-11-15T14:02:00Z",
+  "generated_at": "2026-11-15T14:10:00Z",
   "previous_handoff": "0ai_context/raw/handoff-diff.json",
   "resolved": [],
   "added": [],
   "persisted": [],
   "notes": {
     "REPORT-156": "Custom Export Directory: activated FilePicker-based folder selection in SettingsScreen, prioritised in FfmpegFileHelper.resolveTargetDir() via SettingsService.getCustomOutputPath(). Zero new analyze issues. 229/229 tests passed.",
-    "REPORT-157": "Cleaned 4 use_build_context_synchronously info warnings in ModifiersCard; added active LUT indicator chip in BatchProcessingScreen. Clean 0 analyze issues. 229/229 tests passed."
+    "REPORT-157": "Cleaned 4 use_build_context_synchronously info warnings in ModifiersCard; added active LUT indicator chip in BatchProcessingScreen. Clean 0 analyze issues. 229/229 tests passed.",
+    "REPORT-158": "Dynamic Memory Budget: added calculateComplexityScore and RAM safety limit thresholds to DeviceCapabilityService; replaced static OOM heuristic with dynamic score-based budget check in FfmpegService. Zero analyze issues. 229/229 tests passed."
   },
   "health_change": {
-    "analyze": "4 info warnings -> 0 issues",
+    "analyze": "0 -> 0",
     "test": "229/229 -> 229/229",
     "format": "No formatting issues",
     "graph": "2908 nodes / 7070 edges (unchanged)"

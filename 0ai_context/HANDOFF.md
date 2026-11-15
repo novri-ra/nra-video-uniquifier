@@ -105,4 +105,4 @@ static Future<void> _dispatchTelemetry(Map<String, dynamic> payload) async {
 - **Accepted Risk (`AUDIT-20261108-027`)**: MCP index tooling may intermittently fail with exit code 1 on the first run. The mapper must retry once before aborting.
 
 ## 15. Next Immediate Actions
-- Proceed to Task 158.
+- Proceed to Task 159.
