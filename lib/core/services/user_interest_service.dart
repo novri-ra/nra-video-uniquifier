@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'connectivity_service.dart';
 import 'microstock_news_service.dart';
 
 /// Internal data container for decayed affinity scores with timestamps.
@@ -283,12 +285,35 @@ class UserInterestService {
     }
   }
 
-  /// Strictly offline-first telemetry dispatch. Invokes mockDispatcher in test environments.
+  /// Dispatches telemetry payload to Google Sheets webhook if online. Invokes mockDispatcher in test environments.
   static Future<void> _dispatchTelemetry(Map<String, dynamic> payload) async {
     if (mockDispatcher != null) {
       await mockDispatcher!(payload);
+      return;
     }
-    // Strictly offline-first: 0 external network requests in production.
+
+    if (!ConnectivityService.instance.isOnline.value) {
+      return;
+    }
+
+    try {
+      final urlStr = await getWebhookUrl();
+      final url = Uri.parse(urlStr);
+      final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 5);
+
+      try {
+        final request = await client.postUrl(url);
+        request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+        request.add(utf8.encode(jsonEncode(payload)));
+        final response = await request.close();
+        await response.drain();
+      } finally {
+        client.close();
+      }
+    } catch (e) {
+      debugPrint('[UserInterestService] telemetry dispatch failed: $e');
+    }
   }
 
   /// Retained for test compatibility; performs no external network calls.

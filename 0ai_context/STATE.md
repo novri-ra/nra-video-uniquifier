@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 152-feat-ui-lut-indicator-and-manifest.md
+parent_report: 153-feat-enable-google-sheets-telemetry.md
 ---
 
 # Project State — nra_video_uniquifier
@@ -18,17 +18,17 @@ parent_report: 152-feat-ui-lut-indicator-and-manifest.md
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
-- Status: modified (ProcessingScreen and SuccessManifestCard polished with active LUT indicator and manifest entry)
+- Status: modified (UserInterestService HTTP telemetry + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 152: Added active LUT indicator chip in ProcessingScreen and Color Grading LUT entry in SuccessManifestCard, with clean absolute path filename extraction. Zero Active Findings maintained.
+- Completed Report 153: Implemented HTTP POST telemetry dispatch to Google Sheets Webhook from UserInterestService, with online-guard via ConnectivityService and test-compatible mockDispatcher path. Zero Active Findings maintained.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Ready for Task 153.
+- Ready for Task 154.
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -41,11 +41,13 @@ parent_report: 152-feat-ui-lut-indicator-and-manifest.md
 ## Module Health
 - FfmpegService: stable (software H.264 lock, FIFO queue guard, OOM adaptive device-tier protection, LUT `lut3d` via extracted absolute path)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache)
+- UserInterestService: stable (HTTP telemetry dispatch to Google Sheets Webhook with online-guard, offline fallback, and error-handling via debugPrint)
 - ProcessingScreen: stable (active LUT indicator chip added with AppColors.mintSage/electricIce styling)
 - SuccessManifestCard: stable (Color Grading LUT manifest entry added with clean filename formatting)
 - BatchQueueProvider: stable (`lutName` successfully forwarded in batch execution)
 - UniquifierProvider: stable (`lutName` restored on startup via `SettingsService.getLutName()`)
 - ModifiersCard: stable (includes Custom LUT import picker with try-catch hardening, size limit, and header validation)
+- ConnectivityService: stable (event-driven network monitoring via `connectivity_plus`, 0% idle drain)
 <!-- 0AI_CONTEXT:AUTO:id=health:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=hygiene:start -->
@@ -67,10 +69,12 @@ parent_report: 152-feat-ui-lut-indicator-and-manifest.md
 - [2026-11-15] Hygiene cleanup (Report 146): re-verified 0 empty catch blocks in `lib/` (finding 020 closed), confirmed `0ai_context/raw/findings.json` is absent from worktree and `HEAD` (deleted in commit `5f385bf`, finding 036 closed), leaving only 027/028 active.
 - [2026-11-15] Resolved final two P3 findings (`AUDIT-20261108-027` and `AUDIT-20261108-028`) in Report 151: documented MCP retry risk and video basename log policy in `HANDOFF.md` §14, updated `findings.json` status to `resolved`, and achieved **Zero Active Findings**. Synchronized all 8 Context Mapping Files.
 - [2026-11-15] UI Polish (Report 152): Added active LUT indicator chip on `ProcessingScreen` and Color Grading LUT manifest entry on `SuccessManifestCard` with clean filename extraction. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
+- [2026-11-15] Google Sheets Telemetry Integration (Report 153): Implemented HTTP POST telemetry dispatch to Google Sheets Webhook from `UserInterestService._dispatchTelemetry` with online-guard via `ConnectivityService`, offline fallback, safe error handling via `debugPrint`, and test-compatible mockDispatcher path. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] P1 defect found & partially fixed (Report 147): the LUT pipeline was dead code end-to-end — `provider.lutName` was never forwarded to `FfmpegService.processVideo`, so no `lut3d` filter was ever emitted. Fixed `ProcessingScreen._processWithNative` (single export). Batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` has zero call sites) remain broken; registered as `AUDIT-20261115-038` (P1, active).
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->
 ## Manual Notes
 - Keep FFmpeg hardware acceleration disabled to avoid Android MediaCodec freezes.
+- Telemetry data only sent when device is online; silent offline fallback preserves battery and UI responsiveness.
 <!-- 0AI_CONTEXT:HUMAN:end -->

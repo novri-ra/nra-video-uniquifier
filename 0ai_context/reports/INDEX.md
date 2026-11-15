@@ -31,6 +31,7 @@ moved into the current phase folder once that phase closes.
 - **150** — Hardening Custom LUT Import Feature (`reports/150-chore-harden-custom-lut-import.md`).
 - **151** — Resolve Final P3 Findings & Achieve Zero Active Findings (`reports/151-chore-resolve-final-p3-findings.md`).
 - **152** — UI Polish - Active LUT Indicator on ProcessingScreen and SuccessManifestCard (`reports/152-feat-ui-lut-indicator-and-manifest.md`).
+- **153** — Google Sheets Telemetry Integration via HTTP POST (`reports/153-feat-enable-google-sheets-telemetry.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.
