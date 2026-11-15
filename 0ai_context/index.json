@@ -1,5 +1,5 @@
 {
-  "next_report_number": 155,
+  "next_report_number": 156,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -41,6 +41,7 @@
     { "number": 151, "type": "chore", "path": "reports/151-chore-resolve-final-p3-findings.md" },
     { "number": 152, "type": "feat", "path": "reports/152-feat-ui-lut-indicator-and-manifest.md" },
     { "number": 153, "type": "feat", "path": "reports/153-feat-enable-google-sheets-telemetry.md" },
-    { "number": 154, "type": "feat", "path": "reports/154-feat-auto-dispatch-video-metadata-vault.md" }
+    { "number": 154, "type": "feat", "path": "reports/154-feat-auto-dispatch-video-metadata-vault.md" },
+    { "number": 155, "type": "feat", "path": "reports/155-feat-a11y-lut-selector-polish.md" }
   ]
 }

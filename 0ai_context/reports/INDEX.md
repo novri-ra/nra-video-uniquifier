@@ -33,6 +33,7 @@ moved into the current phase folder once that phase closes.
 - **152** — UI Polish - Active LUT Indicator on ProcessingScreen and SuccessManifestCard (`reports/152-feat-ui-lut-indicator-and-manifest.md`).
 - **153** — Google Sheets Telemetry Integration via HTTP POST (`reports/153-feat-enable-google-sheets-telemetry.md`).
 - **154** — Auto-Dispatch Video Metadata Vault Telemetry (`reports/154-feat-auto-dispatch-video-metadata-vault.md`).
+- **155** — LUT Selector & Custom Import Accessibility Polish (`reports/155-feat-a11y-lut-selector-polish.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.
