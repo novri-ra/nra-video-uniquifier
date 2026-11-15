@@ -172,6 +172,7 @@ class BatchQueueProvider extends ChangeNotifier {
       introTrimOffset: config.introTrimOffset,
       rotateAngle: config.rotateAngle,
       activeVisualEffects: config.activeVisualEffects,
+      lutName: config.lutName,
       onProgress: (p, speed, timeMs) =>
           _handleBatchProgress(i, p, speed, timeMs, current, config),
     );

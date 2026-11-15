@@ -120,6 +120,7 @@ class UniquifierProvider extends ChangeNotifier
       final satLvl = await SettingsService.getSaturationLevel();
       final rotAngle = await SettingsService.getRotateAngle();
       final tgtFps = await SettingsService.getTargetFps();
+      final lutName = await SettingsService.getLutName();
 
       internalSetModifiersFromSettings(
         targetResolution: targetRes,
@@ -147,6 +148,7 @@ class UniquifierProvider extends ChangeNotifier
         saturationLevel: satLvl,
         rotateAngle: rotAngle,
         targetFps: tgtFps,
+        lutName: lutName ?? '',
       );
 
       if (!_isDisposed) {
@@ -308,11 +310,11 @@ class UniquifierProvider extends ChangeNotifier
     final is4k = targetFps >= 30; // simplified 4K check
     final hasHeavyEffects = enableBlurredCanvas ||
         activeVisualEffects.any((e) => [
-          UnifiedVisualEffect.motionEcho,
-          UnifiedVisualEffect.rgbSplit,
-          UnifiedVisualEffect.dreamyBloom,
-          UnifiedVisualEffect.dynamicGrain,
-        ].contains(e));
+              UnifiedVisualEffect.motionEcho,
+              UnifiedVisualEffect.rgbSplit,
+              UnifiedVisualEffect.dreamyBloom,
+              UnifiedVisualEffect.dynamicGrain,
+            ].contains(e));
 
     if (specs.tier == DeviceTier.entry && (is4k || hasHeavyEffects)) {
       _renderedPreviewFramePath = null;
@@ -326,6 +328,7 @@ class UniquifierProvider extends ChangeNotifier
     }
 
     try {
+      final resolvedLutPath = await FfmpegFileHelper.resolveLutPath(lutName);
       final filter =
           customFilter ??
           FilterBuilders.buildPreviewFilterChain(
@@ -339,12 +342,14 @@ class UniquifierProvider extends ChangeNotifier
             effect: selectedVisualEffect,
             activeEffects: _activeVisualEffects,
             motionEchoDelay: _motionEchoDelay,
+            lutPath: resolvedLutPath,
           );
 
       final resultPath = await FfmpegService.renderFilteredPreviewFrame(
         inputPath: inputPath,
         filterComplex: filter,
         timestampSeconds: timestampSeconds,
+        lutPath: resolvedLutPath,
       );
 
       if (!_isDisposed) {

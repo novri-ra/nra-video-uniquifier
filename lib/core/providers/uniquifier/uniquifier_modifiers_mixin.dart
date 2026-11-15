@@ -66,6 +66,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     }
     notifyListeners();
   }
+
   TargetResolution get targetResolution => _targetResolution;
   UpscaleEngine get upscaleEngine => _upscaleEngine;
   VideoCodec get videoCodec => _videoCodec;
@@ -101,6 +102,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     required double saturationLevel,
     double rotateAngle = 0.0,
     required int targetFps,
+    String lutName = '',
   }) {
     _targetResolution = targetResolution;
     _upscaleEngine = upscaleEngine;
@@ -127,6 +129,7 @@ mixin UniquifierModifiersMixin on ChangeNotifier {
     _saturationLevel = saturationLevel;
     _rotateAngle = rotateAngle;
     _targetFps = targetFps;
+    _lutName = lutName;
   }
 
   void internalSetTargetResolution(TargetResolution resolution) {

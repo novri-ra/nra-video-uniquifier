@@ -164,6 +164,7 @@ class FfmpegService {
     required String inputPath,
     required String filterComplex,
     required double timestampSeconds,
+    String? lutPath,
   }) async {
     try {
       final inputFile = File(inputPath);
@@ -184,7 +185,7 @@ class FfmpegService {
       final outputPath =
           '${tempDir.path}/preview_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final cleanFilter = filterComplex.trim();
+      final cleanFilter = _appendLutIfMissing(filterComplex.trim(), lutPath);
       final String vfOption;
       if (cleanFilter.contains(';') || cleanFilter.contains('[')) {
         if (cleanFilter.endsWith(']')) {
@@ -247,6 +248,23 @@ class FfmpegService {
       debugPrint('[FfmpegService] renderFilteredPreviewFrame error: $e');
       return null;
     }
+  }
+
+  /// Appends the LUT stage when the caller passed a [lutPath] that the filter
+  /// chain does not already contain, so preview and export never double-apply.
+  static String _appendLutIfMissing(String filter, String? lutPath) {
+    if (lutPath == null || lutPath.isEmpty) return filter;
+    final lutFilter = "lut3d='$lutPath'";
+    if (filter.contains('lut3d=')) return filter;
+    if (filter.isEmpty) return lutFilter;
+
+    // A trailing "[label]" means the chain ends with a labeled stream: feed it
+    // into the LUT as a separate final segment.
+    if (filter.endsWith(']')) {
+      final label = filter.substring(filter.lastIndexOf('['));
+      return '$filter;$label$lutFilter';
+    }
+    return '$filter,$lutFilter';
   }
 
   /// Deletes old preview_*.jpg files in the temp directory to prevent cache bloat.
@@ -807,12 +825,12 @@ class FfmpegService {
         targetResolution == TargetResolution.r2k;
     final hasHeavyEffects = activeVisualEffects != null &&
         activeVisualEffects.any((e) => [
-          UnifiedVisualEffect.blurredCanvas,
-          UnifiedVisualEffect.motionEcho,
-          UnifiedVisualEffect.rgbSplit,
-          UnifiedVisualEffect.dreamyBloom,
-          UnifiedVisualEffect.dynamicGrain,
-        ].contains(e));
+              UnifiedVisualEffect.blurredCanvas,
+              UnifiedVisualEffect.motionEcho,
+              UnifiedVisualEffect.rgbSplit,
+              UnifiedVisualEffect.dreamyBloom,
+              UnifiedVisualEffect.dynamicGrain,
+            ].contains(e));
 
     // Entry tier: 4K + any heavy effect = very high risk
     if (deviceTier == DeviceTier.entry) {
@@ -879,10 +897,10 @@ class FfmpegService {
       if (returnCode?.getValue() == 1) {
         final isOomPattern =
             lowerLogs.contains('out of memory') ||
-                lowerLogs.contains('malloc failed') ||
-                lowerLogs.contains('buffer overflow') ||
-                lowerLogs.contains('queued in out') ||
-                lowerLogs.contains('cannot allocate video buffer');
+            lowerLogs.contains('malloc failed') ||
+            lowerLogs.contains('buffer overflow') ||
+            lowerLogs.contains('queued in out') ||
+            lowerLogs.contains('cannot allocate video buffer');
         if (isOomPattern) {
           throw Exception(
             'FFmpeg gagal (exit code 1): Out of Memory. '

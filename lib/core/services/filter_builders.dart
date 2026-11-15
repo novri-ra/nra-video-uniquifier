@@ -610,6 +610,7 @@ class FilterBuilders {
     UnifiedVisualEffect effect = UnifiedVisualEffect.none,
     Set<UnifiedVisualEffect>? activeEffects,
     double motionEchoDelay = 0.15,
+    String? lutPath,
   }) {
     final filters = <String>[];
 
@@ -650,10 +651,30 @@ class FilterBuilders {
       effectiveSet = {UnifiedVisualEffect.none};
     }
 
+    String finalize(String res) {
+      if (lutPath != null && lutPath.isNotEmpty) {
+        final lutFilter = "lut3d='$lutPath'";
+        if (res.contains('format=yuv420p')) {
+          return res.replaceFirst(
+            'format=yuv420p',
+            '$lutFilter,format=yuv420p',
+          );
+        } else if (res.contains(';')) {
+          final lastSemi = res.lastIndexOf(';');
+          final prefix = res.substring(0, lastSemi + 1);
+          final lastSeg = res.substring(lastSemi + 1);
+          return '$prefix$lastSeg,$lutFilter';
+        } else {
+          return res.isEmpty ? lutFilter : '$res,$lutFilter';
+        }
+      }
+      return res;
+    }
+
     final orderedEffects = orderEffectsByStage(effectiveSet);
 
     if (orderedEffects.isEmpty) {
-      return filters.join(',');
+      return finalize(filters.join(','));
     }
 
     if (orderedEffects.length == 1) {
@@ -665,12 +686,12 @@ class FilterBuilders {
       );
       if (effectFilter.isNotEmpty) {
         if (filters.isEmpty) {
-          return effectFilter;
+          return finalize(effectFilter);
         } else {
-          return '${filters.join(',')},$effectFilter';
+          return finalize('${filters.join(',')},$effectFilter');
         }
       }
-      return filters.join(',');
+      return finalize(filters.join(','));
     }
 
     // Multiple active effects: chain stage by stage with distinct stream labels
@@ -700,6 +721,6 @@ class FilterBuilders {
       }
     }
 
-    return segments.join(';');
+    return finalize(segments.join(';'));
   }
 }
