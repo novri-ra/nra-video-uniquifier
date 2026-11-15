@@ -5,7 +5,7 @@ mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
 generated_at: 2026-11-15T00:00:00Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 150-chore-harden-custom-lut-import.md
+parent_report: 151-chore-resolve-final-p3-findings.md
 ---
 
 # Project State — nra_video_uniquifier
@@ -23,12 +23,12 @@ parent_report: 150-chore-harden-custom-lut-import.md
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 150: Hardened Custom LUT import feature with try-catch on FilePicker, 5MB file size limit, `.cube` header verification (`LUT_3D_SIZE`/`TITLE`), and Snackbar UI feedback.
+- Completed Report 151: Resolved final two P3 findings (`027` and `028`) via explicit policies in `HANDOFF.md` §14, achieving **Zero Active Findings**.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Ready for UI Polish, Memory Budget optimization per effect, or next feature task (Task 150).
+- Ready for UI Polish, memory budget optimization, or next feature task (Task 152).
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -65,7 +65,7 @@ parent_report: 150-chore-harden-custom-lut-import.md
 - [2026-11-15] LUT wiring (Report 144): shipped `assets/luts/cinematic_warm.cube` (16×16×16 3D LUT), persisted `lutName` in `SettingsService`, exposed it via `UniquifierModifiersMixin`, and added the selector in `ModifiersCard`.
 - [2026-11-15] LUT absolute-path fix (Report 145): added `FfmpegFileHelper.resolveLutPath()` to extract bundled `.cube` assets via `rootBundle` into temp cache; renamed `lutName` → `lutPath` through `FfmpegCommandBuilder` and `FilterBuilders`.
 - [2026-11-15] Hygiene cleanup (Report 146): re-verified 0 empty catch blocks in `lib/` (finding 020 closed), confirmed `0ai_context/raw/findings.json` is absent from worktree and `HEAD` (deleted in commit `5f385bf`, finding 036 closed), leaving only 027/028 active.
-- [2026-11-15] Custom LUT import hardening (Report 150): added try-catch error handling on FilePicker, 5MB file size validation, `.cube` header integrity verification (`LUT_3D_SIZE`/`TITLE`), and Snackbar UI feedback in `ModifiersCard`. Synchronized all 8 Context Mapping Files.
+- [2026-11-15] Resolved final two P3 findings (`AUDIT-20261108-027` and `AUDIT-20261108-028`) in Report 151: documented MCP retry risk and video basename log policy in `HANDOFF.md` §14, updated `findings.json` status to `resolved`, and achieved **Zero Active Findings**. Synchronized all 8 Context Mapping Files.
 - [2026-11-15] P1 defect found & partially fixed (Report 147): the LUT pipeline was dead code end-to-end — `provider.lutName` was never forwarded to `FfmpegService.processVideo`, so no `lut3d` filter was ever emitted. Fixed `ProcessingScreen._processWithNative` (single export). Batch export (`BatchQueueProvider._executeBatchItem`) and startup restore (`SettingsService.getLutName()` has zero call sites) remain broken; registered as `AUDIT-20261115-038` (P1, active).
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 

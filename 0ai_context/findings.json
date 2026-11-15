@@ -68,14 +68,16 @@
     "severity": "P3",
     "category": "infra",
     "description": "MCP index_status exited with code 1 once during preflight; retry succeeded.",
-    "status": "active"
+    "status": "resolved",
+    "resolved_by": "policy documented in report 151 (accepted infra risk with retry)"
   },
   {
     "id": "AUDIT-20261108-028",
     "severity": "P3",
     "category": "policy",
     "description": "Ambiguity in HANDOFF §14 regarding whether user video basenames are allowed in log messages.",
-    "status": "active"
+    "status": "resolved",
+    "resolved_by": "policy clarified in report 151 (basenames permitted in debugPrint)"
   },
   {
     "id": "AUDIT-20261108-030",

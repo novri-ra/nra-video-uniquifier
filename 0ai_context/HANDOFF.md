@@ -50,12 +50,9 @@
 - Privacy and caching considerations in the history service.
 
 ## 10. Findings Inventory (Active)
-*(resolved by reports 105-123 & 148-149: AUDIT-20261108-019, AUDIT-20261108-021, AUDIT-20261108-022, AUDIT-20261108-023, AUDIT-20261108-025, AUDIT-20261108-026, AUDIT-20261108-030, AUDIT-20261108-031, AUDIT-20261108-032, AUDIT-20261108-033, AUDIT-20261108-034, AUDIT-20261108-035, AUDIT-20261108-037, AUDIT-20261115-038 — omitted from active inventory. AUDIT-20261108-020 re-verified and closed by report 146 (0 empty catch blocks in `lib/`). AUDIT-20261108-024 is invalid per report 120. AUDIT-20261108-036 closed by report 146. AUDIT-20261115-038 closed by reports 148 & 149).*
+*(All findings resolved! Zero Active Findings achieved in Report 151. See `0ai_context/findings.json` for full historical audit log).*
 
-| ID | Severity | Category | Description |
-|---|---|---|---|
-| `AUDIT-20261108-027` | P3 | infra | MCP index server intermittent exit code 1. |
-| `AUDIT-20261108-028` | P3 | policy | Policy ambiguity on user video basenames in log output. |
+- No active findings.
 
 ## 11. Code Snippets & Key Patterns
 - `FfmpegService`: manages video rendering pipeline and multi-pass evasion filters.
@@ -94,6 +91,8 @@ The boundary group (`^`, whitespace, quote, bracket, `=`, `,`, `:`, `;`, or back
 - Export hangs (`100 buffers queued`) on Android 15+ if hardware encoding is allowed; use `libx264` only.
 - Full FFmpeg commands are too long for one logcat line; the audit log splits
   them per argument (`[FFmpeg Audit] Arg: ...`) in `_executeFFmpeg`.
+- **Policy Clarification (`AUDIT-20261108-028`)**: Video basenames (e.g., `video.mp4`) are explicitly permitted in `debugPrint` for diagnostic tracing, but absolute filesystem paths must strictly be redacted via `redactFileSystemPaths`.
+- **Accepted Risk (`AUDIT-20261108-027`)**: MCP index tooling may intermittently fail with exit code 1 on the first run. The mapper must retry once before aborting.
 
 ## 15. Next Immediate Actions
 - Validate Custom LUT hardening and import behavior on physical device / simulator.

@@ -2,16 +2,17 @@
   "generated_at": "2026-11-15T00:00:00Z",
   "previous_handoff": "0ai_context/raw/handoff-diff.json",
   "resolved": [
-    "AUDIT-20261115-038"
-  ],
-  "added": [],
-  "persisted": [
+    "AUDIT-20261115-038",
     "AUDIT-20261108-027",
     "AUDIT-20261108-028"
   ],
+  "added": [],
+  "persisted": [],
   "notes": {
-    "AUDIT-20261115-038": "P1 correctness: LUT pipeline end-to-end integration (batch, startup restore, preview filter chain) completed in Report 148, and Custom LUT import feature via file_picker shipped in Report 149.",
-    "REPORT-150": "Hardened Custom LUT import feature with try-catch on FilePicker, 5MB file size validation, .cube header verification (LUT_3D_SIZE/TITLE), and Snackbar UI feedback."
+    "AUDIT-20261115-038": "P1 correctness: LUT pipeline end-to-end integration completed in Report 148, Custom LUT import in Report 149.",
+    "AUDIT-20261108-027": "Resolved in Report 151: MCP index intermittent exit code 1 documented as accepted risk with retry protocol.",
+    "AUDIT-20261108-028": "Resolved in Report 151: Video basenames explicitly permitted in debugPrint logs.",
+    "REPORT-151": "Resolved final two P3 findings and achieved Zero Active Findings."
   },
   "health_change": {
     "analyze": "0 -> 0",
