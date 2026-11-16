@@ -120,6 +120,7 @@ class FfmpegCommandBuilder {
       cropZoomScale: cropZoomScale,
       cropAnchor: cropAnchor,
       rotateAngle: rotateAngle,
+      lutPath: lutPath,
     );
 
     if (outputPath.toLowerCase().endsWith('.mp4')) {
@@ -158,7 +159,18 @@ class FfmpegCommandBuilder {
     buffer.write(' -i "${escapePath(inputPath)}"');
   }
 
+  /// Returns `true` when [graph] is a self-contained complex graph that starts
+  /// at [inputLabel] (`[0:v]` / `[0:a]`) and therefore must not be wrapped
+  /// again. Simple chains never start with a stream label.
+  static bool _isComplexGraph(String graph, String inputLabel) =>
+      graph.startsWith(inputLabel);
+
   /// Appends complex filtergraph, video codecs, audio filters, and CFR flags.
+  ///
+  /// This method is the **single authority** for `-filter_complex` / `-map`,
+  /// codec selection, muxing queue depth, pixel format, color space tags, and
+  /// container flags. `FilterBuilders` returns raw graph strings only; all
+  /// FFmpeg flag decisions live here.
   static void writeFilterAndCodecOptions({
     required StringBuffer buffer,
     required bool modifyVisuals,
@@ -194,6 +206,10 @@ class FfmpegCommandBuilder {
         (enableDeepAntiFingerprint
             ? VariationGenerator.generate()
             : VideoVariations.fallback);
+    final hasActiveEffects =
+        (activeVisualEffects ?? const <UnifiedVisualEffect>{}).any(
+          (effect) => effect != UnifiedVisualEffect.none,
+        );
     final hasVisual =
         modifyVisuals ||
         shouldUpscale ||
@@ -202,71 +218,122 @@ class FfmpegCommandBuilder {
         enableDynamicZoom ||
         enableMicroOverlay ||
         enableFrameSkip ||
-        enableChromaShift;
+        enableChromaShift ||
+        hasActiveEffects;
     final hasAudioProcess = modifyAudio || muteOriginalAudio;
     final isHighRes =
         targetResolution == TargetResolution.r2k ||
         targetResolution == TargetResolution.r4k;
     final effectiveFps = isHighRes ? 30 : (targetFps ?? 30);
 
-    buffer.write(
-      FilterBuilders.buildVideoFilter(
-        hasVisual: hasVisual,
-        hasAudio: hasAudioProcess,
-        modifyVisuals: modifyVisuals,
-        upscale: shouldUpscale,
-        targetResolution: targetResolution,
-        upscaleEngine: upscaleEngine,
-        videoCodec: videoCodec,
-        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableHorizontalFlip: enableHorizontalFlip,
-        isPortrait: isPortrait,
-        enableBlurredCanvas: enableBlurredCanvas,
-        canvasScalePercent: canvasScalePercent,
-        enableDynamicZoom: enableDynamicZoom,
-        enableMicroOverlay: enableMicroOverlay,
-        enableFrameSkip: enableFrameSkip,
-        enableChromaShift: enableChromaShift,
-        variations: vars,
-        targetFps: effectiveFps,
-        saturationLevel: saturationLevel,
-        sharpeningLevel: sharpeningLevel,
-        cropZoomScale: cropZoomScale,
-        cropAnchor: cropAnchor,
-        rotateAngle: rotateAngle,
-        activeVisualEffects: activeVisualEffects,
-        lutPath: lutPath,
-      ),
+    // --- Obtain raw filter graph strings from FilterBuilders ---------------
+    final videoGraph = FilterBuilders.buildVideoFilter(
+      hasVisual: hasVisual,
+      hasAudio: hasAudioProcess,
+      modifyVisuals: modifyVisuals,
+      upscale: shouldUpscale,
+      targetResolution: targetResolution,
+      upscaleEngine: upscaleEngine,
+      videoCodec: videoCodec,
+      enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableHorizontalFlip: enableHorizontalFlip,
+      isPortrait: isPortrait,
+      enableBlurredCanvas: enableBlurredCanvas,
+      canvasScalePercent: canvasScalePercent,
+      enableDynamicZoom: enableDynamicZoom,
+      enableMicroOverlay: enableMicroOverlay,
+      enableFrameSkip: enableFrameSkip,
+      enableChromaShift: enableChromaShift,
+      variations: vars,
+      targetFps: effectiveFps,
+      saturationLevel: saturationLevel,
+      sharpeningLevel: sharpeningLevel,
+      cropZoomScale: cropZoomScale,
+      cropAnchor: cropAnchor,
+      rotateAngle: rotateAngle,
+      activeVisualEffects: activeVisualEffects,
+      lutPath: lutPath,
     );
-    buffer.write(
-      FilterBuilders.buildAudioFilter(
-        hasAudio: hasAudioProcess,
-        hasVisual: hasVisual,
-        modifyAudio: modifyAudio,
-        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-        enableAggressiveAudio: enableAggressiveAudio,
-        muteOriginalAudio: muteOriginalAudio,
-        variations: vars,
-      ),
+
+    final audioGraph = FilterBuilders.buildAudioFilter(
+      hasAudio: hasAudioProcess,
+      hasVisual: hasVisual,
+      modifyAudio: modifyAudio,
+      enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+      enableAggressiveAudio: enableAggressiveAudio,
+      muteOriginalAudio: muteOriginalAudio,
+      variations: vars,
     );
+
+    // Classify each graph: empty / copy / simple / complex (labeled).
+    final videoEmpty = videoGraph.isEmpty;
+    final audioEmpty = audioGraph.isEmpty;
+    final videoCopy = videoGraph == 'copy';
+    final audioCopy = audioGraph == 'copy';
+    final videoProcessed = !videoEmpty && !videoCopy;
+    final audioProcessed = !audioEmpty && !audioCopy;
+
+    // --- Emit one `-filter_complex` graph with deterministic labels --------
+    // FFmpeg v7+ rejects labeled graphs inside `-vf` / `-af`, so every
+    // processed stream goes through `-filter_complex` and is mapped back
+    // explicitly. `FilterBuilders` guarantees `[0:v]...[vout]` for complex
+    // video graphs and `[0:a]...[aout]` for complex audio graphs.
+    if (videoProcessed || audioProcessed) {
+      final parts = <String>[];
+      if (videoProcessed) {
+        parts.add(
+          _isComplexGraph(videoGraph, '[0:v]')
+              ? videoGraph
+              : '[0:v]$videoGraph[vout]',
+        );
+      }
+      if (audioProcessed) {
+        parts.add(
+          _isComplexGraph(audioGraph, '[0:a]')
+              ? audioGraph
+              : '[0:a]$audioGraph[aout]',
+        );
+      }
+      buffer.write(' -filter_complex "${parts.join(';')}"');
+
+      buffer.write(videoProcessed ? ' -map "[vout]"' : ' -map 0:v');
+      if (audioProcessed) {
+        buffer.write(' -map "[aout]"');
+      } else {
+        buffer.write(' -map 0:a?');
+      }
+    }
+
+    // --- Codec arguments (single authority) ---------------------------------
+    if (videoProcessed) {
+      // Encoder policy comes from FilterBuilders so H.264/H.265 and the
+      // 2K/4K presets stay in one place.
+      buffer.write(
+        ' ${FilterBuilders.resolveVideoCodecArgs(videoCodec, targetResolution)}',
+      );
+      buffer.write(' -pix_fmt yuv420p');
+      buffer.write(
+        ' -colorspace bt709 -color_primaries bt709 -color_trc bt709'
+        ' -color_range tv -movflags +faststart',
+      );
+    } else if (videoCopy || hasVisual) {
+      buffer.write(' -c:v copy');
+    }
+
+    if (audioProcessed) {
+      buffer.write(' -c:a aac -b:a 192k -ar 44100 -ac 2');
+    } else if (audioCopy) {
+      buffer.write(' -c:a copy');
+    }
+
+    // --- Constant Frame Rate ------------------------------------------------
     final fpsStr = isHighRes
         ? '30'
         : (targetFps != null
               ? '$targetFps'
               : vars.outputFps.toStringAsFixed(2));
-    if (hasVisual) buffer.write(' -fps_mode cfr -r $fpsStr');
+    if (videoProcessed) buffer.write(' -fps_mode cfr -r $fpsStr');
     if (!hasVisual && !hasAudioProcess) buffer.write(' -c copy');
-
-    if (hasVisual) {
-      // Stability priority: always finish with software-only H.264 encoding.
-      // Written last so it overrides any provider-selected codec arguments
-      // (H.265 / hardware encoders) emitted by FilterBuilders.
-      // Guard: limit muxing queue depth to prevent buffer overflow on heavy filtergraphs
-      buffer.write(' -max_muxing_queue_size 20');
-      buffer.write(
-        ' -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1',
-      );
-    }
   }
 }

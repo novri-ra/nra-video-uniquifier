@@ -254,7 +254,7 @@ class FfmpegService {
   /// chain does not already contain, so preview and export never double-apply.
   static String _appendLutIfMissing(String filter, String? lutPath) {
     if (lutPath == null || lutPath.isEmpty) return filter;
-    final lutFilter = "lut3d='$lutPath'";
+    final lutFilter = "lut3d='${lutPath.replaceAll('\\', '/')}'";
     if (filter.contains('lut3d=')) return filter;
     if (filter.isEmpty) return lutFilter;
 

@@ -1,5 +1,5 @@
 {
-  "next_report_number": 163,
+  "next_report_number": 164,
   "reports": [
     { "number": 103, "type": "audit", "path": "reports/archive/phase4-v1.0.5-fixes/103-audit.md" },
     { "number": 110, "type": "fix", "path": "reports/archive/phase4-v1.0.5-fixes/110-fix-i18n-modifiers-card.md" },
@@ -49,6 +49,7 @@
     { "number": 159, "type": "feat", "path": "reports/159-feat-custom-user-presets.md" },
     { "number": 160, "type": "release", "path": "reports/160-release-v1.1.0.md" },
     { "number": 161, "type": "fix", "path": "reports/161-fix-bypass-oom-for-1080p.md" },
-    { "number": 162, "type": "fix", "path": "reports/162-fix-error-screen-theme.md" }
+    { "number": 162, "type": "fix", "path": "reports/162-fix-error-screen-theme.md" },
+    { "number": 163, "type": "fix", "path": "reports/163-fix-ffmpeg-complex-graphs.md" }
   ]
 }

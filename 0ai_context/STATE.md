@@ -3,33 +3,33 @@ generator: prompt-pemetaan-v3.1
 schema_version: 3.1
 mode_created: MIGRATE-LEGACY
 mode_last_update: UPDATE
-generated_at: 2026-11-15T00:00:00Z
+generated_at: 2026-11-16T01:38:23Z
 evidence_map_version: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-parent_report: 153-feat-enable-google-sheets-telemetry.md
+parent_report: 163-fix-ffmpeg-complex-graphs.md
 ---
 
 # Project State — nra_video_uniquifier
 
 <!-- 0AI_CONTEXT:AUTO:id=ts:start -->
 ## Timestamp
-- UTC: 2026-11-15T15:20:00Z
+- UTC: 2026-11-16T01:38:23Z
 <!-- 0AI_CONTEXT:AUTO:id=ts:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=git:start -->
 ## Git Status
 - Branch: development
 - Version: 1.1.0+6
-- Status: modified (Fix: Dynamic theme adaptation for ErrorScreen in Light Mode + Context Mapping sync)
+- Status: modified (Fix: FFmpeg v7 `-filter_complex` graphs, `fifo` removal, parameter dedup + Context Mapping sync)
 <!-- 0AI_CONTEXT:AUTO:id=git:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=commits:start -->
 ## Recent Commits
-- Completed Report 162: Refactored ErrorScreen to dynamically adapt to Light and Dark Mode colorScheme, eliminating hardcoded dark tokens, poor contrast, and clashing containers. Zero analyze issues. 229/229 tests passed.
+- Completed Report 163: Refactored `FilterBuilders` / `FfmpegCommandBuilder` to emit raw graphs only and a single `-filter_complex` + `-map` authority, removed the deleted `fifo` filter, removed duplicate `-c:v` / `-pix_fmt` / `-max_muxing_queue_size` emissions, normalised LUT paths for Android. Zero analyze issues. 229/229 tests passed.
 <!-- 0AI_CONTEXT:AUTO:id=commits:end -->
 
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:start -->
 ## Active TODO / Next Item
-- Siap untuk rebuild APK (Task 163).
+- Siap untuk rebuild APK ulang dan uji di perangkat fisik (Task 164).
 <!-- 0AI_CONTEXT:PRESERVE:id=todo:end -->
 
 <!-- 0AI_CONTEXT:AUTO:id=mcp-index:start -->
@@ -40,7 +40,9 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 
 <!-- 0AI_CONTEXT:AUTO:id=health:start -->
 ## Module Health
-- FfmpegService: stable (software H.264 lock, FIFO queue guard, dynamic complexity scoring OOM protection with 1080p full bypass, LUT `lut3d` via extracted absolute path)
+- FfmpegService: stable (software H.264/H.265 software encoding, single `-max_muxing_queue_size 4096`, `-filter_complex` + explicit `-map` for labelled graphs, dynamic complexity scoring OOM protection with 1080p full bypass, LUT `lut3d` via extracted absolute path)
+- FilterBuilders: stable (raw filtergraph emitter only — `fifo` removed, canvas/effect graphs terminate with `[vout]`, audio masking terminates with `[aout]` from `[0:a]`, `resolveVideoCodecArgs` owns encoder policy)
+- FfmpegCommandBuilder: stable (single authority for filter flags, maps, codec args, CFR, and muxing queue; no duplicate codec/pix_fmt emissions)
 - FfmpegFileHelper: stable (`resolveLutPath` extracts bundled `.cube` assets to temp cache; `resolveTargetDir` now prioritises user-selected custom export path via `SettingsService.getCustomOutputPath()`)
 - DeviceCapabilityService: stable (mathematical complexity scoring via `calculateComplexityScore`, dynamic RAM budget thresholds `canHandleComplexity`)
 - UserInterestService: stable (HTTP telemetry dispatch to Google Sheets Webhook with online-guard, offline fallback, and error-handling via debugPrint)
@@ -85,6 +87,7 @@ parent_report: 153-feat-enable-google-sheets-telemetry.md
 - [2026-11-15] Release v1.1.0+6 Final Release & Production APK Build (Report 160): Bumped version to `1.1.0+6` in `pubspec.yaml`, updated `CHANGELOG.md` with complete v1.1.0 milestone release notes, executed `flutter clean` & `flutter pub get`, compiled production APK via `flutter build apk --release`, and verified 229/229 tests passing. Synchronized all 8 Context Mapping Files.
 - [2026-11-15] Bypass OOM Guard for 1080p Resolution (Report 161): Updated `FfmpegService._isHighOomRisk` to completely bypass complexity scoring budget limits when `targetResolution == TargetResolution.r1080p`, enabling full creative freedom with visual effects while retaining safety checks for 2K/4K. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 - [2026-11-15] Dynamic Theme Adaptation for ErrorScreen (Report 162): Refactored `ErrorScreen` to eliminate hardcoded dark palette tokens (`AppColors.*`) in favor of dynamic `Theme.of(context).colorScheme` tokens (`surface`, `onSurface`, `errorContainer`, `onErrorContainer`, `primary`, `onPrimary`, `outlineVariant`), fixing unreadable contrast in Light Mode. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
+- [2026-11-16] FFmpeg v7 Complex Filter Graphs (Report 163): Removed the deleted `fifo` filter from both video chains; `FilterBuilders` now returns raw graphs only (complex video `[0:v]…[vout]`, complex audio `[0:a]…[aout]`) with multi-stage effects label-isolated via `_buildEffectGraph`; `FfmpegCommandBuilder` is the single `-filter_complex` / `-map` / codec authority (duplicate `-max_muxing_queue_size 20` and trailing `-c:v libx264 -crf 18` removed); LUT paths normalised to `/` for Android and `lutPath` now actually forwarded to exports. Clean 0 analyze issues. Verified 229/229 tests passed and synchronized all 8 Context Mapping Files.
 <!-- 0AI_CONTEXT:APPEND:id=cleanup-log:end -->
 
 <!-- 0AI_CONTEXT:HUMAN:start -->

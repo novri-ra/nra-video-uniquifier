@@ -96,7 +96,6 @@ class FilterBuilders {
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
       'fps=$targetFps',
       'setpts=PTS-STARTPTS',
-      'fifo',
       'format=yuv420p',
     ];
   }
@@ -129,7 +128,11 @@ class FilterBuilders {
     return 'scale=w=$w:h=$h:flags=lanczos+accurate_rnd,unsharp=5:5:1.2:5:5:0.5';
   }
 
-  static String _resolveCodecArgs(
+  /// Resolves the single source of truth for video encoder arguments.
+  ///
+  /// `FfmpegCommandBuilder` is the only caller: `FilterBuilders` owns the
+  /// codec policy, the command builder owns flag placement.
+  static String resolveVideoCodecArgs(
     VideoCodec videoCodec,
     TargetResolution targetResolution,
   ) {
@@ -138,16 +141,16 @@ class FilterBuilders {
     if (targetResolution == TargetResolution.r4k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 25M -bufsize 50M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 25M -bufsize 50M $x264GopParams';
+          : '-c:v libx264 -preset faster -crf 17 -tag:v avc1 -tune film -maxrate 25M -bufsize 50M $x264GopParams';
     }
     if (targetResolution == TargetResolution.r2k) {
       return videoCodec == VideoCodec.h265
           ? '-c:v libx265 -preset faster -crf 17 -tag:v hvc1 -tune film -maxrate 20M -bufsize 40M'
-          : '-c:v libx264 -preset faster -crf 17 -tune film -maxrate 20M -bufsize 40M $x264GopParams';
+          : '-c:v libx264 -preset faster -crf 17 -tag:v avc1 -tune film -maxrate 20M -bufsize 40M $x264GopParams';
     }
     return videoCodec == VideoCodec.h265
         ? '-c:v libx265 -preset fast -crf 26 -tag:v hvc1'
-        : '-c:v libx264 -preset fast -crf 22 $x264GopParams';
+        : '-c:v libx264 -preset fast -crf 22 -tag:v avc1 $x264GopParams';
   }
 
   static List<String> _buildSpatialCrop(
@@ -212,7 +215,6 @@ class FilterBuilders {
     double cropZoomScale = 1.0,
     String cropAnchor = 'center',
     double? rotateAngle,
-    Set<UnifiedVisualEffect>? activeVisualEffects,
   }) {
     final (targetW, targetH) = canonicalDimensions(
       targetResolution,
@@ -261,14 +263,6 @@ class FilterBuilders {
       else
         'scale=trunc(iw/2)*2:trunc(ih/2)*2',
 
-      // --- TAMBAHKAN LOGIKA MULTI-SELECT VISUAL EFFECTS DI SINI ---
-      if (activeVisualEffects != null)
-        ...activeVisualEffects
-            .where((effect) => effect != UnifiedVisualEffect.none)
-            .map((effect) => buildUnifiedEffectFilter(effect))
-            .where((filterStr) => filterStr.isNotEmpty),
-      // ------------------------------------------------------------
-
       // 1. Paksa konversi frame rate (CFR) setelah semua transformasi
       'fps=$targetFps',
 
@@ -277,7 +271,6 @@ class FilterBuilders {
 
       // 3. Tambahkan watermark kotak kecil transparan (Anti-crash, tidak butuh font)
       'drawbox=x=iw-20:y=ih-20:w=10:h=10:color=white@0.05:t=fill',
-      'fifo',
       'format=yuv420p',
     ];
   }
@@ -321,7 +314,17 @@ class FilterBuilders {
     );
   }
 
-  /// Builds video filtergraph chain (-vf) with PTS, spatial transforms, scaling, enhancements, and grain.
+  /// Builds video filtergraph chain as a raw graph string.
+  ///
+  /// Contract owned by `FfmpegCommandBuilder`:
+  /// - `''`    -> no video processing required.
+  /// - `copy`  -> keep the original video stream untouched.
+  /// - simple  -> linear chain without stream labels; the caller wraps it as
+  ///             `[0:v]<chain>[vout]` inside `-filter_complex`.
+  /// - complex -> self-contained graph that starts at `[0:v]` and terminates
+  ///             with the `[vout]` label (canvas / multi-stage effects).
+  ///
+  /// Never returns `-vf`, `-af`, or codec flags: those belong to the caller.
   static String buildVideoFilter({
     required bool hasVisual,
     required bool hasAudio,
@@ -350,50 +353,86 @@ class FilterBuilders {
     Set<UnifiedVisualEffect>? activeVisualEffects,
     String? lutPath,
   }) {
-    if (!hasVisual) return hasAudio ? ' -c:v copy' : '';
+    if (!hasVisual) return hasAudio ? 'copy' : '';
     try {
       final vars =
           variations ??
           (enableDeepAntiFingerprint
               ? VariationGenerator.generate()
               : VideoVariations.fallback);
-      final vfString = enableBlurredCanvas
-          ? '${_buildCanvasChain(isPortrait: isPortrait, canvasScalePercent: canvasScalePercent, targetResolution: targetResolution, vars: vars, modifyVisuals: modifyVisuals, enableDeepAntiFingerprint: enableDeepAntiFingerprint, cropZoomScale: cropZoomScale, cropAnchor: cropAnchor, rotateAngle: rotateAngle)};[outv]${_buildPostCanvasFilters(modifyVisuals: modifyVisuals, enableHorizontalFlip: enableHorizontalFlip, enableEnhanceAndDenoise: enableEnhanceAndDenoise, enableDynamicZoom: enableDynamicZoom, enableMicroOverlay: enableMicroOverlay, enableFrameSkip: enableFrameSkip, enableChromaShift: enableChromaShift, isPortrait: isPortrait, vars: vars, targetResolution: targetResolution, upscale: upscale, upscaleEngine: upscaleEngine, targetFps: targetFps, saturationLevel: saturationLevel, sharpeningLevel: sharpeningLevel).join(',')}'
-          : _buildFiltersList(
-              modifyVisuals: modifyVisuals,
-              enableDeepAntiFingerprint: enableDeepAntiFingerprint,
-              enableHorizontalFlip: enableHorizontalFlip,
-              upscale: upscale,
-              targetResolution: targetResolution,
-              upscaleEngine: upscaleEngine,
-              enableEnhanceAndDenoise: enableEnhanceAndDenoise,
-              isPortrait: isPortrait,
-              enableDynamicZoom: enableDynamicZoom,
-              enableMicroOverlay: enableMicroOverlay,
-              enableFrameSkip: enableFrameSkip,
-              enableChromaShift: enableChromaShift,
-              vars: vars,
-              targetFps: targetFps,
-              saturationLevel: saturationLevel,
-              sharpeningLevel: sharpeningLevel,
-              cropZoomScale: cropZoomScale,
-              cropAnchor: cropAnchor,
-              rotateAngle: rotateAngle,
-              activeVisualEffects: activeVisualEffects,
-            ).join(',');
-      // LUT (color grading) is inserted immediately before the final pixel
-      // format conversion so it operates on the finished frame.
-      final lutFilter = (lutPath == null || lutPath.isEmpty)
-          ? null
-          : "lut3d='$lutPath'";
-      final vfChain = lutFilter == null
-          ? vfString
-          : vfString.replaceFirst(
-              'format=yuv420p',
-              '$lutFilter,format=yuv420p',
-            );
-      final codecArgs = _resolveCodecArgs(videoCodec, targetResolution);
-      return ' -vf "$vfChain" $codecArgs -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -movflags +faststart';
+
+      final baseFilters = _buildFiltersList(
+        modifyVisuals: modifyVisuals,
+        enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+        enableHorizontalFlip: enableHorizontalFlip,
+        upscale: upscale,
+        targetResolution: targetResolution,
+        upscaleEngine: upscaleEngine,
+        enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+        isPortrait: isPortrait,
+        enableDynamicZoom: enableDynamicZoom,
+        enableMicroOverlay: enableMicroOverlay,
+        enableFrameSkip: enableFrameSkip,
+        enableChromaShift: enableChromaShift,
+        vars: vars,
+        targetFps: targetFps,
+        saturationLevel: saturationLevel,
+        sharpeningLevel: sharpeningLevel,
+        cropZoomScale: cropZoomScale,
+        cropAnchor: cropAnchor,
+        rotateAngle: rotateAngle,
+      );
+
+      final effects = orderEffectsByStage(activeVisualEffects ?? const {});
+
+      String graph;
+      if (enableBlurredCanvas) {
+        // Canvas graphs are inherently complex: split, blur, overlay.
+        final canvas = _buildCanvasChain(
+          isPortrait: isPortrait,
+          canvasScalePercent: canvasScalePercent,
+          targetResolution: targetResolution,
+          vars: vars,
+          modifyVisuals: modifyVisuals,
+          enableDeepAntiFingerprint: enableDeepAntiFingerprint,
+          cropZoomScale: cropZoomScale,
+          cropAnchor: cropAnchor,
+          rotateAngle: rotateAngle,
+        );
+        final post = _buildPostCanvasFilters(
+          modifyVisuals: modifyVisuals,
+          enableHorizontalFlip: enableHorizontalFlip,
+          enableEnhanceAndDenoise: enableEnhanceAndDenoise,
+          enableDynamicZoom: enableDynamicZoom,
+          enableMicroOverlay: enableMicroOverlay,
+          enableFrameSkip: enableFrameSkip,
+          enableChromaShift: enableChromaShift,
+          isPortrait: isPortrait,
+          vars: vars,
+          targetResolution: targetResolution,
+          upscale: upscale,
+          upscaleEngine: upscaleEngine,
+          targetFps: targetFps,
+          saturationLevel: saturationLevel,
+          sharpeningLevel: sharpeningLevel,
+        ).join(',');
+        // The canvas stack must not swallow user-selected effects: park its
+        // output on an intermediate label and chain the effect stages after it.
+        final canvasOut = effects.isEmpty ? '[vout]' : '[vcanvas]';
+        graph = '$canvas;[outv]$post$canvasOut';
+        if (effects.isNotEmpty) {
+          graph =
+              '$graph;${_buildEffectSegments(effects, inLabel: canvasOut, canvasScalePercent: canvasScalePercent)}';
+        }
+      } else if (effects.isNotEmpty) {
+        graph =
+            '[0:v]${baseFilters.join(',')}[v0];'
+            '${_buildEffectSegments(effects, inLabel: '[v0]', canvasScalePercent: canvasScalePercent)}';
+      } else {
+        graph = baseFilters.join(',');
+      }
+
+      return _applyLut(graph, lutPath);
     } catch (_) {
       return _fallbackVideoFilter(
         hasVisual: hasVisual,
@@ -413,7 +452,57 @@ class FilterBuilders {
     }
   }
 
-  /// Builds audio filtergraph chain (-af) with tempo, EQ shaping, and optional pink noise masking.
+  /// Builds the label-isolated effect stages for [effects]:
+  /// `<inLabel><effect 1>[ve1];<effect 2>[ve2];...;<effect n>[vout]`.
+  ///
+  /// Every stage is isolated behind a distinct label so that `split`/`blend`
+  /// branches can never leak an unlabeled pad into a comma chain.
+  static String _buildEffectSegments(
+    List<UnifiedVisualEffect> effects, {
+    required String inLabel,
+    double canvasScalePercent = 95.0,
+  }) {
+    final segments = <String>[];
+    var currentIn = inLabel;
+    for (var i = 0; i < effects.length; i++) {
+      final isLast = i == effects.length - 1;
+      final segment = _buildStageSegment(
+        effects[i],
+        inTag: currentIn,
+        outTag: isLast ? '[vout]' : '[ve${i + 1}]',
+        canvasScalePercent: canvasScalePercent,
+      );
+      if (segment.isEmpty) continue;
+      segments.add(segment);
+      currentIn = isLast ? '[vout]' : '[ve${i + 1}]';
+    }
+    return segments.join(';');
+  }
+
+  /// Injects the LUT immediately before the final pixel format conversion.
+  ///
+  /// Backslashes are normalised to `/` because Android's FFmpeg build resolves
+  /// `lut3d` through a POSIX path parser.
+  static String _applyLut(String graph, String? lutPath) {
+    if (lutPath == null || lutPath.isEmpty) return graph;
+    final lutFilter = "lut3d='${lutPath.replaceAll('\\', '/')}'";
+    if (graph.contains('format=yuv420p')) {
+      return graph.replaceFirst('format=yuv420p', '$lutFilter,format=yuv420p');
+    }
+    return graph.isEmpty ? lutFilter : '$graph,$lutFilter';
+  }
+
+  /// Builds audio filtergraph chain as a raw graph string.
+  ///
+  /// Contract owned by `FfmpegCommandBuilder`:
+  /// - `''`    -> no audio processing required.
+  /// - `copy`  -> keep the original audio stream untouched.
+  /// - simple  -> linear chain without stream labels; the caller wraps it as
+  ///             `[0:a]<chain>[aout]` inside `-filter_complex`.
+  /// - complex -> self-contained graph that starts at `[0:a]` and terminates
+  ///             with the `[aout]` label (noise / subliminal masking).
+  ///
+  /// Never returns `-af` or codec flags: those belong to the caller.
   static String buildAudioFilter({
     required bool hasAudio,
     required bool hasVisual,
@@ -423,7 +512,7 @@ class FilterBuilders {
     bool muteOriginalAudio = false,
     VideoVariations? variations,
   }) {
-    if (!hasAudio) return hasVisual ? ' -c:a copy' : '';
+    if (!hasAudio) return hasVisual ? 'copy' : '';
     try {
       final vars =
           variations ??
@@ -437,17 +526,17 @@ class FilterBuilders {
       final phaseMod = modifyAudio ? ',$phaseChorus' : '';
 
       if (muteOriginalAudio) {
-        return ' -af "volume=0.01,$pitchChain,atempo=$tempo" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return 'volume=0.01,$pitchChain,atempo=$tempo';
       }
       if (enableAggressiveAudio) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.003[noise];aevalsrc=exprs=0.0008*sin(2*PI*24*t)+0.0006*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return '[0:a]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.003[noise];aevalsrc=exprs=0.0008*sin(2*PI*24*t)+0.0006*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[aout]';
       }
       if (enableDeepAntiFingerprint) {
-        return ' -af "[in]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]" -c:a aac -b:a 192k -ar 44100 -ac 2';
+        return '[0:a]$pitchChain,atempo=$tempo$phaseMod,highpass=f=60,lowpass=f=16000,equalizer=f=300:t=q:w=1.5:g=1.5,equalizer=f=3000:t=q:w=1.5:g=-1.5[a0];anoisesrc=d=60:c=pink:a=0.0015[noise];aevalsrc=exprs=0.0005*sin(2*PI*24*t)+0.0004*sin(2*PI*18200*t):d=60:s=44100[subliminal];[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[aout]';
       }
-      return ' -af "$pitchChain,atempo=$tempo$phaseMod,aresample=async=1:first_pts=0,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
+      return '$pitchChain,atempo=$tempo$phaseMod,aresample=async=1:first_pts=0,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11';
     } catch (_) {
-      return ' -af "asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11" -c:a aac -b:a 192k -ar 44100 -ac 2';
+      return 'asetrate=44100*1.012,atempo=1/1.012,atempo=1.015,chorus=0.5:0.9:50|60:0.4|0.32:0.25|0.4:2|1.2,aresample=async=1,aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,loudnorm=I=-16:TP=-1.5:LRA=11';
     }
   }
 
@@ -651,25 +740,7 @@ class FilterBuilders {
       effectiveSet = {UnifiedVisualEffect.none};
     }
 
-    String finalize(String res) {
-      if (lutPath != null && lutPath.isNotEmpty) {
-        final lutFilter = "lut3d='$lutPath'";
-        if (res.contains('format=yuv420p')) {
-          return res.replaceFirst(
-            'format=yuv420p',
-            '$lutFilter,format=yuv420p',
-          );
-        } else if (res.contains(';')) {
-          final lastSemi = res.lastIndexOf(';');
-          final prefix = res.substring(0, lastSemi + 1);
-          final lastSeg = res.substring(lastSemi + 1);
-          return '$prefix$lastSeg,$lutFilter';
-        } else {
-          return res.isEmpty ? lutFilter : '$res,$lutFilter';
-        }
-      }
-      return res;
-    }
+    String finalize(String res) => _applyLut(res, lutPath);
 
     final orderedEffects = orderEffectsByStage(effectiveSet);
 

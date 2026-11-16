@@ -438,7 +438,7 @@ void main() {
       expect(
         cmd,
         contains(
-          '[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[out]',
+          '[noise][subliminal]amix=inputs=2:duration=first:weights=0.5 0.5[dither];[a0][dither]amix=inputs=2:duration=first:weights=1 0.001[aout]',
         ),
       );
       expect(cmd, contains('atempo='));

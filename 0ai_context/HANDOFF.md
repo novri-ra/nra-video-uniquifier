@@ -3,10 +3,10 @@
 ## 1. Project DNA & Executive Summary
 - Name: `nra_video_uniquifier`
 - Version: `1.1.0+6`
-- Current Commit: Latest (Report 162: Dynamic Theme Adaptation for ErrorScreen)
+- Current Commit: Latest (Report 163: FFmpeg v7 Complex Filter Graphs, `fifo` Removal & Parameter Deduplication)
 - Branch: `development`
 - Health Status: Analyze exit 0, Test 229/229 passed, Format exit 0 (0 changed).
-- Executive Summary: Reports 123–162 delivered full 3D LUT Color Grading, Custom LUT Import, Google Sheets Webhook Telemetry & Vault Auto-Dispatch, Custom Export Directory via File Picker, Dynamic Memory Budget Complexity Scoring with 1080p creative bypass, Custom User Presets, and ErrorScreen Light/Dark Theme Adaptation. Zero Active Findings maintained across the entire repository. Application packaged for production release v1.1.0+6.
+- Executive Summary: Reports 123–163 delivered full 3D LUT Color Grading, Custom LUT Import, Google Sheets Webhook Telemetry & Vault Auto-Dispatch, Custom Export Directory via File Picker, Dynamic Memory Budget Complexity Scoring with 1080p creative bypass, Custom User Presets, ErrorScreen Light/Dark Theme Adaptation, and an FFmpeg v7 pipeline hardening pass (`fifo` removed, `-filter_complex` graph conversion, duplicate flag removal). Zero Active Findings maintained across the entire repository. Application packaged for production release v1.1.0+6.
 
 ## 2. Architecture & Core Systems
 - Built on Flutter 3.47.8 / Dart 3.13.7.
@@ -17,10 +17,11 @@
 - Flutter SDK: 3.47.8
 - Dart SDK: 3.13.7
 - Packages: provider, shared_preferences, path_provider, ffmpeg_kit_flutter_new, http (dart:io), connectivity_plus, etc.
-- Video engine: software H.264 only (`libx264 -preset fast -crf 18 -pix_fmt yuv420p -tag:v avc1`, `-hwaccel none`); hardware acceleration and H.265 are disabled.
+- Video engine: software encoding only (`-hwaccel none`); encoder policy is owned by `FilterBuilders.resolveVideoCodecArgs` (H.264 default `preset fast` / `crf 22` at 1080p, `preset faster` / `crf 17` at 2K/4K; H.265 opt-in with `-tag:v hvc1`). Hardware acceleration stays disabled.
+- Filtergraph: every processed stream is emitted through a single `-filter_complex` graph with explicit `-map "[vout]"` / `-map "[aout]"`; `-vf` / `-af` are no longer used for rendering.
 
 ## 4. Current Environment & Health
-- Git status: modified (`user_interest_service.dart`, `0ai_context/`).
+- Git status: modified (`lib/core/services/filter_builders.dart`, `lib/core/services/ffmpeg/ffmpeg_command_builder.dart`, `lib/core/services/ffmpeg_service.dart`, `test/ffmpeg_service_test.dart`, `0ai_context/`).
 - Analysis: 0 issues.
 - Tests: 229/229 passing.
 
@@ -37,7 +38,8 @@
 - `dart format --set-exit-if-changed .`
 
 ## 7. Active Milestones & Roadmap
-- v1.0.5 shipped. Zero active findings. Google Sheets telemetry integration complete.
+- v1.1.0 shipped. Zero active findings. Google Sheets telemetry integration complete.
+- Rendering pipeline hardened for FFmpeg v7.1.1 (complex graph conversion, `fifo` removal).
 
 ## 8. In-Flight Work & Open Threads
 - None. Whitelist tasks successfully completed.
@@ -53,6 +55,8 @@
 - `FfmpegService`: manages video rendering pipeline and multi-pass evasion filters.
 - `UniquifierProvider`: centralized state container coordinating modifiers, preview, and execution.
 - `lib/core/utils/path_redactor.dart`: `redactFileSystemPaths` redacts absolute filesystem paths before they reach user-visible error text.
+- `lib/core/services/filter_builders.dart`: emits raw filtergraph strings only. Complex video graphs start at `[0:v]` and end at `[vout]`; complex audio graphs start at `[0:a]` and end at `[aout]`.
+- `lib/core/services/ffmpeg/ffmpeg_command_builder.dart`: sole owner of `-filter_complex`, `-map`, codec, pixel format, CFR, and muxing-queue flags.
 - `lib/core/services/user_interest_service.dart`: `_dispatchTelemetry` now performs HTTP POST to Google Sheets Webhook when online, with ConnectivityService guard and debugPrint error handling.
 
 ```dart
@@ -100,13 +104,16 @@ static Future<void> _dispatchTelemetry(Map<String, dynamic> payload) async {
 ## 14. Troubleshooting & Known Gotchas
 - FFmpeg native method channel requires mock handling in unit tests.
 - SharedPreferences plugin binding in tests.
-- Export hangs (`100 buffers queued`) on Android 15+ if hardware encoding is allowed; use `libx264` only.
+- Export hangs (`100 buffers queued`) on Android 15+ if hardware encoding is allowed; use software `libx264` only.
+- **FFmpeg v7 gotcha**: the `fifo` filter no longer exists — never re-add it to a chain; use `-max_muxing_queue_size 4096` (declared exactly once) for queue depth.
+- **FFmpeg v7 gotcha**: labelled graphs (`[outv]`, `[aout]`, `[bg]`, ...) must be passed via `-filter_complex` + `-map`, never `-vf` / `-af`.
+- **LUT paths**: always normalise to forward slashes and wrap in single quotes (`lut3d='<path>'`) so Android accepts paths containing spaces.
 - Telemetry data only sent when device is online; silent offline fallback preserves battery and UI responsiveness.
 - **Policy Clarification (`AUDIT-20261108-028`)**: Video basenames (e.g., `video.mp4`) are explicitly permitted in `debugPrint` for diagnostic tracing, but absolute filesystem paths must strictly be redacted via `redactFileSystemPaths`.
 - **Accepted Risk (`AUDIT-20261108-027`)**: MCP index tooling may intermittently fail with exit code 1 on the first run. The mapper must retry once before aborting.
 
 ## 15. Next Immediate Actions
-- Proceed to Task 163 (Rebuild APK & Real Device Testing).
+- Proceed to Task 164 (Rebuild APK & Real Device Testing) to validate the FFmpeg v7 pipeline on the device that logged `No such filter: fifo`.
 
 ## 16. Release Verification & Sign-Off
 - Version: `1.1.0+6`

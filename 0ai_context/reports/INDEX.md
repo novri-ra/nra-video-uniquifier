@@ -41,6 +41,7 @@ moved into the current phase folder once that phase closes.
 - **160** — Release v1.1.0+6 Final Release & Production APK Build (`reports/160-release-v1.1.0.md`).
 - **161** — Bypass OOM Guard for 1080p Resolution (`reports/161-fix-bypass-oom-for-1080p.md`).
 - **162** — Dynamic Theme Adaptation for ErrorScreen (`reports/162-fix-error-screen-theme.md`).
+- **163** — FFmpeg v7 Complex Filter Graphs, `fifo` Removal & Parameter Deduplication (`reports/163-fix-ffmpeg-complex-graphs.md`).
 
 See `0ai_context/findings.json` for the authoritative finding state and
 `0ai_context/index.json` for report→path mappings.

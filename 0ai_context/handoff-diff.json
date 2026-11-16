@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T15:20:00Z",
+  "generated_at": "2026-11-16T01:38:23Z",
   "previous_handoff": "0ai_context/raw/handoff-diff.json",
   "resolved": [],
   "added": [],
@@ -11,7 +11,8 @@
     "REPORT-159": "Custom User Presets: added JSON persistence in SettingsService, saveCurrentAsPreset & loadCustomPreset in UniquifierPresetMixin, and dynamic preset chips with + Save Preset dialog in ModifiersCard. Zero analyze issues. 229/229 tests passed.",
     "REPORT-160": "Release v1.1.0+6: bumped version to 1.1.0+6 in pubspec.yaml, updated CHANGELOG.md, compiled production release APK, and synchronized Context Mapping. Zero analyze issues. 229/229 tests passed.",
     "REPORT-161": "Bypass OOM Guard for 1080p: added total bypass for targetResolution == TargetResolution.r1080p in FfmpegService._isHighOomRisk, allowing unrestricted visual effects on 1080p while keeping 2K/4K budget limits. Zero analyze issues. 229/229 tests passed.",
-    "REPORT-162": "Dynamic Theme Adaptation for ErrorScreen: replaced hardcoded dark palette tokens with dynamic Theme.of(context).colorScheme tokens across Scaffold, HeroHeader, DiagnosticsLog, TelemetryLogBox, RecommendedFixes, and ActionButtons, fixing low contrast in Light Mode. Zero analyze issues. 229/229 tests passed."
+    "REPORT-162": "Dynamic Theme Adaptation for ErrorScreen: replaced hardcoded dark palette tokens with dynamic Theme.of(context).colorScheme tokens across Scaffold, HeroHeader, DiagnosticsLog, TelemetryLogBox, RecommendedFixes, and ActionButtons, fixing low contrast in Light Mode. Zero analyze issues. 229/229 tests passed.",
+    "REPORT-163": "FFmpeg v7 Complex Filter Graphs: removed the deleted `fifo` filter, converted FilterBuilders to raw graph emitters (complex video `[0:v]…[vout]`, audio `[0:a]…[aout]`), made FfmpegCommandBuilder the single `-filter_complex`/`-map`/codec authority, removed duplicate `-max_muxing_queue_size 20` and trailing hardcoded codec flags, chained canvas+effect graphs, forwarded lutPath to exports, and normalised LUT paths to `/` for Android. Zero analyze issues. 229/229 tests passed."
   },
   "health_change": {
     "analyze": "0 -> 0",
